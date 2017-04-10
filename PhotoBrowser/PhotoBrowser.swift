@@ -31,7 +31,7 @@ public protocol PhotoBrowserDelegate {
 }
 
 /// 适配器
-extension PhotoBrowserDelegate {
+public extension PhotoBrowserDelegate {
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex: Int) -> UIImage? {
         return nil
     }
