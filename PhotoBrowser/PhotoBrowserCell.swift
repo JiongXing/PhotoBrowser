@@ -26,6 +26,11 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
+    /// 内嵌容器。本类不能继承UIScrollView。
+    /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
+    /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
+    fileprivate let scrollView = UIScrollView()
+    
     /// 图像加载视图
     public let imageView = UIImageView()
     
@@ -58,11 +63,6 @@ public class PhotoBrowserCell: UICollectionViewCell {
         let y = (scrollView.bounds.height - size.height) > 0 ? (scrollView.bounds.height - size.height) * 0.5 : 0
         return CGRect(x: 0, y: y, width: size.width, height: size.height)
     }
-    
-    /// 内嵌容器。本类不能继承UIScrollView。
-    /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
-    /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
-    private let scrollView = UIScrollView()
     
     /// 记录pan手势开始时imageView的位置
     private var beganFrame = CGRect.zero
@@ -112,7 +112,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 布局
-    public func doLayout() {
+    private func doLayout() {
         scrollView.frame = contentView.bounds
         imageView.frame = fitFrame
         scrollView.setZoomScale(1.0, animated: false)
@@ -123,6 +123,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     public func setImage(_ image: UIImage, url: URL?) {
         guard url != nil else {
             imageView.image = image
+            doLayout()
             return
         }
         
@@ -134,6 +135,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
             }
         }, completionHandler: { (image, error, cacheType, url) in
             weakSelf?.progressView.isHidden = true
+            weakSelf?.doLayout()
         })
     }
     
@@ -241,6 +243,10 @@ extension PhotoBrowserCell: UIGestureRecognizerDelegate {
         }
         // 横向滑动时，不响应pan手势
         if abs(Int(velocity.x)) > Int(velocity.y) {
+            return false
+        }
+        // 向下滑动，如果图片顶部超出可视区域，不响应手势
+        if scrollView.contentOffset.y > 0 {
             return false
         }
         return true

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 // MARK: - PhotoBrowserDelegate
 public protocol PhotoBrowserDelegate {
@@ -148,12 +149,12 @@ public class PhotoBrowser: UIViewController {
         
         // 立即加载collectionView
         let indexPath = IndexPath(item: currentIndex, section: 0)
+        collectionView.reloadData()
         collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
         collectionView.layoutIfNeeded()
         // 取当前应显示的cell，完善转场动画器的设置
         if let cell = collectionView.cellForItem(at: indexPath) as? PhotoBrowserCell {
             presentationAnimator?.endView = cell.imageView
-            
             let imageView = UIImageView(image: cell.imageView.image)
             imageView.contentMode = imageScaleMode
             imageView.clipsToBounds = true
@@ -164,7 +165,6 @@ public class PhotoBrowser: UIViewController {
     override public func viewDidAppear(_ animated: Bool) {
         if isShowPageControl {
             pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - 20)
-            
         }
     }
     
@@ -184,19 +184,37 @@ extension PhotoBrowser: UICollectionViewDataSource {
         cell.photoBrowserCellDelegate = self
         
         let index = indexPath.item
-        var image: UIImage
-        var url: URL?
-        // 优先用本地图片。如无，再加载网络图片
-        if let highQualityImage = photoBrowserDelegate.photoBrowser(self, highQualityImageForIndex: index) {
-            image = highQualityImage
-        } else {
-            let thumbnailImage = photoBrowserDelegate.photoBrowser(self, thumbnailImageForIndex: index)
-            image = thumbnailImage
-            url = photoBrowserDelegate.photoBrowser(self, highQualityUrlStringForIndex: index)
-        }
+        let (image, url) = imageFor(index: index)
         cell.setImage(image, url: url)
-        cell.doLayout()
         return cell
+    }
+    
+    /// 取已有图像，若有高清图，只返回高清图，否则返回缩略图和url
+    private func imageFor(index: Int) -> (UIImage, URL?) {
+        if let highQualityImage = photoBrowserDelegate.photoBrowser(self, highQualityImageForIndex: index) {
+            return (highQualityImage, nil)
+        }
+        var highQualityUrl: URL?
+        if let url = photoBrowserDelegate.photoBrowser(self, highQualityUrlStringForIndex: index) {
+            var cacheImage: UIImage?
+            let result = KingfisherManager.shared.cache.isImageCached(forKey: url.cacheKey)
+            if result.cached, let cacheType = result.cacheType {
+                switch cacheType {
+                case .memory:
+                    cacheImage = KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: url.cacheKey)
+                case .disk:
+                    cacheImage = KingfisherManager.shared.cache.retrieveImageInDiskCache(forKey: url.cacheKey)
+                default:
+                    cacheImage = nil
+                }
+            }
+            if cacheImage != nil {
+                return (cacheImage!, nil)
+            }
+            highQualityUrl = url
+        }
+        let thumbnailImage = photoBrowserDelegate.photoBrowser(self, thumbnailImageForIndex: index)
+        return (thumbnailImage, highQualityUrl)
     }
 }
 
