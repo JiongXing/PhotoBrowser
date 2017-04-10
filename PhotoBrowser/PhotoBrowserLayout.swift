@@ -47,7 +47,6 @@ public class PhotoBrowserLayout: UICollectionViewFlowLayout {
     override public func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         // 页码
         var page = round(proposedContentOffset.x / pageWidth)
-        print("flowLayout offset.x:\(proposedContentOffset.x), velocity:\(velocity), lastPage:\(lastPage), page:\(page)")
         // 处理轻微滑动
         if velocity.x > 0.2 {
             page += 1
@@ -66,7 +65,6 @@ public class PhotoBrowserLayout: UICollectionViewFlowLayout {
         } else if page < minPage {
             page = minPage
         }
-        print("page调整完毕:\(page)")
         lastPage = page
         return CGPoint(x: page * pageWidth, y: 0)
     }

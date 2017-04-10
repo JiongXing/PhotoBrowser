@@ -235,7 +235,6 @@ extension PhotoBrowserCell: UIGestureRecognizerDelegate {
             return true
         }
         let velocity = pan.velocity(in: self)
-        print("pan手势 velocity:\(velocity)")
         // 向上滑动时，不响应手势
         if velocity.y < 0 {
             return false
