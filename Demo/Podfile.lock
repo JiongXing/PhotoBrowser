@@ -1,0 +1,16 @@
+PODS:
+  - JXPhotoBrowser (0.1.5):
+    - Kingfisher
+  - Kingfisher (3.6.1)
+
+DEPENDENCIES:
+  - JXPhotoBrowser
+  - Kingfisher
+
+SPEC CHECKSUMS:
+  JXPhotoBrowser: b6fe0ce878a530dbb854cbf6c9b0238ae4571748
+  Kingfisher: 2f31cb75f3e98d3d4c406cbdcd9b263e956cfa67
+
+PODFILE CHECKSUM: 471493a1fc6781c8633a2629a40770fc243ad04e
+
+COCOAPODS: 1.2.0

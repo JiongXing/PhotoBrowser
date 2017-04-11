@@ -1,0 +1,10 @@
+platform :ios, '8.0'
+
+target 'PhotoBrowser' do
+  
+  use_frameworks!
+  
+  pod 'Kingfisher'
+  pod 'JXPhotoBrowser'
+
+end
