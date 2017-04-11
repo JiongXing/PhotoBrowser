@@ -22,7 +22,7 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
 
 public class PhotoBrowserCell: UICollectionViewCell {
     // MARK: - 属性
-
+    
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
@@ -126,11 +126,10 @@ public class PhotoBrowserCell: UICollectionViewCell {
             doLayout()
             return
         }
-        
+        self.progressView.isHidden = false
         weak var weakSelf = self
         imageView.kf.setImage(with: url, placeholder: image, options: nil, progressBlock: { (receivedSize, totalSize) in
             if totalSize > 0 {
-                weakSelf?.progressView.isHidden = false
                 weakSelf?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
             }
         }, completionHandler: { (image, error, cacheType, url) in
@@ -206,7 +205,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         let size = fitSize
         let needResetSize = imageView.bounds.size.width < size.width
             || imageView.bounds.size.height < size.height
-        UIView.animate(withDuration: 0.25) { 
+        UIView.animate(withDuration: 0.25) {
             self.imageView.center = self.centerOfContentSize
             if needResetSize {
                 self.imageView.bounds.size = size
