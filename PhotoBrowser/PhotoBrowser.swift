@@ -182,9 +182,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self), for: indexPath) as! PhotoBrowserCell
         cell.imageView.contentMode = imageScaleMode
         cell.photoBrowserCellDelegate = self
-        
-        let index = indexPath.item
-        let (image, url) = imageFor(index: index)
+        let (image, url) = imageFor(index: indexPath.item)
         cell.setImage(image, url: url)
         return cell
     }

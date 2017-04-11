@@ -137,6 +137,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
             weakSelf?.progressView.isHidden = true
             weakSelf?.doLayout()
         })
+        self.doLayout()
     }
     
     func onSingleTap() {
