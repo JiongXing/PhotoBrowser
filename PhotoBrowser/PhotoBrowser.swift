@@ -121,6 +121,7 @@ public class PhotoBrowser: UIViewController {
         currentIndex = index
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
+        self.modalPresentationCapturesStatusBarAppearance = true
         presentingVC.present(self, animated: true, completion: nil)
     }
     
@@ -162,7 +163,7 @@ public class PhotoBrowser: UIViewController {
         }
     }
     
-    override public func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         if isShowPageControl {
             pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - 20)
         }
@@ -170,6 +171,10 @@ public class PhotoBrowser: UIViewController {
     
     override public var shouldAutorotate: Bool {
         return false
+    }
+    
+    public override var prefersStatusBarHidden: Bool {
+        return true
     }
 }
 
