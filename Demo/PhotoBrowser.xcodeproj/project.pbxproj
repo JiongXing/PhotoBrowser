@@ -127,6 +127,7 @@
 				TargetAttributes = {
 					945391691E713A4C00A9AF66 = {
 						CreatedOnToolsVersion = 8.2.1;
+						DevelopmentTeam = 4Z74PJAKUM;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -333,7 +334,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4Z74PJAKUM;
 				INFOPLIST_FILE = PhotoBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ljx.PhotoBrowser;
@@ -349,7 +350,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4Z74PJAKUM;
 				INFOPLIST_FILE = PhotoBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ljx.PhotoBrowser;
