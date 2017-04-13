@@ -26,13 +26,13 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
+    /// 图像加载视图
+    public let imageView = UIImageView()
+    
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
     fileprivate let scrollView = UIScrollView()
-    
-    /// 图像加载视图
-    public let imageView = UIImageView()
     
     /// 加载进度指示器
     fileprivate let progressView = PhotoBrowserProgressView()
@@ -114,6 +114,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 布局
     private func doLayout() {
         scrollView.frame = contentView.bounds
+        scrollView.setZoomScale(1.0, animated: false)
         imageView.frame = fitFrame
         scrollView.setZoomScale(1.0, animated: false)
         progressView.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.midY)
@@ -188,8 +189,10 @@ public class PhotoBrowserCell: UICollectionViewCell {
             }
         case .ended, .cancelled:
             if pan.velocity(in: self).y > 0 {
+                // dismiss
                 onSingleTap()
             } else {
+                // 取消dismiss
                 endPan()
             }
         default:

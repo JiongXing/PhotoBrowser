@@ -100,7 +100,7 @@ public class PhotoBrowser: UIViewController {
     
     // MARK: - 方法
     
-    /// 初始化，传入用于present本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
+    /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
     public init(showByViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate) {
         self.presentingVC = presentingVC
         self.photoBrowserDelegate = delegate
@@ -113,7 +113,7 @@ public class PhotoBrowser: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    /// 展示
+    /// 展示，传入图片序号，从0开始
     public func show(index: Int) {
         if isShowPageControl {
             pageControl.numberOfPages = self.photoBrowserDelegate.numberOfPhotos(in: self)
@@ -125,7 +125,13 @@ public class PhotoBrowser: UIViewController {
         presentingVC.present(self, animated: true, completion: nil)
     }
     
-    override public func viewDidLoad() {
+    /// 便利的展示方法，合并init和show两个步骤
+    public class func show(byViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate, index: Int) {
+        let vc = PhotoBrowser(showByViewController: presentingVC, delegate: delegate)
+        vc.show(index: index)
+    }
+    
+    public override func viewDidLoad() {
         super.viewDidLoad()
         // flowLayout
         flowLayout.minimumLineSpacing = photoSpacing
@@ -163,16 +169,19 @@ public class PhotoBrowser: UIViewController {
         }
     }
     
+    /// 页面出来后，再显示pageControl
     public override func viewDidAppear(_ animated: Bool) {
         if isShowPageControl {
             pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - 20)
         }
     }
     
+    /// 禁止旋转
     override public var shouldAutorotate: Bool {
         return false
     }
     
+    /// 隐藏状态栏
     public override var prefersStatusBarHidden: Bool {
         return true
     }

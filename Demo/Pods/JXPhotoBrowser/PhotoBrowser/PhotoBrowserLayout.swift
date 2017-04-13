@@ -44,6 +44,7 @@ public class PhotoBrowserLayout: UICollectionViewFlowLayout {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 调整scroll停下来的位置
     override public func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         // 页码
         var page = round(proposedContentOffset.x / pageWidth)

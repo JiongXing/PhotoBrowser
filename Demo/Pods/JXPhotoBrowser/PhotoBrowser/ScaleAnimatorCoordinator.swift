@@ -8,19 +8,8 @@
 
 import UIKit
 
-protocol ScaleAnimatorCoordinatorDelegate: NSObjectProtocol {
-    /// 转场动画即将开始时回调
-    func scaleTransitionWillBegin(isBeingPresented: Bool)
-}
-
-extension ScaleAnimatorCoordinatorDelegate {
-    func scaleTransitionWillBegin(isBeingPresented: Bool) {}
-}
-
 public class ScaleAnimatorCoordinator: UIPresentationController {
     
-    weak var animatorDelegate: ScaleAnimatorCoordinatorDelegate?
-
     /// 动画结束后需要隐藏的view
     public var currentHiddenView: UIView?
     
@@ -39,9 +28,6 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
     }
     
     override public func presentationTransitionWillBegin() {
-        if let dlg = animatorDelegate {
-            dlg.scaleTransitionWillBegin(isBeingPresented: true)
-        }
         super.presentationTransitionWillBegin()
         guard let containerView = self.containerView else { return }
         
@@ -55,9 +41,6 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
     }
     
     override public func dismissalTransitionWillBegin() {
-        if let dlg = animatorDelegate {
-            dlg.scaleTransitionWillBegin(isBeingPresented: false)
-        }
         super.dismissalTransitionWillBegin()
         currentHiddenView?.isHidden = true
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
