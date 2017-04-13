@@ -1,4 +1,7 @@
 # PhotoBrowser
+![](https://img.shields.io/badge/platform-iOS-green.svg)
+![](https://img.shields.io/badge/swift-3.0-green.svg)
+![](https://img.shields.io/badge/pod-v0.1.7-green.svg)
 
 #  缘起
 那时，我想要一个这样的图片浏览器：
