@@ -103,12 +103,19 @@ extension MomentsViewController: UICollectionViewDelegate {
             return
         }
         selectedCell = cell
-        // 开始图片浏览之前，所有缩略图必须都已准备完毕
+        // 开始图片浏览之前，所有thumbnailImage必须都能取得到
         let vc = PhotoBrowser(showByViewController: self, delegate: self)
+        // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
+        if arc4random_uniform(2) % 2 == 0 {
+            vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: imageArray.count)
+        } else {
+            vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: imageArray.count)
+        }
         vc.show(index: indexPath.item)
     }
 }
 
+// 实现浏览器代理协议
 extension MomentsViewController: PhotoBrowserDelegate {
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
         return imageArray.count
@@ -120,7 +127,7 @@ extension MomentsViewController: PhotoBrowserDelegate {
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage {
         let cell = collectionView!.cellForItem(at: IndexPath(item: index, section: 0)) as! MomentsPhotoCollectionViewCell
-        // 强制取缩略图
+        // 取thumbnailImage
         return cell.imageView.image!
     }
     
@@ -132,14 +139,10 @@ extension MomentsViewController: PhotoBrowserDelegate {
         print("长按，图片size:\(image.size)")
     }
     
-    /*
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex index: Int) -> UIImage? {
-        return imageArray[index]
-    }*/
+    /*// 指定本地图片作为highQualityImage
+     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex index: Int) -> UIImage? {
+     return imageArray[index]
+     }*/
 }
-
-
-
-
 
 

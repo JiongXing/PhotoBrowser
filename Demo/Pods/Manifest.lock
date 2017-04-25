@@ -1,5 +1,5 @@
 PODS:
-  - JXPhotoBrowser (0.1.7):
+  - JXPhotoBrowser (0.1.10):
     - Kingfisher
   - Kingfisher (3.6.2)
 
@@ -8,7 +8,7 @@ DEPENDENCIES:
   - Kingfisher
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: d3447f737d69c78df21c93f9cefa69ebefcddc28
+  JXPhotoBrowser: e98e625891abd82f463fdd35db6e1ba5b74f3583
   Kingfisher: 2c94e72c6830622c71d06adf4ea024c37d316830
 
 PODFILE CHECKSUM: 471493a1fc6781c8633a2629a40770fc243ad04e

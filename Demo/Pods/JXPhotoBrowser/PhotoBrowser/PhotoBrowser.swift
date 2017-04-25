@@ -27,11 +27,11 @@ public protocol PhotoBrowserDelegate {
     /// 实现本方法以返回高质量图片的url。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlStringForIndex index: Int) -> URL?
     
-    /// 长按时回调
+    /// 长按时回调。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
 }
 
-/// 适配器
+/// PhotoBrowserDelegate适配器
 public extension PhotoBrowserDelegate {
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex: Int) -> UIImage? {
         return nil
@@ -42,15 +42,39 @@ public extension PhotoBrowserDelegate {
     }
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {}
+    
+    func pageControlOfPhotoBrowser<T: UIView>(_ photoBrowser: PhotoBrowser) -> T? {
+        return nil
+    }
+}
+
+// MARK: - PhotoBrowserPageControl
+public protocol PhotoBrowserPageControlDelegate {
+    
+    /// 取PageControl，只会取一次
+    func pageControlOfPhotoBrowser(_ photoBrowser: PhotoBrowser) -> UIView
+    
+    /// 添加到父视图上时调用
+    func photoBrowserPageControl(_ pageControl: UIView, didMoveTo superView: UIView)
+    
+    /// 让pageControl布局时调用
+    func photoBrowserPageControl(_ pageControl: UIView, needLayoutIn superView: UIView)
+    
+    /// 页码变更时调用
+    func photoBrowserPageControl(_ pageControl: UIView, didChangedCurrentPage currentPage: Int)
 }
 
 // MARK: - PhotoBrowser
 
 public class PhotoBrowser: UIViewController {
+    
     // MARK: - 属性
     
     /// 实现了PhotoBrowserDelegate协议的对象
     public var photoBrowserDelegate: PhotoBrowserDelegate
+    
+    /// 实现了PhotoBrowserPageControlDelegate协议的对象
+    public var pageControlDelegate: PhotoBrowserPageControlDelegate?
     
     /// 左右两张图之间的间隙
     public var photoSpacing: CGFloat = 30
@@ -58,20 +82,14 @@ public class PhotoBrowser: UIViewController {
     /// 图片缩放模式
     public var imageScaleMode = UIViewContentMode.scaleAspectFill
     
-    /// 是否显示pageControl。默认true
-    public var isShowPageControl = true {
-        didSet {
-            pageControl.isHidden = !isShowPageControl
-        }
-    }
-    
     /// 当前显示的图片序号，从0开始
     fileprivate var currentIndex = 0 {
         didSet {
             animatorCoordinator?.updateCurrentHiddenView(relatedView)
-            if isShowPageControl {
-                pageControl.currentPage = currentIndex
+            guard let dlg = pageControlDelegate, let pageControl = self.pageControl else {
+                return
             }
+            dlg.photoBrowserPageControl(pageControl, didChangedCurrentPage: currentIndex)
         }
     }
     
@@ -96,7 +114,16 @@ public class PhotoBrowser: UIViewController {
     private let flowLayout: PhotoBrowserLayout
     
     /// PageControl
-    fileprivate let pageControl = UIPageControl()
+    lazy private var pageControl: UIView? = {
+        [unowned self] in
+        guard let dlg = self.pageControlDelegate else {
+            return nil
+        }
+        return dlg.pageControlOfPhotoBrowser(self)
+    }()
+    
+    /// 标记第一次viewDidAppeared
+    private var onceViewDidAppeared = false
     
     // MARK: - 方法
     
@@ -115,9 +142,6 @@ public class PhotoBrowser: UIViewController {
     
     /// 展示，传入图片序号，从0开始
     public func show(index: Int) {
-        if isShowPageControl {
-            pageControl.numberOfPages = self.photoBrowserDelegate.numberOfPhotos(in: self)
-        }
         currentIndex = index
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
@@ -148,12 +172,6 @@ public class PhotoBrowser: UIViewController {
         collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
         view.addSubview(collectionView)
         
-        // pageControl
-        if isShowPageControl {
-            pageControl.sizeToFit()
-            view.addSubview(pageControl)
-        }
-        
         // 立即加载collectionView
         let indexPath = IndexPath(item: currentIndex, section: 0)
         collectionView.reloadData()
@@ -171,13 +189,20 @@ public class PhotoBrowser: UIViewController {
     
     /// 页面出来后，再显示pageControl
     public override func viewDidAppear(_ animated: Bool) {
-        if isShowPageControl {
-            pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - 20)
+        guard let dlg = pageControlDelegate else {
+            return
         }
+        if !onceViewDidAppeared, let pc = pageControl {
+            onceViewDidAppeared = true
+            
+            view.addSubview(pc)
+            dlg.photoBrowserPageControl(pc, didMoveTo: view)
+        }
+        dlg.photoBrowserPageControl(self.pageControl!, needLayoutIn: view)
     }
     
     /// 禁止旋转
-    override public var shouldAutorotate: Bool {
+    public override var shouldAutorotate: Bool {
         return false
     }
     
