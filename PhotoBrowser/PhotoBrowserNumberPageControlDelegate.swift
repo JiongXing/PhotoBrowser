@@ -9,7 +9,7 @@
 import UIKit
 
 /// 给图片浏览器提供一个数字样式的PageControl
-class PhotoBrowserNumberPageControlDelegate: PhotoBrowserPageControlDelegate {
+public class PhotoBrowserNumberPageControlDelegate: PhotoBrowserPageControlDelegate {
     /// 总页数
     public var numberOfPages: Int
     
