@@ -22,7 +22,7 @@ public class PhotoBrowserNumberPageControlDelegate: PhotoBrowserPageControlDeleg
     /// 中心点Y坐标
     public var centerY: CGFloat = 30
     
-    init(numberOfPages: Int) {
+    public init(numberOfPages: Int) {
         self.numberOfPages = numberOfPages
     }
     

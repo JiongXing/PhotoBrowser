@@ -13,7 +13,7 @@ public class PhotoBrowserDefaultPageControlDelegate: PhotoBrowserPageControlDele
     /// 总页数
     public var numberOfPages: Int
     
-    init(numberOfPages: Int) {
+    public init(numberOfPages: Int) {
         self.numberOfPages = numberOfPages
     }
     
