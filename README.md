@@ -1,5 +1,5 @@
 # JXPhotoBrowser
-![](https://img.shields.io/badge/platform-iOS%208.0%2B-green.svg)
+![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
 ![](https://img.shields.io/badge/pod-v0.1.10-green.svg)
 
@@ -8,14 +8,19 @@
 - 从小图进入大图浏览时，使用转场动画
 - 可加载网络图片，且过渡自然，不阻塞操作
 - 可各种姿势玩弄图片，且过渡自然，不阻塞操作
-- 可以在往下拉时，给我缩小，背景变半透明，我要看见底下的东西
-- 总之就是语言无法描述的狂拽炫酷x炸天的效果...(那是啥效果...)
-
-很遗憾，久寻无果，于是我决定自己造一个。
+- 可以在往下拽时，尺寸随位移缩小，背景半透明，要能看见底下的场景
+- 反正就是各种效果啦...
 
 ![PhotoBrowser.png](http://upload-images.jianshu.io/upload_images/2419179-9cc2a64dba3c237f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
 
-# 如何调起图片浏览器
+很遗憾，久寻无果，于是我决定自己造一个。
+
+# Requirements
+- iOS 8.0+
+- Swift 3.0+
+- Xcode 8.1+
+
+# 调起方式
 由于我们打算使用转场动画，所以在容器的选择上，只能使用UIViewController，那就让我们的类继承它吧：
 ```swift
 public class PhotoBrowser: UIViewController
@@ -42,7 +47,7 @@ public init(showByViewController presentingVC: UIViewController) {
 }
 ```
 
-# 如何向图片浏览器传递数据
+# 传递数据
 作为一个图片浏览器，它需要知道哪些关键信息？
 - 一共有多少张图片
 - 第n张图片它的缩略图，或者说占位图，是什么
@@ -897,33 +902,62 @@ public class PhotoBrowserProgressView: UIView {
 
 ![加载图络图片.gif](http://upload-images.jianshu.io/upload_images/2419179-df7348d08250124f.gif?imageMogr2/auto-orient/strip)
 
-# 其它
-**PageControl**
-默认开启了页码指示器pageControl，在PhotoBrowser完全渲染出现于屏幕时，pageControl才会出现，并正确指示当前页。
+#页码指示器#
+为了框架适用性，PhotoBrowser内部并没有内嵌PageControl，而是以协议的方式支持装配一个PageControl。
+
 ```swift
-public override func viewDidLoad() {
-    ...
-    if isShowPageControl {
-        pageControl.sizeToFit()
-        view.addSubview(pageControl)
-    }
+// MARK: - PhotoBrowserPageControl
+public protocol PhotoBrowserPageControlDelegate {
+    
+    /// 取PageControl，只会取一次
+    func pageControlOfPhotoBrowser(_ photoBrowser: PhotoBrowser) -> UIView
+    
+    /// 添加到父视图上时调用
+    func photoBrowserPageControl(_ pageControl: UIView, didMoveTo superView: UIView)
+    
+    /// 让pageControl布局时调用
+    func photoBrowserPageControl(_ pageControl: UIView, needLayoutIn superView: UIView)
+    
+    /// 页码变更时调用
+    func photoBrowserPageControl(_ pageControl: UIView, didChangedCurrentPage currentPage: Int)
 }
-public override func viewDidAppear(_ animated: Bool) {
-    if isShowPageControl {
-        pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - 20)
-    }
-}
-```
-之所以让它在这个时机出现，是为了不影响转场动画的视觉效果。
-如果不需要pageControl，可以设置public属性`isShowPageControl`：
-```swift
-browser.isShowPageControl = false
 ```
 
+同时为了方便使用，我提供了两个写好的实现了`PhotoBrowserPageControlDelegate`协议的类，它们分别是：
+- ```swift 
+/// 给图片浏览器提供一个UIPageControl
+public class PhotoBrowserDefaultPageControlDelegate: PhotoBrowserPageControlDelegate
+```
+
+![UIPageControl.png](http://upload-images.jianshu.io/upload_images/2419179-dd60f14462ea5114.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- ```swift 
+/// 给图片浏览器提供一个数字样式的PageControl
+public class PhotoBrowserNumberPageControlDelegate: PhotoBrowserPageControlDelegate
+```
+
+![数字样式PageControl.png](http://upload-images.jianshu.io/upload_images/2419179-66fc50b9420e69e2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+使用方法是装配式的，只需为图片浏览器指定代理即可：
+```swift
+let vc = PhotoBrowser(showByViewController: self, delegate: self)
+// 装配PageControl，这里示例随机选择一种PageControl实现
+if arc4random_uniform(2) % 2 == 0 {
+    vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: imageArray.count)
+} else {
+    vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: imageArray.count)
+}
+vc.show(index: indexPath.item)
+```
+
+如果框架的两个样式都无法满足需求时，也可自己实现PageControl协议，自由定制。
+
 # CocoaPods
-库已上传CocoaPods，现可直接导入：
+已上传CocoaPods，现可直接导入：
 ```
 pod 'JXPhotoBrowser'
 ```
 
+# 源码
+GitHub地址: [PhotoBrowser](https://github.com/JiongXing/PhotoBrowser)
 若使用过程中有任何问题，请拼命issues我。 ^_^
