@@ -1,7 +1,7 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-iOS%208.0%2B-green.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
-![](https://img.shields.io/badge/pod-v0.1.7-green.svg)
+![](https://img.shields.io/badge/pod-v0.1.10-green.svg)
 
 #  缘起
 那时，我想要一个这样的图片浏览器：
@@ -13,7 +13,7 @@
 
 很遗憾，久寻无果，于是我决定自己造一个。
 
-![PhotoBrowser.png](http://upload-images.jianshu.io/upload_images/2419179-9cc2a64dba3c237f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/620)
+![PhotoBrowser.png](http://upload-images.jianshu.io/upload_images/2419179-9cc2a64dba3c237f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
 
 # 如何调起图片浏览器
 由于我们打算使用转场动画，所以在容器的选择上，只能使用UIViewController，那就让我们的类继承它吧：
