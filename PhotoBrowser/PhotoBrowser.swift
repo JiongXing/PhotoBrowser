@@ -114,8 +114,7 @@ public class PhotoBrowser: UIViewController {
     private let flowLayout: PhotoBrowserLayout
     
     /// PageControl
-    private lazy var pageControl: UIView? = {
-        [unowned self] in
+    private lazy var pageControl: UIView? = { [unowned self] in
         guard let dlg = self.pageControlDelegate else {
             return nil
         }
@@ -190,14 +189,9 @@ public class PhotoBrowser: UIViewController {
         }
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // 遮盖状态栏
-        coverStatusBar(true)
-    }
-    
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         // 页面出来后，再显示pageControl
         guard let dlg = pageControlDelegate else {
             return
@@ -209,6 +203,9 @@ public class PhotoBrowser: UIViewController {
             dlg.photoBrowserPageControl(pc, didMoveTo: view)
         }
         dlg.photoBrowserPageControl(self.pageControl!, needLayoutIn: view)
+        
+        // 遮盖状态栏
+        coverStatusBar(true)
     }
     
     /// 禁止旋转
