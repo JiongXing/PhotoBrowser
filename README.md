@@ -116,20 +116,6 @@ public class func show(byViewController presentingVC: UIViewController, delegate
 PhotoBrowser.show(byViewController: self, delegate: self, index: indexPath.item)
 ```
 
-# 隐藏状态栏
-图片浏览过程中并不需要状态栏StatusBar，应当隐藏。
-iOS7后，能控制状态栏的类有两个，`UIApplication`和`UIViewController`，两者只能取其一，默认情况下，由各`UIViewController`独立控制自己的状态栏。
-于是，隐藏状态栏就有两种办法：
-- 重写UIViewController的`prefersStatusBarHidden`属性/方法，并返回`true`来隐藏状态栏
-- 在`info.plist`中取消`UIViewController`的控制权，即设置`View controller-based status bar appearance`为`NO`，然后再设置`UIApplication.shared.isStatusBarHidden = false`
-
-作为一个框架，不应该设置全局属性，不应该操作UIApplication，而且从解耦角度来说就更不应该了。所以我们只负责自己Controller视图的状态栏：
-```swift
-public override var prefersStatusBarHidden: Bool {
-    return true
-}
-```
-
 # 横向滑动布局
 嗯，这是个横向的`TableView`，我们用`UICollectionView`来做吧。
 ```swift
@@ -901,6 +887,83 @@ public class PhotoBrowserProgressView: UIView {
 ```
 
 ![加载图络图片.gif](http://upload-images.jianshu.io/upload_images/2419179-df7348d08250124f.gif?imageMogr2/auto-orient/strip)
+
+# 隐藏状态栏
+图片浏览过程中并不需要状态栏StatusBar，应当隐藏。
+iOS7后，能控制状态栏的类有两个，`UIApplication`和`UIViewController`，两者只能取其一，默认情况下，由各`UIViewController`独立控制自己的状态栏。
+于是，隐藏状态栏就有两种办法：
+- 重写UIViewController的`prefersStatusBarHidden`属性/方法，并返回`true`来隐藏状态栏
+- 在`info.plist`中取消`UIViewController`的控制权，即设置`View controller-based status bar appearance`为`NO`，然后再设置`UIApplication.shared.isStatusBarHidden = false`
+
+作为一个框架，不应该设置全局属性，不应该操作UIApplication，而且从解耦角度来说就更不应该了。所以我们只负责自己Controller视图的状态栏：
+```swift
+public override var prefersStatusBarHidden: Bool {
+    return true
+}
+```
+
+然而这种做法，会导致一个问题：在使用pan手势下拽图片时，背景变半透明后，会看见底下页面的状态栏没有了！这是因为背景半透明时，当前ViewController依然还是图片浏览器，而图片浏览器控制着状态栏隐藏。
+
+我们或许会想着，在背景半透明时，刷新状态栏，让prefersStatusBarHidden返回false，在背景恢复全黑时，再刷新状态栏，让prefersStatusBarHidden返回true。
+然而这种做法，还是会有问题，我们是不可以让prefersStatusBarHidden直接就返回true的，因为说不定前一页面的状态栏本身就是隐藏的呢，我们这么做岂不是破坏了现场？
+
+我们或许又会想到，那让用户，让调用者在使用图片浏览器的时候，告诉我们，它原本的状态栏是隐藏还是不隐藏的，这样不就解决了吗？确实这样好像能解决问题，但是不好的地方在于增加了用户使用的难度，毕竟多加了一个参数。
+不行！为了把**让用户傻瓜式操作**的理念贯彻到底，参数必须能少一个就少一个！我们来另想办法。
+
+其实我们的目的只是要让状态不要挡住图片浏览，那么除了让状态栏本身隐藏掉，还有办法就是盖住它。
+我们知道，状态栏在视图层上的level是非常高的，所以得让我们的视图level比它还要高，才有可能盖住它。没错！就是设置`windowLevel`属性为`UIWindowLevelStatusBar + 1`：
+
+```swift
+public class PhotoBrowser: UIViewController {
+    /// 保存原windowLevel
+    private var originWindowLevel: UIWindowLevel!
+
+    /// 遮盖状态栏。以改变windowLevel的方式遮盖
+    fileprivate func coverStatusBar(_ cover: Bool) {
+        guard let window = view.window else {
+            return
+        }
+        if originWindowLevel == nil {
+            originWindowLevel = window.windowLevel
+        }
+        if cover {
+            if window.windowLevel == UIWindowLevelStatusBar + 1 {
+                return
+            }
+            window.windowLevel = UIWindowLevelStatusBar + 1
+        } else {
+            if window.windowLevel == originWindowLevel {
+                return
+            }
+            window.windowLevel = originWindowLevel
+        }
+    }
+}
+```
+
+我们定义了一个`coverStatusBar`方法，让它控制是否遮盖状态栏。而调用它的地方主要有三处：
+1. 页面出现后
+```swift
+    public override func viewDidAppear(_ animated: Bool) {
+        // 遮盖状态栏
+        coverStatusBar(true)
+    }
+```
+2. 页面消失前
+```swift
+    public func photoBrowserCellDidSingleTap(_ view: PhotoBrowserCell) {
+        coverStatusBar(false)
+        dismiss(animated: true, completion: nil)
+    }
+```
+3. 背景变半透明时 
+```swift
+    public func photoBrowserCell(_ view: PhotoBrowserCell, didPanScale scale: CGFloat) {
+        let alpha = scale * scale
+        // 半透明时重现状态栏，否则遮盖状态栏
+        coverStatusBar(alpha >= 1.0)
+    }
+```
 
 #页码指示器#
 为了框架适用性，PhotoBrowser内部并没有内嵌PageControl，而是以协议的方式支持装配一个PageControl。
