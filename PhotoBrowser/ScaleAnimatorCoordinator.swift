@@ -21,10 +21,10 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
     }()
     
     /// 更新动画结束后需要隐藏的view
-    public func updateCurrentHiddenView(_ view: UIView) {
+    public func updateCurrentHiddenView(_ view: UIView?) {
         currentHiddenView?.isHidden = false
         currentHiddenView = view
-        view.isHidden = true
+        view?.isHidden = true
     }
     
     override public func presentationTransitionWillBegin() {

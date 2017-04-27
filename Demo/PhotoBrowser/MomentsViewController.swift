@@ -63,7 +63,7 @@ class MomentsViewController: UIViewController {
         
         let lineSpacing: CGFloat = 10.0
         let height = itemSize * CGFloat(rowCount) + lineSpacing * 2
-        let y: CGFloat = 60.0
+        let y: CGFloat = 610.0
         
         let frame = CGRect(x: xMargin, y: y, width: width, height: height)
         
@@ -121,7 +121,7 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return imageArray.count
     }
     
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
         return collectionView!.cellForItem(at: IndexPath(item: index, section: 0))!
     }
     
