@@ -1,7 +1,7 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
-![](https://img.shields.io/badge/pod-v0.1.10-green.svg)
+![](https://img.shields.io/badge/pod-v0.2.3-green.svg)
 
 #  缘起
 那时，我想要一个这样的图片浏览器：
