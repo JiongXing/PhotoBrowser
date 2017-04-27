@@ -114,7 +114,7 @@ public class PhotoBrowser: UIViewController {
     private let flowLayout: PhotoBrowserLayout
     
     /// PageControl
-    lazy private var pageControl: UIView? = {
+    private lazy var pageControl: UIView? = {
         [unowned self] in
         guard let dlg = self.pageControlDelegate else {
             return nil
@@ -124,6 +124,9 @@ public class PhotoBrowser: UIViewController {
     
     /// 标记第一次viewDidAppeared
     private var onceViewDidAppeared = false
+    
+    /// 保存原windowLevel
+    private var originWindowLevel: UIWindowLevel!
     
     // MARK: - 方法
     
@@ -187,8 +190,15 @@ public class PhotoBrowser: UIViewController {
         }
     }
     
-    /// 页面出来后，再显示pageControl
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // 遮盖状态栏
+        coverStatusBar(true)
+    }
+    
     public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // 页面出来后，再显示pageControl
         guard let dlg = pageControlDelegate else {
             return
         }
@@ -206,9 +216,25 @@ public class PhotoBrowser: UIViewController {
         return false
     }
     
-    /// 隐藏状态栏
-    public override var prefersStatusBarHidden: Bool {
-        return true
+    /// 遮盖状态栏。以改变windowLevel的方式遮盖
+    fileprivate func coverStatusBar(_ cover: Bool) {
+        guard let window = view.window else {
+            return
+        }
+        if originWindowLevel == nil {
+            originWindowLevel = window.windowLevel
+        }
+        if cover {
+            if window.windowLevel == UIWindowLevelStatusBar + 1 {
+                return
+            }
+            window.windowLevel = UIWindowLevelStatusBar + 1
+        } else {
+            if window.windowLevel == originWindowLevel {
+                return
+            }
+            window.windowLevel = originWindowLevel
+        }
     }
 }
 
@@ -303,7 +329,10 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
     
     public func photoBrowserCell(_ view: PhotoBrowserCell, didPanScale scale: CGFloat) {
         // 实测用scale的平方，效果比线性好些
-        animatorCoordinator?.maskView.alpha = scale * scale
+        let alpha = scale * scale
+        animatorCoordinator?.maskView.alpha = alpha
+        // 半透明时重现状态栏，否则遮盖状态栏
+        coverStatusBar(alpha >= 1.0)
     }
     
     public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
