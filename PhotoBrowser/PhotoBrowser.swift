@@ -321,6 +321,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
 
 extension PhotoBrowser: PhotoBrowserCellDelegate {
     public func photoBrowserCellDidSingleTap(_ view: PhotoBrowserCell) {
+        coverStatusBar(false)
         dismiss(animated: true, completion: nil)
     }
     
