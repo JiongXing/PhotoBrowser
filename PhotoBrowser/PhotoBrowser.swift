@@ -19,7 +19,7 @@ public protocol PhotoBrowserDelegate {
     
     /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的hidden属性
     /// 比如你可返回ImageView，或整个Cell
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
     
     /// 实现本方法以返回高质量图片。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex index: Int) -> UIImage?
@@ -100,7 +100,7 @@ public class PhotoBrowser: UIViewController {
     }
     
     /// 当前正在显示视图的前一个页面关联视图
-    fileprivate var relatedView: UIView {
+    fileprivate var relatedView: UIView? {
         return photoBrowserDelegate.photoBrowser(self, thumbnailViewForIndex: currentIndex)
     }
     

@@ -54,22 +54,30 @@ public class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         
         // 求缩放视图的起始和结束frame
         guard let startView = self.startView,
-            let endView = self.endView,
             let scaleView = self.scaleView else {
             return
         }
-        guard let startFrame = startView.superview?.convert(startView.frame, to: containerView) else {
-            print("无法获取startFrame")
-            return
+        
+        let startFrame = startView.convert(startView.bounds, to: containerView)
+        var endFrame = startFrame
+        var endAlpha: CGFloat = 0.0
+        
+        if let endView = self.endView {
+            // 当前正在显示视图的前一个页面关联视图已经存在，此时分两种情况
+            // 1、该视图显示在屏幕内 2、该视图不显示在屏幕内
+            let relativeFrame = endView.convert(endView.bounds, to: nil)
+            let keyWindowBounds =  UIScreen.main.bounds
+            if keyWindowBounds.intersects(relativeFrame) { // 显示在屏幕内
+                endAlpha = 1.0
+                endFrame = endView.convert(endView.bounds, to: containerView)
+            }
         }
-        guard let endFrame = endView.superview?.convert(endView.frame, to: containerView) else {
-            print("无法获取endFrame")
-            return
-        }
+        
         scaleView.frame = startFrame
         containerView.addSubview(scaleView)
         
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: { 
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
+            scaleView.alpha = endAlpha
             scaleView.frame = endFrame
         }) { _ in
             // presentation转场，需要把目标视图添加到视图栈
