@@ -21,14 +21,24 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
 }
 
 public class PhotoBrowserCell: UICollectionViewCell {
-    // MARK: - 属性
-    
+    // MARK: - 公开属性
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
     /// 图像加载视图
     public let imageView = UIImageView()
     
+    /// 捏合手势放大图片时的最大允许比例
+    public var imageMaximumZoomScale: CGFloat = 2.0 {
+        didSet {
+            self.scrollView.maximumZoomScale = imageMaximumZoomScale
+        }
+    }
+    
+    /// 双击放大图片时的目标比例
+    public var imageZoomScaleForDoubleTap: CGFloat = 2.0
+    
+    // MARK: - 内部属性
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
@@ -76,7 +86,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         super.init(frame: frame)
         contentView.addSubview(scrollView)
         scrollView.delegate = self
-        scrollView.maximumZoomScale = 2.0
+        scrollView.maximumZoomScale = imageMaximumZoomScale
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
         
@@ -91,7 +101,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         imageView.addGestureRecognizer(longPress)
         
         // 双击手势
-        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleTap))
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleTap(_:)))
         doubleTap.numberOfTapsRequired = 2
         imageView.addGestureRecognizer(doubleTap)
         
@@ -146,12 +156,20 @@ public class PhotoBrowserCell: UICollectionViewCell {
         }
     }
     
-    func onDoubleTap() {
-        var scale = scrollView.maximumZoomScale
-        if scrollView.zoomScale == scrollView.maximumZoomScale {
-            scale = 1.0
+    func onDoubleTap(_ dbTap: UITapGestureRecognizer) {
+        // 如果当前没有任何缩放，则放大到目标比例
+        // 否则重置到原比例
+        if scrollView.zoomScale == 1.0 {
+            // 以点击的位置为中心，放大
+            let pointInView = dbTap.location(in: imageView)
+            let w = scrollView.bounds.size.width / imageZoomScaleForDoubleTap
+            let h = scrollView.bounds.size.height / imageZoomScaleForDoubleTap
+            let x = pointInView.x - (w / 2.0)
+            let y = pointInView.y - (h / 2.0)
+            scrollView.zoom(to: CGRect(x: x, y: y, width: w, height: h), animated: true)
+        } else {
+            scrollView.setZoomScale(1.0, animated: true)
         }
-        scrollView.setZoomScale(scale, animated: true)
     }
     
     func onPan(_ pan: UIPanGestureRecognizer) {

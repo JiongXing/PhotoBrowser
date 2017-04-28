@@ -68,8 +68,7 @@ public protocol PhotoBrowserPageControlDelegate {
 
 public class PhotoBrowser: UIViewController {
     
-    // MARK: - 属性
-    
+    // MARK: -  公开属性
     /// 实现了PhotoBrowserDelegate协议的对象
     public var photoBrowserDelegate: PhotoBrowserDelegate
     
@@ -82,6 +81,13 @@ public class PhotoBrowser: UIViewController {
     /// 图片缩放模式
     public var imageScaleMode = UIViewContentMode.scaleAspectFill
     
+    /// 捏合手势放大图片时的最大允许比例
+    public var imageMaximumZoomScale: CGFloat = 2.0
+    
+    /// 双击放大图片时的目标比例
+    public var imageZoomScaleForDoubleTap: CGFloat = 2.0
+    
+    // MARK: -  内部属性
     /// 当前显示的图片序号，从0开始
     fileprivate var currentIndex = 0 {
         didSet {
@@ -127,8 +133,7 @@ public class PhotoBrowser: UIViewController {
     /// 保存原windowLevel
     private var originWindowLevel: UIWindowLevel!
     
-    // MARK: - 方法
-    
+    // MARK: - 公开方法
     /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
     public init(showByViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate) {
         self.presentingVC = presentingVC
@@ -138,7 +143,7 @@ public class PhotoBrowser: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -157,6 +162,7 @@ public class PhotoBrowser: UIViewController {
         vc.show(index: index)
     }
     
+    // MARK: - 内部方法
     public override func viewDidLoad() {
         super.viewDidLoad()
         // flowLayout
@@ -246,6 +252,8 @@ extension PhotoBrowser: UICollectionViewDataSource {
         cell.photoBrowserCellDelegate = self
         let (image, url) = imageFor(index: indexPath.item)
         cell.setImage(image, url: url)
+        cell.imageMaximumZoomScale = imageMaximumZoomScale
+        cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
         return cell
     }
     
