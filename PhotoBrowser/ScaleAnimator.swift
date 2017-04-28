@@ -49,25 +49,26 @@ public class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             presentedView.isHidden = true
         }
         
-        // 取转场中介容器
+        // 转场容器
         let containerView = transitionContext.containerView
         
-        // 求缩放视图的起始和结束frame
-        guard let startView = self.startView,
-            let scaleView = self.scaleView else {
+        guard let startView = self.startView, let scaleView = self.scaleView else {
             return
         }
-        
         let startFrame = startView.convert(startView.bounds, to: containerView)
+        
+        // 暂不求endFrame
         var endFrame = startFrame
         var endAlpha: CGFloat = 0.0
         
         if let endView = self.endView {
             // 当前正在显示视图的前一个页面关联视图已经存在，此时分两种情况
-            // 1、该视图显示在屏幕内 2、该视图不显示在屏幕内
+            // 1、该视图显示在屏幕内，作scale动画
+            // 2、该视图不显示在屏幕内，作fade动画
             let relativeFrame = endView.convert(endView.bounds, to: nil)
             let keyWindowBounds =  UIScreen.main.bounds
-            if keyWindowBounds.intersects(relativeFrame) { // 显示在屏幕内
+            if keyWindowBounds.intersects(relativeFrame) {
+                // 在屏幕内，求endFrame，让其缩放
                 endAlpha = 1.0
                 endFrame = endView.convert(endView.bounds, to: containerView)
             }

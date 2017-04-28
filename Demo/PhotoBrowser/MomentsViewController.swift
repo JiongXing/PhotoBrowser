@@ -63,7 +63,7 @@ class MomentsViewController: UIViewController {
         
         let lineSpacing: CGFloat = 10.0
         let height = itemSize * CGFloat(rowCount) + lineSpacing * 2
-        let y: CGFloat = 610.0
+        let y: CGFloat = 60.0
         
         let frame = CGRect(x: xMargin, y: y, width: width, height: height)
         
@@ -103,7 +103,7 @@ extension MomentsViewController: UICollectionViewDelegate {
             return
         }
         selectedCell = cell
-        // 开始图片浏览之前，所有thumbnailImage必须都能取得到
+        // 调起图片浏览器
         let vc = PhotoBrowser(showByViewController: self, delegate: self)
         // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         if arc4random_uniform(2) % 2 == 0 {
@@ -122,13 +122,13 @@ extension MomentsViewController: PhotoBrowserDelegate {
     }
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
-        return collectionView!.cellForItem(at: IndexPath(item: index, section: 0))!
+        return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
     
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage {
-        let cell = collectionView!.cellForItem(at: IndexPath(item: index, section: 0)) as! MomentsPhotoCollectionViewCell
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
+        let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
         // 取thumbnailImage
-        return cell.imageView.image!
+        return cell?.imageView.image
     }
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlStringForIndex index: Int) -> URL? {

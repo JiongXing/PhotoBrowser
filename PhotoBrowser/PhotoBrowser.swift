@@ -15,7 +15,7 @@ public protocol PhotoBrowserDelegate {
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
     
     /// 实现本方法以返回默认图片，缩略图或占位图
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
     
     /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的hidden属性
     /// 比如你可返回ImageView，或整个Cell
@@ -204,7 +204,6 @@ public class PhotoBrowser: UIViewController {
         }
         if !onceViewDidAppeared, let pc = pageControl {
             onceViewDidAppeared = true
-            
             view.addSubview(pc)
             dlg.photoBrowserPageControl(pc, didMoveTo: view)
         }
@@ -258,7 +257,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
     }
     
     /// 取已有图像，若有高清图，只返回高清图，否则返回缩略图和url
-    private func imageFor(index: Int) -> (UIImage, URL?) {
+    private func imageFor(index: Int) -> (UIImage?, URL?) {
         if let highQualityImage = photoBrowserDelegate.photoBrowser(self, highQualityImageForIndex: index) {
             return (highQualityImage, nil)
         }

@@ -131,7 +131,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 设置图片。image为placeholder图片，url为网络图片
-    public func setImage(_ image: UIImage, url: URL?) {
+    public func setImage(_ image: UIImage?, url: URL?) {
         guard url != nil else {
             imageView.image = image
             doLayout()
