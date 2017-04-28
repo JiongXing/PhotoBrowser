@@ -98,23 +98,22 @@ public class PhotoBrowserCell: UICollectionViewCell {
         
         // 长按手势
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
-        imageView.addGestureRecognizer(longPress)
+        contentView.addGestureRecognizer(longPress)
         
         // 双击手势
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleTap(_:)))
         doubleTap.numberOfTapsRequired = 2
-        imageView.addGestureRecognizer(doubleTap)
+        contentView.addGestureRecognizer(doubleTap)
         
         // 单击手势
-        imageView.isUserInteractionEnabled = true
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(onSingleTap))
-        imageView.addGestureRecognizer(singleTap)
+        contentView.addGestureRecognizer(singleTap)
         singleTap.require(toFail: doubleTap)
         
         // 拖动手势
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
         pan.delegate = self
-        imageView.addGestureRecognizer(pan)
+        scrollView.addGestureRecognizer(pan)
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -176,18 +175,17 @@ public class PhotoBrowserCell: UICollectionViewCell {
         switch pan.state {
         case .began:
             beganFrame = imageView.frame
-            beganTouch = pan.location(in: pan.view?.superview)
+            beganTouch = pan.location(in: scrollView)
         case .changed:
             // 拖动偏移量
-            let translation = pan.translation(in: self)
-            let currentTouch = pan.location(in: pan.view?.superview)
+            let translation = pan.translation(in: scrollView)
+            let currentTouch = pan.location(in: scrollView)
             
             // 由下拉的偏移值决定缩放比例，越往下偏移，缩得越小。scale值区间[0.3, 1.0]
             let scale = min(1.0, max(0.3, 1 - translation.y / bounds.height))
             
-            let theFitSize = fitSize
-            let width = theFitSize.width * scale
-            let height = theFitSize.height * scale
+            let width = beganFrame.size.width * scale
+            let height = beganFrame.size.height * scale
             
             // 计算x和y。保持手指在图片上的相对位置不变。
             // 即如果手势开始时，手指在图片X轴三分之一处，那么在移动图片时，保持手指始终位于图片X轴的三分之一处
