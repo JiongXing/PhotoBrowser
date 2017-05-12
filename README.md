@@ -1,7 +1,7 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
-![](https://img.shields.io/badge/pod-v0.2.3-green.svg)
+![](https://img.shields.io/badge/pod-v0.2.5-green.svg)
 
 #  缘起
 那时，我想要一个这样的图片浏览器：
@@ -942,9 +942,10 @@ public class PhotoBrowser: UIViewController {
 ```
 
 我们定义了一个`coverStatusBar`方法，让它控制是否遮盖状态栏。而调用它的地方主要有三处：
-1. 页面出现后
+1. 页面出现前
 ```swift
-    public override func viewDidAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         // 遮盖状态栏
         coverStatusBar(true)
     }
