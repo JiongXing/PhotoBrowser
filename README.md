@@ -889,6 +889,7 @@ public class PhotoBrowserProgressView: UIView {
 ![加载图络图片.gif](http://upload-images.jianshu.io/upload_images/2419179-df7348d08250124f.gif?imageMogr2/auto-orient/strip)
 
 # 隐藏状态栏
+
 图片浏览过程中并不需要状态栏StatusBar，应当隐藏。
 iOS7后，能控制状态栏的类有两个，`UIApplication`和`UIViewController`，两者只能取其一，默认情况下，由各`UIViewController`独立控制自己的状态栏。
 于是，隐藏状态栏就有两种办法：
@@ -966,7 +967,8 @@ public class PhotoBrowser: UIViewController {
     }
 ```
 
-#页码指示器#
+# 页码指示器
+
 为了框架适用性，PhotoBrowser内部并没有内嵌PageControl，而是以协议的方式支持装配一个PageControl。
 
 ```swift
