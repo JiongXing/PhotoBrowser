@@ -260,13 +260,14 @@ extension PhotoBrowser: UICollectionViewDataSource {
         return cell
     }
     
-    /// 取已有图像，若有高清图，只返回高清图，否则返回缩略图和url
+    /// 取已有图像，若有高清图缓存，只取出高清图以作为placeholder
     private func imageFor(index: Int) -> (UIImage?, URL?) {
         if let highQualityImage = photoBrowserDelegate.photoBrowser(self, highQualityImageForIndex: index) {
             return (highQualityImage, nil)
         }
         var highQualityUrl: URL?
         if let url = photoBrowserDelegate.photoBrowser(self, highQualityUrlStringForIndex: index) {
+            // 取高清图缓存
             var cacheImage: UIImage?
             let result = KingfisherManager.shared.cache.isImageCached(forKey: url.cacheKey)
             if result.cached, let cacheType = result.cacheType {
@@ -280,7 +281,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
                 }
             }
             if cacheImage != nil {
-                return (cacheImage!, nil)
+                return (cacheImage!, url)
             }
             highQualityUrl = url
         }
