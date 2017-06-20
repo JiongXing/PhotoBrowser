@@ -12,18 +12,6 @@ import JXPhotoBrowser
 
 class MomentsViewController: UIViewController {
     
-    fileprivate lazy var imageArray: [UIImage] = {
-        return [UIImage(named: "photo1")!,
-                UIImage(named: "photo2")!,
-                UIImage(named: "photo3")!,
-                UIImage(named: "photo4")!,
-                UIImage(named: "photo5")!,
-                UIImage(named: "photo6")!,
-                UIImage(named: "photo7")!,
-                UIImage(named: "photo8")!,
-                UIImage(named: "photo9")!]
-    }()
-    
     fileprivate lazy var thumbnailImageUrls: [String] = {
         return ["http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
                 "http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
@@ -87,7 +75,7 @@ class MomentsViewController: UIViewController {
 
 extension MomentsViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageArray.count
+        return thumbnailImageUrls.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -107,9 +95,9 @@ extension MomentsViewController: UICollectionViewDelegate {
         let vc = PhotoBrowser(showByViewController: self, delegate: self)
         // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         if arc4random_uniform(2) % 2 == 0 {
-            vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: imageArray.count)
+            vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
         } else {
-            vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: imageArray.count)
+            vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
         }
         vc.show(index: indexPath.item)
     }
@@ -118,31 +106,36 @@ extension MomentsViewController: UICollectionViewDelegate {
 // 实现浏览器代理协议
 extension MomentsViewController: PhotoBrowserDelegate {
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
-        return imageArray.count
+        return thumbnailImageUrls.count
     }
     
+    /// 缩放起始视图
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
         return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
     
+    /// 图片加载前的placeholder
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
         let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
         // 取thumbnailImage
         return cell?.imageView.image
     }
     
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlStringForIndex index: Int) -> URL? {
+    /// 高清图
+    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
         return URL(string: highQualityImageUrls[index])
+    }
+    
+    /// 最高清图，原图
+    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
+        return nil
+//        // 测试
+//        return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
     }
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
         print("长按，图片size:\(image.size)")
     }
-    
-    /*// 指定本地图片作为highQualityImage
-     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex index: Int) -> UIImage? {
-     return imageArray[index]
-     }*/
 }
 
 

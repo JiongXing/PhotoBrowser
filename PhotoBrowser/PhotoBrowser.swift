@@ -21,11 +21,11 @@ public protocol PhotoBrowserDelegate {
     /// 比如你可返回ImageView，或整个Cell
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
     
-    /// 实现本方法以返回高质量图片。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex index: Int) -> UIImage?
-    
     /// 实现本方法以返回高质量图片的url。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlStringForIndex index: Int) -> URL?
+    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
+    
+    /// 实现本方法以返回原图url。可选
+    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
     
     /// 长按时回调。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
@@ -33,11 +33,11 @@ public protocol PhotoBrowserDelegate {
 
 /// PhotoBrowserDelegate适配器
 public extension PhotoBrowserDelegate {
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityImageForIndex: Int) -> UIImage? {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex: Int) -> URL? {
         return nil
     }
     
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlStringForIndex: Int) -> URL? {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
         return nil
     }
     
@@ -253,40 +253,21 @@ extension PhotoBrowser: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self), for: indexPath) as! PhotoBrowserCell
         cell.imageView.contentMode = imageScaleMode
         cell.photoBrowserCellDelegate = self
-        let (image, url) = imageFor(index: indexPath.item)
-        cell.setImage(image, url: url)
+        let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
+        cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
         cell.imageMaximumZoomScale = imageMaximumZoomScale
         cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
         return cell
     }
     
-    /// 取已有图像，若有高清图缓存，只取出高清图以作为placeholder
-    private func imageFor(index: Int) -> (UIImage?, URL?) {
-        if let highQualityImage = photoBrowserDelegate.photoBrowser(self, highQualityImageForIndex: index) {
-            return (highQualityImage, nil)
-        }
-        var highQualityUrl: URL?
-        if let url = photoBrowserDelegate.photoBrowser(self, highQualityUrlStringForIndex: index) {
-            // 取高清图缓存
-            var cacheImage: UIImage?
-            let result = KingfisherManager.shared.cache.isImageCached(forKey: url.cacheKey)
-            if result.cached, let cacheType = result.cacheType {
-                switch cacheType {
-                case .memory:
-                    cacheImage = KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: url.cacheKey)
-                case .disk:
-                    cacheImage = KingfisherManager.shared.cache.retrieveImageInDiskCache(forKey: url.cacheKey)
-                default:
-                    cacheImage = nil
-                }
-            }
-            if cacheImage != nil {
-                return (cacheImage!, url)
-            }
-            highQualityUrl = url
-        }
+    private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+        // 缩略图
         let thumbnailImage = photoBrowserDelegate.photoBrowser(self, thumbnailImageForIndex: index)
-        return (thumbnailImage, highQualityUrl)
+        // 高清图url
+        let highQualityUrl = photoBrowserDelegate.photoBrowser(self, highQualityUrlForIndex: index)
+        // 原图url
+        let rawUrl = photoBrowserDelegate.photoBrowser(self, rawUrlForIndex: index)
+        return (thumbnailImage, highQualityUrl, rawUrl)
     }
 }
 
