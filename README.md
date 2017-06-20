@@ -1,9 +1,37 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
-![](https://img.shields.io/badge/pod-v0.2.6-green.svg)
+![](https://img.shields.io/badge/pod-v0.3.0-green.svg)
 
-#  缘起
+# 用法
+```swift
+// 创建实例，传入present发起者，和delegate实现者
+let browser = PhotoBrowser(showByViewController: self, delegate: self)
+// 显示，并指定打开第几张图
+browser.show(index: 3)
+
+// 作为和delegate实现者必须实现的协议方法
+/// 图片总数
+func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
+    return thumbnailImageUrls.count
+}
+/// 缩放起始视图
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
+    return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
+}
+/// 图片加载前的placeholder
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
+    let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
+    // 取thumbnailImage
+    return cell?.imageView.image
+}
+/// 高清图
+func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
+    return URL(string: highQualityImageUrls[index])
+}
+```
+
+# 缘起
 那时，我想要一个这样的图片浏览器：
 - 从小图进入大图浏览时，使用转场动画
 - 可加载网络图片，且过渡自然，不阻塞操作
