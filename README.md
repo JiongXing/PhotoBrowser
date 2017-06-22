@@ -10,7 +10,7 @@ let browser = PhotoBrowser(showByViewController: self, delegate: self)
 // 显示，并指定打开第几张图
 browser.show(index: 3)
 
-// 作为和delegate实现者必须实现的协议方法
+// 作为delegate必须实现的协议方法
 /// 图片总数
 func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
     return thumbnailImageUrls.count
