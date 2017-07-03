@@ -3,7 +3,17 @@
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
 ![](https://img.shields.io/badge/pod-v0.3.0-green.svg)
 
-# 用法
+# Requirements
+- iOS 8.0+
+- Swift 3.0+
+- Xcode 8.1+
+
+# Installation with CocoaPods
+```
+pod 'JXPhotoBrowser'
+```
+
+# Usage
 ```swift
 // 创建实例，传入present发起者，和delegate实现者
 let browser = PhotoBrowser(showByViewController: self, delegate: self)
@@ -42,11 +52,6 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: In
 ![PhotoBrowser.png](http://upload-images.jianshu.io/upload_images/2419179-9cc2a64dba3c237f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
 
 很遗憾，久寻无果，于是我决定自己造一个。
-
-# Requirements
-- iOS 8.0+
-- Swift 3.0+
-- Xcode 8.1+
 
 # 调起方式
 由于我们打算使用转场动画，所以在容器的选择上，只能使用UIViewController，那就让我们的类继承它吧：
