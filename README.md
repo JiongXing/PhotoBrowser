@@ -1,7 +1,7 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
-![](https://img.shields.io/badge/pod-v0.3.0-green.svg)
+![](https://img.shields.io/badge/pod-0.3.1-green.svg)
 
 # Requirements
 - iOS 8.0+
@@ -130,7 +130,7 @@ public func show(index: Int) {
     presentingVC.present(self, animated: true, completion: nil)
 }
 ```
-# 让用户傻瓜式操作！
+# 简化使用
 现在我们调起图片浏览器的姿势是这样的：
 ```swift
 let browser = PhotoBrowser(showByViewController: self, , delegate: self)
