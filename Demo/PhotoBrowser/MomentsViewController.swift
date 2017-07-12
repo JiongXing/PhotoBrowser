@@ -40,6 +40,12 @@ class MomentsViewController: UIViewController {
     
     fileprivate var collectionView: UICollectionView?
     
+    deinit {
+        #if DEBUG
+            print("deinit:\(self)")
+        #endif
+    }
+    
     override func viewDidLoad() {
         let colCount = 3
         let rowCount = 3

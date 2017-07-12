@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 
 // MARK: - PhotoBrowserDelegate
-public protocol PhotoBrowserDelegate {
+public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回图片数量
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
     
@@ -49,7 +49,7 @@ public extension PhotoBrowserDelegate {
 }
 
 // MARK: - PhotoBrowserPageControl
-public protocol PhotoBrowserPageControlDelegate {
+public protocol PhotoBrowserPageControlDelegate: class {
     
     /// 取PageControl，只会取一次
     func pageControlOfPhotoBrowser(_ photoBrowser: PhotoBrowser) -> UIView
@@ -70,10 +70,10 @@ public class PhotoBrowser: UIViewController {
     
     // MARK: -  公开属性
     /// 实现了PhotoBrowserDelegate协议的对象
-    public var photoBrowserDelegate: PhotoBrowserDelegate
+    public weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
     /// 实现了PhotoBrowserPageControlDelegate协议的对象
-    public var pageControlDelegate: PhotoBrowserPageControlDelegate?
+    public weak var pageControlDelegate: PhotoBrowserPageControlDelegate?
     
     /// 左右两张图之间的间隙
     public var photoSpacing: CGFloat = 30
@@ -101,7 +101,7 @@ public class PhotoBrowser: UIViewController {
     
     /// 当前正在显示视图的前一个页面关联视图
     fileprivate var relatedView: UIView? {
-        return photoBrowserDelegate.photoBrowser(self, thumbnailViewForIndex: currentIndex)
+        return photoBrowserDelegate?.photoBrowser(self, thumbnailViewForIndex: currentIndex)
     }
     
     /// 转场协调器
@@ -145,6 +145,12 @@ public class PhotoBrowser: UIViewController {
     
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        #if DEBUG
+            print("deinit:\(self)")
+        #endif
     }
     
     /// 展示，传入图片序号，从0开始
@@ -246,7 +252,10 @@ public class PhotoBrowser: UIViewController {
 
 extension PhotoBrowser: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.photoBrowserDelegate.numberOfPhotos(in: self)
+        guard let delegate = photoBrowserDelegate else {
+            return 0
+        }
+        return delegate.numberOfPhotos(in: self)
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -261,12 +270,15 @@ extension PhotoBrowser: UICollectionViewDataSource {
     }
     
     private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+        guard let delegate = photoBrowserDelegate else {
+            return (nil, nil, nil)
+        }
         // 缩略图
-        let thumbnailImage = photoBrowserDelegate.photoBrowser(self, thumbnailImageForIndex: index)
+        let thumbnailImage = delegate.photoBrowser(self, thumbnailImageForIndex: index)
         // 高清图url
-        let highQualityUrl = photoBrowserDelegate.photoBrowser(self, highQualityUrlForIndex: index)
+        let highQualityUrl = delegate.photoBrowser(self, highQualityUrlForIndex: index)
         // 原图url
-        let rawUrl = photoBrowserDelegate.photoBrowser(self, rawUrlForIndex: index)
+        let rawUrl = delegate.photoBrowser(self, rawUrlForIndex: index)
         return (thumbnailImage, highQualityUrl, rawUrl)
     }
 }
@@ -328,7 +340,7 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
     
     public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
         if let indexPath = collectionView.indexPath(for: cell) {
-            photoBrowserDelegate.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
+            photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
         }
     }
 }
