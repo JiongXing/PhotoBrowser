@@ -125,7 +125,7 @@ public class PhotoBrowser: UIViewController {
             return nil
         }
         return dlg.pageControlOfPhotoBrowser(self)
-    }()
+        }()
     
     /// 标记第一次viewDidAppeared
     private var onceViewDidAppeared = false
@@ -171,14 +171,13 @@ public class PhotoBrowser: UIViewController {
     // MARK: - 内部方法
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
         // flowLayout
         flowLayout.minimumLineSpacing = photoSpacing
         flowLayout.itemSize = view.bounds.size
         
         // collectionView
         collectionView.frame = view.bounds
-        collectionView.backgroundColor = UIColor.black
+        collectionView.backgroundColor = UIColor.clear
         collectionView.decelerationRate = UIScrollViewDecelerationRateFast
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
@@ -222,11 +221,9 @@ public class PhotoBrowser: UIViewController {
         dlg.photoBrowserPageControl(self.pageControl!, needLayoutIn: view)
     }
     
-    public override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        // 适配屏幕旋转
-        collectionView.frame = view.bounds
-        flowLayout.itemSize = view.bounds.size
+    /// 禁止旋转
+    public override var shouldAutorotate: Bool {
+        return false
     }
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖

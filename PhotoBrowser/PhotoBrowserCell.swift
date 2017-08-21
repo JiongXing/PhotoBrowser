@@ -64,7 +64,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(onRawImageButtonTap), for: .touchUpInside)
         return button
-    }()
+        }()
     
     /// 计算contentSize应处于的中心位置
     fileprivate var centerOfContentSize: CGPoint {
@@ -137,11 +137,6 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        doLayout()
     }
     
     /// 布局

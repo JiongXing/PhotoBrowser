@@ -149,12 +149,12 @@ open class AnimatedImageView: UIImageView {
         super.didMoveToSuperview()
         didMove()
     }
-    
-    // This is for back compatibility that using regular UIImageView to show GIF.
-    override func shouldPreloadAllGIF() -> Bool {
+
+    // This is for back compatibility that using regular UIImageView to show animated image.
+    override func shouldPreloadAllAnimation() -> Bool {
         return false
     }
-    
+
     // MARK: - Private method
     /// Reset the animator.
     private func reset() {
@@ -179,7 +179,25 @@ open class AnimatedImageView: UIImageView {
     
     /// Update the current frame with the displayLink duration.
     private func updateFrame() {
-        if animator?.updateCurrentFrame(duration: displayLink.duration) ?? false {
+        let duration: CFTimeInterval
+
+        // CA based display link is opt-out from ProMotion by default.
+        // So the duration and its FPS might not match. 
+        // See [#718](https://github.com/onevcat/Kingfisher/issues/718)
+        if #available(iOS 10.0, tvOS 10.0, *) {
+            // By setting CADisableMinimumFrameDuration to YES in Info.plist may 
+            // cause the preferredFramesPerSecond being 0
+            if displayLink.preferredFramesPerSecond == 0 {
+                duration = displayLink.duration
+            } else {
+                // Some devices (like iPad Pro 10.5) will have a different FPS.
+                duration = 1.0 / Double(displayLink.preferredFramesPerSecond)
+            }
+        } else {
+            duration = displayLink.duration
+        }
+    
+        if animator?.updateCurrentFrame(duration: duration) ?? false {
             layer.setNeedsDisplay()
         }
     }
@@ -208,7 +226,7 @@ class Animator {
     fileprivate var timeSinceLastFrameChange: TimeInterval = 0.0
     fileprivate var needsPrescaling = true
     
-    /// Loop count of animatd image.
+    /// Loop count of animated image.
     private var loopCount = 0
     
     var currentFrame: UIImage? {
@@ -352,4 +370,13 @@ extension Array {
 
 private func pure<T>(_ value: T) -> [T] {
     return [value]
+}
+
+// MARK: - Deprecated. Only for back compatibility.
+extension AnimatedImageView {
+    // This is for back compatibility that using regular UIImageView to show GIF.
+    @available(*, deprecated, renamed: "shouldPreloadAllAnimation")
+    override func shouldPreloadAllGIF() -> Bool {
+        return false
+    }
 }
