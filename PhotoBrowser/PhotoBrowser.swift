@@ -73,7 +73,7 @@ public class PhotoBrowser: UIViewController {
     public weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
     /// 实现了PhotoBrowserPageControlDelegate协议的对象
-    public weak var pageControlDelegate: PhotoBrowserPageControlDelegate?
+    public var pageControlDelegate: PhotoBrowserPageControlDelegate?
     
     /// 左右两张图之间的间隙
     public var photoSpacing: CGFloat = 30
