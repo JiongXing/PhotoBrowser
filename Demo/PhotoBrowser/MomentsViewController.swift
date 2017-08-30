@@ -132,15 +132,25 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return URL(string: highQualityImageUrls[index])
     }
     
-    /// 最高清图，原图
+    /// 最高清图，原图。（需要时可实现本方法）
+    /*
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
         return nil
-//        // 测试
-//        return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
-    }
+        // 测试
+        return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
+    }*/
     
+    /// 长按图片
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
-        print("长按，图片size:\(image.size)")
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let saveImageAction = UIAlertAction(title: "保存图片", style: .default) { (_) in
+            print("保存图片：\(image)")
+        }
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+        
+        actionSheet.addAction(saveImageAction)
+        actionSheet.addAction(cancelAction)
+        photoBrowser.present(actionSheet, animated: true, completion: nil)
     }
 }
 
