@@ -133,6 +133,9 @@ public class PhotoBrowser: UIViewController {
     /// 保存原windowLevel
     private var originWindowLevel: UIWindowLevel!
     
+    /// 是否已初始化视图
+    private var didInitializedLayout = false
+    
     // MARK: - 公开方法
     /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
     public init(showByViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate) {
@@ -171,34 +174,7 @@ public class PhotoBrowser: UIViewController {
     // MARK: - 内部方法
     public override func viewDidLoad() {
         super.viewDidLoad()
-        // flowLayout
-        flowLayout.minimumLineSpacing = photoSpacing
-        flowLayout.itemSize = view.bounds.size
-        
-        // collectionView
-        collectionView.frame = view.bounds
-        collectionView.backgroundColor = UIColor.clear
-        collectionView.decelerationRate = UIScrollViewDecelerationRateFast
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
-        view.addSubview(collectionView)
-        
-        // 立即加载collectionView
-        let indexPath = IndexPath(item: currentIndex, section: 0)
-        collectionView.reloadData()
-        collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
-        collectionView.layoutIfNeeded()
-        // 取当前应显示的cell，完善转场动画器的设置
-        if let cell = collectionView.cellForItem(at: indexPath) as? PhotoBrowserCell {
-            presentationAnimator?.endView = cell.imageView
-            let imageView = UIImageView(image: cell.imageView.image)
-            imageView.contentMode = imageScaleMode
-            imageView.clipsToBounds = true
-            presentationAnimator?.scaleView = imageView
-        }
+        initialLayout()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -224,6 +200,28 @@ public class PhotoBrowser: UIViewController {
     /// 禁止旋转
     public override var shouldAutorotate: Bool {
         return false
+    }
+    
+    /// 初始layout
+    fileprivate func initialLayout() {
+        guard didInitializedLayout == false else {
+            return
+        }
+        didInitializedLayout = true
+        // flowLayout
+        flowLayout.minimumLineSpacing = photoSpacing
+        flowLayout.itemSize = view.bounds.size
+        
+        // collectionView
+        collectionView.frame = view.bounds
+        collectionView.backgroundColor = UIColor.clear
+        collectionView.decelerationRate = UIScrollViewDecelerationRateFast
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
+        view.addSubview(collectionView)
     }
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
@@ -298,8 +296,19 @@ extension PhotoBrowser: UICollectionViewDelegate {
 
 extension PhotoBrowser: UIViewControllerTransitioningDelegate {
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        // 在本方法被调用时，endView和scaleView还未确定。需于viewDidLoad方法中给animator赋值endView
-        let animator = ScaleAnimator(startView: relatedView, endView: nil, scaleView: nil)
+        // 视图布局
+        initialLayout()
+        // 立即加载collectionView
+        let indexPath = IndexPath(item: currentIndex, section: 0)
+        collectionView.reloadData()
+        collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+        collectionView.layoutIfNeeded()
+        let cell = collectionView.cellForItem(at: indexPath) as? PhotoBrowserCell
+        let imageView = UIImageView(image: cell?.imageView.image)
+        imageView.contentMode = imageScaleMode
+        imageView.clipsToBounds = true
+        // 创建animator
+        let animator = ScaleAnimator(startView: relatedView, endView: cell?.imageView, scaleView: imageView)
         presentationAnimator = animator
         return animator
     }
