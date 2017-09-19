@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "Kingfisher": [
-
+      "~> 3.13.1"
     ]
   }
 }
