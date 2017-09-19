@@ -92,7 +92,7 @@ public class PhotoBrowser: UIViewController {
     
     // MARK: -  内部属性
     /// 当前显示的图片序号，从0开始
-    fileprivate var currentIndex = 0 {
+    private var currentIndex = 0 {
         didSet {
             animatorCoordinator?.updateCurrentHiddenView(relatedView)
             guard let dlg = pageControlDelegate, let pageControl = self.pageControl else {
@@ -103,21 +103,21 @@ public class PhotoBrowser: UIViewController {
     }
     
     /// 当前正在显示视图的前一个页面关联视图
-    fileprivate var relatedView: UIView? {
+    private var relatedView: UIView? {
         return photoBrowserDelegate?.photoBrowser(self, thumbnailViewForIndex: currentIndex)
     }
     
     /// 转场协调器
-    fileprivate weak var animatorCoordinator: ScaleAnimatorCoordinator?
+    private weak var animatorCoordinator: ScaleAnimatorCoordinator?
     
     /// presentation转场动画
-    fileprivate weak var presentationAnimator: ScaleAnimator?
+    private weak var presentationAnimator: ScaleAnimator?
     
     /// 本VC的presentingViewController
-    fileprivate let presentingVC: UIViewController
+    private let presentingVC: UIViewController
     
     /// 容器
-    fileprivate let collectionView: UICollectionView
+    private let collectionView: UICollectionView
     
     /// 容器layout
     private let flowLayout: PhotoBrowserLayout
@@ -195,7 +195,7 @@ public class PhotoBrowser: UIViewController {
     }
     
     /// 初始layout
-    fileprivate func initialLayout() {
+    private func initialLayout() {
         if didInitializedLayout {
             return
         }
@@ -234,7 +234,7 @@ public class PhotoBrowser: UIViewController {
     }
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
-    fileprivate func coverStatusBar(_ cover: Bool) {
+    private func coverStatusBar(_ cover: Bool) {
         let win = view.window ?? UIApplication.shared.keyWindow
         guard let window = win else {
             return

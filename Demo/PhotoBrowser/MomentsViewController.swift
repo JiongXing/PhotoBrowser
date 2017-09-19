@@ -12,7 +12,7 @@ import JXPhotoBrowser
 
 class MomentsViewController: UIViewController {
     
-    fileprivate lazy var thumbnailImageUrls: [String] = {
+    private lazy var thumbnailImageUrls: [String] = {
         return ["http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
                 "http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
                 "http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
@@ -24,7 +24,7 @@ class MomentsViewController: UIViewController {
                 "http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7usmc8j20i543zngx.jpg",]
     }()
     
-    fileprivate lazy var highQualityImageUrls: [String] = {
+    private lazy var highQualityImageUrls: [String] = {
         return ["http://wx1.sinaimg.cn/large/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
                 "http://wx3.sinaimg.cn/large/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
                 "http://wx1.sinaimg.cn/large/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
@@ -36,9 +36,9 @@ class MomentsViewController: UIViewController {
                 "http://wx3.sinaimg.cn/large/bfc243a3gy1febm7usmc8j20i543zngx.jpg",]
     }()
     
-    weak fileprivate var selectedCell: MomentsPhotoCollectionViewCell?
+    weak private var selectedCell: MomentsPhotoCollectionViewCell?
     
-    fileprivate var collectionView: UICollectionView?
+    private var collectionView: UICollectionView?
     
     deinit {
         #if DEBUG

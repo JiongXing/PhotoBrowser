@@ -45,10 +45,10 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
-    fileprivate let scrollView = UIScrollView()
+    private let scrollView = UIScrollView()
     
     /// 加载进度指示器
-    fileprivate let progressView = PhotoBrowserProgressView()
+    private let progressView = PhotoBrowserProgressView()
     
     /// 查看原图按钮
     private lazy var rawImageButton: UIButton = { [unowned self] in
@@ -67,7 +67,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         }()
     
     /// 计算contentSize应处于的中心位置
-    fileprivate var centerOfContentSize: CGPoint {
+    private var centerOfContentSize: CGPoint {
         let deltaWidth = bounds.width - scrollView.contentSize.width
         let offsetX = deltaWidth > 0 ? deltaWidth * 0.5 : 0
         let deltaHeight = bounds.height - scrollView.contentSize.height
@@ -207,29 +207,27 @@ public class PhotoBrowserCell: UICollectionViewCell {
             return nil
         }
         var cacheImage: UIImage?
-        let result = KingfisherManager.shared.cache.isImageCached(forKey: url.cacheKey)
-        if result.cached, let cacheType = result.cacheType {
-            switch cacheType {
-            case .memory:
-                cacheImage = KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: url.cacheKey)
-            case .disk:
-                cacheImage = KingfisherManager.shared.cache.retrieveImageInDiskCache(forKey: url.cacheKey)
-            default:
-                cacheImage = nil
-            }
+        let result = KingfisherManager.shared.cache.imageCachedType(forKey: url.cacheKey)
+        switch result {
+        case .none:
+            cacheImage = nil
+        case .memory:
+            cacheImage = KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: url.cacheKey)
+        case .disk:
+            cacheImage = KingfisherManager.shared.cache.retrieveImageInDiskCache(forKey: url.cacheKey)
         }
         return cacheImage
     }
     
     /// 响应单击
-    func onSingleTap() {
+    @objc func onSingleTap() {
         if let dlg = photoBrowserCellDelegate {
             dlg.photoBrowserCellDidSingleTap(self)
         }
     }
     
     /// 响应双击
-    func onDoubleTap(_ dbTap: UITapGestureRecognizer) {
+    @objc func onDoubleTap(_ dbTap: UITapGestureRecognizer) {
         // 如果当前没有任何缩放，则放大到目标比例
         // 否则重置到原比例
         if scrollView.zoomScale == 1.0 {
@@ -246,7 +244,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 响应拖动
-    func onPan(_ pan: UIPanGestureRecognizer) {
+    @objc func onPan(_ pan: UIPanGestureRecognizer) {
         guard imageView.image != nil else {
             return
         }
@@ -311,14 +309,14 @@ public class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 响应长按
-    func onLongPress(_ press: UILongPressGestureRecognizer) {
+    @objc func onLongPress(_ press: UILongPressGestureRecognizer) {
         if press.state == .began, let dlg = photoBrowserCellDelegate, let image = imageView.image {
             dlg.photoBrowserCell(self, didLongPressWith: image)
         }
     }
     
     /// 响应查看原图按钮
-    func onRawImageButtonTap() {
+    @objc func onRawImageButtonTap() {
         loadImage(withPlaceholder: imageView.image, url: rawUrl)
         rawImageButton.isHidden = true
     }
