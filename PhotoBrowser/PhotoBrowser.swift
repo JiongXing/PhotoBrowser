@@ -33,7 +33,7 @@ public protocol PhotoBrowserDelegate: class {
 
 /// PhotoBrowserDelegate适配器
 public extension PhotoBrowserDelegate {
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex: Int) -> URL? {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
         return nil
     }
     
@@ -50,6 +50,9 @@ public extension PhotoBrowserDelegate {
 
 // MARK: - PhotoBrowserPageControl
 public protocol PhotoBrowserPageControlDelegate: class {
+    
+    /// 总图片数/页数
+    var numberOfPages: Int { get set }
     
     /// 取PageControl，只会取一次
     func pageControlOfPhotoBrowser(_ photoBrowser: PhotoBrowser) -> UIView
@@ -121,11 +124,8 @@ public class PhotoBrowser: UIViewController {
     
     /// PageControl
     private lazy var pageControl: UIView? = { [unowned self] in
-        guard let dlg = self.pageControlDelegate else {
-            return nil
-        }
-        return dlg.pageControlOfPhotoBrowser(self)
-        }()
+        return self.pageControlDelegate?.pageControlOfPhotoBrowser(self)
+    }()
     
     /// 标记第一次viewDidAppeared
     private var onceViewDidAppeared = false
@@ -186,15 +186,7 @@ public class PhotoBrowser: UIViewController {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // 页面出来后，再显示pageControl
-        guard let dlg = pageControlDelegate else {
-            return
-        }
-        if !onceViewDidAppeared, let pc = pageControl {
-            onceViewDidAppeared = true
-            view.addSubview(pc)
-            dlg.photoBrowserPageControl(pc, didMoveTo: view)
-        }
-        dlg.photoBrowserPageControl(self.pageControl!, needLayoutIn: view)
+        layoutPageControl()
     }
     
     /// 禁止旋转
@@ -204,7 +196,7 @@ public class PhotoBrowser: UIViewController {
     
     /// 初始layout
     fileprivate func initialLayout() {
-        guard didInitializedLayout == false else {
+        if didInitializedLayout {
             return
         }
         didInitializedLayout = true
@@ -222,6 +214,23 @@ public class PhotoBrowser: UIViewController {
         collectionView.delegate = self
         collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
         view.addSubview(collectionView)
+    }
+    
+    /// 显示pageControl
+    private func layoutPageControl() {
+        guard let dlg = pageControlDelegate else {
+            return
+        }
+        // 如果只有一页，不显示
+        guard dlg.numberOfPages > 1 else {
+            return
+        }
+        if !onceViewDidAppeared, let pc = pageControl {
+            onceViewDidAppeared = true
+            view.addSubview(pc)
+            dlg.photoBrowserPageControl(pc, didMoveTo: view)
+        }
+        dlg.photoBrowserPageControl(self.pageControl!, needLayoutIn: view)
     }
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖

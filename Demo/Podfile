@@ -4,7 +4,7 @@ target 'PhotoBrowser' do
   
   use_frameworks!
   
-  pod 'Kingfisher'
+  pod 'Kingfisher', '~> 3.13.1'
   pod 'JXPhotoBrowser', :path => '..'
 
 end

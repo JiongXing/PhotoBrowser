@@ -1,20 +1,20 @@
 PODS:
-  - JXPhotoBrowser (0.3.6):
+  - JXPhotoBrowser (0.3.7):
     - Kingfisher
-  - Kingfisher (3.13.0)
+  - Kingfisher (3.13.1)
 
 DEPENDENCIES:
   - JXPhotoBrowser (from `..`)
-  - Kingfisher
+  - Kingfisher (~> 3.13.1)
 
 EXTERNAL SOURCES:
   JXPhotoBrowser:
     :path: ..
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: 15809e79706eaefbf17759b186e3ba280d5b62ed
-  Kingfisher: 7eebf6000ac64401839f10da37f21eefa7d88970
+  JXPhotoBrowser: 83251417cb8431b9b643081a651101314b8dabf0
+  Kingfisher: ed9707a409cc47fddafbcd12a43a9757e3600af5
 
-PODFILE CHECKSUM: 900f5373691efdc86731fa95d430d0e761196485
+PODFILE CHECKSUM: 89a3b96b33bcb20c4d9b9aefbd526e7ba85869e1
 
 COCOAPODS: 1.2.1

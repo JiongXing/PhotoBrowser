@@ -247,6 +247,9 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     /// 响应拖动
     func onPan(_ pan: UIPanGestureRecognizer) {
+        guard imageView.image != nil else {
+            return
+        }
         switch pan.state {
         case .began:
             beganFrame = imageView.frame
