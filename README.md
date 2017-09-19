@@ -1,12 +1,11 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
-![](https://img.shields.io/badge/pod-v0.3.6-blue.svg)
+![](https://img.shields.io/badge/pod-v0.4.0-blue.svg)
 
 # Requirements
 - iOS 8.0+
-- Swift 3.0+
-- Xcode 8.1+
+- Swift 4 (JXPhotoBrowser 0.4.x), Swift 3 (JXPhotoBrowser 3.x)
 
 # Installation with CocoaPods
 ```
