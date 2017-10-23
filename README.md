@@ -2,14 +2,28 @@
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
 ![](https://img.shields.io/badge/swift-3.0-green.svg)
 ![](https://img.shields.io/badge/pod-v0.4.0-blue.svg)
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Requirements
 - iOS 8.0+
 - Swift 4 (JXPhotoBrowser 0.4.x), Swift 3 (JXPhotoBrowser 0.3.x)
 
-# Installation with CocoaPods
+# Installation
+## CocoaPods
+更新你的本地仓库以同步最新版本
+```
+pod repo update
+```
+在你项目的Podfile中配置
 ```
 pod 'JXPhotoBrowser'
+```
+
+## Carthage
+本库依赖Kingfisher，需一并引入。在你项目的Cartfile中配置
+```
+github "onevcat/Kingfisher"
+github "JiongXing/PhotoBrowser"
 ```
 
 # Usage
@@ -1058,4 +1072,4 @@ pod 'JXPhotoBrowser'
 
 # 源码
 GitHub地址: [PhotoBrowser](https://github.com/JiongXing/PhotoBrowser)
-若使用过程中有任何问题，请拼命issues我。 ^_^
+若使用过程中有任何问题，请issues我。 ^_^
