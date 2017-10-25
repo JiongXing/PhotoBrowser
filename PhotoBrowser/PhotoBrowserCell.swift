@@ -108,7 +108,10 @@ public class PhotoBrowserCell: UICollectionViewCell {
         scrollView.maximumZoomScale = imageMaximumZoomScale
         scrollView.showsVerticalScrollIndicator = false
         scrollView.showsHorizontalScrollIndicator = false
-        
+        if #available(iOS 11.0, *) {
+            scrollView.contentInsetAdjustmentBehavior = .never
+        }
+
         scrollView.addSubview(imageView)
         imageView.clipsToBounds = true
         
