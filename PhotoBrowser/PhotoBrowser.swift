@@ -116,33 +116,37 @@ public class PhotoBrowser: UIViewController {
     /// 本VC的presentingViewController
     private let presentingVC: UIViewController
     
-    /// 容器
-    private let collectionView: UICollectionView
-    
     /// 容器layout
-    private let flowLayout: PhotoBrowserLayout
+    private lazy var flowLayout: PhotoBrowserLayout = {
+        return PhotoBrowserLayout()
+    }()
+    
+    /// 容器
+    private lazy var collectionView: UICollectionView = { [unowned self] in
+        let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
+        collectionView.backgroundColor = UIColor.clear
+        collectionView.decelerationRate = UIScrollViewDecelerationRateFast
+        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
+        return collectionView
+    }()
     
     /// PageControl
     private lazy var pageControl: UIView? = { [unowned self] in
         return self.pageControlDelegate?.pageControlOfPhotoBrowser(self)
     }()
     
-    /// 标记第一次viewDidAppeared
-    private var onceViewDidAppeared = false
-    
     /// 保存原windowLevel
     private var originWindowLevel: UIWindowLevel!
-    
-    /// 是否已初始化视图
-    private var didInitializedLayout = false
     
     // MARK: - 公开方法
     /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
     public init(showByViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate) {
         self.presentingVC = presentingVC
         self.photoBrowserDelegate = delegate
-        flowLayout = PhotoBrowserLayout()
-        collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -174,7 +178,7 @@ public class PhotoBrowser: UIViewController {
     // MARK: - 内部方法
     public override func viewDidLoad() {
         super.viewDidLoad()
-        initialLayout()
+        setupViews()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -185,52 +189,48 @@ public class PhotoBrowser: UIViewController {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // 页面出来后，再显示pageControl
-        layoutPageControl()
-    }
-    
-    /// 禁止旋转
-    public override var shouldAutorotate: Bool {
-        return false
-    }
-    
-    /// 初始layout
-    private func initialLayout() {
-        if didInitializedLayout {
-            return
+        // 页面出来后，再显示页码指示器
+        // 多于一张图才会显示
+        if let pcdlg = pageControlDelegate, pcdlg.numberOfPages > 1, let pc = pageControl {
+            view.addSubview(pc)
+            pcdlg.photoBrowserPageControl(pc, needLayoutIn: view)
         }
-        didInitializedLayout = true
-        // flowLayout
-        flowLayout.minimumLineSpacing = photoSpacing
-        flowLayout.itemSize = view.bounds.size
-        
-        // collectionView
-        collectionView.frame = view.bounds
-        collectionView.backgroundColor = UIColor.clear
-        collectionView.decelerationRate = UIScrollViewDecelerationRateFast
-        collectionView.showsVerticalScrollIndicator = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
+    }
+    
+    public override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        layoutViews()
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // 屏幕旋转后的调整
+        let indexPath = IndexPath.init(item: self.currentIndex, section: 0)
+        self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+    }
+    
+    /// 支持旋转
+    public override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    /// 支持旋转的方向
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .all
+    }
+    
+    /// 添加视图
+    private func setupViews() {
         view.addSubview(collectionView)
     }
     
-    /// 显示pageControl
-    private func layoutPageControl() {
-        guard let dlg = pageControlDelegate else {
-            return
-        }
-        // 如果只有一页，不显示
-        guard dlg.numberOfPages > 1 else {
-            return
-        }
-        if !onceViewDidAppeared, let pc = pageControl {
-            onceViewDidAppeared = true
-            view.addSubview(pc)
-            dlg.photoBrowserPageControl(pc, didMoveTo: view)
-        }
-        dlg.photoBrowserPageControl(self.pageControl!, needLayoutIn: view)
+    /// 视图布局
+    private func layoutViews() {
+        // flowLayout
+        flowLayout.minimumLineSpacing = photoSpacing
+        flowLayout.itemSize = view.bounds.size
+        // collectionView
+        collectionView.frame = view.bounds
     }
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
@@ -244,14 +244,8 @@ public class PhotoBrowser: UIViewController {
             originWindowLevel = window.windowLevel
         }
         if cover {
-            if window.windowLevel == UIWindowLevelStatusBar + 1 {
-                return
-            }
             window.windowLevel = UIWindowLevelStatusBar + 1
         } else {
-            if window.windowLevel == originWindowLevel {
-                return
-            }
             window.windowLevel = originWindowLevel
         }
     }
@@ -296,7 +290,7 @@ extension PhotoBrowser: UICollectionViewDelegate {
     /// 减速完成后，计算当前页
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let offsetX = scrollView.contentOffset.x
-        let width = scrollView.bounds.width + photoSpacing
+        let width = scrollView.frame.width + photoSpacing
         currentIndex = Int(offsetX / width)
     }
 }
@@ -305,8 +299,9 @@ extension PhotoBrowser: UICollectionViewDelegate {
 
 extension PhotoBrowser: UIViewControllerTransitioningDelegate {
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        // 视图布局
-        initialLayout()
+        // 立即布局
+        setupViews()
+        layoutViews()
         // 立即加载collectionView
         let indexPath = IndexPath(item: currentIndex, section: 0)
         collectionView.reloadData()

@@ -142,6 +142,11 @@ public class PhotoBrowserCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        doLayout()
+    }
+    
     /// 布局
     private func doLayout() {
         scrollView.frame = contentView.bounds

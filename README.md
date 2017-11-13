@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v0.4.1-blue.svg)
+![](https://img.shields.io/badge/pod-v0.4.2-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Requirements
@@ -1063,12 +1063,5 @@ vc.show(index: indexPath.item)
 
 如果框架的两个样式都无法满足需求时，也可自己实现PageControl协议，自由定制。
 
-# CocoaPods
-已上传CocoaPods，现可直接导入：
-```
-pod 'JXPhotoBrowser'
-```
 
-# 源码
-GitHub地址: [PhotoBrowser](https://github.com/JiongXing/PhotoBrowser)
 若使用过程中有任何问题，请issues我。 ^_^

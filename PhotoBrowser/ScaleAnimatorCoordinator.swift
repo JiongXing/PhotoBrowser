@@ -33,6 +33,7 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
         
         containerView.addSubview(maskView)
         maskView.frame = containerView.bounds
+        maskView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         maskView.alpha = 0
         currentHiddenView?.isHidden = true
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in

@@ -11,9 +11,9 @@ import UIKit
 public class PhotoBrowserLayout: UICollectionViewFlowLayout {
     
     /// 一页宽度，算上空隙
-    private lazy var pageWidth: CGFloat = {
+    private var pageWidth: CGFloat {
         return self.itemSize.width + self.minimumLineSpacing
-    }()
+    }
     
     /// 上次页码
     private lazy var lastPage: CGFloat = {

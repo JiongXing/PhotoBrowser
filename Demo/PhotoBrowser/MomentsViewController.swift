@@ -77,6 +77,14 @@ class MomentsViewController: UIViewController {
         cv.backgroundColor = UIColor.white
         collectionView = cv
     }
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .all
+    }
 }
 
 extension MomentsViewController: UICollectionViewDataSource {
