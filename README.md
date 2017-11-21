@@ -5,7 +5,7 @@
 
 # Requirements
 - iOS 8.0+
-- Swift 4 (JXPhotoBrowser 0.4.x), Swift 3 (JXPhotoBrowser 0.3.x)
+- Swift 4
 
 # Installation
 ## CocoaPods
