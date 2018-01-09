@@ -207,6 +207,10 @@ public class PhotoBrowser: UIViewController {
         // 屏幕旋转后的调整
         let indexPath = IndexPath.init(item: self.currentIndex, section: 0)
         self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+
+        guard let pcdlg = pageControlDelegate, pcdlg.numberOfPages > 1, let pc = pageControl else { return }
+
+        pcdlg.photoBrowserPageControl(pc, needLayoutIn: view)
     }
     
     /// 支持旋转
