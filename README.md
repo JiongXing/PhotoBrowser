@@ -1,13 +1,13 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v0.4.3-blue.svg)
+![](https://img.shields.io/badge/pod-v0.4.5-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-# Requirements
+# 系统要求
 - iOS 8.0+
 - Swift 4
 
-# Installation
+# 安装
 ## CocoaPods
 更新你的本地仓库以同步最新版本
 ```
@@ -25,7 +25,7 @@ github "onevcat/Kingfisher"
 github "JiongXing/PhotoBrowser"
 ```
 
-# Usage
+# 使用方法
 ```swift
 // 创建实例，传入present发起者，和delegate实现者
 let browser = PhotoBrowser(showByViewController: self, delegate: self)
