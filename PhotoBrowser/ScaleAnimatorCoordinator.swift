@@ -13,6 +13,9 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
     /// 动画结束后需要隐藏的view
     public var currentHiddenView: UIView?
     
+    /// 暂存需隐藏的view的原alpha值
+    private var currentHiddenViewOriginAlpha: CGFloat?;
+    
     /// 蒙板
     public var maskView: UIView = {
         let view = UIView()
@@ -22,9 +25,12 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
     
     /// 更新动画结束后需要隐藏的view
     public func updateCurrentHiddenView(_ view: UIView?) {
-        currentHiddenView?.isHidden = false
+        // 重新显示前一个隐藏视图。??后的1.0不会生效，仅为语法而写。
+        currentHiddenView?.alpha = currentHiddenViewOriginAlpha ?? 1.0;
+        // 隐藏新视图
         currentHiddenView = view
-        view?.isHidden = true
+        currentHiddenViewOriginAlpha = view?.alpha
+        view?.alpha = 0.01
     }
     
     override public func presentationTransitionWillBegin() {
@@ -35,7 +41,7 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
         maskView.frame = containerView.bounds
         maskView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         maskView.alpha = 0
-        currentHiddenView?.isHidden = true
+        currentHiddenView?.alpha = 0.01
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
             self.maskView.alpha = 1
         }, completion:nil)
@@ -43,11 +49,11 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
     
     override public func dismissalTransitionWillBegin() {
         super.dismissalTransitionWillBegin()
-        currentHiddenView?.isHidden = true
+        currentHiddenView?.alpha = 0.01
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
             self.maskView.alpha = 0
         }, completion: { _ in
-            self.currentHiddenView?.isHidden = false
+            self.currentHiddenView?.alpha = self.currentHiddenViewOriginAlpha ?? 1.0
         })
     }
 }

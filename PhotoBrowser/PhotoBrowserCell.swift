@@ -158,6 +158,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         imageView.frame = fitFrame
         scrollView.setZoomScale(1.0, animated: false)
         progressView.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.midY)
+        
         // 查看原图按钮
         if rawImageButton.isHidden == false {
             contentView.addSubview(rawImageButton)

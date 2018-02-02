@@ -208,9 +208,9 @@ public class PhotoBrowser: UIViewController {
         let indexPath = IndexPath.init(item: self.currentIndex, section: 0)
         self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
 
-        guard let pcdlg = pageControlDelegate, pcdlg.numberOfPages > 1, let pc = pageControl else { return }
-
-        pcdlg.photoBrowserPageControl(pc, needLayoutIn: view)
+        if let pcdlg = pageControlDelegate, pcdlg.numberOfPages > 1, let pc = pageControl {
+            pcdlg.photoBrowserPageControl(pc, needLayoutIn: view)
+        }
     }
     
     /// 支持旋转

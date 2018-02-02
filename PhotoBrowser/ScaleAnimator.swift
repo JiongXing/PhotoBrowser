@@ -46,7 +46,7 @@ public class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         
         // dismissal转场，需要把presentedView隐藏，只显示scaleView
         if !presentation, let presentedView = transitionContext.view(forKey: .from) {
-            presentedView.isHidden = true
+            presentedView.alpha = 0.01;
         }
         
         // 转场容器
