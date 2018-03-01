@@ -28,7 +28,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 显示图像
     public let imageView = UIImageView()
     
-    /// 原图url
+    /// 保存原图url，用于点查看原图时使用
     public var rawUrl: URL?
     
     /// 捏合手势放大图片时的最大允许比例
@@ -171,46 +171,56 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     /// 设置图片。image为placeholder图片，url为网络图片
     public func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
-        // 查看原图按钮
-        rawImageButton.isHidden = (rawUrl == nil)
-        self.rawUrl = rawUrl
-        
-        // 取placeholder图像，默认使用传入的缩略图
-        var placeholder = image
-        // 若已有原图缓存，优先使用原图
-        // 次之使用高清图
-        var url = highQualityUrl
-        if let cacheImage = imageFor(url: rawUrl) {
-            placeholder = cacheImage
-            url = rawUrl
-            rawImageButton.isHidden = true
-        } else if let cacheImage = imageFor(url: highQualityUrl) {
-            placeholder = cacheImage
-        }
-        // 处理只配置了原图而不配置高清图的情况。此时使用原图代替高清图作为下载url
-        if url == nil {
-            url = rawUrl
-        }
-        guard url != nil else {
+        // 默认隐藏查看原图按钮
+        self.rawUrl = nil
+        rawImageButton.isHidden = true
+        // 若已有原图缓存，使用原图
+        if let image = imageFor(url: rawUrl) {
             imageView.image = image
             doLayout()
             return
         }
-        loadImage(withPlaceholder: placeholder, url: url)
+        // 若已有高清图缓存，使用高清图
+        if let image = imageFor(url: highQualityUrl) {
+            imageView.image = image
+            // 有rawUrl则显示查看原图按钮
+            if rawUrl != nil {
+                self.rawUrl = rawUrl
+                rawImageButton.isHidden = false
+            }
+            doLayout()
+            return
+        }
+        // 无缓存，开始加载图片
+        if highQualityUrl != nil {
+            loadImage(withPlaceholder: image, url: highQualityUrl, completion: { [weak self] in
+                if rawUrl != nil {
+                    self?.rawUrl = rawUrl
+                    self?.rawImageButton.isHidden = false
+                }
+                self?.doLayout()
+            })
+        } else {
+            loadImage(withPlaceholder: image, url: rawUrl, completion: { [weak self] in
+                self?.doLayout()
+            })
+        }
         self.doLayout()
     }
     
     /// 加载图片
-    private func loadImage(withPlaceholder placeholder: UIImage?, url: URL?) {
+    private func loadImage(withPlaceholder placeholder: UIImage?, url: URL?, completion: (() -> Void)?) {
+        // 显示加载进度
         self.progressView.isHidden = false
-        weak var weakSelf = self
-        imageView.kf.setImage(with: url, placeholder: placeholder, options: nil, progressBlock: { (receivedSize, totalSize) in
+        imageView.kf.setImage(with: url, placeholder: placeholder, options: nil, progressBlock: { [weak self] (receivedSize, totalSize) in
             if totalSize > 0 {
-                weakSelf?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
+                self?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
             }
-        }, completionHandler: { (image, error, cacheType, url) in
-            weakSelf?.progressView.isHidden = true
-            weakSelf?.doLayout()
+        }, completionHandler: { [weak self] (image, error, cacheType, url) in
+            self?.progressView.isHidden = true
+            if let completion = completion {
+                completion()
+            }
         })
     }
     
@@ -338,8 +348,10 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     /// 响应查看原图按钮
     @objc func onRawImageButtonTap() {
-        loadImage(withPlaceholder: imageView.image, url: rawUrl)
         rawImageButton.isHidden = true
+        loadImage(withPlaceholder: imageView.image, url: rawUrl, completion: { [weak self] in
+            self?.doLayout()
+        })
     }
 }
 

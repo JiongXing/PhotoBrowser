@@ -141,9 +141,7 @@ extension MomentsViewController: PhotoBrowserDelegate {
     }
     
     /// 最高清图，原图。（需要时可实现本方法）
-    /*
-    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-        return nil
+    /*func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
         // 测试
         return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
     }*/
