@@ -3,11 +3,38 @@
 ![](https://img.shields.io/badge/pod-v0.4.6-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-# 系统要求
+# Usage
+```swift
+// 创建实例，传入present发起者，和delegate实现者
+let browser = PhotoBrowser(showByViewController: self, delegate: self)
+// 显示，并指定打开第几张图
+browser.show(index: 3)
+
+/// 实现本方法以返回图片数量
+func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
+    
+/// 实现本方法以返回默认图片，缩略图或占位图
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
+    
+/// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
+/// 比如你可返回ImageView，或整个Cell
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
+    
+/// 实现本方法以返回高质量图片的url。可选
+func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
+    
+/// 实现本方法以返回原图url。可选
+func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
+    
+/// 长按时回调，可以在此处保存图片。可选
+func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
+```
+
+# Requirements
 - iOS 8.0+
 - Swift 4
 
-# 安装
+# Installation
 ## CocoaPods
 更新你的本地仓库以同步最新版本
 ```
@@ -25,34 +52,7 @@ github "onevcat/Kingfisher"
 github "JiongXing/PhotoBrowser"
 ```
 
-# 使用方法
-```swift
-// 创建实例，传入present发起者，和delegate实现者
-let browser = PhotoBrowser(showByViewController: self, delegate: self)
-// 显示，并指定打开第几张图
-browser.show(index: 3)
-
-// 作为delegate必须实现的协议方法
-/// 图片总数
-func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
-    return thumbnailImageUrls.count
-}
-/// 缩放起始视图
-func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
-    return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
-}
-/// 图片加载前的placeholder
-func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
-    let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
-    // 取thumbnailImage
-    return cell?.imageView.image
-}
-/// 高清图
-func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
-    return URL(string: highQualityImageUrls[index])
-}
-```
-
+# 以下是初版实现原理
 # 缘起
 那时，我想要一个这样的图片浏览器：
 - 从小图进入大图浏览时，使用转场动画
