@@ -17,7 +17,7 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回默认图片，缩略图或占位图
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
     
-    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的hidden属性
+    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
     /// 比如你可返回ImageView，或整个Cell
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
     
