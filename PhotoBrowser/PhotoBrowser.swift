@@ -14,7 +14,7 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回图片数量
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
     
-    /// 实现本方法以返回默认图片，缩略图或占位图
+    /// 实现本方法以返回默认显示图片，缩略图或占位图
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
     
     /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
@@ -24,7 +24,7 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回高质量图片的url。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
     
-    /// 实现本方法以返回原图url。可选
+    /// 实现本方法以返回原图级质量的url。当本代理方法有返回值时，自动显示查看原图按钮。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
     
     /// 长按时回调。可选
