@@ -6,7 +6,7 @@
 # Usage
 ```swift
 // 创建实例，传入present发起者，和delegate实现者
-let browser = PhotoBrowser(showByViewController: self, delegate: self)
+let browser = PhotoBrowser(showByViewController: vc, delegate: self)
 // 显示，并指定打开第几张图
 browser.show(index: 3)
 
