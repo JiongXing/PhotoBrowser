@@ -52,27 +52,16 @@ PhotoBrowser {
     /// 便利的展示方法，合并init和show两个步骤
     /// - parameter presentingVC: 由谁 present 出本浏览器
     /// - parameter delegate: 浏览器协议代理
-    public class func show(byViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate, index: Int) {
-        let vc = PhotoBrowser(showByViewController: presentingVC, delegate: delegate)
-        vc.show(index: index)
-    }
+    public class func show(byViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate, index: Int)
     
     /// 展示，传入图片序号，从0开始
     /// - parameter index: 图片序号，从0开始
-    public func show(index: Int) {
-        currentIndex = index
-        self.transitioningDelegate = self
-        self.modalPresentationStyle = .custom
-        self.modalPresentationCapturesStatusBarAppearance = true
-        presentingVC.present(self, animated: true, completion: nil)
-    }
+    public func show(index: Int)
     
     /// 主动关闭浏览器。
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
-    public func dismiss(animated: Bool) {
-        dismiss(animated: animated, completion: nil)
-    }
+    public func dismiss(animated: Bool)
 }
 ```
 
