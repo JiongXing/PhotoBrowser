@@ -132,13 +132,9 @@ extension MomentsViewController: UICollectionViewDelegate {
 
 // 实现浏览器代理协议
 extension MomentsViewController: PhotoBrowserDelegate {
+    /// 共有多少张图片
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
         return thumbnailImageUrls.count
-    }
-    
-    /// 缩放起始视图
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
-        return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
     
     /// 图片加载前的placeholder
@@ -148,19 +144,24 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return cell?.imageView.image
     }
     
+    /// 缩放起始视图
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
+        return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
+    }
+    
     /// 高清图
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
         return URL(string: highQualityImageUrls[index])
     }
     
-    /// 最高清图，原图。（需要时可实现本方法）
+    /// 原图。最高清图。
     /*
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
         // 测试
         return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
     }*/
     
-    /// 长按图片
+    /// 长按图片。你可以在此处得到当前图片，并可以做些弹个窗，保存图片等操作
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let saveImageAction = UIAlertAction(title: "保存图片", style: .default) { (_) in

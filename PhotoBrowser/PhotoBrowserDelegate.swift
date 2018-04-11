@@ -18,13 +18,14 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回默认显示图片，缩略图或占位图
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
     
-    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
-    /// 比如你可返回ImageView，或整个Cell
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
-    
     //
     // MARK: - 可选
     //
+    
+    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
+    /// 比如你可返回ImageView，或整个Cell
+    /// 使用 scale 动画时必须实现本方法
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
     
     /// 实现本方法以返回高质量图片的url。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
@@ -51,6 +52,10 @@ public protocol PhotoBrowserDelegate: class {
 //
 
 public extension PhotoBrowserDelegate {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
+        return nil
+    }
+    
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
         return nil
     }
