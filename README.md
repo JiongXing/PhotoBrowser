@@ -4,80 +4,6 @@
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Usage
-## PhotoBrowserDelegate
-```swift
-public protocol PhotoBrowserDelegate: class {
-    //
-    // MARK: - 必选
-    //
-    
-    /// 实现本方法以返回图片数量
-    func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
-    
-    /// 实现本方法以返回默认显示图片，缩略图或占位图
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
-    
-    //
-    // MARK: - 可选
-    //
-    
-    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
-    /// 比如你可返回ImageView，或整个Cell
-    /// 使用 scale 动画时必须实现本方法
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
-    
-    /// 实现本方法以返回高质量图片的url。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
-    
-    /// 实现本方法以返回原图级质量的url。当本代理方法有返回值时，自动显示查看原图按钮。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
-    
-    /// 长按时回调。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
-    
-    /// 即将关闭图片浏览器时回调
-    /// - parameter index: 即将关闭时，正在显示的图片序号
-    /// - parameter image: 即将关闭时，正在显示的图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage)
-    
-    /// 已经关闭图片浏览器时回调
-    /// - parameter index: 最后显示的图片序号
-    /// - parameter image: 最后显示的图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage)
-}
-```
-
-## PhotoBrowser
-```swift
-PhotoBrowser {
-    /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
-    /// - parameter presentingVC: 由谁 present 出本浏览器
-    /// - parameter delegate: 浏览器协议代理
-    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    public init(showByViewController presentingVC: UIViewController,
-                delegate: PhotoBrowserDelegate,
-                animationType: AnimationType = .scale)
-                
-    /// 展示，传入图片序号，从0开始
-    /// - parameter index: 图片序号，从0开始
-    public func show(index: Int)
-    
-    /// 便利的展示方法，合并init和show两个步骤
-    /// - parameter presentingVC: 由谁 present 出本浏览器
-    /// - parameter delegate: 浏览器协议代理
-    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    /// - parameter index: 图片序号，从0开始
-    public class func show(byViewController presentingVC: UIViewController,
-                           delegate: PhotoBrowserDelegate,
-                           animationType: AnimationType = .scale,
-                           index: Int)
-                           
-    /// 主动关闭浏览器。
-    /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
-    /// - parameter animated: 是否需要关闭转场动画
-    public func dismiss(animated: Bool)
-}
-```
 
 ## 简单示例
 创建并展示：
@@ -152,6 +78,81 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int,
 /// 已经关闭图片浏览器
 func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage) {
     print("已经关闭图片浏览器，index:\(index), image:\(image)")
+}
+```
+
+## PhotoBrowserDelegate
+```swift
+public protocol PhotoBrowserDelegate: class {
+    //
+    // MARK: - 必选
+    //
+    
+    /// 实现本方法以返回图片数量
+    func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
+    
+    /// 实现本方法以返回默认显示图片，缩略图或占位图
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
+    
+    //
+    // MARK: - 可选
+    //
+    
+    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
+    /// 比如你可返回ImageView，或整个Cell
+    /// 使用 scale 动画时必须实现本方法
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
+    
+    /// 实现本方法以返回高质量图片的url。可选
+    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
+    
+    /// 实现本方法以返回原图级质量的url。当本代理方法有返回值时，自动显示查看原图按钮。可选
+    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
+    
+    /// 长按时回调。可选
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
+    
+    /// 即将关闭图片浏览器时回调
+    /// - parameter index: 即将关闭时，正在显示的图片序号
+    /// - parameter image: 即将关闭时，正在显示的图片
+    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage)
+    
+    /// 已经关闭图片浏览器时回调
+    /// - parameter index: 最后显示的图片序号
+    /// - parameter image: 最后显示的图片
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage)
+}
+```
+
+## PhotoBrowser
+```swift
+PhotoBrowser {
+    /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
+    /// - parameter presentingVC: 由谁 present 出本浏览器
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    public init(showByViewController presentingVC: UIViewController,
+                delegate: PhotoBrowserDelegate,
+                animationType: AnimationType = .scale)
+                
+    /// 展示，传入图片序号，从0开始
+    /// - parameter index: 图片序号，从0开始
+    public func show(index: Int)
+    
+    /// 便利的展示方法，合并init和show两个步骤
+    /// - parameter presentingVC: 由谁 present 出本浏览器
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    /// - parameter index: 图片序号，从0开始
+    public class func show(byViewController presentingVC: UIViewController,
+                           delegate: PhotoBrowserDelegate,
+                           animationType: AnimationType = .scale,
+                           index: Int)
+                           
+    /// 主动关闭浏览器。
+    /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
+    /// - parameter animated: 是否需要关闭转场动画
+    public func dismiss(animated: Bool)
 }
 ```
 
