@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Kingfisher
 import JXPhotoBrowser
 
 class MomentsViewController: UIViewController {
@@ -108,12 +107,18 @@ extension MomentsViewController: UICollectionViewDelegate {
         // 调起图片浏览器
         let vc = PhotoBrowser(showByViewController: self, delegate: self)
         // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
+        // 这里随机创建一种
         if arc4random_uniform(2) % 2 == 0 {
             vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
         } else {
             vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
         }
         vc.show(index: indexPath.item)
+        /*
+        // 可命令关闭图片浏览器
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            vc.dismiss(animated: false)
+        }*/
     }
 }
 
@@ -141,7 +146,8 @@ extension MomentsViewController: PhotoBrowserDelegate {
     }
     
     /// 最高清图，原图。（需要时可实现本方法）
-    /*func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
+    /*
+    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
         // 测试
         return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
     }*/
@@ -157,6 +163,16 @@ extension MomentsViewController: PhotoBrowserDelegate {
         actionSheet.addAction(saveImageAction)
         actionSheet.addAction(cancelAction)
         photoBrowser.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    /// 即将关闭图片浏览器
+    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage) {
+        print("即将关闭图片浏览器，index:\(index), image:\(image)")
+    }
+
+    /// 已经关闭图片浏览器
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage) {
+        print("已经关闭图片浏览器，index:\(index), image:\(image)")
     }
 }
 

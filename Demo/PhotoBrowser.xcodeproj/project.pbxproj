@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		94329C39207DA25300C83E5C /* JXPhotoBrowser.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 94329C38207DA25300C83E5C /* JXPhotoBrowser.podspec */; };
+		94329C3B207DA5A800C83E5C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 94329C3A207DA5A800C83E5C /* README.md */; };
 		943AB24A1E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */; };
 		9453916E1E713A4C00A9AF66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9453916D1E713A4C00A9AF66 /* AppDelegate.swift */; };
 		945391751E713A4C00A9AF66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 945391741E713A4C00A9AF66 /* Assets.xcassets */; };
@@ -21,6 +23,8 @@
 		47E5F69AEB2919CEBF10D4AA /* Pods-PhotoBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoBrowser.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PhotoBrowser/Pods-PhotoBrowser.debug.xcconfig"; sourceTree = "<group>"; };
 		59EF5448ECA4869EE2F0BD69 /* Pods_PhotoBrowserUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoBrowserUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8586CF77D6602139070D6A91 /* Pods_PhotoBrowserTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoBrowserTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		94329C38207DA25300C83E5C /* JXPhotoBrowser.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = JXPhotoBrowser.podspec; path = ../JXPhotoBrowser.podspec; sourceTree = "<group>"; };
+		94329C3A207DA5A800C83E5C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentsPhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		9453916A1E713A4C00A9AF66 /* PhotoBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9453916D1E713A4C00A9AF66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -52,9 +56,19 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		94329C37207DA23D00C83E5C /* MetaData */ = {
+			isa = PBXGroup;
+			children = (
+				94329C3A207DA5A800C83E5C /* README.md */,
+				94329C38207DA25300C83E5C /* JXPhotoBrowser.podspec */,
+			);
+			name = MetaData;
+			sourceTree = "<group>";
+		};
 		945391611E713A4C00A9AF66 = {
 			isa = PBXGroup;
 			children = (
+				94329C37207DA23D00C83E5C /* MetaData */,
 				9453916C1E713A4C00A9AF66 /* PhotoBrowser */,
 				9453916B1E713A4C00A9AF66 /* Products */,
 				FA9EB99E53011C5B705EE036 /* Pods */,
@@ -104,7 +118,6 @@
 				945391671E713A4C00A9AF66 /* Frameworks */,
 				945391681E713A4C00A9AF66 /* Resources */,
 				E3A327B6E42AEF8E822153C4 /* [CP] Embed Pods Frameworks */,
-				DC1978D5512843EF1EB8FDC0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -157,6 +170,8 @@
 			files = (
 				945391781E713A4C00A9AF66 /* LaunchScreen.storyboard in Resources */,
 				945391751E713A4C00A9AF66 /* Assets.xcassets in Resources */,
+				94329C3B207DA5A800C83E5C /* README.md in Resources */,
+				94329C39207DA25300C83E5C /* JXPhotoBrowser.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,28 +184,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PhotoBrowser-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		DC1978D5512843EF1EB8FDC0 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PhotoBrowser/Pods-PhotoBrowser-resources.sh\"\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E3A327B6E42AEF8E822153C4 /* [CP] Embed Pods Frameworks */ = {
@@ -199,9 +202,14 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-PhotoBrowser/Pods-PhotoBrowser-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/JXPhotoBrowser/JXPhotoBrowser.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JXPhotoBrowser.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

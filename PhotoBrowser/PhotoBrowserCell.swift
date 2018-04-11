@@ -10,11 +10,11 @@ import UIKit
 import Kingfisher
 
 protocol PhotoBrowserCellDelegate: NSObjectProtocol {
-    /// 单击时回调
-    func photoBrowserCellDidSingleTap(_ cell: PhotoBrowserCell)
-    
     /// 拖动时回调。scale:缩放比率
     func photoBrowserCell(_ cell: PhotoBrowserCell, didPanScale scale: CGFloat)
+    
+    /// 单击时回调
+    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage)
     
     /// 长按时回调
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
@@ -146,11 +146,11 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        doLayout()
+        layout()
     }
     
     /// 布局
-    private func doLayout() {
+    private func layout() {
         guard shouldLayout else { return }
 
         scrollView.frame = contentView.bounds
@@ -177,7 +177,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         // 若已有原图缓存，使用原图
         if let image = imageFor(url: rawUrl) {
             imageView.image = image
-            doLayout()
+            layout()
             return
         }
         // 若已有高清图缓存，使用高清图
@@ -188,7 +188,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
                 self.rawUrl = rawUrl
                 rawImageButton.isHidden = false
             }
-            doLayout()
+            layout()
             return
         }
         // 无缓存，开始加载图片
@@ -198,14 +198,14 @@ public class PhotoBrowserCell: UICollectionViewCell {
                     self?.rawUrl = rawUrl
                     self?.rawImageButton.isHidden = false
                 }
-                self?.doLayout()
+                self?.layout()
             })
         } else {
             loadImage(withPlaceholder: image, url: rawUrl, completion: { [weak self] in
-                self?.doLayout()
+                self?.layout()
             })
         }
-        self.doLayout()
+        self.layout()
     }
     
     /// 加载图片
@@ -244,8 +244,8 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     /// 响应单击
     @objc func onSingleTap() {
-        if let dlg = photoBrowserCellDelegate {
-            dlg.photoBrowserCellDidSingleTap(self)
+        if let dlg = photoBrowserCellDelegate, let image = imageView.image {
+            dlg.photoBrowserCell(self, didSingleTap: image)
         }
     }
     
@@ -350,7 +350,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     @objc func onRawImageButtonTap() {
         rawImageButton.isHidden = true
         loadImage(withPlaceholder: imageView.image, url: rawUrl, completion: { [weak self] in
-            self?.doLayout()
+            self?.layout()
         })
     }
 }
