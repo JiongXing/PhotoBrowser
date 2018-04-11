@@ -4,7 +4,7 @@
 //
 //  Created by Wei Wang on 2016/09/02.
 //
-//  Copyright (c) 2017 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ public struct DefaultCacheSerializer: CacheSerializer {
     
     public func data(with image: Image, original: Data?) -> Data? {
         let imageFormat = original?.kf.imageFormat ?? .unknown
-        
+
         let data: Data?
         switch imageFormat {
         case .PNG: data = image.kf.pngRepresentation()
@@ -72,7 +72,7 @@ public struct DefaultCacheSerializer: CacheSerializer {
         case .GIF: data = image.kf.gifRepresentation()
         case .unknown: data = original ?? image.kf.normalized.kf.pngRepresentation()
         }
-        
+
         return data
     }
     

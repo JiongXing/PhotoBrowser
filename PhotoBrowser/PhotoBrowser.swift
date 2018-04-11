@@ -33,6 +33,9 @@ public class PhotoBrowser: UIViewController {
     /// 双击放大图片时的目标比例
     public var imageZoomScaleForDoubleTap: CGFloat = 2.0
     
+    /// 转场动画类型
+    public var animationType: AnimationType
+    
     //
     // MARK: - 私有属性
     //
@@ -40,7 +43,7 @@ public class PhotoBrowser: UIViewController {
     /// 当前显示的图片序号，从0开始
     private var currentIndex = 0 {
         didSet {
-            animatorCoordinator?.updateCurrentHiddenView(relatedView)
+            scalePresentationController?.updateCurrentHiddenView(relatedView)
             guard let dlg = pageControlDelegate, let pageControl = self.pageControl else {
                 return
             }
@@ -54,10 +57,10 @@ public class PhotoBrowser: UIViewController {
     }
     
     /// 转场协调器
-    private weak var animatorCoordinator: ScaleAnimatorCoordinator?
+    private weak var fadePresentationController: FadePresentationControllerDelegate?
     
-    /// presentation转场动画
-    private weak var presentationAnimator: ScaleAnimator?
+    /// 缩放型转场协调器
+    private weak var scalePresentationController: ScalePresentationController?
     
     /// 本VC的presentingViewController
     private let presentingVC: UIViewController
@@ -102,9 +105,13 @@ public class PhotoBrowser: UIViewController {
     /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
     /// - parameter presentingVC: 由谁 present 出本浏览器
     /// - parameter delegate: 浏览器协议代理
-    public init(showByViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate) {
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    public init(showByViewController presentingVC: UIViewController,
+                delegate: PhotoBrowserDelegate,
+                animationType: AnimationType = .scale) {
         self.presentingVC = presentingVC
         self.photoBrowserDelegate = delegate
+        self.animationType = animationType
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -121,8 +128,13 @@ extension PhotoBrowser {
     /// 便利的展示方法，合并init和show两个步骤
     /// - parameter presentingVC: 由谁 present 出本浏览器
     /// - parameter delegate: 浏览器协议代理
-    public class func show(byViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate, index: Int) {
-        let vc = PhotoBrowser(showByViewController: presentingVC, delegate: delegate)
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    /// - parameter index: 图片序号，从0开始
+    public class func show(byViewController presentingVC: UIViewController,
+                           delegate: PhotoBrowserDelegate,
+                           animationType: AnimationType = .scale,
+                           index: Int) {
+        let vc = PhotoBrowser(showByViewController: presentingVC, delegate: delegate, animationType: animationType)
         vc.show(index: index)
     }
     
@@ -149,7 +161,7 @@ extension PhotoBrowser {
 //
 
 extension PhotoBrowser {
-    // MARK: - 内部方法
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
@@ -286,7 +298,45 @@ extension PhotoBrowser: UICollectionViewDelegate {
 //
 
 extension PhotoBrowser: UIViewControllerTransitioningDelegate {
+    /// 提供进场动画
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        // 枚举动画类型
+        switch animationType {
+        case .scale:
+            return makeScalePresentationAnimator()
+        case .fade:
+            return FadeAnimator()
+        }
+    }
+    
+    /// 提供退场动画
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        switch animationType {
+        case .scale:
+            return makeDismissedAnimator()
+        case .fade:
+            return FadeAnimator()
+        }
+    }
+    
+    /// 提供转场协调器
+    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
+        switch animationType {
+        case .scale:
+            let controller = ScalePresentationController(presentedViewController: presented, presenting: presenting)
+            controller.currentHiddenView = relatedView
+            fadePresentationController = controller
+            scalePresentationController = controller
+            return controller
+        case .fade:
+            let controller = FadePresentationController(presentedViewController: presented, presenting: presented)
+            fadePresentationController = controller
+            return controller
+        }
+    }
+    
+    /// 创建缩放型进场动画
+    private func makeScalePresentationAnimator() -> UIViewControllerAnimatedTransitioning {
         // 立即布局
         setupViews()
         layoutViews()
@@ -300,12 +350,11 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
         imageView.contentMode = imageScaleMode
         imageView.clipsToBounds = true
         // 创建animator
-        let animator = ScaleAnimator(startView: relatedView, endView: cell?.imageView, scaleView: imageView)
-        presentationAnimator = animator
-        return animator
+        return ScaleAnimator(startView: relatedView, endView: cell?.imageView, scaleView: imageView)
     }
     
-    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    /// 创建缩放型退场动画
+    private func makeDismissedAnimator() -> UIViewControllerAnimatedTransitioning? {
         guard let cell = collectionView.visibleCells.first as? PhotoBrowserCell else {
             return nil
         }
@@ -314,13 +363,6 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
         imageView.clipsToBounds = true
         return ScaleAnimator(startView: cell.imageView, endView: relatedView, scaleView: imageView)
     }
-    
-    public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        let coordinator = ScaleAnimatorCoordinator(presentedViewController: presented, presenting: presenting)
-        coordinator.currentHiddenView = relatedView
-        animatorCoordinator = coordinator
-        return coordinator
-    }
 }
 
 //
@@ -328,7 +370,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
 //
 
 extension PhotoBrowser: PhotoBrowserCellDelegate {
-    public func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage) {
+    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage) {
         if let dlg = photoBrowserDelegate {
             dlg.photoBrowser(self, willDismissWithIndex: currentIndex, image: image)
         }
@@ -340,15 +382,15 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         })
     }
     
-    public func photoBrowserCell(_ view: PhotoBrowserCell, didPanScale scale: CGFloat) {
+    func photoBrowserCell(_ view: PhotoBrowserCell, didPanScale scale: CGFloat) {
         // 实测用scale的平方，效果比线性好些
         let alpha = scale * scale
-        animatorCoordinator?.maskView.alpha = alpha
+        fadePresentationController?.maskAlpha = alpha
         // 半透明时重现状态栏，否则遮盖状态栏
         coverStatusBar(alpha >= 1.0)
     }
     
-    public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
+    func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
         if let indexPath = collectionView.indexPath(for: cell) {
             photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
         }

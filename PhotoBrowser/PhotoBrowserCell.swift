@@ -20,26 +20,26 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
 }
 
-public class PhotoBrowserCell: UICollectionViewCell {
+class PhotoBrowserCell: UICollectionViewCell {
     // MARK: - 公开属性
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
     /// 显示图像
-    public let imageView = UIImageView()
+    let imageView = UIImageView()
     
     /// 保存原图url，用于点查看原图时使用
-    public var rawUrl: URL?
+    var rawUrl: URL?
     
     /// 捏合手势放大图片时的最大允许比例
-    public var imageMaximumZoomScale: CGFloat = 2.0 {
+    var imageMaximumZoomScale: CGFloat = 2.0 {
         didSet {
             self.scrollView.maximumZoomScale = imageMaximumZoomScale
         }
     }
     
     /// 双击放大图片时的目标比例
-    public var imageZoomScaleForDoubleTap: CGFloat = 2.0
+    var imageZoomScaleForDoubleTap: CGFloat = 2.0
     
     // MARK: - 内部属性
     /// 内嵌容器。本类不能继承UIScrollView。
@@ -144,7 +144,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         layout()
     }
@@ -170,7 +170,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 设置图片。image为placeholder图片，url为网络图片
-    public func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+    func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 默认隐藏查看原图按钮
         self.rawUrl = nil
         rawImageButton.isHidden = true
@@ -356,17 +356,17 @@ public class PhotoBrowserCell: UICollectionViewCell {
 }
 
 extension PhotoBrowserCell: UIScrollViewDelegate {
-    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
     
-    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
         imageView.center = centerOfContentSize
     }
 }
 
 extension PhotoBrowserCell: UIGestureRecognizerDelegate {
-    override public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // 只响应pan手势
         guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
             return true

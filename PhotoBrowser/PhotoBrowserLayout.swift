@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class PhotoBrowserLayout: UICollectionViewFlowLayout {
+class PhotoBrowserLayout: UICollectionViewFlowLayout {
     
     /// 一页宽度，算上空隙
     private var pageWidth: CGFloat {
@@ -40,12 +40,12 @@ public class PhotoBrowserLayout: UICollectionViewFlowLayout {
         scrollDirection = .horizontal
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     /// 调整scroll停下来的位置
-    override public func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         // 页码
         var page = round(proposedContentOffset.x / pageWidth)
         // 处理轻微滑动

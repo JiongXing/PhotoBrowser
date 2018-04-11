@@ -12,8 +12,8 @@ import JXPhotoBrowser
 class MomentsViewController: UIViewController {
     
     private lazy var thumbnailImageUrls: [String] = {
-        return ["http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
-                "http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
+        return ["http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
+                "http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
                 "http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
                 "http://wx2.sinaimg.cn/thumbnail/bfc243a3gy1febm7pmnk7j20i70jidwo.jpg",
                 "http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7qjop4j20i00hw4c6.jpg",
@@ -24,8 +24,8 @@ class MomentsViewController: UIViewController {
     }()
     
     private lazy var highQualityImageUrls: [String] = {
-        return ["http://wx1.sinaimg.cn/large/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
-                "http://wx3.sinaimg.cn/large/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
+        return ["http://wx3.sinaimg.cn/large/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
+                "http://wx1.sinaimg.cn/large/bfc243a3gy1febm7n9eorj20i60hsann.jpg",
                 "http://wx1.sinaimg.cn/large/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
                 "http://wx2.sinaimg.cn/large/bfc243a3gy1febm7pmnk7j20i70jidwo.jpg",
                 "http://wx3.sinaimg.cn/large/bfc243a3gy1febm7qjop4j20i00hw4c6.jpg",
@@ -104,7 +104,7 @@ extension MomentsViewController: UICollectionViewDelegate {
             return
         }
         selectedCell = cell
-        // 调起图片浏览器
+        // 创建图片浏览器
         let vc = PhotoBrowser(showByViewController: self, delegate: self)
         // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         // 这里随机创建一种
@@ -113,10 +113,18 @@ extension MomentsViewController: UICollectionViewDelegate {
         } else {
             vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
         }
+        
+        // 提供两种动画效果：缩放和渐变。默认是缩放
+        // 可以在这里改为渐变
+        /*
+        vc.animationType = .fade
+        */
+        
+        // 展示
         vc.show(index: indexPath.item)
         /*
-        // 可命令关闭图片浏览器
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+        // 可主动关闭图片浏览器
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             vc.dismiss(animated: false)
         }*/
     }

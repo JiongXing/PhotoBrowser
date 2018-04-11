@@ -1,5 +1,5 @@
 //
-//  ScaleAnimatorCoordinator.swift
+//  ScalePresentationController.swift
 //  PhotoBrowser
 //
 //  Created by JiongXing on 2017/3/24.
@@ -8,23 +8,23 @@
 
 import UIKit
 
-public class ScaleAnimatorCoordinator: UIPresentationController {
+class ScalePresentationController: UIPresentationController {
     
     /// 动画结束后需要隐藏的view
-    public var currentHiddenView: UIView?
+    var currentHiddenView: UIView?
     
     /// 暂存需隐藏的view的原alpha值
     private var currentHiddenViewOriginAlpha: CGFloat?;
     
     /// 蒙板
-    public var maskView: UIView = {
+    private var maskView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.black
         return view
     }()
     
     /// 更新动画结束后需要隐藏的view
-    public func updateCurrentHiddenView(_ view: UIView?) {
+    func updateCurrentHiddenView(_ view: UIView?) {
         // 重新显示前一个隐藏视图。??后的1.0不会生效，仅为语法而写。
         currentHiddenView?.alpha = currentHiddenViewOriginAlpha ?? 1.0;
         // 隐藏新视图
@@ -33,7 +33,7 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
         view?.alpha = 0.01
     }
     
-    override public func presentationTransitionWillBegin() {
+    override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
         guard let containerView = self.containerView else { return }
         
@@ -47,7 +47,7 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
         }, completion:nil)
     }
     
-    override public func dismissalTransitionWillBegin() {
+    override func dismissalTransitionWillBegin() {
         super.dismissalTransitionWillBegin()
         currentHiddenView?.alpha = 0.01
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
@@ -55,5 +55,18 @@ public class ScaleAnimatorCoordinator: UIPresentationController {
         }, completion: { _ in
             self.currentHiddenView?.alpha = self.currentHiddenViewOriginAlpha ?? 1.0
         })
+    }
+}
+
+// MARK: - 转场协调器协议
+
+extension ScalePresentationController: FadePresentationControllerDelegate {
+    var maskAlpha: CGFloat {
+        set {
+            maskView.alpha = newValue
+        }
+        get {
+            return maskView.alpha
+        }
     }
 }

@@ -4,7 +4,7 @@
 //
 //  Created by Wei Wang on 15/4/6.
 //
-//  Copyright (c) 2017 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,12 @@ import AppKit
 import UIKit
 #endif
 
-public typealias DownloadProgressBlock = ((_ receivedSize: Int64, _ totalSize: Int64) -> ())
-public typealias CompletionHandler = ((_ image: Image?, _ error: NSError?, _ cacheType: CacheType, _ imageURL: URL?) -> ())
+public typealias DownloadProgressBlock = ((_ receivedSize: Int64, _ totalSize: Int64) -> Void)
+public typealias CompletionHandler = ((_ image: Image?, _ error: NSError?, _ cacheType: CacheType, _ imageURL: URL?) -> Void)
 
 /// RetrieveImageTask represents a task of image retrieving process.
 /// It contains an async task of getting image from disk and from network.
-public class RetrieveImageTask {
+public final class RetrieveImageTask {
     
     public static let empty = RetrieveImageTask()
     
@@ -157,7 +157,7 @@ public class KingfisherManager {
                 if let error = error, error.code == KingfisherError.notModified.rawValue {
                     // Not modified. Try to find the image from cache.
                     // (The image should be in cache. It should be guaranteed by the framework users.)
-                    targetCache.retrieveImage(forKey: key, options: options, completionHandler: { (cacheImage, cacheType) -> () in
+                    targetCache.retrieveImage(forKey: key, options: options, completionHandler: { (cacheImage, cacheType) -> Void in
                         completionHandler?(cacheImage, nil, cacheType, url)
                     })
                     return
@@ -171,10 +171,11 @@ public class KingfisherManager {
                                       cacheSerializer: options.cacheSerializer,
                                       toDisk: !options.cacheMemoryOnly,
                                       completionHandler: nil)
-                    if options.cacheOriginalImage {
+                    if options.cacheOriginalImage && options.processor != DefaultImageProcessor.default {
+                        let originalCache = options.originalCache
                         let defaultProcessor = DefaultImageProcessor.default
-                        if let originaliImage = defaultProcessor.process(item: .data(originalData), options: options) {
-                            targetCache.store(originaliImage,
+                        if let originalImage = defaultProcessor.process(item: .data(originalData), options: options) {
+                            originalCache.store(originalImage,
                                               original: originalData,
                                               forKey: key,
                                               processorIdentifier: defaultProcessor.identifier,
@@ -182,7 +183,6 @@ public class KingfisherManager {
                                               toDisk: !options.cacheMemoryOnly,
                                               completionHandler: nil)
                         }
-                        
                     }
                 }
 
@@ -198,9 +198,8 @@ public class KingfisherManager {
                               completionHandler: CompletionHandler?,
                                         options: KingfisherOptionsInfo)
     {
-        
-        
-        let diskTaskCompletionHandler: CompletionHandler = { (image, error, cacheType, imageURL) -> () in
+
+        let diskTaskCompletionHandler: CompletionHandler = { (image, error, cacheType, imageURL) -> Void in
             completionHandler?(image, error, cacheType, imageURL)
         }
         
@@ -238,8 +237,9 @@ public class KingfisherManager {
             
             // If processor is not the default one, we have a chance to check whether
             // the original image is already in cache.
+            let originalCache = options.originalCache
             let optionsWithoutProcessor = options.removeAllMatchesIgnoringAssociatedValue(.processor(processor))
-            targetCache.retrieveImage(forKey: key, options: optionsWithoutProcessor) { image, cacheType in
+            originalCache.retrieveImage(forKey: key, options: optionsWithoutProcessor) { image, cacheType in
                 // If we found the original image, there is no need to download it again.
                 // We could just apply processor to it now.
                 guard let image = image else {

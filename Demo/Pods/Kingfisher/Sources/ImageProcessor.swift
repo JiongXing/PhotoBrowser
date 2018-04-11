@@ -4,7 +4,7 @@
 //
 //  Created by Wei Wang on 2016/08/26.
 //
-//  Copyright (c) 2017 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,10 @@
 import Foundation
 import CoreGraphics
 
+#if os(macOS)
+import AppKit
+#endif
+
 /// The item which could be processed by an `ImageProcessor`
 ///
 /// - image: Input image
@@ -39,7 +43,7 @@ public enum ImageProcessItem {
 /// An `ImageProcessor` would be used to convert some downloaded data to an image.
 public protocol ImageProcessor {
     /// Identifier of the processor. It will be used to identify the processor when 
-    /// caching and retriving an image. You might want to make sure that processors with
+    /// caching and retrieving an image. You might want to make sure that processors with
     /// same properties/functionality have the same identifiers, so correct processed images
     /// could be retrived with proper key.
     /// 
@@ -129,7 +133,7 @@ public struct DefaultImageProcessor: ImageProcessor {
     public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
         switch item {
         case .image(let image):
-            return image
+            return image.kf.scaled(to: options.scaleFactor)
         case .data(let data):
             return Kingfisher<Image>.image(
                 data: data,
@@ -159,6 +163,118 @@ public struct RectCorner: OptionSet {
         return "_corner(\(rawValue))"
     }
 }
+
+#if !os(macOS)
+/// Processor for adding an blend mode to images. Only CG-based images are supported.
+public struct BlendImageProcessor: ImageProcessor {
+
+    /// Identifier of the processor.
+    /// - Note: See documentation of `ImageProcessor` protocol for more.
+    public let identifier: String
+
+    /// Blend Mode will be used to blend the input image.
+    public let blendMode: CGBlendMode
+    /// Alpha will be used when blend image.
+    public let alpha: CGFloat
+
+    /// Background color of the output image. If `nil`, it will stay transparent.
+    public let backgroundColor: Color?
+
+    /// Initialize an `BlendImageProcessor`
+    ///
+    /// - parameter blendMode:       Blend Mode will be used to blend the input image.
+    /// - parameter alpha:           Alpha will be used when blend image.
+    ///                              From 0.0 to 1.0. 1.0 means solid image, 0.0 means transparent image.
+    ///                              Default is 1.0.
+    /// - parameter backgroundColor: Backgroud color to apply for the output image. Default is `nil`.
+    public init(blendMode: CGBlendMode, alpha: CGFloat = 1.0, backgroundColor: Color? = nil) {
+        self.blendMode = blendMode
+        self.alpha = alpha
+        self.backgroundColor = backgroundColor
+        var identifier = "com.onevcat.Kingfisher.BlendImageProcessor(\(blendMode.rawValue),\(alpha))"
+        if let color = backgroundColor {
+            identifier.append("_\(color.hex)")
+        }
+        self.identifier = identifier
+    }
+
+    /// Process an input `ImageProcessItem` item to an image for this processor.
+    ///
+    /// - parameter item:    Input item which will be processed by `self`
+    /// - parameter options: Options when processing the item.
+    ///
+    /// - returns: The processed image.
+    ///
+    /// - Note: See documentation of `ImageProcessor` protocol for more.
+    public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
+        switch item {
+        case .image(let image):
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.image(withBlendMode: blendMode, alpha: alpha, backgroundColor: backgroundColor)
+        case .data(_):
+            return (DefaultImageProcessor.default >> self).process(item: item, options: options)
+        }
+    }
+}
+#endif
+
+#if os(macOS)
+/// Processor for adding an compositing operation to images. Only CG-based images are supported in macOS.
+public struct CompositingImageProcessor: ImageProcessor {
+
+    /// Identifier of the processor.
+    /// - Note: See documentation of `ImageProcessor` protocol for more.
+    public let identifier: String
+
+    /// Compositing operation will be used to the input image.
+    public let compositingOperation: NSCompositingOperation
+
+    /// Alpha will be used when compositing image.
+    public let alpha: CGFloat
+
+    /// Background color of the output image. If `nil`, it will stay transparent.
+    public let backgroundColor: Color?
+
+    /// Initialize an `CompositingImageProcessor`
+    ///
+    /// - parameter compositingOperation: Compositing operation will be used to the input image.
+    /// - parameter alpha:                Alpha will be used when compositing image.
+    ///                                   From 0.0 to 1.0. 1.0 means solid image, 0.0 means transparent image.
+    ///                                   Default is 1.0.
+    /// - parameter backgroundColor:      Backgroud color to apply for the output image. Default is `nil`.
+    public init(compositingOperation: NSCompositingOperation,
+                alpha: CGFloat = 1.0,
+                backgroundColor: Color? = nil)
+    {
+        self.compositingOperation = compositingOperation
+        self.alpha = alpha
+        self.backgroundColor = backgroundColor
+        var identifier = "com.onevcat.Kingfisher.CompositingImageProcessor(\(compositingOperation.rawValue),\(alpha))"
+        if let color = backgroundColor {
+            identifier.append("_\(color.hex)")
+        }
+        self.identifier = identifier
+    }
+
+    /// Process an input `ImageProcessItem` item to an image for this processor.
+    ///
+    /// - parameter item:    Input item which will be processed by `self`
+    /// - parameter options: Options when processing the item.
+    ///
+    /// - returns: The processed image.
+    ///
+    /// - Note: See documentation of `ImageProcessor` protocol for more.
+    public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
+        switch item {
+        case .image(let image):
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.image(withCompositingOperation: compositingOperation, alpha: alpha, backgroundColor: backgroundColor)
+        case .data(_):
+            return (DefaultImageProcessor.default >> self).process(item: item, options: options)
+        }
+    }
+}
+#endif
 
 /// Processor for making round corner images. Only CG-based images are supported in macOS, 
 /// if a non-CG image passed in, the processor will do nothing.
@@ -222,7 +338,8 @@ public struct RoundCornerImageProcessor: ImageProcessor {
         switch item {
         case .image(let image):
             let size = targetSize ?? image.kf.size
-            return image.kf.image(withRoundRadius: cornerRadius, fit: size, roundingCorners: roundingCorners, backgroundColor: backgroundColor)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.image(withRoundRadius: cornerRadius, fit: size, roundingCorners: roundingCorners, backgroundColor: backgroundColor)
         case .data(_):
             return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
@@ -296,7 +413,8 @@ public struct ResizingImageProcessor: ImageProcessor {
     public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
         switch item {
         case .image(let image):
-            return image.kf.resize(to: referenceSize, for: targetContentMode)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.resize(to: referenceSize, for: targetContentMode)
         case .data(_):
             return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
@@ -334,7 +452,8 @@ public struct BlurImageProcessor: ImageProcessor {
         switch item {
         case .image(let image):
             let radius = blurRadius * options.scaleFactor
-            return image.kf.blurred(withRadius: radius)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.blurred(withRadius: radius)
         case .data(_):
             return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
@@ -376,7 +495,8 @@ public struct OverlayImageProcessor: ImageProcessor {
     public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
         switch item {
         case .image(let image):
-            return image.kf.overlaying(with: overlay, fraction: fraction)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.overlaying(with: overlay, fraction: fraction)
         case .data(_):
             return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
@@ -412,7 +532,8 @@ public struct TintImageProcessor: ImageProcessor {
     public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
         switch item {
         case .image(let image):
-            return image.kf.tinted(with: tint)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.tinted(with: tint)
         case .data(_):
             return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
@@ -464,7 +585,8 @@ public struct ColorControlsProcessor: ImageProcessor {
     public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
         switch item {
         case .image(let image):
-            return image.kf.adjusted(brightness: brightness, contrast: contrast, saturation: saturation, inputEV: inputEV)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.adjusted(brightness: brightness, contrast: contrast, saturation: saturation, inputEV: inputEV)
         case .data(_):
             return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
@@ -549,7 +671,8 @@ public struct CroppingImageProcessor: ImageProcessor {
     public func process(item: ImageProcessItem, options: KingfisherOptionsInfo) -> Image? {
         switch item {
         case .image(let image):
-            return image.kf.crop(to: size, anchorOn: anchor)
+            return image.kf.scaled(to: options.scaleFactor)
+                        .kf.crop(to: size, anchorOn: anchor)
         case .data(_): return (DefaultImageProcessor.default >> self).process(item: item, options: options)
         }
     }
@@ -565,15 +688,19 @@ public func >>(left: ImageProcessor, right: ImageProcessor) -> ImageProcessor {
     return left.append(another: right)
 }
 
-fileprivate extension Color {
+extension Color {
     var hex: String {
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0
         var a: CGFloat = 0
-        
+
+        #if os(macOS)
+        (usingColorSpace(.sRGB) ?? self).getRed(&r, green: &g, blue: &b, alpha: &a)
+        #else
         getRed(&r, green: &g, blue: &b, alpha: &a)
-        
+        #endif
+
         let rInt = Int(r * 255) << 24
         let gInt = Int(g * 255) << 16
         let bInt = Int(b * 255) << 8

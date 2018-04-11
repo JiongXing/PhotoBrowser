@@ -4,7 +4,7 @@
 //
 //  Created by Wei Wang on 15/4/6.
 //
-//  Copyright (c) 2017 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -173,7 +173,7 @@ extension Kingfisher where Base: ImageView {
     /// Default is .none, means no indicator will be shown.
     public var indicatorType: IndicatorType {
         get {
-            let indicator = (objc_getAssociatedObject(base, &indicatorTypeKey) as? Box<IndicatorType?>)?.value
+            let indicator = objc_getAssociatedObject(base, &indicatorTypeKey) as? IndicatorType
             return indicator ?? .none
         }
         
@@ -189,7 +189,7 @@ extension Kingfisher where Base: ImageView {
                 indicator = anIndicator
             }
             
-            objc_setAssociatedObject(base, &indicatorTypeKey, Box(value: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(base, &indicatorTypeKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
@@ -198,7 +198,10 @@ extension Kingfisher where Base: ImageView {
     /// It will be `nil` if `indicatorType` is `.none`.
     public fileprivate(set) var indicator: Indicator? {
         get {
-            return (objc_getAssociatedObject(base, &indicatorKey) as? Box<Indicator?>)?.value
+            guard let box = objc_getAssociatedObject(base, &indicatorKey) as? Box<Indicator> else {
+                return nil
+            }
+            return box.value
         }
         
         set {
@@ -210,7 +213,7 @@ extension Kingfisher where Base: ImageView {
             // Add new
             if var newIndicator = newValue {
                 // Set default indicator frame if the view's frame not set.
-                if newIndicator.view.frame != .zero {
+                if newIndicator.view.frame == .zero {
                     newIndicator.view.frame = base.frame
                 }
                 newIndicator.viewCenter = CGPoint(x: base.bounds.midX, y: base.bounds.midY)
@@ -219,7 +222,9 @@ extension Kingfisher where Base: ImageView {
             }
             
             // Save in associated object
-            objc_setAssociatedObject(base, &indicatorKey, Box(value: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            // Wrap newValue with Box to workaround an issue that Swift does not recognize
+            // and casting protocol for associate object correctly. https://github.com/onevcat/Kingfisher/issues/872
+            objc_setAssociatedObject(base, &indicatorKey, newValue.map(Box.init), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
@@ -233,7 +238,7 @@ extension Kingfisher where Base: ImageView {
     
     public fileprivate(set) var placeholder: Placeholder? {
         get {
-            return (objc_getAssociatedObject(base, &placeholderKey) as? Box<Placeholder?>)?.value
+            return objc_getAssociatedObject(base, &placeholderKey) as? Placeholder
         }
         
         set {
@@ -247,7 +252,7 @@ extension Kingfisher where Base: ImageView {
                 base.image = nil
             }
             
-            objc_setAssociatedObject(base, &placeholderKey, Box(value: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(base, &placeholderKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
 }

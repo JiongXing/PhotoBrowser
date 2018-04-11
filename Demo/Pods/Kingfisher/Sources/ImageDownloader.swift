@@ -4,7 +4,7 @@
 //
 //  Created by Wei Wang on 15/4/6.
 //
-//  Copyright (c) 2017 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ import UIKit
 public typealias ImageDownloaderProgressBlock = DownloadProgressBlock
 
 /// Completion block of downloader.
-public typealias ImageDownloaderCompletionHandler = ((_ image: Image?, _ error: NSError?, _ url: URL?, _ originalData: Data?) -> ())
+public typealias ImageDownloaderCompletionHandler = ((_ image: Image?, _ error: NSError?, _ url: URL?, _ originalData: Data?) -> Void)
 
 /// Download task.
 public struct RetrieveImageDownloadTask {
@@ -43,11 +43,11 @@ public struct RetrieveImageDownloadTask {
     /// Downloader by which this task is intialized.
     public private(set) weak var ownerDownloader: ImageDownloader?
 
-    /**
-     Cancel this download task. It will trigger the completion handler with an NSURLErrorCancelled error.
-     */
+    
+    /// Cancel this download task. It will trigger the completion handler with an NSURLErrorCancelled error.
+    /// If you want to cancel all downloading tasks, call `cancelAll()` of `ImageDownloader` instance.
     public func cancel() {
-        ownerDownloader?.cancelDownloadingTask(self)
+        ownerDownloader?.cancel(self)
     }
     
     /// The original request URL of this download task.
@@ -132,6 +132,20 @@ public protocol ImageDownloaderDelegate: class {
             you can implement this method to change that behavior.
     */
     func isValidStatusCode(_ code: Int, for downloader: ImageDownloader) -> Bool
+    
+    /**
+     Called when the `ImageDownloader` object successfully downloaded image data from specified URL.
+     
+     - parameter downloader: The `ImageDownloader` object finishes data downloading.
+     - parameter data:       Downloaded data.
+     - parameter url:        URL of the original request URL.
+     
+     - returns: The data from which Kingfisher should use to create an image.
+     
+     - Note: This callback can be used to preprocess raw image data
+             before creation of UIImage instance (i.e. decrypting or verification).
+     */
+    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, for url: URL) -> Data?
 }
 
 extension ImageDownloaderDelegate {
@@ -140,6 +154,9 @@ extension ImageDownloaderDelegate {
     public func imageDownloader(_ downloader: ImageDownloader, willDownloadImageForURL url: URL, with request: URLRequest?) {}
     public func isValidStatusCode(_ code: Int, for downloader: ImageDownloader) -> Bool {
         return (200..<400).contains(code)
+    }
+    public func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, for url: URL) -> Data? {
+        return data
     }
 }
 
@@ -385,21 +402,43 @@ extension ImageDownloader {
         }
     }
     
-    func cancelDownloadingTask(_ task: RetrieveImageDownloadTask) {
-        barrierQueue.sync(flags: .barrier) {
-            if let URL = task.internalTask.originalRequest?.url, let imageFetchLoad = self.fetchLoads[URL] {
-                imageFetchLoad.downloadTaskCount -= 1
-                if imageFetchLoad.downloadTaskCount == 0 {
-                    task.internalTask.cancel()
-                }
+    private func cancelTaskImpl(_ task: RetrieveImageDownloadTask, fetchLoad: ImageFetchLoad? = nil, ignoreTaskCount: Bool = false) {
+        
+        func getFetchLoad(from task: RetrieveImageDownloadTask) -> ImageFetchLoad? {
+            guard let URL = task.internalTask.originalRequest?.url,
+                  let imageFetchLoad = self.fetchLoads[URL] else
+            {
+                return nil
             }
+            return imageFetchLoad
+        }
+        
+        guard let imageFetchLoad = fetchLoad ?? getFetchLoad(from: task) else {
+            return
+        }
+
+        imageFetchLoad.downloadTaskCount -= 1
+        if ignoreTaskCount || imageFetchLoad.downloadTaskCount == 0 {
+            task.internalTask.cancel()
         }
     }
     
-    func clean(for url: URL) {
+    func cancel(_ task: RetrieveImageDownloadTask) {
+        barrierQueue.sync(flags: .barrier) { cancelTaskImpl(task) }
+    }
+    
+    /// Cancel all downloading tasks. It will trigger the completion handlers for all not-yet-finished
+    /// downloading tasks with an NSURLErrorCancelled error.
+    ///
+    /// If you need to only cancel a certain task, call `cancel()` on the `RetrieveImageDownloadTask`
+    /// returned by the downloading methods.
+    public func cancelAll() {
         barrierQueue.sync(flags: .barrier) {
-            fetchLoads.removeValue(forKey: url)
-            return
+            fetchLoads.forEach { v in
+                let fetchLoad = v.value
+                guard let task = fetchLoad.downloadTask else { return }
+                cancelTaskImpl(task, fetchLoad: fetchLoad, ignoreTaskCount: true)
+            }
         }
     }
 }
@@ -411,7 +450,7 @@ extension ImageDownloader {
 /// If we use `ImageDownloader` as the session delegate, it will not be released.
 /// So we need an additional handler to break the retain cycle.
 // See https://github.com/onevcat/Kingfisher/issues/235
-class ImageDownloaderSessionHandler: NSObject, URLSessionDataDelegate, AuthenticationChallengeResponsable {
+final class ImageDownloaderSessionHandler: NSObject, URLSessionDataDelegate, AuthenticationChallengeResponsable {
     
     // The holder will keep downloader not released while a data task is being executed.
     // It will be set when the task started, and reset when the task finished.
@@ -493,11 +532,12 @@ class ImageDownloaderSessionHandler: NSObject, URLSessionDataDelegate, Authentic
         guard let downloader = downloadHolder else {
             return
         }
-        
-        downloader.clean(for: url)
-        
-        if downloader.fetchLoads.isEmpty {
-            downloadHolder = nil
+
+        downloader.barrierQueue.sync(flags: .barrier) {
+            downloader.fetchLoads.removeValue(forKey: url)
+            if downloader.fetchLoads.isEmpty {
+                downloadHolder = nil
+            }
         }
     }
     
@@ -536,7 +576,14 @@ class ImageDownloaderSessionHandler: NSObject, URLSessionDataDelegate, Authentic
             
             self.cleanFetchLoad(for: url)
             
-            let data = fetchLoad.responseData as Data
+            let data: Data?
+            let fetchedData = fetchLoad.responseData as Data
+            
+            if let delegate = downloader.delegate {
+                data = delegate.imageDownloader(downloader, didDownload: fetchedData, for: url)
+            } else {
+                data = fetchedData
+            }
             
             // Cache the processed images. So we do not need to re-process the image if using the same processor.
             // Key is the identifier of processor.
@@ -548,9 +595,8 @@ class ImageDownloaderSessionHandler: NSObject, URLSessionDataDelegate, Authentic
                 let callbackQueue = options.callbackDispatchQueue
                 
                 let processor = options.processor
-                
                 var image = imageCache[processor.identifier]
-                if image == nil {
+                if let data = data, image == nil {
                     image = processor.process(item: .data(data), options: options)
                     // Add the processed image to cache. 
                     // If `image` is nil, nothing will happen (since the key is not existing before).
@@ -558,14 +604,17 @@ class ImageDownloaderSessionHandler: NSObject, URLSessionDataDelegate, Authentic
                 }
                 
                 if let image = image {
-                    
+
                     downloader.delegate?.imageDownloader(downloader, didDownload: image, for: url, with: task.response)
-                    
+
+                    let imageModifier = options.imageModifier
+                    let finalImage = imageModifier.modify(image)
+
                     if options.backgroundDecode {
-                        let decodedImage = image.kf.decoded
+                        let decodedImage = finalImage.kf.decoded
                         callbackQueue.safeAsync { completionHandler?(decodedImage, nil, url, data) }
                     } else {
-                        callbackQueue.safeAsync { completionHandler?(image, nil, url, data) }
+                        callbackQueue.safeAsync { completionHandler?(finalImage, nil, url, data) }
                     }
                     
                 } else {
