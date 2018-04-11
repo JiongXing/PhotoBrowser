@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod%20-v0.5.0-blue.svg)
+![](https://img.shields.io/badge/pod-v0.6.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Usage
@@ -17,13 +17,14 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回默认显示图片，缩略图或占位图
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
     
-    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
-    /// 比如你可返回ImageView，或整个Cell
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
-    
     //
     // MARK: - 可选
     //
+    
+    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
+    /// 比如你可返回ImageView，或整个Cell
+    /// 使用 scale 动画时必须实现本方法
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
     
     /// 实现本方法以返回高质量图片的url。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
@@ -49,19 +50,108 @@ public protocol PhotoBrowserDelegate: class {
 ## PhotoBrowser
 ```swift
 PhotoBrowser {
-    /// 便利的展示方法，合并init和show两个步骤
+    /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
     /// - parameter presentingVC: 由谁 present 出本浏览器
     /// - parameter delegate: 浏览器协议代理
-    public class func show(byViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate, index: Int)
-    
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    public init(showByViewController presentingVC: UIViewController,
+                delegate: PhotoBrowserDelegate,
+                animationType: AnimationType = .scale)
+                
     /// 展示，传入图片序号，从0开始
     /// - parameter index: 图片序号，从0开始
     public func show(index: Int)
     
+    /// 便利的展示方法，合并init和show两个步骤
+    /// - parameter presentingVC: 由谁 present 出本浏览器
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    /// - parameter index: 图片序号，从0开始
+    public class func show(byViewController presentingVC: UIViewController,
+                           delegate: PhotoBrowserDelegate,
+                           animationType: AnimationType = .scale,
+                           index: Int)
+                           
     /// 主动关闭浏览器。
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
     public func dismiss(animated: Bool)
+}
+```
+
+## 简单示例
+创建并展示：
+```swift
+// 创建图片浏览器
+let vc = PhotoBrowser(showByViewController: self, delegate: self)
+
+// 提供两种动画效果：缩放和渐变。默认是缩放`.scale`
+// 可以改为渐变
+vc.animationType = .fade
+
+// 装配页码指示器 PageControl，提供了两种 PageControl 实现，若需要其它样式，可参照着自由定制
+// 小光点型
+vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
+// 数字型
+vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
+
+// 展示
+vc.show(index: indexPath.item)
+        
+// 可主动关闭图片浏览器
+vc.dismiss(animated: false)
+```
+
+数据：
+```swift
+/// 告诉图片浏览器共有多少张图片
+func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
+    return thumbnailImageUrls.count
+}
+
+/// 告诉图片浏览器每张需要下载的图片的 placeholder
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
+    let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
+    // 取thumbnailImage
+    return cell?.imageView.image
+}
+
+/// 缩放起始视图
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
+    return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
+}
+
+/// 高清图
+func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
+    return URL(string: highQualityImageUrls[index])
+}
+
+/// 原图
+func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
+    return URL(string: rawImageUrls[index])
+}
+
+/// 长按图片。你可以在此处得到当前图片，并可以做些弹个窗，保存图片等操作
+func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
+    let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    let saveImageAction = UIAlertAction(title: "保存图片", style: .default) { (_) in
+        print("保存图片：\(image)")
+    }
+    let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+        
+    actionSheet.addAction(saveImageAction)
+    actionSheet.addAction(cancelAction)
+    photoBrowser.present(actionSheet, animated: true, completion: nil)
+}
+    
+/// 即将关闭图片浏览器
+func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage) {
+    print("即将关闭图片浏览器，index:\(index), image:\(image)")
+}
+
+/// 已经关闭图片浏览器
+func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage) {
+    print("已经关闭图片浏览器，index:\(index), image:\(image)")
 }
 ```
 
