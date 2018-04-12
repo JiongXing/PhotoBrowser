@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v0.6.0-blue.svg)
+![](https://img.shields.io/badge/pod-v0.7.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Usage
@@ -8,24 +8,31 @@
 ## 简单示例
 创建并展示：
 ```swift
+// 直接打开图片浏览器
+PhotoBrowser.show(byViewController: self,
+                  delegate: self,
+                  openIndex: index,
+                  pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
+                  animationType: .scale)
+
+// 也可以先创建，然后传参，再打开
 // 创建图片浏览器
-let vc = PhotoBrowser(showByViewController: self, delegate: self)
-
-// 提供两种动画效果：缩放和渐变。默认是缩放`.scale`
-// 可以改为渐变
-vc.animationType = .fade
-
-// 装配页码指示器 PageControl，提供了两种 PageControl 实现，若需要其它样式，可参照着自由定制
-// 小光点型
-vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
-// 数字型
-vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
-
+let vc = PhotoBrowser()
+// 提供两种动画效果：缩放`.scale`和渐变`.fade`。
+vc.animationType = .scale
+// 浏览器协议实现者
+vc.photoBrowserDelegate = self
+// 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
+// 这里随机创建一种
+if arc4random_uniform(2) % 2 == 0 {
+    vc.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
+} else {
+    vc.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
+}
+// 指定打开图片组中的哪张
+vc.setOpenIndex(index)
 // 展示
-vc.show(index: indexPath.item)
-        
-// 可主动关闭图片浏览器
-vc.dismiss(animated: false)
+self.present(vc, animated: true, completion: nil)
 ```
 
 数据：
@@ -127,32 +134,39 @@ public protocol PhotoBrowserDelegate: class {
 ## PhotoBrowser
 ```swift
 PhotoBrowser {
-    /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
-    /// - parameter presentingVC: 由谁 present 出本浏览器
+    /// 展示，完整参数
+    /// - parameter presentingVC: 由谁 present 出图片浏览器
+    /// - parameter openIndex: 打开是显示哪张图片，从0开始
     /// - parameter delegate: 浏览器协议代理
+    /// - parameter pageControlDelegate: 页码指示器。默认
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    public init(showByViewController presentingVC: UIViewController,
-                delegate: PhotoBrowserDelegate,
-                animationType: AnimationType = .scale)
-                
-    /// 展示，传入图片序号，从0开始
-    /// - parameter index: 图片序号，从0开始
-    public func show(index: Int)
-    
-    /// 便利的展示方法，合并init和show两个步骤
-    /// - parameter presentingVC: 由谁 present 出本浏览器
-    /// - parameter delegate: 浏览器协议代理
-    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    /// - parameter index: 图片序号，从0开始
     public class func show(byViewController presentingVC: UIViewController,
                            delegate: PhotoBrowserDelegate,
-                           animationType: AnimationType = .scale,
-                           index: Int)
-                           
-    /// 主动关闭浏览器。
+                           openIndex: Int,
+                           pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
+                           animationType: AnimationType = .scale) {
+        let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate)
+        vc.setOpenIndex(openIndex)
+        vc.show(byViewController: presentingVC)
+    }
+    
+    /// 指定打开图片组中的哪张
+    public func setOpenIndex(_ index: Int) {
+        currentIndex = index
+    }
+    
+    /// 展示图片浏览器
+    /// - parameter presentingVC: 由谁 present 出图片浏览器
+    public func show(byViewController presentingVC: UIViewController) {
+        presentingVC.present(self, animated: true, completion: nil)
+    }
+    
+    /// 关闭浏览器
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
-    public func dismiss(animated: Bool)
+    public func dismiss(animated: Bool) {
+        dismiss(animated: animated, completion: nil)
+    }
 }
 ```
 
