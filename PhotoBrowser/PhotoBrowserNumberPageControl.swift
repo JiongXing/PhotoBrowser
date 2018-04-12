@@ -1,5 +1,5 @@
 //
-//  PhotoBrowserNumberPageControlDelegate.swift
+//  PhotoBrowserNumberPageControl.swift
 //  PhotoBrowser
 //
 //  Created by JiongXing on 2017/4/25.
@@ -9,7 +9,7 @@
 import UIKit
 
 /// 给图片浏览器提供一个数字样式的PageControl
-public class PhotoBrowserNumberPageControlDelegate: PhotoBrowserPageControlDelegate {
+public class PhotoBrowserNumberPageControl: PhotoBrowserPageControlDelegate {
     /// 总页数
     public var numberOfPages: Int
     

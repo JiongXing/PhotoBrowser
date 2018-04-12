@@ -109,9 +109,9 @@ extension MomentsViewController: UICollectionViewDelegate {
         // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         // 这里随机创建一种
         if arc4random_uniform(2) % 2 == 0 {
-            vc.pageControlDelegate = PhotoBrowserDefaultPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
+            vc.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
         } else {
-            vc.pageControlDelegate = PhotoBrowserNumberPageControlDelegate(numberOfPages: thumbnailImageUrls.count)
+            vc.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
         }
         
         // 提供两种动画效果：缩放和渐变。默认是缩放
