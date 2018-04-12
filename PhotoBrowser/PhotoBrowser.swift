@@ -34,7 +34,7 @@ public class PhotoBrowser: UIViewController {
     public var imageZoomScaleForDoubleTap: CGFloat = 2.0
     
     /// 转场动画类型
-    public var animationType: AnimationType
+    public var animationType: AnimationType = .scale
     
     //
     // MARK: - 私有属性
@@ -61,9 +61,6 @@ public class PhotoBrowser: UIViewController {
     
     /// 缩放型转场协调器
     private weak var scalePresentationController: ScalePresentationController?
-    
-    /// 本VC的presentingViewController
-    private let presentingVC: UIViewController
     
     /// 容器layout
     private lazy var flowLayout: PhotoBrowserLayout = {
@@ -102,17 +99,20 @@ public class PhotoBrowser: UIViewController {
         #endif
     }
     
-    /// 初始化，传入用于present出本VC的VC，以及实现了PhotoBrowserDelegate协议的对象
-    /// - parameter presentingVC: 由谁 present 出本浏览器
-    /// - parameter delegate: 浏览器协议代理
+    /// 初始化
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    public init(showByViewController presentingVC: UIViewController,
-                delegate: PhotoBrowserDelegate,
-                animationType: AnimationType = .scale) {
-        self.presentingVC = presentingVC
-        self.photoBrowserDelegate = delegate
-        self.animationType = animationType
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter pageControlDelegate: 页码指示器
+    public init(animationType: AnimationType = .scale,
+                delegate: PhotoBrowserDelegate? = nil,
+                pageControlDelegate: PhotoBrowserPageControlDelegate? = nil) {
         super.init(nibName: nil, bundle: nil)
+        self.transitioningDelegate = self
+        self.modalPresentationStyle = .custom
+        self.modalPresentationCapturesStatusBarAppearance = true
+        self.animationType = animationType
+        self.photoBrowserDelegate = delegate
+        self.pageControlDelegate = pageControlDelegate
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -125,30 +125,34 @@ public class PhotoBrowser: UIViewController {
 //
 
 extension PhotoBrowser {
-    /// 便利的展示方法，合并init和show两个步骤
-    /// - parameter presentingVC: 由谁 present 出本浏览器
+    /// 展示，完整参数
+    /// - parameter presentingVC: 由谁 present 出图片浏览器
+    /// - parameter openIndex: 打开是显示哪张图片，从0开始
     /// - parameter delegate: 浏览器协议代理
+    /// - parameter pageControlDelegate: 页码指示器。默认
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    /// - parameter index: 图片序号，从0开始
     public class func show(byViewController presentingVC: UIViewController,
                            delegate: PhotoBrowserDelegate,
-                           animationType: AnimationType = .scale,
-                           index: Int) {
-        let vc = PhotoBrowser(showByViewController: presentingVC, delegate: delegate, animationType: animationType)
-        vc.show(index: index)
+                           openIndex: Int,
+                           pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
+                           animationType: AnimationType = .scale) {
+        let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate)
+        vc.setOpenIndex(openIndex)
+        vc.show(byViewController: presentingVC)
     }
     
-    /// 展示，传入图片序号，从0开始
-    /// - parameter index: 图片序号，从0开始
-    public func show(index: Int) {
+    /// 指定打开图片组中的哪张
+    public func setOpenIndex(_ index: Int) {
         currentIndex = index
-        self.transitioningDelegate = self
-        self.modalPresentationStyle = .custom
-        self.modalPresentationCapturesStatusBarAppearance = true
+    }
+    
+    /// 展示图片浏览器
+    /// - parameter presentingVC: 由谁 present 出图片浏览器
+    public func show(byViewController presentingVC: UIViewController) {
         presentingVC.present(self, animated: true, completion: nil)
     }
     
-    /// 主动关闭浏览器。
+    /// 关闭浏览器
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
     public func dismiss(animated: Bool) {

@@ -104,26 +104,43 @@ extension MomentsViewController: UICollectionViewDelegate {
             return
         }
         selectedCell = cell
+    
+        // 直接打开图片浏览器
+//        openPhotoBrowserWithClassMethod(index: indexPath.item)
+ 
+        // 也可以先创建，然后传参，再打开
+        openPhotoBrowserWithInstanceMethod(index: indexPath.item)
+    }
+    
+    private func openPhotoBrowserWithClassMethod(index: Int) {
+        // 直接打开图片浏览器
+        PhotoBrowser.show(byViewController: self,
+                          delegate: self,
+                          openIndex: index,
+                          pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
+                          animationType: .scale)
+    }
+    
+    private func openPhotoBrowserWithInstanceMethod(index: Int) {
         // 创建图片浏览器
-        let vc = PhotoBrowser(showByViewController: self, delegate: self)
-        // 装配PageControl，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
+        let vc = PhotoBrowser()
+        // 提供两种动画效果：缩放`.scale`和渐变`.fade`。
+        vc.animationType = .scale
+        // 浏览器协议实现者
+        vc.photoBrowserDelegate = self
+        // 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         // 这里随机创建一种
         if arc4random_uniform(2) % 2 == 0 {
             vc.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
         } else {
             vc.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
         }
-        
-        // 提供两种动画效果：缩放和渐变。默认是缩放
-        // 可以在这里改为渐变
-        /*
-        vc.animationType = .fade
-        */
-        
+        // 指定打开图片组中的哪张
+        vc.setOpenIndex(index)
         // 展示
-        vc.show(index: indexPath.item)
-        /*
+        self.present(vc, animated: true, completion: nil)
         // 可主动关闭图片浏览器
+        /*
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             vc.dismiss(animated: false)
         }*/

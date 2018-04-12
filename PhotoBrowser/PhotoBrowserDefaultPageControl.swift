@@ -8,7 +8,7 @@
 
 import UIKit
 
-/// 给图片浏览器提供一个UIPageControl
+/// 给图片浏览器提供一个UIPageControl，小光点样式
 public class PhotoBrowserDefaultPageControl: PhotoBrowserPageControlDelegate {
     /// 总页数
     public var numberOfPages: Int
