@@ -17,22 +17,26 @@ PhotoBrowser.show(byViewController: self,
 
 // 也可以先创建，然后传参，再打开
 // 创建图片浏览器
-let vc = PhotoBrowser()
+let browser = PhotoBrowser()
 // 提供两种动画效果：缩放`.scale`和渐变`.fade`。
-vc.animationType = .scale
+browser.animationType = .scale
 // 浏览器协议实现者
-vc.photoBrowserDelegate = self
+browser.photoBrowserDelegate = self
 // 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
 // 这里随机创建一种
 if arc4random_uniform(2) % 2 == 0 {
-    vc.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
+    browser.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
 } else {
-    vc.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
+    browser.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
 }
 // 指定打开图片组中的哪张
-vc.setOpenIndex(index)
+browser.setOpenIndex(index)
+// 捏合手势放大图片时的最大允许比例，默认2.0
+browser.imageMaximumZoomScale = 2.0
+// 双击放大图片时的目标比例，默认2.0
+browser.imageZoomScaleForDoubleTap = 2.0
 // 展示
-self.present(vc, animated: true, completion: nil)
+self.present(browser, animated: true, completion: nil)
 ```
 
 数据：
