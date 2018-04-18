@@ -244,8 +244,8 @@ class PhotoBrowserCell: UICollectionViewCell {
     
     /// 响应单击
     @objc func onSingleTap() {
-        if let dlg = photoBrowserCellDelegate, let image = imageView.image {
-            dlg.photoBrowserCell(self, didSingleTap: image)
+        if let dlg = photoBrowserCellDelegate {
+            dlg.photoBrowserCell(self, didSingleTap: imageView.image ?? UIImage())
         }
     }
     
