@@ -14,7 +14,7 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     func photoBrowserCell(_ cell: PhotoBrowserCell, didPanScale scale: CGFloat)
     
     /// 单击时回调
-    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage)
+    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?)
     
     /// 长按时回调
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
@@ -245,7 +245,7 @@ class PhotoBrowserCell: UICollectionViewCell {
     /// 响应单击
     @objc func onSingleTap() {
         if let dlg = photoBrowserCellDelegate {
-            dlg.photoBrowserCell(self, didSingleTap: imageView.image ?? UIImage())
+            dlg.photoBrowserCell(self, didSingleTap: imageView.image)
         }
     }
     

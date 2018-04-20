@@ -39,12 +39,12 @@ public protocol PhotoBrowserDelegate: class {
     /// 即将关闭图片浏览器时回调
     /// - parameter index: 即将关闭时，正在显示的图片序号
     /// - parameter image: 即将关闭时，正在显示的图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage)
+    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage?)
     
     /// 已经关闭图片浏览器时回调
     /// - parameter index: 最后显示的图片序号
     /// - parameter image: 最后显示的图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage)
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage?)
 }
 
 //
