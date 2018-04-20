@@ -8,6 +8,7 @@
 
 import UIKit
 import JXPhotoBrowser
+import Kingfisher
 
 class MomentsViewController: UIViewController {
     
@@ -118,6 +119,7 @@ extension MomentsViewController: UICollectionViewDelegate {
                           delegate: self,
                           openIndex: index,
                           pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
+                          photoLoader: KingfisherPhotoLoader(),
                           animationType: .scale)
     }
     

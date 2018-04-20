@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 public class PhotoBrowser: UIViewController {
     
@@ -20,6 +19,11 @@ public class PhotoBrowser: UIViewController {
     
     /// 实现了PhotoBrowserPageControlDelegate协议的对象。（此处强引用）
     public var pageControlDelegate: PhotoBrowserPageControlDelegate?
+    
+    // 图片加载器
+    public var photoLoader: PhotoLoader?
+    
+    private var photoLoadStates: Dictionary<Int, PhotoLoadState> = Dictionary()
     
     /// 左右两张图之间的间隙
     public var photoSpacing: CGFloat = 30
@@ -105,7 +109,8 @@ public class PhotoBrowser: UIViewController {
     /// - parameter pageControlDelegate: 页码指示器
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
-                pageControlDelegate: PhotoBrowserPageControlDelegate? = nil) {
+                pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
+                photoLoader: PhotoLoader) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
@@ -113,6 +118,7 @@ public class PhotoBrowser: UIViewController {
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
         self.pageControlDelegate = pageControlDelegate
+        self.photoLoader = photoLoader;
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -135,8 +141,9 @@ extension PhotoBrowser {
                            delegate: PhotoBrowserDelegate,
                            openIndex: Int,
                            pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
+                           photoLoader: PhotoLoader,
                            animationType: AnimationType = .scale) {
-        let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate)
+        let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate, photoLoader: photoLoader)
         vc.setOpenIndex(openIndex)
         vc.show(byViewController: presentingVC)
     }
@@ -256,23 +263,27 @@ extension PhotoBrowser: UICollectionViewDataSource {
         guard let delegate = photoBrowserDelegate else {
             return 0
         }
-        return delegate.numberOfPhotos(in: self)
+        let number = delegate.numberOfPhotos(in: self)
+        if (number != self.photoLoadStates.count) {
+            self.photoLoadStates.removeAll()
+        }
+        return number;
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self), for: indexPath) as! PhotoBrowserCell
         cell.imageView.contentMode = imageScaleMode
         cell.photoBrowserCellDelegate = self
-        let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
-        cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
+        let state = stateFor(index: indexPath.item)
+        cell.setState(state!)
         cell.imageMaximumZoomScale = imageMaximumZoomScale
         cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
         return cell
     }
     
-    private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+    private func stateFor(index: Int) -> PhotoLoadState? {
         guard let delegate = photoBrowserDelegate else {
-            return (nil, nil, nil)
+            return nil
         }
         // 缩略图
         let thumbnailImage = delegate.photoBrowser(self, thumbnailImageForIndex: index)
@@ -280,7 +291,15 @@ extension PhotoBrowser: UICollectionViewDataSource {
         let highQualityUrl = delegate.photoBrowser(self, highQualityUrlForIndex: index)
         // 原图url
         let rawUrl = delegate.photoBrowser(self, rawUrlForIndex: index)
-        return (thumbnailImage, highQualityUrl, rawUrl)
+        var photoLoadState = photoLoadStates[index]
+        if photoLoadState == nil {
+            photoLoadState = PhotoLoadState(photoLoader: self.photoLoader)
+            photoLoadState?.thumbnailImage = thumbnailImage
+            photoLoadState?.highQualityUrl = highQualityUrl
+            photoLoadState?.rawUrl = rawUrl
+            photoLoadStates[index] = photoLoadState
+        }
+        return photoLoadState
     }
 }
 
