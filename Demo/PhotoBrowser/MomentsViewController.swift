@@ -139,13 +139,10 @@ extension MomentsViewController: UICollectionViewDelegate {
         }
         // 指定打开图片组中的哪张
         browser.setOpenIndex(index)
-        
         // 捏合手势放大图片时的最大允许比例，默认2.0
         browser.imageMaximumZoomScale = 2.0
-        
         // 双击放大图片时的目标比例，默认2.0
         browser.imageZoomScaleForDoubleTap = 2.0
-        
         // 展示
         self.present(browser, animated: true, completion: nil)
         // 可主动关闭图片浏览器
@@ -183,11 +180,10 @@ extension MomentsViewController: PhotoBrowserDelegate {
     /// 原图。最高清图。
     /*
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-        // 测试
-        return index == 2 ? URL(string: "https://b-ssl.duitang.com/uploads/item/201501/28/20150128173439_RK4XS.jpeg") : nil
+        return index == 2 ? URL(string: "http://img04.tooopen.com/images/20121104/tooopen_201211040112213931.jpg") : nil
     }*/
     
-    /// 长按图片。你可以在此处得到当前图片，并可以做些弹个窗，保存图片等操作
+    /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let saveImageAction = UIAlertAction(title: "保存图片", style: .default) { (_) in
@@ -201,13 +197,13 @@ extension MomentsViewController: PhotoBrowserDelegate {
     }
     
     /// 即将关闭图片浏览器
-    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage) {
-        print("即将关闭图片浏览器，index:\(index), image:\(image)")
+    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage?) {
+        print("即将关闭图片浏览器，index:\(index)")
     }
 
     /// 已经关闭图片浏览器
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage) {
-        print("已经关闭图片浏览器，index:\(index), image:\(image)")
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage?) {
+        print("已经关闭图片浏览器，index:\(index)")
     }
 }
 

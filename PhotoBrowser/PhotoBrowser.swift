@@ -393,7 +393,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
 //
 
 extension PhotoBrowser: PhotoBrowserCellDelegate {
-    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage) {
+    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?) {
         if let dlg = photoBrowserDelegate {
             dlg.photoBrowser(self, willDismissWithIndex: currentIndex, image: image)
         }
