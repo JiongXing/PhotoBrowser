@@ -103,6 +103,13 @@ public class PhotoBrowser: UIViewController {
         #endif
     }
     
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+        self.transitioningDelegate = self
+        self.modalPresentationStyle = .custom
+        self.modalPresentationCapturesStatusBarAppearance = true
+    }
+    
     /// 初始化
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
@@ -110,7 +117,7 @@ public class PhotoBrowser: UIViewController {
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
                 pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
-                photoLoader: PhotoLoader) {
+                photoLoader: PhotoLoader?) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom

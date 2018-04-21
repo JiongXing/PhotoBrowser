@@ -26,10 +26,7 @@ class PhotoLoadState {
     var thumbnailImage:UIImage?
     
     var highQualityUrl:URL? {
-        get {
-            return self.highQualityUrl
-        }
-        set(newValue) {
+        willSet(newValue) {
             self.highLoadState = .none
             if let value = newValue {
                 self.photoLoader?.isLoaded(url: value) { (isLoaded) in
@@ -41,10 +38,7 @@ class PhotoLoadState {
         }
     }
     var rawUrl:URL? {
-        get {
-            return self.rawUrl
-        }
-        set(newValue) {
+        willSet(newValue) {
             self.rawLoadState = .none
             if let value = newValue {
                 self.photoLoader?.isLoaded(url: value) { (isLoaded) in

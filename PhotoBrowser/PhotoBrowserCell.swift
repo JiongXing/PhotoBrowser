@@ -165,7 +165,11 @@ class PhotoBrowserCell: UICollectionViewCell {
         if self.photoLoadState?.highLoadState != .loading && self.photoLoadState?.rawLoadState != .loading {
             self.progressView.isHidden = true
         }
-        if self.photoLoadState?.highLoadState == .loaded {
+        if self.photoLoadState?.highLoadState == .loaded &&
+            self.photoLoadState?.rawUrl != nil &&
+            self.photoLoadState?.rawLoadState == .none {
+            rawImageButton.isHidden = false
+        }else{
             rawImageButton.isHidden = true
         }
     }
@@ -196,6 +200,7 @@ class PhotoBrowserCell: UICollectionViewCell {
             state.view = nil
         }
         self.photoLoadState = state
+        self.photoLoadState?.view = self
         self.imageView.image = state.thumbnailImage
         self.photoLoadState?.load(imageView: self.imageView)
     }
