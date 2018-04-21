@@ -203,6 +203,7 @@ class PhotoBrowserCell: UICollectionViewCell {
         self.photoLoadState?.view = self
         self.imageView.image = state.thumbnailImage
         self.photoLoadState?.load(imageView: self.imageView)
+        self.updateState()
     }
     
     /// 响应单击
