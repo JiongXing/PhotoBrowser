@@ -8,6 +8,7 @@
 
 import UIKit
 import JXPhotoBrowser
+import Kingfisher
 
 class MomentsViewController: UIViewController {
     
@@ -118,6 +119,7 @@ extension MomentsViewController: UICollectionViewDelegate {
                           delegate: self,
                           openIndex: index,
                           pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
+                          photoLoader: KingfisherPhotoLoader(),
                           animationType: .scale)
     }
     
@@ -128,6 +130,9 @@ extension MomentsViewController: UICollectionViewDelegate {
         browser.animationType = .scale
         // 浏览器协议实现者
         browser.photoBrowserDelegate = self
+        
+        browser.photoLoader = KingfisherPhotoLoader()
+        
         // 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         // 这里随机创建一种
         if arc4random_uniform(2) % 2 == 0 {

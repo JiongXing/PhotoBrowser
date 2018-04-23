@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     /// 拖动时回调。scale:缩放比率
@@ -21,12 +20,15 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
 }
 
 class PhotoBrowserCell: UICollectionViewCell {
+    
     // MARK: - 公开属性
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
     /// 显示图像
     let imageView = UIImageView()
+    
+    var photoLoadState: PhotoLoadState?
     
     /// 保存原图url，用于点查看原图时使用
     var rawUrl: URL?
@@ -149,6 +151,29 @@ class PhotoBrowserCell: UICollectionViewCell {
         layout()
     }
     
+    func updateState() {
+        if self.photoLoadState?.highLoadState == .loading {
+            self.progressView.isHidden = false
+            self.progressView.progress = CGFloat((self.photoLoadState?.highProgress)!)
+        }
+        
+        if self.photoLoadState?.rawLoadState == .loading {
+            self.progressView.isHidden = false
+            self.progressView.progress = CGFloat((self.photoLoadState?.rawProgress)!)
+        }
+        
+        if self.photoLoadState?.highLoadState != .loading && self.photoLoadState?.rawLoadState != .loading {
+            self.progressView.isHidden = true
+        }
+        if self.photoLoadState?.highLoadState == .loaded &&
+            self.photoLoadState?.rawUrl != nil &&
+            self.photoLoadState?.rawLoadState == .none {
+            rawImageButton.isHidden = false
+        }else{
+            rawImageButton.isHidden = true
+        }
+    }
+    
     /// 布局
     private func layout() {
         guard shouldLayout else { return }
@@ -170,76 +195,15 @@ class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 设置图片。image为placeholder图片，url为网络图片
-    func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
-        // 默认隐藏查看原图按钮
-        self.rawUrl = nil
-        rawImageButton.isHidden = true
-        // 若已有原图缓存，使用原图
-        if let image = imageFor(url: rawUrl) {
-            imageView.image = image
-            layout()
-            return
+    func setState(_ state: PhotoLoadState) {
+        if let state = self.photoLoadState {
+            state.view = nil
         }
-        // 若已有高清图缓存，使用高清图
-        if let image = imageFor(url: highQualityUrl) {
-            imageView.image = image
-            // 有rawUrl则显示查看原图按钮
-            if rawUrl != nil {
-                self.rawUrl = rawUrl
-                rawImageButton.isHidden = false
-            }
-            layout()
-            return
-        }
-        // 无缓存，开始加载图片
-        if highQualityUrl != nil {
-            loadImage(withPlaceholder: image, url: highQualityUrl, completion: { [weak self] in
-                if rawUrl != nil {
-                    self?.rawUrl = rawUrl
-                    self?.rawImageButton.isHidden = false
-                }
-                self?.layout()
-            })
-        } else {
-            loadImage(withPlaceholder: image, url: rawUrl, completion: { [weak self] in
-                self?.layout()
-            })
-        }
-        self.layout()
-    }
-    
-    /// 加载图片
-    private func loadImage(withPlaceholder placeholder: UIImage?, url: URL?, completion: (() -> Void)?) {
-        // 显示加载进度
-        self.progressView.isHidden = false
-        imageView.kf.setImage(with: url, placeholder: placeholder, options: nil, progressBlock: { [weak self] (receivedSize, totalSize) in
-            if totalSize > 0 {
-                self?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
-            }
-        }, completionHandler: { [weak self] (image, error, cacheType, url) in
-            self?.progressView.isHidden = true
-            if let completion = completion {
-                completion()
-            }
-        })
-    }
-    
-    /// 根据url从缓存取图像
-    private func imageFor(url: URL?) -> UIImage? {
-        guard let url = url else {
-            return nil
-        }
-        var cacheImage: UIImage?
-        let result = KingfisherManager.shared.cache.imageCachedType(forKey: url.cacheKey)
-        switch result {
-        case .none:
-            cacheImage = nil
-        case .memory:
-            cacheImage = KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: url.cacheKey)
-        case .disk:
-            cacheImage = KingfisherManager.shared.cache.retrieveImageInDiskCache(forKey: url.cacheKey)
-        }
-        return cacheImage
+        self.photoLoadState = state
+        self.photoLoadState?.view = self
+        self.imageView.image = state.thumbnailImage
+        self.photoLoadState?.load(imageView: self.imageView)
+        self.updateState()
     }
     
     /// 响应单击
@@ -349,9 +313,8 @@ class PhotoBrowserCell: UICollectionViewCell {
     /// 响应查看原图按钮
     @objc func onRawImageButtonTap() {
         rawImageButton.isHidden = true
-        loadImage(withPlaceholder: imageView.image, url: rawUrl, completion: { [weak self] in
-            self?.layout()
-        })
+        self.photoLoadState?.forceRaw = true
+        self.photoLoadState?.load(imageView: self.imageView)
     }
 }
 
