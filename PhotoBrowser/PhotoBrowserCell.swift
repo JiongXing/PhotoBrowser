@@ -20,15 +20,15 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
 }
 
 class PhotoBrowserCell: UICollectionViewCell {
-    
     // MARK: - 公开属性
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
+    /// 网络图片加载器
+    public var photoLoader: PhotoLoaderDelegate?
+    
     /// 显示图像
     let imageView = UIImageView()
-    
-    var photoLoadState: PhotoLoadState?
     
     /// 保存原图url，用于点查看原图时使用
     var rawUrl: URL?
@@ -101,9 +101,7 @@ class PhotoBrowserCell: UICollectionViewCell {
     /// 记录pan手势开始时，手势位置
     private var beganTouch = CGPoint.zero
 
-    private var shouldLayout = true
-    
-    // MARK: - 方法
+    private var enableLayout = true
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -150,34 +148,17 @@ class PhotoBrowserCell: UICollectionViewCell {
         super.layoutSubviews()
         layout()
     }
-    
-    func updateState() {
-        if self.photoLoadState?.highLoadState == .loading {
-            self.progressView.isHidden = false
-            self.progressView.progress = CGFloat((self.photoLoadState?.highProgress)!)
-        }
-        
-        if self.photoLoadState?.rawLoadState == .loading {
-            self.progressView.isHidden = false
-            self.progressView.progress = CGFloat((self.photoLoadState?.rawProgress)!)
-        }
-        
-        if self.photoLoadState?.highLoadState != .loading && self.photoLoadState?.rawLoadState != .loading {
-            self.progressView.isHidden = true
-        }
-        if self.photoLoadState?.highLoadState == .loaded &&
-            self.photoLoadState?.rawUrl != nil &&
-            self.photoLoadState?.rawLoadState == .none {
-            rawImageButton.isHidden = false
-        }else{
-            rawImageButton.isHidden = true
-        }
-    }
-    
+}
+
+//
+// MARK: - Data & Layout
+//
+
+extension PhotoBrowserCell {
     /// 布局
     private func layout() {
-        guard shouldLayout else { return }
-
+        guard enableLayout else { return }
+        
         scrollView.frame = contentView.bounds
         scrollView.setZoomScale(1.0, animated: false)
         imageView.frame = fitFrame
@@ -185,27 +166,79 @@ class PhotoBrowserCell: UICollectionViewCell {
         progressView.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.midY)
         
         // 查看原图按钮
-        if rawImageButton.isHidden == false {
+        if !rawImageButton.isHidden {
             contentView.addSubview(rawImageButton)
             rawImageButton.sizeToFit()
             rawImageButton.bounds.size.width += 14
             rawImageButton.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.height - 20 - rawImageButton.bounds.height)
-            rawImageButton.isHidden = false
         }
     }
     
     /// 设置图片。image为placeholder图片，url为网络图片
-    func setState(_ state: PhotoLoadState) {
-        if let state = self.photoLoadState {
-            state.view = nil
+    func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+        // 默认隐藏查看原图按钮
+        self.rawUrl = nil
+        rawImageButton.isHidden = true
+        // 若已有原图缓存，使用原图
+        if let url = rawUrl, let image = photoLoader?.cachedImage(with: imageView, url: url) {
+            imageView.image = image
+            layout()
+            return
         }
-        self.photoLoadState = state
-        self.photoLoadState?.view = self
-        self.imageView.image = state.thumbnailImage
-        self.photoLoadState?.load(imageView: self.imageView)
-        self.updateState()
+        // 若已有高清图缓存，使用高清图
+        if let url = highQualityUrl, let image = photoLoader?.cachedImage(with: imageView, url: url) {
+            imageView.image = image
+            // 有rawUrl则显示查看原图按钮
+            if rawUrl != nil {
+                self.rawUrl = rawUrl
+                rawImageButton.isHidden = false
+            }
+            layout()
+            return
+        }
+        // 无缓存
+        if let url = highQualityUrl {
+            // 加载高清级
+            loadImage(withPlaceholder: image, url: url, completion: { [weak self] in
+                // 有rawUrl则显示查看原图按钮
+                if rawUrl != nil {
+                    self?.rawUrl = rawUrl
+                    self?.rawImageButton.isHidden = false
+                }
+                self?.layout()
+            })
+        } else if let url = rawUrl {
+            // 加载原图级
+            loadImage(withPlaceholder: image, url: url, completion: { [weak self] in
+                self?.layout()
+            })
+        }
+        self.layout()
     }
     
+    /// 加载图片
+    private func loadImage(withPlaceholder placeholder: UIImage?, url: URL, completion: (() -> Void)?) {
+        // 显示加载进度
+        self.progressView.isHidden = false
+        photoLoader?.setImage(with: imageView, url: url, placeholder: placeholder, progressBlock: { [weak self] (receivedSize, totalSize) in
+            if totalSize > 0 {
+                self?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
+            }
+            }, completionHandler: { [weak self] in
+                // 隐藏加载进度
+                self?.progressView.isHidden = true
+                if let completion = completion {
+                    completion()
+                }
+        })
+    }
+}
+
+//
+// MARK: - Events
+//
+
+extension PhotoBrowserCell {
     /// 响应单击
     @objc func onSingleTap() {
         if let dlg = photoBrowserCellDelegate {
@@ -235,31 +268,31 @@ class PhotoBrowserCell: UICollectionViewCell {
         guard imageView.image != nil else {
             return
         }
-
+        
         var results: (CGRect, CGFloat) {
             // 拖动偏移量
             let translation = pan.translation(in: scrollView)
             let currentTouch = pan.location(in: scrollView)
-
+            
             // 由下拉的偏移值决定缩放比例，越往下偏移，缩得越小。scale值区间[0.3, 1.0]
             let scale = min(1.0, max(0.3, 1 - translation.y / bounds.height))
-
+            
             let width = beganFrame.size.width * scale
             let height = beganFrame.size.height * scale
-
+            
             // 计算x和y。保持手指在图片上的相对位置不变。
             // 即如果手势开始时，手指在图片X轴三分之一处，那么在移动图片时，保持手指始终位于图片X轴的三分之一处
             let xRate = (beganTouch.x - beganFrame.origin.x) / beganFrame.size.width
             let currentTouchDeltaX = xRate * width
             let x = currentTouch.x - currentTouchDeltaX
-
+            
             let yRate = (beganTouch.y - beganFrame.origin.y) / beganFrame.size.height
             let currentTouchDeltaY = yRate * height
             let y = currentTouch.y - currentTouchDeltaY
-
+            
             return (CGRect(x: x, y: y, width: width, height: height), scale)
         }
-
+        
         switch pan.state {
         case .began:
             beganFrame = imageView.frame
@@ -267,7 +300,7 @@ class PhotoBrowserCell: UICollectionViewCell {
         case .changed:
             let r = results
             imageView.frame = r.0
-
+            
             // 通知代理，发生了缩放。代理可依scale值改变背景蒙板alpha值
             if let dlg = photoBrowserCellDelegate {
                 dlg.photoBrowserCell(self, didPanScale: r.1)
@@ -275,7 +308,7 @@ class PhotoBrowserCell: UICollectionViewCell {
         case .ended, .cancelled:
             if pan.velocity(in: self).y > 0 {
                 // dismiss
-                shouldLayout = false
+                enableLayout = false
                 imageView.frame = results.0
                 onSingleTap()
             } else {
@@ -312,11 +345,17 @@ class PhotoBrowserCell: UICollectionViewCell {
     
     /// 响应查看原图按钮
     @objc func onRawImageButtonTap() {
+        guard let url = rawUrl else { return }
         rawImageButton.isHidden = true
-        self.photoLoadState?.forceRaw = true
-        self.photoLoadState?.load(imageView: self.imageView)
+        loadImage(withPlaceholder: imageView.image, url: url, completion: { [weak self] in
+            self?.layout()
+        })
     }
 }
+
+//
+// MARK: - UIScrollViewDelegate
+//
 
 extension PhotoBrowserCell: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -327,6 +366,10 @@ extension PhotoBrowserCell: UIScrollViewDelegate {
         imageView.center = centerOfContentSize
     }
 }
+
+//
+// MARK: - UIGestureRecognizerDelegate
+//
 
 extension PhotoBrowserCell: UIGestureRecognizerDelegate {
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {

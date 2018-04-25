@@ -1,3 +1,4 @@
+
 //
 //  MomentsViewController.swift
 //  PhotoBrowser
@@ -8,7 +9,6 @@
 
 import UIKit
 import JXPhotoBrowser
-import Kingfisher
 
 class MomentsViewController: UIViewController {
     
@@ -42,7 +42,7 @@ class MomentsViewController: UIViewController {
     
     deinit {
         #if DEBUG
-            print("deinit:\(self)")
+        print("deinit:\(self)")
         #endif
     }
     
@@ -105,12 +105,12 @@ extension MomentsViewController: UICollectionViewDelegate {
             return
         }
         selectedCell = cell
-    
+        
         // 直接打开图片浏览器
-//        openPhotoBrowserWithClassMethod(index: indexPath.item)
- 
+        openPhotoBrowserWithClassMethod(index: indexPath.item)
+        
         // 也可以先创建，然后传参，再打开
-        openPhotoBrowserWithInstanceMethod(index: indexPath.item)
+        // openPhotoBrowserWithInstanceMethod(index: indexPath.item)
     }
     
     private func openPhotoBrowserWithClassMethod(index: Int) {
@@ -119,7 +119,6 @@ extension MomentsViewController: UICollectionViewDelegate {
                           delegate: self,
                           openIndex: index,
                           pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
-                          photoLoader: KingfisherPhotoLoader(),
                           animationType: .scale)
     }
     
@@ -130,9 +129,6 @@ extension MomentsViewController: UICollectionViewDelegate {
         browser.animationType = .scale
         // 浏览器协议实现者
         browser.photoBrowserDelegate = self
-        
-        browser.photoLoader = KingfisherPhotoLoader()
-        
         // 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         // 这里随机创建一种
         if arc4random_uniform(2) % 2 == 0 {
@@ -150,9 +146,9 @@ extension MomentsViewController: UICollectionViewDelegate {
         self.present(browser, animated: true, completion: nil)
         // 可主动关闭图片浏览器
         /*
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            browser.dismiss(animated: false)
-        }*/
+         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+         browser.dismiss(animated: false)
+         }*/
     }
 }
 
@@ -180,11 +176,10 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return URL(string: highQualityImageUrls[index])
     }
     
-    /// 原图。最高清图。
-    /*
+    /// 原图
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-        return index == 2 ? URL(string: "http://img04.tooopen.com/images/20121104/tooopen_201211040112213931.jpg") : nil
-    }*/
+        return index == 5 ? URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg") : nil
+    }
     
     /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
@@ -203,7 +198,7 @@ extension MomentsViewController: PhotoBrowserDelegate {
     func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage?) {
         print("即将关闭图片浏览器，index:\(index)")
     }
-
+    
     /// 已经关闭图片浏览器
     func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage?) {
         print("已经关闭图片浏览器，index:\(index)")

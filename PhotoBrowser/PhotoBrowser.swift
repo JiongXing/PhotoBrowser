@@ -20,10 +20,8 @@ public class PhotoBrowser: UIViewController {
     /// 实现了PhotoBrowserPageControlDelegate协议的对象。（此处强引用）
     public var pageControlDelegate: PhotoBrowserPageControlDelegate?
     
-    // 图片加载器
-    public var photoLoader: PhotoLoader?
-    
-    private var photoLoadStates: Dictionary<Int, PhotoLoadState> = Dictionary()
+    /// 网络图片加载器
+    public var photoLoader: PhotoLoaderDelegate?
     
     /// 左右两张图之间的间隙
     public var photoSpacing: CGFloat = 30
@@ -90,7 +88,10 @@ public class PhotoBrowser: UIViewController {
     }()
     
     /// 保存原windowLevel
-    private var originWindowLevel: UIWindowLevel!
+    private lazy var originWindowLevel: UIWindowLevel? = { [weak self] in
+        let window = self?.view.window ?? UIApplication.shared.keyWindow
+        return window?.windowLevel
+    }()
     
     //
     // MARK: - 创建与销毁
@@ -103,21 +104,15 @@ public class PhotoBrowser: UIViewController {
         #endif
     }
     
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-        self.transitioningDelegate = self
-        self.modalPresentationStyle = .custom
-        self.modalPresentationCapturesStatusBarAppearance = true
-    }
-    
     /// 初始化
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
     /// - parameter pageControlDelegate: 页码指示器
+    /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
                 pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
-                photoLoader: PhotoLoader?) {
+                photoLoader: PhotoLoaderDelegate? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
@@ -125,7 +120,7 @@ public class PhotoBrowser: UIViewController {
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
         self.pageControlDelegate = pageControlDelegate
-        self.photoLoader = photoLoader;
+        self.photoLoader = photoLoader ?? KingfisherPhotoLoader()
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -138,17 +133,18 @@ public class PhotoBrowser: UIViewController {
 //
 
 extension PhotoBrowser {
-    /// 展示，完整参数
+    /// 展示，传入完整参数
     /// - parameter presentingVC: 由谁 present 出图片浏览器
     /// - parameter openIndex: 打开是显示哪张图片，从0开始
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControlDelegate: 页码指示器。默认
+    /// - parameter pageControlDelegate: 页码指示器
+    /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     public class func show(byViewController presentingVC: UIViewController,
                            delegate: PhotoBrowserDelegate,
                            openIndex: Int,
                            pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
-                           photoLoader: PhotoLoader,
+                           photoLoader: PhotoLoaderDelegate? = nil,
                            animationType: AnimationType = .scale) {
         let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate, photoLoader: photoLoader)
         vc.setOpenIndex(openIndex)
@@ -234,10 +230,8 @@ extension PhotoBrowser {
     
     /// 视图布局
     private func layoutViews() {
-        // flowLayout
         flowLayout.minimumLineSpacing = photoSpacing
         flowLayout.itemSize = view.bounds.size
-        // collectionView
         collectionView.frame = view.bounds
     }
 }
@@ -245,19 +239,16 @@ extension PhotoBrowser {
 extension PhotoBrowser {
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
     private func coverStatusBar(_ cover: Bool) {
-        let win = view.window ?? UIApplication.shared.keyWindow
-        guard let window = win else {
+        guard let window = view.window ?? UIApplication.shared.keyWindow else {
             return
         }
-        
         if originWindowLevel == nil {
             originWindowLevel = window.windowLevel
         }
-        if cover {
-            window.windowLevel = UIWindowLevelStatusBar + 1
-        } else {
-            window.windowLevel = originWindowLevel
+        guard let originLevel = originWindowLevel else {
+            return
         }
+        window.windowLevel = cover ? UIWindowLevelStatusBar + 1 : originLevel
     }
 }
 
@@ -270,27 +261,24 @@ extension PhotoBrowser: UICollectionViewDataSource {
         guard let delegate = photoBrowserDelegate else {
             return 0
         }
-        let number = delegate.numberOfPhotos(in: self)
-        if (number != self.photoLoadStates.count) {
-            self.photoLoadStates.removeAll()
-        }
-        return number;
+        return delegate.numberOfPhotos(in: self)
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self), for: indexPath) as! PhotoBrowserCell
         cell.imageView.contentMode = imageScaleMode
         cell.photoBrowserCellDelegate = self
-        let state = stateFor(index: indexPath.item)
-        cell.setState(state!)
+        cell.photoLoader = photoLoader
+        let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
+        cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
         cell.imageMaximumZoomScale = imageMaximumZoomScale
         cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
         return cell
     }
     
-    private func stateFor(index: Int) -> PhotoLoadState? {
+    private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         guard let delegate = photoBrowserDelegate else {
-            return nil
+            return (nil, nil, nil)
         }
         // 缩略图
         let thumbnailImage = delegate.photoBrowser(self, thumbnailImageForIndex: index)
@@ -298,15 +286,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
         let highQualityUrl = delegate.photoBrowser(self, highQualityUrlForIndex: index)
         // 原图url
         let rawUrl = delegate.photoBrowser(self, rawUrlForIndex: index)
-        var photoLoadState = photoLoadStates[index]
-        if photoLoadState == nil {
-            photoLoadState = PhotoLoadState(photoLoader: self.photoLoader)
-            photoLoadState?.thumbnailImage = thumbnailImage
-            photoLoadState?.highQualityUrl = highQualityUrl
-            photoLoadState?.rawUrl = rawUrl
-            photoLoadStates[index] = photoLoadState
-        }
-        return photoLoadState
+        return (thumbnailImage, highQualityUrl, rawUrl)
     }
 }
 
