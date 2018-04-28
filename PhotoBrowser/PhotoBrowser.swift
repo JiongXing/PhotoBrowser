@@ -219,7 +219,7 @@ extension PhotoBrowser {
     }
     
     /// 支持旋转的方向
-    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .all
     }
     
