@@ -139,39 +139,27 @@ public protocol PhotoBrowserDelegate: class {
 ## PhotoBrowser
 ```swift
 PhotoBrowser {
-    /// 展示，完整参数
+    /// 展示，传入完整参数
     /// - parameter presentingVC: 由谁 present 出图片浏览器
     /// - parameter openIndex: 打开是显示哪张图片，从0开始
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControlDelegate: 页码指示器。默认
+    /// - parameter pageControlDelegate: 页码指示器
+    /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     public class func show(byViewController presentingVC: UIViewController,
                            delegate: PhotoBrowserDelegate,
                            openIndex: Int,
                            pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
-                           animationType: AnimationType = .scale) {
-        let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate)
-        vc.setOpenIndex(openIndex)
-        vc.show(byViewController: presentingVC)
-    }
+                           photoLoader: PhotoLoaderDelegate? = nil,
+                           animationType: AnimationType = .scale)
     
     /// 指定打开图片组中的哪张
-    public func setOpenIndex(_ index: Int) {
-        currentIndex = index
-    }
-    
-    /// 展示图片浏览器
-    /// - parameter presentingVC: 由谁 present 出图片浏览器
-    public func show(byViewController presentingVC: UIViewController) {
-        presentingVC.present(self, animated: true, completion: nil)
-    }
+    public func setOpenIndex(_ index: Int)
     
     /// 关闭浏览器
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
-    public func dismiss(animated: Bool) {
-        dismiss(animated: animated, completion: nil)
-    }
+    public func dismiss(animated: Bool)
 }
 ```
 
