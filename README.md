@@ -5,8 +5,8 @@
 
 # Usage
 
-## 简单示例
-创建并展示：
+## Initialize & Show
+
 ```swift
 // 直接打开图片浏览器
 PhotoBrowser.show(byViewController: self,
@@ -39,7 +39,8 @@ browser.imageZoomScaleForDoubleTap = 2.0
 self.present(browser, animated: true, completion: nil)
 ```
 
-数据：
+## Data
+
 ```swift
 /// 告诉图片浏览器共有多少张图片
 func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
@@ -174,11 +175,30 @@ PhotoBrowser {
 }
 ```
 
+# Features
+
+- [x] 支持缩放式转场
+- [x] 支持淡入淡出式转场
+- [x] 支持入场时放大，退场时淡出
+- [x] 支持两级网络图片加载，大图与原图
+- [x] 支持自定义网络图片加载器  
+- [x] 支持光点样式的页码指示
+- [x] 支持数字样式的页码指示
+- [x] 支持长按手势，返回当前图片对象
+- [x] 支持浏览器生命周期事件回调
+- [ ] 支持链式调用语法
+- [ ] 改用闭包传值，提高内聚
+- [ ] 附加功能插件化
+- [ ] RxSwift 扩展
+- [ ] React Native 组件
+
+
 # Requirements
 - iOS 8.0+
 - Swift 4
 
 # Installation
+
 ## CocoaPods
 更新你的本地仓库以同步最新版本
 ```
