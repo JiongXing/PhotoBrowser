@@ -33,6 +33,9 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回原图级质量的url。当本代理方法有返回值时，自动显示查看原图按钮。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
     
+    /// 实现本方法以返回本地大图。本地图片的展示将优先于网络图片
+    func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage?
+    
     /// 长按时回调。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
     
@@ -52,17 +55,13 @@ public protocol PhotoBrowserDelegate: class {
 //
 
 public extension PhotoBrowserDelegate {
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
-        return nil
-    }
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? { return nil }
     
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
-        return nil
-    }
+    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? { return nil }
     
-    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-        return nil
-    }
+    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? { return nil }
+    
+    func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? { return nil }
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {}
     
@@ -70,7 +69,5 @@ public extension PhotoBrowserDelegate {
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage?) {}
     
-    func pageControlOfPhotoBrowser<T: UIView>(_ photoBrowser: PhotoBrowser) -> T? {
-        return nil
-    }
+    func pageControlOfPhotoBrowser<T: UIView>(_ photoBrowser: PhotoBrowser) -> T? { return nil }
 }
