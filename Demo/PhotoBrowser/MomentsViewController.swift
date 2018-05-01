@@ -181,6 +181,11 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return index == 5 ? URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg") : nil
     }
     
+    /// 加载本地图片，本地图片的展示将优先于网络图片
+    func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
+        return index == 3 ? UIImage(named: "xingkong") : nil
+    }
+    
     /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)

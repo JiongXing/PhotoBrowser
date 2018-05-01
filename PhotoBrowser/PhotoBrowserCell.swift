@@ -174,6 +174,16 @@ extension PhotoBrowserCell {
         }
     }
     
+    /// 设置本地大图
+    /// 调用了本方法后，不再加载网络图片
+    func setLocalImage(_ image: UIImage) {
+        rawImageButton.isHidden = true
+        self.progressView.isHidden = true
+        photoLoader?.setLocalImage(on: imageView, image: image, completionHandler: { [weak self] in
+            self?.layout()
+        })
+    }
+    
     /// 设置图片。image为placeholder图片，url为网络图片
     func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 默认隐藏查看原图按钮
@@ -220,7 +230,7 @@ extension PhotoBrowserCell {
     private func loadImage(withPlaceholder placeholder: UIImage?, url: URL, completion: (() -> Void)?) {
         // 显示加载进度
         self.progressView.isHidden = false
-        photoLoader?.setImage(with: imageView, url: url, placeholder: placeholder, progressBlock: { [weak self] (receivedSize, totalSize) in
+        photoLoader?.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { [weak self] (receivedSize, totalSize) in
             if totalSize > 0 {
                 self?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
             }

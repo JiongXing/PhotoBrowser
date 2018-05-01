@@ -9,7 +9,7 @@ import Foundation
 import Kingfisher
 
 public class KingfisherPhotoLoader: PhotoLoaderDelegate {
-    
+
     public func cachedImage(with imageView: UIImageView, url: URL) -> UIImage? {
         let result = KingfisherManager.shared.cache.imageCachedType(forKey: url.cacheKey)
         switch result {
@@ -22,7 +22,7 @@ public class KingfisherPhotoLoader: PhotoLoaderDelegate {
         }
     }
     
-    public func setImage(with imageView: UIImageView, url: URL, placeholder: UIImage?, progressBlock: ((Int64, Int64) -> Void)?, completionHandler: (() -> Void)?) {
+    public func setImage(on imageView: UIImageView, url: URL, placeholder: UIImage?, progressBlock: ((Int64, Int64) -> Void)?, completionHandler: (() -> Void)?) {
         imageView.kf.setImage(with: url, placeholder: placeholder, options: nil, progressBlock: { (receivedSize, totalSize) in
             progressBlock?(receivedSize, totalSize)
         }) { (_, _, _, _) in
@@ -30,4 +30,9 @@ public class KingfisherPhotoLoader: PhotoLoaderDelegate {
         }
     }
     
+    public func setLocalImage(on imageView: UIImageView, image: UIImage, completionHandler: (() -> Void)?) {
+        imageView.kf.setImage(with: nil, placeholder: image, options: nil, progressBlock: nil, completionHandler: { (_, _, _, _) in
+            completionHandler?()
+        })
+    }
 }

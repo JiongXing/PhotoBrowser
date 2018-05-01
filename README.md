@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v0.8.0-blue.svg)
+![](https://img.shields.io/badge/pod-v0.8.1-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Usage
@@ -67,6 +67,11 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: In
 /// 原图
 func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
     return URL(string: rawImageUrls[index])
+}
+
+/// 加载本地图片，本地图片的展示将优先于网络图片
+func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
+    return index == 3 ? UIImage(named: "xingkong") : nil
 }
 
 /// 长按图片。你可以在此处得到当前图片，并可以做些弹个窗，保存图片等操作

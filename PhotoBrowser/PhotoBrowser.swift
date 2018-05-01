@@ -269,11 +269,20 @@ extension PhotoBrowser: UICollectionViewDataSource {
         cell.imageView.contentMode = imageScaleMode
         cell.photoBrowserCellDelegate = self
         cell.photoLoader = photoLoader
-        let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
-        cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
         cell.imageMaximumZoomScale = imageMaximumZoomScale
         cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
+        if let local = localImage(for: indexPath.item) {
+            cell.setLocalImage(local)
+        } else {
+            let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
+            cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
+        }
         return cell
+    }
+    
+    /// 尝试取本地图片
+    private func localImage(for index: Int) -> UIImage? {
+        return photoBrowserDelegate?.photoBrowser(self, localImageForIndex: index)
     }
     
     private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
