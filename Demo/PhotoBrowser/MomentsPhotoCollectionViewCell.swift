@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 class MomentsPhotoCollectionViewCell: UICollectionViewCell {
     
@@ -14,8 +15,9 @@ class MomentsPhotoCollectionViewCell: UICollectionViewCell {
         return NSStringFromClass(self)
     }
     
-    lazy var imageView: UIImageView = {
-        let iv = UIImageView()
+    lazy var imageView: AnimatedImageView = {
+        
+        let iv = AnimatedImageView()
         iv.contentMode = .scaleAspectFill
         iv.layer.masksToBounds = true
         return iv

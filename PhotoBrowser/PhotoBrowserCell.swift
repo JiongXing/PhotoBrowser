@@ -174,60 +174,34 @@ extension PhotoBrowserCell {
         }
     }
     
-    /// 设置本地大图
-    /// 调用了本方法后，不再加载网络图片
-    func setLocalImage(_ image: UIImage) {
+    /// 设置图片
+    func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+        // 保存/更新原图url
+        self.rawUrl = rawUrl
+        
+        // 重置查看原图按钮为隐藏
         rawImageButton.isHidden = true
-        self.progressView.isHidden = true
-        photoLoader?.setLocalImage(on: imageView, image: image, completionHandler: { [weak self] in
+        
+        // 若存在原图缓存，直接显示原图
+        if let url = rawUrl,
+            let isCached = photoLoader?.isImageCached(on: imageView, url: url),
+            isCached {
+            loadImage(withPlaceholder: placeholder, url: url, completion: { [weak self] in
+                self?.layout()
+            })
+            return
+        }
+        
+        // 加载大图
+        loadImage(withPlaceholder: placeholder, url: highQualityUrl, completion: { [weak self] in
+            self?.rawImageButton.isHidden = (rawUrl == nil)
             self?.layout()
         })
-    }
-    
-    /// 设置图片。image为placeholder图片，url为网络图片
-    func setImage(_ image: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
-        // 默认隐藏查看原图按钮
-        self.rawUrl = nil
-        rawImageButton.isHidden = true
-        // 若已有原图缓存，使用原图
-        if let url = rawUrl, let image = photoLoader?.cachedImage(with: imageView, url: url) {
-            imageView.image = image
-            layout()
-            return
-        }
-        // 若已有高清图缓存，使用高清图
-        if let url = highQualityUrl, let image = photoLoader?.cachedImage(with: imageView, url: url) {
-            imageView.image = image
-            // 有rawUrl则显示查看原图按钮
-            if rawUrl != nil {
-                self.rawUrl = rawUrl
-                rawImageButton.isHidden = false
-            }
-            layout()
-            return
-        }
-        // 无缓存
-        if let url = highQualityUrl {
-            // 加载高清级
-            loadImage(withPlaceholder: image, url: url, completion: { [weak self] in
-                // 有rawUrl则显示查看原图按钮
-                if rawUrl != nil {
-                    self?.rawUrl = rawUrl
-                    self?.rawImageButton.isHidden = false
-                }
-                self?.layout()
-            })
-        } else if let url = rawUrl {
-            // 加载原图级
-            loadImage(withPlaceholder: image, url: url, completion: { [weak self] in
-                self?.layout()
-            })
-        }
-        self.layout()
+        layout()
     }
     
     /// 加载图片
-    private func loadImage(withPlaceholder placeholder: UIImage?, url: URL, completion: (() -> Void)?) {
+    private func loadImage(withPlaceholder placeholder: UIImage?, url: URL?, completion: (() -> Void)?) {
         // 显示加载进度
         self.progressView.isHidden = false
         photoLoader?.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { [weak self] (receivedSize, totalSize) in

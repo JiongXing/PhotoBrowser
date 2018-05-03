@@ -9,30 +9,24 @@ import Foundation
 import Kingfisher
 
 public class KingfisherPhotoLoader: PhotoLoaderDelegate {
-
-    public func cachedImage(with imageView: UIImageView, url: URL) -> UIImage? {
+    
+    public func isImageCached(on imageView: UIImageView, url: URL) -> Bool {
         let result = KingfisherManager.shared.cache.imageCachedType(forKey: url.cacheKey)
         switch result {
         case .none:
-            return nil
+            return false
         case .memory:
-            return KingfisherManager.shared.cache.retrieveImageInMemoryCache(forKey: url.cacheKey)
+            return true
         case .disk:
-            return KingfisherManager.shared.cache.retrieveImageInDiskCache(forKey: url.cacheKey)
+            return true
         }
     }
     
-    public func setImage(on imageView: UIImageView, url: URL, placeholder: UIImage?, progressBlock: ((Int64, Int64) -> Void)?, completionHandler: (() -> Void)?) {
+    public func setImage(on imageView: UIImageView, url: URL?, placeholder: UIImage?, progressBlock: @escaping (Int64, Int64) -> Void, completionHandler: @escaping () -> Void) {
         imageView.kf.setImage(with: url, placeholder: placeholder, options: nil, progressBlock: { (receivedSize, totalSize) in
-            progressBlock?(receivedSize, totalSize)
+            progressBlock(receivedSize, totalSize)
         }) { (_, _, _, _) in
-            completionHandler?()
+            completionHandler()
         }
-    }
-    
-    public func setLocalImage(on imageView: UIImageView, image: UIImage, completionHandler: (() -> Void)?) {
-        imageView.kf.setImage(with: nil, placeholder: image, options: nil, progressBlock: nil, completionHandler: { (_, _, _, _) in
-            completionHandler?()
-        })
     }
 }

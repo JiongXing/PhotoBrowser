@@ -173,17 +173,29 @@ extension MomentsViewController: PhotoBrowserDelegate {
     
     /// 高清图
     func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
+        // 测试Gif
+        if index == 1 {
+            return URL(string: "http://img.gaoxiaogif.cn/GaoxiaoGiffiles/images/2015/07/10/maomiqiangqianbuhuan.gif")
+        }
         return URL(string: highQualityImageUrls[index])
     }
     
     /// 原图
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-        return index == 5 ? URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg") : nil
+        // 测试原图
+        if index == 5 {
+            return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
+        }
+        return nil
     }
     
     /// 加载本地图片，本地图片的展示将优先于网络图片
     func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
-        return index == 3 ? UIImage(named: "xingkong") : nil
+        // 测试本地图
+        if index == 3 {
+            return UIImage(named: "xingkong")
+        }
+        return nil
     }
     
     /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作

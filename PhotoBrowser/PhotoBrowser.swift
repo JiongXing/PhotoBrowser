@@ -272,7 +272,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
         cell.imageMaximumZoomScale = imageMaximumZoomScale
         cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
         if let local = localImage(for: indexPath.item) {
-            cell.setLocalImage(local)
+            cell.setImage(local, highQualityUrl: nil, rawUrl: nil)
         } else {
             let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
             cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
