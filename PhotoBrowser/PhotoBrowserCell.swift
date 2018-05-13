@@ -25,7 +25,7 @@ class PhotoBrowserCell: UICollectionViewCell {
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
     /// 网络图片加载器
-    public var photoLoader: PhotoLoaderDelegate?
+    public var photoLoader: PhotoLoader?
     
     /// 显示图像
     let imageView = UIImageView()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol PageControlDelegate: class {
+public protocol PageControl: class {
 
     /// 取PageControl，只会取一次
     func pageControlView(on photoBrowser: PhotoBrowser) -> UIView

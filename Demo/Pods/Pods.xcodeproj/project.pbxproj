@@ -15,7 +15,7 @@
 		0FCFB46189E2CB64363AD1BA88AEBD7B /* DefaultPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66B223E372063AEF4E4EE5691E20FC2 /* DefaultPageControl.swift */; };
 		170FA23A649A0CDB33A9DC72C01EABF6 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE40A7EAEF227D102A4A633F1DD74B7F /* Image.swift */; };
 		181C90198DF28683BE9CF3D6AF72CFC9 /* PhotoBrowserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D584FD7B3DCCC76BC4365B22762861 /* PhotoBrowserCell.swift */; };
-		1F6136D5C1BED5B6C8EF714BDBCD50A2 /* PhotoLoaderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A855B60164B5C23D8EF8DEB9F4010C /* PhotoLoaderDelegate.swift */; };
+		1F6136D5C1BED5B6C8EF714BDBCD50A2 /* PhotoLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74A855B60164B5C23D8EF8DEB9F4010C /* PhotoLoader.swift */; };
 		2776F489D0BC9D15E06DC256994A77B6 /* KingfisherManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD9F1FF08D5D1E848E01F627B669B79 /* KingfisherManager.swift */; };
 		284E883B2C6919E0F867A7609FCDF04C /* RequestModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91647A8F0DB816B83E9D56525FA36939 /* RequestModifier.swift */; };
 		2AA0BB46CB87723806A5027BCC8A8BDB /* AnimatedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D10678DCDE585C27DF431ED1FC4FCF /* AnimatedImageView.swift */; };
@@ -43,7 +43,7 @@
 		9EEB28B7F80985C61D8F06FAFBF3F7D9 /* Kingfisher-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 76EBEEFF6C8E4E7A9FD92E4A3B139319 /* Kingfisher-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A5D6EB5CAD09C4F74B2BB57E9BB11EEA /* ImageView+Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF9EA4E7E8A6B7A4EDA54F899FEBE4E /* ImageView+Kingfisher.swift */; };
 		AC8EB546B1C519046E45A3276D5F2D72 /* ImageModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6915372D6C183E4ADBAD6DDB4BA5999 /* ImageModifier.swift */; };
-		B2A44683CC4DE67ABD9F2688AC9926AC /* PageControlDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8223560A28AEF77EB888171DB08459 /* PageControlDelegate.swift */; };
+		B2A44683CC4DE67ABD9F2688AC9926AC /* PageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8223560A28AEF77EB888171DB08459 /* PageControl.swift */; };
 		B5035795B97D3A339EBA186645EF3CC5 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02DA0EE7A103885B0606126A579FBFF3 /* ImageDownloader.swift */; };
 		B96373EF5C91C3901679C95A9E975527 /* Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 593766F839E7E059C1FFDFEFC7279F59 /* Kingfisher.swift */; };
 		BB9FB594284905E38F347D51084CA383 /* Box.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4898867061D203311A4AC3C7A70B2F /* Box.swift */; };
@@ -116,7 +116,7 @@
 		642CEA27EFED82B9F108780D829A3FE9 /* Pods-PhotoBrowser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-PhotoBrowser.debug.xcconfig"; sourceTree = "<group>"; };
 		6E7BA9BF2007BDB5D46E7A70C3A0F55C /* PhotoBrowserDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhotoBrowserDelegate.swift; path = PhotoBrowser/PhotoBrowserDelegate.swift; sourceTree = "<group>"; };
 		71287AFAF7C48DDADA45D6AB921B36EF /* ImageProcessor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageProcessor.swift; path = Sources/ImageProcessor.swift; sourceTree = "<group>"; };
-		74A855B60164B5C23D8EF8DEB9F4010C /* PhotoLoaderDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhotoLoaderDelegate.swift; path = PhotoBrowser/PhotoLoaderDelegate.swift; sourceTree = "<group>"; };
+		74A855B60164B5C23D8EF8DEB9F4010C /* PhotoLoader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhotoLoader.swift; path = PhotoBrowser/PhotoLoader.swift; sourceTree = "<group>"; };
 		750EE1FAF6BA5CD3D6D2A1626883C510 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		76EBEEFF6C8E4E7A9FD92E4A3B139319 /* Kingfisher-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Kingfisher-umbrella.h"; sourceTree = "<group>"; };
 		7C64A00CFF52248A871220408228D7EB /* NumberPageControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NumberPageControl.swift; path = PhotoBrowser/NumberPageControl.swift; sourceTree = "<group>"; };
@@ -158,7 +158,7 @@
 		FA772C693A587FD7B65AF642CFC6D641 /* ScaleAnimator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScaleAnimator.swift; path = PhotoBrowser/ScaleAnimator.swift; sourceTree = "<group>"; };
 		FBE744C890CB7645987CA3E6DF8F29B1 /* ScalePresentationController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScalePresentationController.swift; path = PhotoBrowser/ScalePresentationController.swift; sourceTree = "<group>"; };
 		FD558208F513A70BEAAEF555B991A11C /* Kingfisher-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Kingfisher-prefix.pch"; sourceTree = "<group>"; };
-		FE8223560A28AEF77EB888171DB08459 /* PageControlDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PageControlDelegate.swift; path = PhotoBrowser/PageControlDelegate.swift; sourceTree = "<group>"; };
+		FE8223560A28AEF77EB888171DB08459 /* PageControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PageControl.swift; path = PhotoBrowser/PageControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -227,9 +227,9 @@
 				6E7BA9BF2007BDB5D46E7A70C3A0F55C /* PhotoBrowserDelegate.swift */,
 				1AD8684A5530CF33E2B1CA52609B772F /* PhotoBrowserLayout.swift */,
 				7C64A00CFF52248A871220408228D7EB /* NumberPageControl.swift */,
-				FE8223560A28AEF77EB888171DB08459 /* PageControlDelegate.swift */,
+				FE8223560A28AEF77EB888171DB08459 /* PageControl.swift */,
 				3BE882C14EC6BDF4C9498B4320733F86 /* PhotoBrowserProgressView.swift */,
-				74A855B60164B5C23D8EF8DEB9F4010C /* PhotoLoaderDelegate.swift */,
+				74A855B60164B5C23D8EF8DEB9F4010C /* PhotoLoader.swift */,
 				FA772C693A587FD7B65AF642CFC6D641 /* ScaleAnimator.swift */,
 				FBE744C890CB7645987CA3E6DF8F29B1 /* ScalePresentationController.swift */,
 				94E645F720A7DF960056B65F /* TopMostViewControllerGetter.swift */,
@@ -532,9 +532,9 @@
 				C52BCF1E6C8B66845BDE90ECAFE80B10 /* PhotoBrowserDelegate.swift in Sources */,
 				E4054E6E41764EC216BC1125820C2DCA /* PhotoBrowserLayout.swift in Sources */,
 				C529B5BF7D07213165C1EC0307F0675D /* NumberPageControl.swift in Sources */,
-				B2A44683CC4DE67ABD9F2688AC9926AC /* PageControlDelegate.swift in Sources */,
+				B2A44683CC4DE67ABD9F2688AC9926AC /* PageControl.swift in Sources */,
 				64D9C5082BEFEDDA949B311FEF800D44 /* PhotoBrowserProgressView.swift in Sources */,
-				1F6136D5C1BED5B6C8EF714BDBCD50A2 /* PhotoLoaderDelegate.swift in Sources */,
+				1F6136D5C1BED5B6C8EF714BDBCD50A2 /* PhotoLoader.swift in Sources */,
 				9E1FE3C2ABF5E5A9200ECC50064D62F8 /* ScaleAnimator.swift in Sources */,
 				843C4619E0A5A15934E653614C89277A /* ScalePresentationController.swift in Sources */,
 			);

@@ -1,5 +1,5 @@
 //
-//  PhotoLoaderDelegate.swift
+//  PhotoLoader.swift
 //  JXPhotoBrowser
 //
 //  Created by JiongXing on 2018/4/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol PhotoLoaderDelegate {
+public protocol PhotoLoader {
     /// 是否有指定的缓存图片
     func isImageCached(on imageView: UIImageView, url: URL) -> Bool
     

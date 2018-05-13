@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct TopMostViewControllerGetter {
+public struct TopMostViewControllerGetter {
     private static var sharedApplication: UIApplication? {
         let selector = NSSelectorFromString("sharedApplication")
         return UIApplication.perform(selector)?.takeUnretainedValue() as? UIApplication

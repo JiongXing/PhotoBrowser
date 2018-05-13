@@ -110,16 +110,12 @@ extension MomentsViewController: UICollectionViewDelegate {
         openPhotoBrowserWithClassMethod(index: indexPath.item)
         
         // 也可以先创建，然后传参，再打开
-        // openPhotoBrowserWithInstanceMethod(index: indexPath.item)
+//         openPhotoBrowserWithInstanceMethod(index: indexPath.item)
     }
     
     private func openPhotoBrowserWithClassMethod(index: Int) {
         // 直接打开图片浏览器
-        PhotoBrowser.show(byViewController: self,
-                          delegate: self,
-                          openIndex: index,
-                          pageControlDelegate: DefaultPageControl(),
-                          animationType: .scale)
+        PhotoBrowser.show(delegate: self, initializePageIndex: index)
     }
     
     private func openPhotoBrowserWithInstanceMethod(index: Int) {
@@ -137,11 +133,7 @@ extension MomentsViewController: UICollectionViewDelegate {
             browser.pageControl = NumberPageControl()
         }
         // 指定打开图片组中的哪张
-        browser.setOpenIndex(index)
-        // 捏合手势放大图片时的最大允许比例，默认2.0
-        browser.imageMaximumZoomScale = 2.0
-        // 双击放大图片时的目标比例，默认2.0
-        browser.imageZoomScaleForDoubleTap = 2.0
+        browser.initializePageIndex = index
         // 展示
         self.present(browser, animated: true, completion: nil)
         // 可主动关闭图片浏览器

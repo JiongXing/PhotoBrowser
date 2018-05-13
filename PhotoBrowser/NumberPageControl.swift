@@ -9,7 +9,7 @@
 import UIKit
 
 /// 给图片浏览器提供一个数字样式的PageControl
-open class NumberPageControl: PageControlDelegate {
+open class NumberPageControl: PageControl {
     
     /// 字体
     open var font = UIFont.systemFont(ofSize: 17)
@@ -31,7 +31,7 @@ open class NumberPageControl: PageControlDelegate {
     
     public init() {}
     
-    // MARK: - PageControlDelegate
+    // MARK: - PageControl
     
     open func pageControlView(on photoBrowser: PhotoBrowser) -> UIView {
         return numberLabel

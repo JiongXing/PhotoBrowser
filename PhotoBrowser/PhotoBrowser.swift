@@ -18,10 +18,10 @@ public class PhotoBrowser: UIViewController {
     public weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
     /// 实现了PageControlDelegate协议的对象
-    public var pageControl: PageControlDelegate?
+    public var pageControl: PageControl?
     
     /// 网络图片加载器
-    public var photoLoader: PhotoLoaderDelegate?
+    public var photoLoader: PhotoLoader?
     
     /// 左右两张图之间的间隙
     public var photoSpacing: CGFloat = 30
@@ -37,6 +37,9 @@ public class PhotoBrowser: UIViewController {
     
     /// 转场动画类型
     public var animationType: AnimationType = .scale
+    
+    /// 打开时的初始页码，第一页为 0.
+    public var initializePageIndex: Int = 0
     
     //
     // MARK: - 私有属性
@@ -101,20 +104,24 @@ public class PhotoBrowser: UIViewController {
     /// 初始化
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControlDelegate: 页码指示器
-    /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
+    /// - parameter pageControl: 页码指示器，默认 DefaultPageControl
+    /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter initializePageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
-                pageControlDelegate: PageControlDelegate? = nil,
-                photoLoader: PhotoLoaderDelegate? = nil) {
+                photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                pageControl: PageControl? = DefaultPageControl(),
+                initializePageIndex: Int = 0) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
         self.modalPresentationCapturesStatusBarAppearance = true
+        
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
-        self.pageControl = pageControlDelegate
-        self.photoLoader = photoLoader ?? KingfisherPhotoLoader()
+        self.photoLoader = photoLoader
+        self.pageControl = pageControl
+        self.initializePageIndex = initializePageIndex
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -128,32 +135,30 @@ public class PhotoBrowser: UIViewController {
 
 extension PhotoBrowser {
     /// 展示，传入完整参数
-    /// - parameter presentingVC: 由谁 present 出图片浏览器
-    /// - parameter openIndex: 打开是显示哪张图片，从0开始
-    /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControlDelegate: 页码指示器
-    /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    public class func show(byViewController presentingVC: UIViewController,
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter pageControl: 页码指示器，默认 DefaultPageControl
+    /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter initializePageIndex: 打开时的初始页码，第一页为 0.
+    /// - parameter fromViewController: 基于哪个 ViewController 执行 present.
+    public class func show(animationType: AnimationType = .scale,
                            delegate: PhotoBrowserDelegate,
-                           openIndex: Int,
-                           pageControlDelegate: PageControlDelegate? = nil,
-                           photoLoader: PhotoLoaderDelegate? = nil,
-                           animationType: AnimationType = .scale) {
-        let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate, photoLoader: photoLoader)
-        vc.setOpenIndex(openIndex)
-        vc.show(byViewController: presentingVC)
-    }
-    
-    /// 指定打开图片组中的哪张
-    public func setOpenIndex(_ index: Int) {
-        currentIndex = index
+                           pageControl: PageControl? = DefaultPageControl(),
+                           photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                           initializePageIndex: Int,
+                           fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
+        let vc = PhotoBrowser(animationType: animationType,
+                              delegate: delegate,
+                              photoLoader: photoLoader,
+                              pageControl: pageControl,
+                              initializePageIndex: initializePageIndex)
+        vc.show(from: fromViewController)
     }
     
     /// 展示图片浏览器
     /// - parameter presentingVC: 由谁 present 出图片浏览器
-    public func show(byViewController presentingVC: UIViewController) {
-        presentingVC.present(self, animated: true, completion: nil)
+    public func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost) {
+        viewController?.present(self, animated: true, completion: nil)
     }
     
     /// 关闭浏览器
@@ -173,6 +178,7 @@ extension PhotoBrowser {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        currentIndex = initializePageIndex
     }
     
     public override func viewWillAppear(_ animated: Bool) {
