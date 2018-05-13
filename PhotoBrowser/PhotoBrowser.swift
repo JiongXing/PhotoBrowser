@@ -41,6 +41,9 @@ public class PhotoBrowser: UIViewController {
     /// 打开时的初始页码，第一页为 0.
     public var initializePageIndex: Int = 0
     
+    /// 插件组
+    public var plugins: [PhotoBrowserPlugin] = []
+    
     //
     // MARK: - 私有属性
     //
@@ -49,6 +52,9 @@ public class PhotoBrowser: UIViewController {
     private var currentIndex = 0 {
         didSet {
             scalePresentationController?.updateCurrentHiddenView(relatedView)
+            plugins.forEach {
+                $0.photoBrowser(self, didChangedPageIndex: currentIndex)
+            }
             if let pageControl = pageControl, let total = photoBrowserDelegate?.numberOfPhotos(in: self) {
                 pageControl.pageControlPageDidChanged(current: currentIndex, total: total)
             }
@@ -150,7 +156,7 @@ extension PhotoBrowser {
         let vc = PhotoBrowser(animationType: animationType,
                               delegate: delegate,
                               photoLoader: photoLoader,
-                              pageControl: pageControl,
+                              pageControl: DefaultPageControl(),
                               initializePageIndex: initializePageIndex)
         vc.show(from: fromViewController)
     }
@@ -178,6 +184,9 @@ extension PhotoBrowser {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidLoad: view)
+        }
         currentIndex = initializePageIndex
     }
     
@@ -185,10 +194,16 @@ extension PhotoBrowser {
         super.viewWillAppear(animated)
         // 遮盖状态栏
         coverStatusBar(true)
+        plugins.forEach {
+            $0.photoBrowser(self, viewWillAppear: view, animated: animated)
+        }
     }
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidAppear: view, animated: animated)
+        }
         // 页面出来后，再显示页码指示器
         // 多于一张图才会显示
         if let pageControl = pageControl,
@@ -201,14 +216,20 @@ extension PhotoBrowser {
     
     public override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        layoutViews()
+        plugins.forEach {
+            $0.photoBrowser(self, viewWillLayoutSubviews: view)
+        }
     }
     
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        layoutViews()
         // 屏幕旋转后的调整
         let indexPath = IndexPath.init(item: self.currentIndex, section: 0)
         self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidLayoutSubviews: view)
+        }
         if let pageControl = pageControl,
             let total = photoBrowserDelegate?.numberOfPhotos(in: self), total > 1 {
             pageControl.pageControlLayout(in: view)
@@ -260,10 +281,11 @@ extension PhotoBrowser {
 
 extension PhotoBrowser: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let delegate = photoBrowserDelegate else {
-            return 0
+        let number = photoBrowserDelegate?.numberOfPhotos(in: self) ?? 0
+        plugins.forEach {
+            $0.photoBrowser(self, numberOfPhotos: number)
         }
-        return delegate.numberOfPhotos(in: self)
+        return number
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -278,6 +300,9 @@ extension PhotoBrowser: UICollectionViewDataSource {
         } else {
             let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
             cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
+        }
+        plugins.forEach {
+            $0.photoBrowser(self, reusableCell: cell, atIndex: indexPath.item)
         }
         return cell
     }

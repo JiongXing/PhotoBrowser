@@ -19,8 +19,15 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
 }
 
-class PhotoBrowserCell: UICollectionViewCell {
-    // MARK: - 公开属性
+public class PhotoBrowserCell: UICollectionViewCell {
+    
+    //
+    // MARK: - Public
+    //
+    
+    /// 提供一个可用来关联对象的引用
+    public var associatedObject: Any? = nil
+    
     /// 代理
     weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
@@ -43,7 +50,10 @@ class PhotoBrowserCell: UICollectionViewCell {
     /// 双击放大图片时的目标比例
     var imageZoomScaleForDoubleTap: CGFloat = 2.0
     
-    // MARK: - 内部属性
+    //
+    // MARK: - Private
+    //
+    
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
@@ -66,7 +76,7 @@ class PhotoBrowserCell: UICollectionViewCell {
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(onRawImageButtonTap), for: .touchUpInside)
         return button
-        }()
+    }()
     
     /// 计算contentSize应处于的中心位置
     private var centerOfContentSize: CGPoint {
@@ -144,7 +154,7 @@ class PhotoBrowserCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
         layout()
     }
@@ -340,11 +350,11 @@ extension PhotoBrowserCell {
 //
 
 extension PhotoBrowserCell: UIScrollViewDelegate {
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
     
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         imageView.center = centerOfContentSize
     }
 }
@@ -354,7 +364,7 @@ extension PhotoBrowserCell: UIScrollViewDelegate {
 //
 
 extension PhotoBrowserCell: UIGestureRecognizerDelegate {
-    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // 只响应pan手势
         guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
             return true
