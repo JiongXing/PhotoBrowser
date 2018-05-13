@@ -107,15 +107,10 @@ extension MomentsViewController: UICollectionViewDelegate {
         selectedCell = cell
         
         // 直接打开图片浏览器
-//        openPhotoBrowserWithClassMethod(index: indexPath.item)
+        // PhotoBrowser.show(delegate: self, initializePageIndex: index)
         
         // 也可以先创建，然后传参，再打开
-         openPhotoBrowserWithInstanceMethod(index: indexPath.item)
-    }
-    
-    private func openPhotoBrowserWithClassMethod(index: Int) {
-        // 直接打开图片浏览器
-        PhotoBrowser.show(delegate: self, initializePageIndex: index)
+        openPhotoBrowserWithInstanceMethod(index: indexPath.item)
     }
     
     private func openPhotoBrowserWithInstanceMethod(index: Int) {
@@ -132,11 +127,11 @@ extension MomentsViewController: UICollectionViewDelegate {
         browser.initializePageIndex = index
         // 展示
         self.present(browser, animated: true, completion: nil)
-        // 可主动关闭图片浏览器
         /*
-         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-         browser.dismiss(animated: false)
-         }*/
+        // 可主动关闭图片浏览器
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            browser.dismiss(animated: false)
+        }*/
     }
 }
 
@@ -147,15 +142,14 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return thumbnailImageUrls.count
     }
     
-    /// 图片加载前的placeholder
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
+    /// 缩放起始图
+    func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage? {
         let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
-        // 取thumbnailImage
         return cell?.imageView.image
     }
     
     /// 缩放起始视图
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -> UIView? {
         return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
     

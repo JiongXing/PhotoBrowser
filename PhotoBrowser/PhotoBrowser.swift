@@ -57,7 +57,7 @@ public class PhotoBrowser: UIViewController {
     
     /// 当前正在显示视图的前一个页面关联视图
     private var relatedView: UIView? {
-        return photoBrowserDelegate?.photoBrowser(self, thumbnailViewForIndex: currentIndex)
+        return photoBrowserDelegate?.photoBrowser(self, originViewForIndex: currentIndex)
     }
     
     /// 转场协调器
@@ -299,12 +299,12 @@ extension PhotoBrowser: UICollectionViewDataSource {
             return (nil, nil, nil)
         }
         // 缩略图
-        let thumbnailImage = delegate.photoBrowser(self, thumbnailImageForIndex: index)
+        let originImage = delegate.photoBrowser(self, originImageForIndex: index)
         // 高清图url
         let highQualityUrl = delegate.photoBrowser(self, highQualityUrlForIndex: index)
         // 原图url
         let rawUrl = delegate.photoBrowser(self, rawUrlForIndex: index)
-        return (thumbnailImage, highQualityUrl, rawUrl)
+        return (originImage, highQualityUrl, rawUrl)
     }
 }
 
