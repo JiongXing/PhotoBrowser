@@ -17,8 +17,8 @@ public class PhotoBrowser: UIViewController {
     /// 实现了PhotoBrowserDelegate协议的对象
     public weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
-    /// 实现了PhotoBrowserPageControlDelegate协议的对象。（此处强引用）
-    public var pageControlDelegate: PhotoBrowserPageControlDelegate?
+    /// 实现了PageControlDelegate协议的对象
+    public var pageControl: PageControlDelegate?
     
     /// 网络图片加载器
     public var photoLoader: PhotoLoaderDelegate?
@@ -46,10 +46,9 @@ public class PhotoBrowser: UIViewController {
     private var currentIndex = 0 {
         didSet {
             scalePresentationController?.updateCurrentHiddenView(relatedView)
-            guard let dlg = pageControlDelegate, let pageControl = self.pageControl else {
-                return
+            if let pageControl = pageControl, let total = photoBrowserDelegate?.numberOfPhotos(in: self) {
+                pageControl.pageControlPageDidChanged(current: currentIndex, total: total)
             }
-            dlg.photoBrowserPageControl(pageControl, didChangedCurrentPage: currentIndex)
         }
     }
     
@@ -82,11 +81,6 @@ public class PhotoBrowser: UIViewController {
         return collectionView
     }()
     
-    /// PageControl
-    private lazy var pageControl: UIView? = { [unowned self] in
-        return self.pageControlDelegate?.pageControlOfPhotoBrowser(self)
-    }()
-    
     /// 保存原windowLevel
     private lazy var originWindowLevel: UIWindowLevel? = { [weak self] in
         let window = self?.view.window ?? UIApplication.shared.keyWindow
@@ -111,7 +105,7 @@ public class PhotoBrowser: UIViewController {
     /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
-                pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
+                pageControlDelegate: PageControlDelegate? = nil,
                 photoLoader: PhotoLoaderDelegate? = nil) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
@@ -119,7 +113,7 @@ public class PhotoBrowser: UIViewController {
         self.modalPresentationCapturesStatusBarAppearance = true
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
-        self.pageControlDelegate = pageControlDelegate
+        self.pageControl = pageControlDelegate
         self.photoLoader = photoLoader ?? KingfisherPhotoLoader()
     }
     
@@ -143,7 +137,7 @@ extension PhotoBrowser {
     public class func show(byViewController presentingVC: UIViewController,
                            delegate: PhotoBrowserDelegate,
                            openIndex: Int,
-                           pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
+                           pageControlDelegate: PageControlDelegate? = nil,
                            photoLoader: PhotoLoaderDelegate? = nil,
                            animationType: AnimationType = .scale) {
         let vc = PhotoBrowser(animationType: animationType, delegate: delegate, pageControlDelegate: pageControlDelegate, photoLoader: photoLoader)
@@ -191,9 +185,11 @@ extension PhotoBrowser {
         super.viewDidAppear(animated)
         // 页面出来后，再显示页码指示器
         // 多于一张图才会显示
-        if let pcdlg = pageControlDelegate, pcdlg.numberOfPages > 1, let pc = pageControl {
-            view.addSubview(pc)
-            pcdlg.photoBrowserPageControl(pc, needLayoutIn: view)
+        if let pageControl = pageControl,
+            let total = photoBrowserDelegate?.numberOfPhotos(in: self), total > 1 {
+            view.addSubview(pageControl.pageControlView(on: self))
+            pageControl.pageControlDidMove(to: view)
+            pageControl.pageControlLayout(in: view)
         }
     }
     
@@ -207,9 +203,9 @@ extension PhotoBrowser {
         // 屏幕旋转后的调整
         let indexPath = IndexPath.init(item: self.currentIndex, section: 0)
         self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
-        
-        if let pcdlg = pageControlDelegate, pcdlg.numberOfPages > 1, let pc = pageControl {
-            pcdlg.photoBrowserPageControl(pc, needLayoutIn: view)
+        if let pageControl = pageControl,
+            let total = photoBrowserDelegate?.numberOfPhotos(in: self), total > 1 {
+            pageControl.pageControlLayout(in: view)
         }
     }
     

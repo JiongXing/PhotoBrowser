@@ -118,7 +118,7 @@ extension MomentsViewController: UICollectionViewDelegate {
         PhotoBrowser.show(byViewController: self,
                           delegate: self,
                           openIndex: index,
-                          pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
+                          pageControlDelegate: DefaultPageControl(),
                           animationType: .scale)
     }
     
@@ -132,9 +132,9 @@ extension MomentsViewController: UICollectionViewDelegate {
         // 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
         // 这里随机创建一种
         if arc4random_uniform(2) % 2 == 0 {
-            browser.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
+            browser.pageControl = DefaultPageControl()
         } else {
-            browser.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
+            browser.pageControl = NumberPageControl()
         }
         // 指定打开图片组中的哪张
         browser.setOpenIndex(index)

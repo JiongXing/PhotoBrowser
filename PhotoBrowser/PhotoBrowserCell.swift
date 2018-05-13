@@ -252,48 +252,22 @@ extension PhotoBrowserCell {
         guard imageView.image != nil else {
             return
         }
-        
-        var results: (CGRect, CGFloat) {
-            // 拖动偏移量
-            let translation = pan.translation(in: scrollView)
-            let currentTouch = pan.location(in: scrollView)
-            
-            // 由下拉的偏移值决定缩放比例，越往下偏移，缩得越小。scale值区间[0.3, 1.0]
-            let scale = min(1.0, max(0.3, 1 - translation.y / bounds.height))
-            
-            let width = beganFrame.size.width * scale
-            let height = beganFrame.size.height * scale
-            
-            // 计算x和y。保持手指在图片上的相对位置不变。
-            // 即如果手势开始时，手指在图片X轴三分之一处，那么在移动图片时，保持手指始终位于图片X轴的三分之一处
-            let xRate = (beganTouch.x - beganFrame.origin.x) / beganFrame.size.width
-            let currentTouchDeltaX = xRate * width
-            let x = currentTouch.x - currentTouchDeltaX
-            
-            let yRate = (beganTouch.y - beganFrame.origin.y) / beganFrame.size.height
-            let currentTouchDeltaY = yRate * height
-            let y = currentTouch.y - currentTouchDeltaY
-            
-            return (CGRect(x: x, y: y, width: width, height: height), scale)
-        }
-        
         switch pan.state {
         case .began:
             beganFrame = imageView.frame
             beganTouch = pan.location(in: scrollView)
         case .changed:
-            let r = results
-            imageView.frame = r.0
-            
+            let result = panResult(pan)
+            imageView.frame = result.0
             // 通知代理，发生了缩放。代理可依scale值改变背景蒙板alpha值
             if let dlg = photoBrowserCellDelegate {
-                dlg.photoBrowserCell(self, didPanScale: r.1)
+                dlg.photoBrowserCell(self, didPanScale: result.1)
             }
         case .ended, .cancelled:
             if pan.velocity(in: self).y > 0 {
                 // dismiss
                 enableLayout = false
-                imageView.frame = results.0
+                imageView.frame = panResult(pan).0
                 onSingleTap()
             } else {
                 // 取消dismiss
@@ -302,6 +276,30 @@ extension PhotoBrowserCell {
         default:
             endPan()
         }
+    }
+    
+    private func panResult(_ pan: UIPanGestureRecognizer) -> (CGRect, CGFloat) {
+        // 拖动偏移量
+        let translation = pan.translation(in: scrollView)
+        let currentTouch = pan.location(in: scrollView)
+        
+        // 由下拉的偏移值决定缩放比例，越往下偏移，缩得越小。scale值区间[0.3, 1.0]
+        let scale = min(1.0, max(0.3, 1 - translation.y / bounds.height))
+        
+        let width = beganFrame.size.width * scale
+        let height = beganFrame.size.height * scale
+        
+        // 计算x和y。保持手指在图片上的相对位置不变。
+        // 即如果手势开始时，手指在图片X轴三分之一处，那么在移动图片时，保持手指始终位于图片X轴的三分之一处
+        let xRate = (beganTouch.x - beganFrame.origin.x) / beganFrame.size.width
+        let currentTouchDeltaX = xRate * width
+        let x = currentTouch.x - currentTouchDeltaX
+        
+        let yRate = (beganTouch.y - beganFrame.origin.y) / beganFrame.size.height
+        let currentTouchDeltaY = yRate * height
+        let y = currentTouch.y - currentTouchDeltaY
+        
+        return (CGRect(x: x, y: y, width: width, height: height), scale)
     }
     
     private func endPan() {
