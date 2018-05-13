@@ -36,7 +36,7 @@ public class PhotoBrowser: UIViewController {
     public var animationType: AnimationType = .scale
     
     /// 打开时的初始页码，第一页为 0.
-    public var initializePageIndex: Int = 0
+    public var originPageIndex: Int = 0
     
     /// 插件组
     public var plugins: [PhotoBrowserPlugin] = []
@@ -61,7 +61,7 @@ public class PhotoBrowser: UIViewController {
     }
     
     /// 转场协调器
-    private weak var fadePresentationController: FadePresentationControllerDelegate?
+    private weak var fadePresentationController: PhotoBrowserPresentationController?
     
     /// 缩放型转场协调器
     private weak var scalePresentationController: ScalePresentationController?
@@ -106,7 +106,7 @@ public class PhotoBrowser: UIViewController {
     /// - parameter delegate: 浏览器协议代理
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
-    /// - parameter initializePageIndex: 打开时的初始页码，第一页为 0.
+    /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
                 photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
@@ -121,7 +121,7 @@ public class PhotoBrowser: UIViewController {
         self.photoBrowserDelegate = delegate
         self.photoLoader = photoLoader
         self.plugins = plugins
-        self.initializePageIndex = initializePageIndex
+        self.originPageIndex = initializePageIndex
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -139,7 +139,7 @@ extension PhotoBrowser {
     /// - parameter delegate: 浏览器协议代理
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
-    /// - parameter initializePageIndex: 打开时的初始页码，第一页为 0.
+    /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     /// - parameter fromViewController: 基于哪个 ViewController 执行 present.
     public class func show(animationType: AnimationType = .scale,
                            delegate: PhotoBrowserDelegate,
@@ -181,7 +181,7 @@ extension PhotoBrowser {
         plugins.forEach {
             $0.photoBrowser(self, viewDidLoad: view)
         }
-        currentIndex = initializePageIndex
+        currentIndex = originPageIndex
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -428,6 +428,14 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
         if let indexPath = collectionView.indexPath(for: cell) {
             photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
+        }
+    }
+    
+    func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
+        if let indexPath = collectionView.indexPath(for: cell) {
+            plugins.forEach {
+                $0.photoBrowser(self, didLayout: cell, at: indexPath.item)
+            }
         }
     }
 }

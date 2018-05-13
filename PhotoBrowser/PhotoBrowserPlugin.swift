@@ -27,6 +27,8 @@ public protocol PhotoBrowserPlugin {
     func photoBrowser(_ photoBrowser: PhotoBrowser, viewWillLayoutSubviews view: UIView)
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView)
+    
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell, at index: Int)
 }
 
 extension PhotoBrowserPlugin {
@@ -47,4 +49,6 @@ extension PhotoBrowserPlugin {
     public func photoBrowser(_ photoBrowser: PhotoBrowser, viewWillLayoutSubviews view: UIView) {}
     
     public func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {}
+    
+    public func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell, at index: Int) {}
 }

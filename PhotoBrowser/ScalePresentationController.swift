@@ -60,7 +60,7 @@ class ScalePresentationController: UIPresentationController {
 
 // MARK: - 转场协调器协议
 
-extension ScalePresentationController: FadePresentationControllerDelegate {
+extension ScalePresentationController: PhotoBrowserPresentationController {
     var maskAlpha: CGFloat {
         set {
             maskView.alpha = newValue

@@ -56,7 +56,7 @@
 		D93C9F8BC280E7E12A3BBF065276CFC3 /* FormatIndicatedCacheSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51313B06008A49CEE34BA3780BDE1DF3 /* FormatIndicatedCacheSerializer.swift */; };
 		E00CE60A7E767577EFB1FF1BF79E57BF /* ImageTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5ACEF73DDC51ADD99C0C6BBE3FAC8E4 /* ImageTransition.swift */; };
 		E4054E6E41764EC216BC1125820C2DCA /* PhotoBrowserLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AD8684A5530CF33E2B1CA52609B772F /* PhotoBrowserLayout.swift */; };
-		E7E5E10AF13E95DF05FCF19CF279AB1D /* FadePresentationControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54D9D1E31D3737C3DCACBB24ADBA362 /* FadePresentationControllerDelegate.swift */; };
+		E7E5E10AF13E95DF05FCF19CF279AB1D /* PhotoBrowserPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A54D9D1E31D3737C3DCACBB24ADBA362 /* PhotoBrowserPresentationController.swift */; };
 		E9DA8A064FD125BAB2BE69AB88BC16CB /* Pods-PhotoBrowser-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 4EEDC485349AA93AEC557B5A4535DCF0 /* Pods-PhotoBrowser-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F96093825B5A93E26D0CD01A9F667E79 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11373FF82ED248D8BE23AE3AAA7840D6 /* Filter.swift */; };
 /* End PBXBuildFile section */
@@ -132,7 +132,7 @@
 		9713B7D7F25FDCDD4485F5ACB7BEEC8B /* JXPhotoBrowser.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = JXPhotoBrowser.xcconfig; sourceTree = "<group>"; };
 		9B2F2D5886F9409C4E7429B2EA57F3D5 /* JXPhotoBrowser-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "JXPhotoBrowser-dummy.m"; sourceTree = "<group>"; };
 		A21BB68CFF1A90165701501253D0DAE9 /* Kingfisher.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Kingfisher.modulemap; sourceTree = "<group>"; };
-		A54D9D1E31D3737C3DCACBB24ADBA362 /* FadePresentationControllerDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FadePresentationControllerDelegate.swift; path = PhotoBrowser/FadePresentationControllerDelegate.swift; sourceTree = "<group>"; };
+		A54D9D1E31D3737C3DCACBB24ADBA362 /* PhotoBrowserPresentationController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhotoBrowserPresentationController.swift; path = PhotoBrowser/PhotoBrowserPresentationController.swift; sourceTree = "<group>"; };
 		A6915372D6C183E4ADBAD6DDB4BA5999 /* ImageModifier.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageModifier.swift; path = Sources/ImageModifier.swift; sourceTree = "<group>"; };
 		A726B49974505E1FA22990DE737081D9 /* PhotoBrowser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhotoBrowser.swift; path = PhotoBrowser/PhotoBrowser.swift; sourceTree = "<group>"; };
 		A8768A036BE11F8DDE5209645F70A5E5 /* FadeAnimator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FadeAnimator.swift; path = PhotoBrowser/FadeAnimator.swift; sourceTree = "<group>"; };
@@ -219,7 +219,7 @@
 				B4B1FD1A8B1ABC354F32201E18602101 /* AnimationType.swift */,
 				A8768A036BE11F8DDE5209645F70A5E5 /* FadeAnimator.swift */,
 				BD3DAA81629162ABA218B62009626D25 /* FadePresentationController.swift */,
-				A54D9D1E31D3737C3DCACBB24ADBA362 /* FadePresentationControllerDelegate.swift */,
+				A54D9D1E31D3737C3DCACBB24ADBA362 /* PhotoBrowserPresentationController.swift */,
 				BDDD504BDE3E17CEE3B6348E169E4240 /* KingfisherPhotoLoader.swift */,
 				A726B49974505E1FA22990DE737081D9 /* PhotoBrowser.swift */,
 				94E645FB20A865AA0056B65F /* PhotoBrowserPlugin.swift */,
@@ -522,7 +522,7 @@
 				0EB8067AB64656283EC6330C27C63DF0 /* AnimationType.swift in Sources */,
 				52AB43B21A3288504FA38127F0AF4720 /* FadeAnimator.swift in Sources */,
 				BDEE2BCA5FB847D09EEB6DAE4E63A3BC /* FadePresentationController.swift in Sources */,
-				E7E5E10AF13E95DF05FCF19CF279AB1D /* FadePresentationControllerDelegate.swift in Sources */,
+				E7E5E10AF13E95DF05FCF19CF279AB1D /* PhotoBrowserPresentationController.swift in Sources */,
 				94E6460220A8878F0056B65F /* DefaultPageControlPlugin.swift in Sources */,
 				2B411881D19CB80E89308C616FE3E6E3 /* JXPhotoBrowser-dummy.m in Sources */,
 				41D8F004825758F0DFFA1CF74BB93BA2 /* KingfisherPhotoLoader.swift in Sources */,

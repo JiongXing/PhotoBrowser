@@ -17,6 +17,9 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     
     /// 长按时回调
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
+    
+    /// Layout 时回调
+    func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell)
 }
 
 public class PhotoBrowserCell: UICollectionViewCell {
@@ -182,6 +185,8 @@ extension PhotoBrowserCell {
             rawImageButton.bounds.size.width += 14
             rawImageButton.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.height - 20 - rawImageButton.bounds.height)
         }
+        
+        photoBrowserCellDelegate?.photoBrowserCellDidLayout(self)
     }
     
     /// 设置图片

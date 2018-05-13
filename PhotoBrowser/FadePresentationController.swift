@@ -40,7 +40,7 @@ class FadePresentationController: UIPresentationController {
 
 // MARK: - 转场协调器协议
 
-extension FadePresentationController: FadePresentationControllerDelegate {
+extension FadePresentationController: PhotoBrowserPresentationController {
     var maskAlpha: CGFloat {
         set {
             maskView.alpha = newValue
