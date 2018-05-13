@@ -17,9 +17,6 @@ public class PhotoBrowser: UIViewController {
     /// 实现了PhotoBrowserDelegate协议的对象
     public weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
-    /// 实现了PageControlDelegate协议的对象
-    public var pageControl: PageControl?
-    
     /// 网络图片加载器
     public var photoLoader: PhotoLoader?
     
@@ -54,9 +51,6 @@ public class PhotoBrowser: UIViewController {
             scalePresentationController?.updateCurrentHiddenView(relatedView)
             plugins.forEach {
                 $0.photoBrowser(self, didChangedPageIndex: currentIndex)
-            }
-            if let pageControl = pageControl, let total = photoBrowserDelegate?.numberOfPhotos(in: self) {
-                pageControl.pageControlPageDidChanged(current: currentIndex, total: total)
             }
         }
     }
@@ -100,23 +94,23 @@ public class PhotoBrowser: UIViewController {
     // MARK: - 创建与销毁
     //
     
+    #if DEBUG
     /// 销毁
     deinit {
-        #if DEBUG
         print("deinit:\(self)")
-        #endif
     }
+    #endif
     
     /// 初始化
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControl: 页码指示器，默认 DefaultPageControl
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter initializePageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
                 photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
-                pageControl: PageControl? = DefaultPageControl(),
+                plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                 initializePageIndex: Int = 0) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
@@ -126,7 +120,7 @@ public class PhotoBrowser: UIViewController {
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
         self.photoLoader = photoLoader
-        self.pageControl = pageControl
+        self.plugins = plugins
         self.initializePageIndex = initializePageIndex
     }
     
@@ -143,20 +137,20 @@ extension PhotoBrowser {
     /// 展示，传入完整参数
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControl: 页码指示器，默认 DefaultPageControl
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter initializePageIndex: 打开时的初始页码，第一页为 0.
     /// - parameter fromViewController: 基于哪个 ViewController 执行 present.
     public class func show(animationType: AnimationType = .scale,
                            delegate: PhotoBrowserDelegate,
-                           pageControl: PageControl? = DefaultPageControl(),
                            photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                           plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                            initializePageIndex: Int,
                            fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
         let vc = PhotoBrowser(animationType: animationType,
                               delegate: delegate,
                               photoLoader: photoLoader,
-                              pageControl: DefaultPageControl(),
+                              plugins: plugins,
                               initializePageIndex: initializePageIndex)
         vc.show(from: fromViewController)
     }
@@ -204,14 +198,6 @@ extension PhotoBrowser {
         plugins.forEach {
             $0.photoBrowser(self, viewDidAppear: view, animated: animated)
         }
-        // 页面出来后，再显示页码指示器
-        // 多于一张图才会显示
-        if let pageControl = pageControl,
-            let total = photoBrowserDelegate?.numberOfPhotos(in: self), total > 1 {
-            view.addSubview(pageControl.pageControlView(on: self))
-            pageControl.pageControlDidMove(to: view)
-            pageControl.pageControlLayout(in: view)
-        }
     }
     
     public override func viewWillLayoutSubviews() {
@@ -229,10 +215,6 @@ extension PhotoBrowser {
         self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
         plugins.forEach {
             $0.photoBrowser(self, viewDidLayoutSubviews: view)
-        }
-        if let pageControl = pageControl,
-            let total = photoBrowserDelegate?.numberOfPhotos(in: self), total > 1 {
-            pageControl.pageControlLayout(in: view)
         }
     }
     
@@ -336,6 +318,13 @@ extension PhotoBrowser: UICollectionViewDelegate {
         let offsetX = scrollView.contentOffset.x
         let width = scrollView.frame.width + photoSpacing
         currentIndex = Int(offsetX / width)
+    }
+    
+    /// 滑动中
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        plugins.forEach {
+            $0.photoBrowser(self, scrollView: scrollView)
+        }
     }
 }
 

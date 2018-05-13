@@ -107,10 +107,10 @@ extension MomentsViewController: UICollectionViewDelegate {
         selectedCell = cell
         
         // 直接打开图片浏览器
-        openPhotoBrowserWithClassMethod(index: indexPath.item)
+//        openPhotoBrowserWithClassMethod(index: indexPath.item)
         
         // 也可以先创建，然后传参，再打开
-//         openPhotoBrowserWithInstanceMethod(index: indexPath.item)
+         openPhotoBrowserWithInstanceMethod(index: indexPath.item)
     }
     
     private func openPhotoBrowserWithClassMethod(index: Int) {
@@ -126,12 +126,8 @@ extension MomentsViewController: UICollectionViewDelegate {
         // 浏览器协议实现者
         browser.photoBrowserDelegate = self
         // 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
-        // 这里随机创建一种
-        if arc4random_uniform(2) % 2 == 0 {
-            browser.pageControl = DefaultPageControl()
-        } else {
-            browser.pageControl = NumberPageControl()
-        }
+        browser.plugins.append(DefaultPageControlPlugin())
+        browser.plugins.append(NumberPageControlPlugin())
         // 指定打开图片组中的哪张
         browser.initializePageIndex = index
         // 展示

@@ -8,7 +8,11 @@
 import Foundation
 
 public protocol PhotoBrowserPlugin {
+    /// 页码以改变
     func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int)
+    
+    /// 滑动时调用
+    func photoBrowser(_ photoBrowser: PhotoBrowser, scrollView: UIScrollView)
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos number: Int)
     
@@ -27,6 +31,8 @@ public protocol PhotoBrowserPlugin {
 
 extension PhotoBrowserPlugin {
     public func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int) {}
+    
+    public func photoBrowser(_ photoBrowser: PhotoBrowser, scrollView: UIScrollView) {}
     
     public func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos number: Int) {}
     

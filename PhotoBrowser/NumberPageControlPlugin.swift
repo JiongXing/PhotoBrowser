@@ -33,14 +33,6 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
     
     public init() {}
     
-    open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidAppear view: UIView, animated: Bool) {
-        view.addSubview(numberLabel)
-    }
-    
-    open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
-        layout()
-    }
-    
     open func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos count: Int) {
         totalPages = count
         layout()
@@ -51,8 +43,20 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
         layout()
     }
     
+    open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidAppear view: UIView, animated: Bool) {
+        // 页面出来后，再显示页码指示器
+        // 多于一张图才显示
+        if totalPages > 1 {
+            view.addSubview(numberLabel)
+        }
+    }
+    
+    open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
+        layout()
+    }
+    
     open func layout() {
-        numberLabel.text = "\(currentPage) / \(totalPages)"
+        numberLabel.text = "\(currentPage + 1) / \(totalPages)"
         numberLabel.sizeToFit()
         guard let superView = numberLabel.superview else { return }
         numberLabel.center = CGPoint(x: superView.bounds.midX, y: superView.bounds.minY + centerY)
