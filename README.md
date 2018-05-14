@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v0.8.2-blue.svg)
+![](https://img.shields.io/badge/pod-v0.9.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -15,10 +15,9 @@
 - [x] 支持光点样式的页码指示
 - [x] 支持数字样式的页码指示
 - [x] 支持长按手势，返回当前图片对象
-- [x] 支持浏览器生命周期事件回调
-- [ ] 附加功能插件化
-- [ ] 无 Kingfisher 依赖的可选方案
-- [ ] 支持在浏览场景自由添加视图
+- [x] 支持在浏览场景自由添加视图
+- [x] 支持开发插件，自由添加需要的功能
+- [ ] 非 Kingfisher 依赖的可选方案
 - [ ] RxSwift 扩展
 - [ ] React Native 组件
 - [ ] 开放关键类与方法，支持继承，高度可定制
@@ -27,58 +26,65 @@
 
 ## Initialize & Show
 
+类方法直接打开图片浏览器：
 ```swift
 // 直接打开图片浏览器
-PhotoBrowser.show(byViewController: self,
-                  delegate: self,
-                  openIndex: index,
-                  pageControlDelegate: PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count),
-                  animationType: .scale)
+// delegate: 协议代理
+// originPageIndex: 打开时的初始页码
+PhotoBrowser.show(delegate: self, originPageIndex: indexPath.item)
 
-// 也可以先创建，然后传参，再打开
+```
+
+也可以先创建浏览器，配置好需要的特性，再打开：
+```swift
 // 创建图片浏览器
-let browser = PhotoBrowser()
+let browser = PhotoBrowser(){
 // 提供两种动画效果：缩放`.scale`和渐变`.fade`。
 browser.animationType = .scale
 // 浏览器协议实现者
 browser.photoBrowserDelegate = self
-// 装配页码指示器，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
-// 这里随机创建一种
-if arc4random_uniform(2) % 2 == 0 {
-    browser.pageControlDelegate = PhotoBrowserDefaultPageControl(numberOfPages: thumbnailImageUrls.count)
-} else {
-    browser.pageControlDelegate = PhotoBrowserNumberPageControl(numberOfPages: thumbnailImageUrls.count)
-}
+// 装配页码指示器插件，提供了两种PageControl实现，若需要其它样式，可参照着自由定制
+// 光点型页码指示器
+browser.plugins.append(DefaultPageControlPlugin())
+// 数字型页码指示器
+browser.plugins.append(NumberPageControlPlugin())
+// 装配图片描述插件
+browser.plugins.append(DescriptionPlugin())
 // 指定打开图片组中的哪张
-browser.setOpenIndex(index)
-// 捏合手势放大图片时的最大允许比例，默认2.0
-browser.imageMaximumZoomScale = 2.0
-// 双击放大图片时的目标比例，默认2.0
-browser.imageZoomScaleForDoubleTap = 2.0
+browser.originPageIndex = index
 // 展示
-self.present(browser, animated: true, completion: nil)
+self.present(browser, animated: true, completion: nil)}
 ```
 
-## Data
+## PhotoBrowser Delegate
 
+必选协议方法：
 ```swift
-/// 告诉图片浏览器共有多少张图片
+/// 共有多少张图片
 func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
     return thumbnailImageUrls.count
 }
 
-/// 告诉图片浏览器每张需要下载的图片的 placeholder
-func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
+/// 缩放动画起始图，也是图片加载完成前的 placeholder
+func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage? {
     let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
-    // 取thumbnailImage
     return cell?.imageView.image
 }
 
+```
+
+
+使用缩放式动画时得必选协议方法：
+```swift
 /// 缩放起始视图
 func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
     return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
 }
 
+```
+
+可选协议方法：
+```swift
 /// 高清图
 func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
     return URL(string: highQualityImageUrls[index])
@@ -118,74 +124,21 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, 
 }
 ```
 
-## PhotoBrowserDelegate
+## PhotoBrowser Parameters
 ```swift
-public protocol PhotoBrowserDelegate: class {
-    //
-    // MARK: - 必选
-    //
-    
-    /// 实现本方法以返回图片数量
-    func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
-    
-    /// 实现本方法以返回默认显示图片，缩略图或占位图
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage?
-    
-    //
-    // MARK: - 可选
-    //
-    
-    /// 实现本方法以返回默认图所在view，在转场动画完成后将会修改这个view的alpha属性
-    /// 比如你可返回ImageView，或整个Cell
-    /// 使用 scale 动画时必须实现本方法
-    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView?
-    
-    /// 实现本方法以返回高质量图片的url。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL?
-    
-    /// 实现本方法以返回原图级质量的url。当本代理方法有返回值时，自动显示查看原图按钮。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
-    
-    /// 长按时回调。可选
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
-    
-    /// 即将关闭图片浏览器时回调
-    /// - parameter index: 即将关闭时，正在显示的图片序号
-    /// - parameter image: 即将关闭时，正在显示的图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage)
-    
-    /// 已经关闭图片浏览器时回调
-    /// - parameter index: 最后显示的图片序号
-    /// - parameter image: 最后显示的图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage)
-}
-```
-
-## PhotoBrowser
-```swift
-PhotoBrowser {
-    /// 展示，传入完整参数
-    /// - parameter presentingVC: 由谁 present 出图片浏览器
-    /// - parameter openIndex: 打开是显示哪张图片，从0开始
-    /// - parameter delegate: 浏览器协议代理
-    /// - parameter pageControlDelegate: 页码指示器
-    /// - parameter photoLoader: 网络图片加载器。默认使用 KingfisherPhotoLoader
-    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    public class func show(byViewController presentingVC: UIViewController,
-                           delegate: PhotoBrowserDelegate,
-                           openIndex: Int,
-                           pageControlDelegate: PhotoBrowserPageControlDelegate? = nil,
-                           photoLoader: PhotoLoaderDelegate? = nil,
-                           animationType: AnimationType = .scale)
-    
-    /// 指定打开图片组中的哪张
-    public func setOpenIndex(_ index: Int)
-    
-    /// 关闭浏览器
-    /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
-    /// - parameter animated: 是否需要关闭转场动画
-    public func dismiss(animated: Bool)
-}
+/// 展示，传入完整参数
+/// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+/// - parameter delegate: 浏览器协议代理
+/// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+/// - parameter plugins: 插件组，默认加载一个光点型页码指示器
+/// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
+/// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层 VC。
+public class func show(animationType: AnimationType = .scale,
+                       delegate: PhotoBrowserDelegate,
+                       photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                       plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
+                       originPageIndex: Int,
+                       fromViewController: UIViewController? = TopMostViewControllerGetter.topMost);
 ```
 
 # Requirements
@@ -1194,15 +1147,15 @@ public protocol PhotoBrowserPageControlDelegate {
 ```
 
 同时为了方便使用，我提供了两个写好的实现了`PhotoBrowserPageControlDelegate`协议的类，它们分别是：
-- ```swift 
-/// 给图片浏览器提供一个UIPageControl
+给图片浏览器提供一个UIPageControl：
+```swift 
 public class PhotoBrowserDefaultPageControlDelegate: PhotoBrowserPageControlDelegate
 ```
 
 ![UIPageControl.png](http://upload-images.jianshu.io/upload_images/2419179-dd60f14462ea5114.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-- ```swift 
-/// 给图片浏览器提供一个数字样式的PageControl
+给图片浏览器提供一个数字样式的PageControl：
+```swift 
 public class PhotoBrowserNumberPageControlDelegate: PhotoBrowserPageControlDelegate
 ```
 

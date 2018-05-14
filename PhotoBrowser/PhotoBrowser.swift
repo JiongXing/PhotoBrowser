@@ -147,7 +147,7 @@ public class PhotoBrowser: UIViewController {
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
-    /// - parameter fromViewController: 基于哪个 ViewController 执行 present.
+    /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层 VC。
     public class func show(animationType: AnimationType = .scale,
                            delegate: PhotoBrowserDelegate,
                            photoLoader: PhotoLoader? = KingfisherPhotoLoader(),

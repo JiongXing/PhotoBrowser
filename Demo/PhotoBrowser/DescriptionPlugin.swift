@@ -19,6 +19,7 @@ class DescriptionPlugin: PhotoBrowserPlugin {
     var dataSource = ["   进化的喵喵~",
                       "   抱抱大腿~"]
     
+    /// 每次取复用 cell 时会调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {
         guard index == 5 || index == 7 else {
             return
@@ -39,6 +40,7 @@ class DescriptionPlugin: PhotoBrowserPlugin {
         }
     }
 
+    /// PhotoBrowserCell 执行布局方法时调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell, at index: Int) {
         guard index == 5 || index == 7 else {
             return
@@ -57,6 +59,7 @@ class DescriptionPlugin: PhotoBrowserPlugin {
         lab.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         lab.textColor = .white
         lab.font = UIFont.systemFont(ofSize: 15)
+        lab.numberOfLines = 0
         return lab
     }
 }
