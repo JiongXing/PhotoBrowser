@@ -161,6 +161,10 @@ public class PhotoBrowser: UIViewController {
                               originPageIndex: originPageIndex)
         vc.show(from: fromViewController)
     }
+    
+    public func reloadData() {
+        collectionView.reloadData()
+    }
 }
 
 //

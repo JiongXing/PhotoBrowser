@@ -107,10 +107,10 @@ extension MomentsViewController: UICollectionViewDelegate {
         selectedCell = cell
         
         // 直接打开图片浏览器
-        PhotoBrowser.show(delegate: self, originPageIndex: indexPath.item)
+        // PhotoBrowser.show(delegate: self, originPageIndex: indexPath.item)
         
         // 也可以先创建，然后传参，再打开
-        //openPhotoBrowserWithInstanceMethod(index: indexPath.item)
+        openPhotoBrowserWithInstanceMethod(index: indexPath.item)
     }
     
     private func openPhotoBrowserWithInstanceMethod(index: Int) {
@@ -125,8 +125,17 @@ extension MomentsViewController: UICollectionViewDelegate {
         browser.plugins.append(DefaultPageControlPlugin())
         // 数字型页码指示器
         browser.plugins.append(NumberPageControlPlugin())
-        // 装配图片描述插件
-        browser.plugins.append(DescriptionPlugin())
+        // 装配附加视图插件
+        weak var weakBrowser = browser
+        browser.plugins.append({
+            let plugin = OverlayPlugin()
+            plugin.didTouchDeleteButton = { [weak self] index in
+                self?.thumbnailImageUrls.remove(at: index)
+                self?.highQualityImageUrls.remove(at: index)
+                weakBrowser?.reloadData()
+            }
+            return plugin
+        }())
         // 指定打开图片组中的哪张
         browser.originPageIndex = index
         // 展示
@@ -195,16 +204,6 @@ extension MomentsViewController: PhotoBrowserDelegate {
         actionSheet.addAction(saveImageAction)
         actionSheet.addAction(cancelAction)
         photoBrowser.present(actionSheet, animated: true, completion: nil)
-    }
-    
-    /// 即将关闭图片浏览器
-    func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage?) {
-        print("即将关闭图片浏览器，index:\(index)")
-    }
-    
-    /// 已经关闭图片浏览器
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage?) {
-        print("已经关闭图片浏览器，index:\(index)")
     }
 }
 

@@ -20,15 +20,20 @@ open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     /// 总页码
     open var totalPages = 0
     
+    /// 当前页码
+    open var currentPage = 0
+    
     public init() {}
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int) {
+        currentPage = index
         pageControl.currentPage = index
     }
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos count: Int) {
         totalPages = count
         pageControl.numberOfPages = count
+        pageControl.currentPage = currentPage
     }
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidAppear view: UIView, animated: Bool) {
