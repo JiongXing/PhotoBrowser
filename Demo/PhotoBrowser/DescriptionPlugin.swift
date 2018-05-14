@@ -9,12 +9,15 @@
 import Foundation
 import JXPhotoBrowser
 
+/// 图片描述插件
 class DescriptionPlugin: PhotoBrowserPlugin {
     
-    var dataSource = ["    进化的喵喵~",
-                      "    抱抱大腿~"]
-    
+    /// 自定义添加的视图组
     var labels: [UILabel] = []
+    
+    /// 视图数据源
+    var dataSource = ["   进化的喵喵~",
+                      "   抱抱大腿~"]
     
     func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {
         guard index == 5 || index == 7 else {

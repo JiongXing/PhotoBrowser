@@ -11,7 +11,7 @@ import UIKit
 public class PhotoBrowser: UIViewController {
     
     //
-    // MARK: - 公开属性
+    // MARK: - Public Properties
     //
     
     /// 实现了PhotoBrowserDelegate协议的对象
@@ -42,7 +42,7 @@ public class PhotoBrowser: UIViewController {
     public var plugins: [PhotoBrowserPlugin] = []
     
     //
-    // MARK: - 私有属性
+    // MARK: - Private Properties
     //
     
     /// 当前显示的图片序号，从0开始
@@ -91,7 +91,7 @@ public class PhotoBrowser: UIViewController {
     }()
     
     //
-    // MARK: - 创建与销毁
+    // MARK: - Initialize Methods
     //
     
     #if DEBUG
@@ -111,7 +111,7 @@ public class PhotoBrowser: UIViewController {
                 delegate: PhotoBrowserDelegate? = nil,
                 photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
                 plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
-                initializePageIndex: Int = 0) {
+                originPageIndex: Int = 0) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
@@ -121,38 +121,11 @@ public class PhotoBrowser: UIViewController {
         self.photoBrowserDelegate = delegate
         self.photoLoader = photoLoader
         self.plugins = plugins
-        self.originPageIndex = initializePageIndex
+        self.originPageIndex = originPageIndex
     }
     
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-}
-
-//
-// MARK: - 公开方法
-//
-
-extension PhotoBrowser {
-    /// 展示，传入完整参数
-    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-    /// - parameter delegate: 浏览器协议代理
-    /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
-    /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
-    /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
-    /// - parameter fromViewController: 基于哪个 ViewController 执行 present.
-    public class func show(animationType: AnimationType = .scale,
-                           delegate: PhotoBrowserDelegate,
-                           photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
-                           plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
-                           initializePageIndex: Int,
-                           fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
-        let vc = PhotoBrowser(animationType: animationType,
-                              delegate: delegate,
-                              photoLoader: photoLoader,
-                              plugins: plugins,
-                              initializePageIndex: initializePageIndex)
-        vc.show(from: fromViewController)
     }
     
     /// 展示图片浏览器
@@ -167,10 +140,31 @@ extension PhotoBrowser {
     public func dismiss(animated: Bool) {
         dismiss(animated: animated, completion: nil)
     }
+    
+    /// 展示，传入完整参数
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
+    /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
+    /// - parameter fromViewController: 基于哪个 ViewController 执行 present.
+    public class func show(animationType: AnimationType = .scale,
+                           delegate: PhotoBrowserDelegate,
+                           photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                           plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
+                           originPageIndex: Int,
+                           fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
+        let vc = PhotoBrowser(animationType: animationType,
+                              delegate: delegate,
+                              photoLoader: photoLoader,
+                              plugins: plugins,
+                              originPageIndex: originPageIndex)
+        vc.show(from: fromViewController)
+    }
 }
 
 //
-// MARK: - 生命周期及其回调方法
+// MARK: - Life Cycle
 //
 
 extension PhotoBrowser {
@@ -218,6 +212,20 @@ extension PhotoBrowser {
         }
     }
     
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        plugins.forEach {
+            $0.photoBrowser(self, viewWillDisappear: view)
+        }
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidDisappear: view)
+        }
+    }
+    
     /// 支持旋转
     public override var shouldAutorotate: Bool {
         return true
@@ -258,7 +266,7 @@ extension PhotoBrowser {
 }
 
 //
-// MARK: - UICollectionViewDataSource
+// MARK: - UICollectionView DataSource
 //
 
 extension PhotoBrowser: UICollectionViewDataSource {
@@ -309,7 +317,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
 }
 
 //
-// MARK: - UICollectionViewDelegate
+// MARK: - UICollectionView Delegate
 //
 
 extension PhotoBrowser: UICollectionViewDelegate {
@@ -329,7 +337,7 @@ extension PhotoBrowser: UICollectionViewDelegate {
 }
 
 //
-// MARK: - 转场动画
+// MARK: - Animated Transitioning
 //
 
 extension PhotoBrowser: UIViewControllerTransitioningDelegate {
@@ -401,7 +409,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
 }
 
 //
-// MARK: - PhotoBrowserCellDelegate
+// MARK: - PhotoBrowserCell Delegate
 //
 
 extension PhotoBrowser: PhotoBrowserCellDelegate {
