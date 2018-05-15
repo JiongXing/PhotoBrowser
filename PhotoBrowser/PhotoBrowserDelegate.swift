@@ -15,14 +15,14 @@ public protocol PhotoBrowserDelegate: class {
     /// 实现本方法以返回图片数量
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int
     
-    /// 实现本方法以返回缩放动画起始图
+    /// 实现本方法以返回各缩略图图片
     func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage?
     
     //
     // MARK: - Optional
     //
     
-    /// 实现本方法以返回缩放动画起始图所在 view，在转场动画完成后将会修改这个 view 的 alpha 属性
+    /// 实现本方法以返回各缩略图所在 view，在转场动画完成后将会修改这个 view 的 alpha 属性
     /// 比如你可返回 ImageView，或整个 Cell
     /// 使用 scale 动画时必须实现本方法
     func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -> UIView?

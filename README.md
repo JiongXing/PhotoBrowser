@@ -84,7 +84,7 @@ func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
     return thumbnailImageUrls.count
 }
 
-/// 缩放动画起始图，也是图片加载完成前的 placeholder
+/// 各缩略图图片，也是图片加载完成前的 placeholder
 func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage? {
     let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
     return cell?.imageView.image
@@ -95,8 +95,8 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) 
 
 使用缩放式动画的必选协议方法：
 ```swift
-/// 缩放起始视图
-func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
+/// 各缩略图所在 view
+func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -> UIView? {
     return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
 }
 
@@ -111,12 +111,12 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: In
 
 /// 原图
 func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-    return URL(string: rawImageUrls[index])
+    return nil
 }
 
 /// 加载本地图片，本地图片的展示将优先于网络图片
 func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
-    return index == 3 ? UIImage(named: "xingkong") : nil
+    return nil
 }
 
 /// 长按图片。你可以在此处得到当前图片，并可以做些弹个窗，保存图片等操作
@@ -130,16 +130,6 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
     actionSheet.addAction(saveImageAction)
     actionSheet.addAction(cancelAction)
     photoBrowser.present(actionSheet, animated: true, completion: nil)
-}
-    
-/// 即将关闭图片浏览器
-func photoBrowser(_ photoBrowser: PhotoBrowser, willDismissWithIndex index: Int, image: UIImage) {
-    print("即将关闭图片浏览器，index:\(index), image:\(image)")
-}
-
-/// 已经关闭图片浏览器
-func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage) {
-    print("已经关闭图片浏览器，index:\(index), image:\(image)")
 }
 ```
 

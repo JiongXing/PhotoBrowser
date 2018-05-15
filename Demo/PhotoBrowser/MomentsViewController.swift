@@ -155,13 +155,13 @@ extension MomentsViewController: PhotoBrowserDelegate {
         return thumbnailImageUrls.count
     }
     
-    /// 缩放动画起始图，也是图片加载完成前的 placeholder
+    /// 各缩略图图片，也是图片加载完成前的 placeholder
     func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage? {
         let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
         return cell?.imageView.image
     }
     
-    /// 缩放起始视图
+    /// 各缩略图所在 view
     func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -> UIView? {
         return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
