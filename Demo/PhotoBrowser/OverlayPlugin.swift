@@ -16,15 +16,15 @@ class OverlayPlugin: PhotoBrowserPlugin {
     var didTouchDeleteButton: ((_ index: Int) -> Void)?
     
     /// 视图数据源
-    var dataSource = [AdditionalModel(showButton: false, text: nil),
-                      AdditionalModel(showButton: true, text: "   啊啊啊~"),
-                      AdditionalModel(showButton: false, text: nil),
-                      AdditionalModel(showButton: false, text: nil),
-                      AdditionalModel(showButton: false, text: nil),
-                      AdditionalModel(showButton: true, text: "   喵喵进化~"),
-                      AdditionalModel(showButton: false, text: nil),
-                      AdditionalModel(showButton: false, text: "   抱抱大腿~"),
-                      AdditionalModel(showButton: false, text: nil)]
+    static var dataSource = [AdditionalModel(showButton: false, text: nil),
+                             AdditionalModel(showButton: true, text: "   啊啊啊~"),
+                             AdditionalModel(showButton: false, text: nil),
+                             AdditionalModel(showButton: false, text: nil),
+                             AdditionalModel(showButton: false, text: nil),
+                             AdditionalModel(showButton: true, text: "   喵喵进化~"),
+                             AdditionalModel(showButton: false, text: nil),
+                             AdditionalModel(showButton: false, text: "   抱抱大腿~"),
+                             AdditionalModel(showButton: false, text: nil)]
     
     /// 每次取复用 cell 时会调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {
@@ -32,14 +32,14 @@ class OverlayPlugin: PhotoBrowserPlugin {
             let view = AdditionalView()
             view.index = index
             view.didTouchDeleteButton = { [weak self] index in
-                self?.dataSource.remove(at: index)
+                OverlayPlugin.dataSource.remove(at: index)
                 self?.didTouchDeleteButton?(index)
             }
             cell.contentView.addSubview(view)
             cell.associatedObject = view
             return view
         }()
-        additionalView.configure(dataSource[index])
+        additionalView.configure(OverlayPlugin.dataSource[index])
     }
 
     /// PhotoBrowserCell 执行布局方法时调用
