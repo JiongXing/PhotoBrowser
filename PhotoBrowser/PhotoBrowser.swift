@@ -67,8 +67,10 @@ open class PhotoBrowser: UIViewController {
     private weak var scalePresentationController: ScalePresentationController?
     
     /// 容器layout
-    private lazy var flowLayout: PhotoBrowserLayout = {
-        return PhotoBrowserLayout()
+    private lazy var flowLayout: UICollectionViewFlowLayout = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        return layout
     }()
     
     /// 容器
@@ -81,6 +83,8 @@ open class PhotoBrowser: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(PhotoBrowserCell.self, forCellWithReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self))
+        collectionView.isPagingEnabled = true
+        collectionView.alwaysBounceVertical = false
         return collectionView
     }()
     
@@ -256,6 +260,8 @@ open class PhotoBrowser: UIViewController {
         flowLayout.minimumLineSpacing = photoSpacing
         flowLayout.itemSize = view.bounds.size
         collectionView.frame = view.bounds
+        collectionView.frame.size.width = view.bounds.width + photoSpacing
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: photoSpacing)
     }
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
@@ -332,7 +338,8 @@ extension PhotoBrowser: UICollectionViewDelegate {
     /// 减速完成后，计算当前页
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let offsetX = scrollView.contentOffset.x
-        let width = scrollView.frame.width + photoSpacing
+//        let width = scrollView.frame.width + photoSpacing
+        let width = scrollView.frame.width
         currentIndex = Int(offsetX / width)
     }
     

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		009B9D5C622AC606273BDD3266222F85 /* ImageView+Kingfisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF9EA4E7E8A6B7A4EDA54F899FEBE4E /* ImageView+Kingfisher.swift */; };
 		0856220A25598072D8B548D0C2F6309B /* PhotoBrowserProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE101ACD95905EAA49DE5E08834A5750 /* PhotoBrowserProgressView.swift */; };
-		0E091F100356D7AC32B652C4D5220B10 /* PhotoBrowserLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1619C2DEC77C44F7925DFF82BBDFE3 /* PhotoBrowserLayout.swift */; };
 		10302FEF3BDB7EA592578E7BAC5599A9 /* Kingfisher.h in Headers */ = {isa = PBXBuildFile; fileRef = CF58A2C8B2D1E80C830DD92F91F41CBD /* Kingfisher.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		16BA40709D96FF1B926421FA44052DB3 /* PhotoBrowserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7044E63744CD1771ACB4235EFEF2076 /* PhotoBrowserCell.swift */; };
 		1BB64219F96EAE6C67646700F0326EFF /* Indicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BAC26D78DB33794F9BC456BB1F3404 /* Indicator.swift */; };
@@ -114,7 +113,6 @@
 		5907C36966D9BE78A049FBCB1B9F08A3 /* Pods-PhotoBrowser.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-PhotoBrowser.modulemap"; sourceTree = "<group>"; };
 		593766F839E7E059C1FFDFEFC7279F59 /* Kingfisher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Kingfisher.swift; path = Sources/Kingfisher.swift; sourceTree = "<group>"; };
 		5B21DB9C5671AF25D856F2FA4CD351AB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		5C1619C2DEC77C44F7925DFF82BBDFE3 /* PhotoBrowserLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhotoBrowserLayout.swift; path = PhotoBrowser/PhotoBrowserLayout.swift; sourceTree = "<group>"; };
 		6004481E9B47EDEBABB32FAC17846F51 /* ImageCache.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCache.swift; path = Sources/ImageCache.swift; sourceTree = "<group>"; };
 		626DDEC144742C7349EA7AE2876EAC31 /* Pods_PhotoBrowser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoBrowser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		641EFFF236A856B4166FEB2B06E3B66C /* KingfisherOptionsInfo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = KingfisherOptionsInfo.swift; path = Sources/KingfisherOptionsInfo.swift; sourceTree = "<group>"; };
@@ -238,7 +236,6 @@
 				70B3788DB5D5B7CDEEE9AA9ACDBC784D /* DefaultPageControlPlugin.swift */,
 				2AB518B6E69E116A56CC2DA401EC5C11 /* NumberPageControlPlugin.swift */,
 				D7044E63744CD1771ACB4235EFEF2076 /* PhotoBrowserCell.swift */,
-				5C1619C2DEC77C44F7925DFF82BBDFE3 /* PhotoBrowserLayout.swift */,
 				EE101ACD95905EAA49DE5E08834A5750 /* PhotoBrowserProgressView.swift */,
 				F45D2BC79076F003DDFBF021546B09CF /* TopMostViewControllerGetter.swift */,
 				9D49BF3CC2FF9D90D25A257707A76294 /* Pod */,
@@ -498,7 +495,6 @@
 				5D14BD344926104B53260E36758E2EFB /* PhotoBrowser.swift in Sources */,
 				16BA40709D96FF1B926421FA44052DB3 /* PhotoBrowserCell.swift in Sources */,
 				AB21F0DDFCB0DED2F73CA1CA3FF3DC3B /* PhotoBrowserDelegate.swift in Sources */,
-				0E091F100356D7AC32B652C4D5220B10 /* PhotoBrowserLayout.swift in Sources */,
 				3E32BA85A55C3C9A3FF95327E387E44A /* PhotoBrowserPlugin.swift in Sources */,
 				EEB1C2ECAAC8765ADDFA9C0BD27CAF73 /* PhotoBrowserPresentationController.swift in Sources */,
 				0856220A25598072D8B548D0C2F6309B /* PhotoBrowserProgressView.swift in Sources */,

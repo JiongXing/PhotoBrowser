@@ -268,6 +268,7 @@ extension PhotoBrowserCell {
                 dlg.photoBrowserCell(self, didPanScale: result.1)
             }
         case .ended, .cancelled:
+            imageView.frame = panResult(pan).0
             if pan.velocity(in: self).y > 0 {
                 // dismiss
                 onSingleTap()
