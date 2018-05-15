@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/pod-v0.9.1-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-# Features
+# 特性
 
 - [x] 支持缩放式转场动画
 - [x] 支持淡入淡出式转场动画
@@ -22,14 +22,17 @@
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 
-## Todo
+## 待完成
+
 - [ ] 查看原图按钮插件化定制
+
+## 效果
 
 ![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
 
-# Usage
+# 使用
 
-## Initialize & Show
+## 初始化 & 展示
 
 类方法直接打开图片浏览器：
 ```swift
@@ -77,7 +80,7 @@ browser.plugins.append(overlayPlugin)
 
 ```
 
-## PhotoBrowser Delegate
+## 图片浏览器协议
 
 必选协议方法：
 ```swift
@@ -135,7 +138,7 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
 }
 ```
 
-## PhotoBrowser Parameters
+## 初始参数
 ```swift
 /// 展示，传入完整参数
 /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
