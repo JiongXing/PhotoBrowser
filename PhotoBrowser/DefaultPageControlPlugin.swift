@@ -14,7 +14,9 @@ open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     
     /// 页码指示器
     open lazy var pageControl: UIPageControl = {
-        return UIPageControl()
+        let pgc = UIPageControl()
+        pgc.isEnabled = false
+        return pgc
     }()
     
     /// 总页码

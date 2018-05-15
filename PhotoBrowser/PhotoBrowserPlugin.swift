@@ -21,7 +21,7 @@ public protocol PhotoBrowserPlugin {
     func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int)
     
     /// PhotoBrowserCell 执行布局方法时调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell, at index: Int)
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell)
     
     /// 执行 viewDidLoad 时调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLoad view: UIView)
@@ -59,7 +59,7 @@ extension PhotoBrowserPlugin {
     public func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {}
     
     /// PhotoBrowserCell 执行布局方法时调用
-    public func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell, at index: Int) {}
+    public func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell) {}
     
     /// 执行 viewDidLoad 时调用
     public func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLoad view: UIView) {}

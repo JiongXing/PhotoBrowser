@@ -113,8 +113,6 @@ public class PhotoBrowserCell: UICollectionViewCell {
     
     /// 记录pan手势开始时，手势位置
     private var beganTouch = CGPoint.zero
-
-    private var enableLayout = true
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -170,8 +168,6 @@ public class PhotoBrowserCell: UICollectionViewCell {
 extension PhotoBrowserCell {
     /// 布局
     private func layout() {
-        guard enableLayout else { return }
-        
         scrollView.frame = contentView.bounds
         scrollView.setZoomScale(1.0, animated: false)
         imageView.frame = fitFrame
@@ -185,7 +181,6 @@ extension PhotoBrowserCell {
             rawImageButton.bounds.size.width += 14
             rawImageButton.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.height - 20 - rawImageButton.bounds.height)
         }
-        
         photoBrowserCellDelegate?.photoBrowserCellDidLayout(self)
     }
     
@@ -281,8 +276,6 @@ extension PhotoBrowserCell {
         case .ended, .cancelled:
             if pan.velocity(in: self).y > 0 {
                 // dismiss
-                enableLayout = false
-                imageView.frame = panResult(pan).0
                 onSingleTap()
             } else {
                 // 取消dismiss

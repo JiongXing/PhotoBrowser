@@ -444,10 +444,8 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
     }
     
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
-        if let indexPath = collectionView.indexPath(for: cell) {
-            plugins.forEach {
-                $0.photoBrowser(self, didLayout: cell, at: indexPath.item)
-            }
+        plugins.forEach {
+            $0.photoBrowser(self, didLayout: cell)
         }
     }
 }

@@ -16,8 +16,15 @@ class OverlayPlugin: PhotoBrowserPlugin {
     var didTouchDeleteButton: ((_ index: Int) -> Void)?
     
     /// 视图数据源
-    var dataSource = ["   喵喵进化~",
-                      "   抱抱大腿~",]
+    var dataSource = [AdditionalModel(showButton: false, text: nil),
+                      AdditionalModel(showButton: false, text: nil),
+                      AdditionalModel(showButton: false, text: nil),
+                      AdditionalModel(showButton: true, text: nil),
+                      AdditionalModel(showButton: false, text: nil),
+                      AdditionalModel(showButton: true, text: "   喵喵进化~"),
+                      AdditionalModel(showButton: false, text: nil),
+                      AdditionalModel(showButton: false, text: "   抱抱大腿~"),
+                      AdditionalModel(showButton: false, text: nil)]
     
     /// 每次取复用 cell 时会调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {
@@ -25,24 +32,19 @@ class OverlayPlugin: PhotoBrowserPlugin {
             let view = AdditionalView()
             view.index = index
             view.didTouchDeleteButton = { [weak self] index in
+                self?.dataSource.remove(at: index)
                 self?.didTouchDeleteButton?(index)
+                print("删除model")
             }
             cell.contentView.addSubview(view)
             cell.associatedObject = view
             return view
         }()
-        switch index {
-        case 5:
-            additionalView.label.text = dataSource[0]
-        case 7:
-            additionalView.label.text = dataSource[1]
-        default:
-            break
-        }
+        additionalView.configure(dataSource[index])
     }
 
     /// PhotoBrowserCell 执行布局方法时调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell, at index: Int) {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell) {
         if let view = cell.associatedObject as? AdditionalView {
             let height: CGFloat = 100
             view.frame = CGRect(x: 0,
@@ -102,5 +104,16 @@ class OverlayPlugin: PhotoBrowserPlugin {
         @objc private func onButton() {
             didTouchDeleteButton?(index)
         }
+        
+        func configure(_ model: AdditionalModel) {
+            button.isHidden = !model.showButton
+            label.text = model.text
+            label.isHidden = model.text == nil
+        }
+    }
+    
+    struct AdditionalModel {
+        let showButton: Bool
+        let text: String?
     }
 }
