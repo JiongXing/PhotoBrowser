@@ -8,38 +8,38 @@
 
 import UIKit
 
-public class PhotoBrowser: UIViewController {
+open class PhotoBrowser: UIViewController {
     
     //
     // MARK: - Public Properties
     //
     
     /// 实现了PhotoBrowserDelegate协议的对象
-    public weak var photoBrowserDelegate: PhotoBrowserDelegate?
+    open weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
     /// 网络图片加载器
-    public var photoLoader: PhotoLoader?
+    open var photoLoader: PhotoLoader?
     
     /// 左右两张图之间的间隙
-    public var photoSpacing: CGFloat = 30
+    open var photoSpacing: CGFloat = 30
     
     /// 图片缩放模式
-    public var imageScaleMode = UIViewContentMode.scaleAspectFill
+    open var imageScaleMode = UIViewContentMode.scaleAspectFill
     
     /// 捏合手势放大图片时的最大允许比例
-    public var imageMaximumZoomScale: CGFloat = 2.0
+    open var imageMaximumZoomScale: CGFloat = 2.0
     
     /// 双击放大图片时的目标比例
-    public var imageZoomScaleForDoubleTap: CGFloat = 2.0
+    open var imageZoomScaleForDoubleTap: CGFloat = 2.0
     
     /// 转场动画类型
-    public var animationType: AnimationType = .scale
+    open var animationType: AnimationType = .scale
     
     /// 打开时的初始页码，第一页为 0.
-    public var originPageIndex: Int = 0
+    open var originPageIndex: Int = 0
     
     /// 插件组
-    public var plugins: [PhotoBrowserPlugin] = []
+    open var plugins: [PhotoBrowserPlugin] = []
     
     //
     // MARK: - Private Properties
@@ -91,7 +91,7 @@ public class PhotoBrowser: UIViewController {
     }()
     
     //
-    // MARK: - Initialize Methods
+    // MARK: - Initialize
     //
     
     #if DEBUG
@@ -128,16 +128,20 @@ public class PhotoBrowser: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //
+    // MARK: - Public Methods
+    //
+    
     /// 展示图片浏览器
     /// - parameter presentingVC: 由谁 present 出图片浏览器
-    public func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost) {
+    open func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost) {
         viewController?.present(self, animated: true, completion: nil)
     }
     
     /// 关闭浏览器
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
-    public func dismiss(animated: Bool) {
+    open func dismiss(animated: Bool) {
         dismiss(animated: animated, completion: nil)
     }
     
@@ -148,12 +152,12 @@ public class PhotoBrowser: UIViewController {
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层 VC。
-    public class func show(animationType: AnimationType = .scale,
-                           delegate: PhotoBrowserDelegate,
-                           photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
-                           plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
-                           originPageIndex: Int,
-                           fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
+    open class func show(animationType: AnimationType = .scale,
+                         delegate: PhotoBrowserDelegate,
+                         photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                         plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
+                         originPageIndex: Int,
+                         fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
         let vc = PhotoBrowser(animationType: animationType,
                               delegate: delegate,
                               photoLoader: photoLoader,
@@ -162,18 +166,16 @@ public class PhotoBrowser: UIViewController {
         vc.show(from: fromViewController)
     }
     
-    public func reloadData() {
+    /// 重新加载数据源
+    open func reloadData() {
         collectionView.reloadData()
     }
-}
-
-//
-// MARK: - Life Cycle
-//
-
-extension PhotoBrowser {
     
-    public override func viewDidLoad() {
+    //
+    // MARK: - Life Cycle
+    //
+    
+    open override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         plugins.forEach {
@@ -182,7 +184,7 @@ extension PhotoBrowser {
         currentIndex = originPageIndex
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
+    open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // 遮盖状态栏
         coverStatusBar(true)
@@ -191,21 +193,21 @@ extension PhotoBrowser {
         }
     }
     
-    public override func viewDidAppear(_ animated: Bool) {
+    open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         plugins.forEach {
             $0.photoBrowser(self, viewDidAppear: view, animated: animated)
         }
     }
     
-    public override func viewWillLayoutSubviews() {
+    open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         plugins.forEach {
             $0.photoBrowser(self, viewWillLayoutSubviews: view)
         }
     }
     
-    public override func viewDidLayoutSubviews() {
+    open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         layoutViews()
         // 屏幕旋转后的调整
@@ -216,14 +218,14 @@ extension PhotoBrowser {
         }
     }
     
-    public override func viewWillDisappear(_ animated: Bool) {
+    open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         plugins.forEach {
             $0.photoBrowser(self, viewWillDisappear: view)
         }
     }
     
-    public override func viewDidDisappear(_ animated: Bool) {
+    open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         plugins.forEach {
             $0.photoBrowser(self, viewDidDisappear: view)
@@ -231,14 +233,18 @@ extension PhotoBrowser {
     }
     
     /// 支持旋转
-    public override var shouldAutorotate: Bool {
+    open override var shouldAutorotate: Bool {
         return true
     }
     
     /// 支持旋转的方向
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .all
     }
+    
+    //
+    // MARK: - Private Methods
+    //
     
     /// 添加视图
     private func setupViews() {
@@ -251,9 +257,7 @@ extension PhotoBrowser {
         flowLayout.itemSize = view.bounds.size
         collectionView.frame = view.bounds
     }
-}
-
-extension PhotoBrowser {
+    
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
     private func coverStatusBar(_ cover: Bool) {
         guard let window = view.window ?? UIApplication.shared.keyWindow else {
