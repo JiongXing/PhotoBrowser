@@ -49,12 +49,28 @@ browser.photoBrowserDelegate = self
 browser.plugins.append(DefaultPageControlPlugin())
 // 数字型页码指示器
 browser.plugins.append(NumberPageControlPlugin())
-// 装配图片描述插件
-browser.plugins.append(DescriptionPlugin())
 // 指定打开图片组中的哪张
 browser.originPageIndex = index
 // 展示
 self.present(browser, animated: true, completion: nil)}
+```
+
+如果想在浏览场景添加一些视图，可以自己开发插件。
+例子给出了添加图片描述和图片删除按钮的做法：
+```swift
+let browser = PhotoBrowser()
+// 装配附加视图插件
+weak var weakBrowser = browser
+let overlayPlugin = OverlayPlugin()
+// 点击删除按钮回调
+overlayPlugin.didTouchDeleteButton = { [weak self] index in
+    self?.thumbnailImageUrls.remove(at: index)
+    self?.highQualityImageUrls.remove(at: index)
+    self?.collectionView?.reloadData()
+    weakBrowser?.reloadData()
+}
+browser.plugins.append(overlayPlugin)
+
 ```
 
 ## PhotoBrowser Delegate
@@ -139,7 +155,7 @@ public class func show(animationType: AnimationType = .scale,
                        photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
                        plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                        originPageIndex: Int,
-                       fromViewController: UIViewController? = TopMostViewControllerGetter.topMost);
+                       fromViewController: UIViewController? = TopMostViewControllerGetter.topMost)
 ```
 
 # Requirements
