@@ -25,6 +25,8 @@
 ## Todo
 - [ ] 查看原图按钮插件化定制
 
+![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
+
 # Usage
 
 ## Initialize & Show
