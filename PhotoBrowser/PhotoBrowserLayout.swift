@@ -8,15 +8,15 @@
 
 import UIKit
 
-class PhotoBrowserLayout: UICollectionViewFlowLayout {
+open class PhotoBrowserLayout: UICollectionViewFlowLayout {
     
     /// 一页宽度，算上空隙
-    private var pageWidth: CGFloat {
+    open var pageWidth: CGFloat {
         return self.itemSize.width + self.minimumLineSpacing
     }
     
     /// 上次页码
-    private lazy var lastPage: CGFloat = {
+    open lazy var lastPage: CGFloat = {
         guard let offsetX = self.collectionView?.contentOffset.x else {
             return 0
         }
@@ -24,10 +24,10 @@ class PhotoBrowserLayout: UICollectionViewFlowLayout {
     }()
     
     /// 最小页码
-    private let minPage: CGFloat = 0
+    open let minPage: CGFloat = 0
     
     /// 最大页码
-    private lazy var maxPage: CGFloat = {
+    open lazy var maxPage: CGFloat = {
         guard var contentWidth = self.collectionView?.contentSize.width else {
             return 0
         }
@@ -35,17 +35,17 @@ class PhotoBrowserLayout: UICollectionViewFlowLayout {
         return contentWidth / self.pageWidth - 1
     }()
     
-    override init() {
+    public override init() {
         super.init()
         scrollDirection = .horizontal
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     /// 调整scroll停下来的位置
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
+    open override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint, withScrollingVelocity velocity: CGPoint) -> CGPoint {
         // 页码
         var page = round(proposedContentOffset.x / pageWidth)
         // 处理轻微滑动

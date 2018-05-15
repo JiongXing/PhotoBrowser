@@ -417,7 +417,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
 //
 
 extension PhotoBrowser: PhotoBrowserCellDelegate {
-    func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?) {
+    public func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?) {
         if let dlg = photoBrowserDelegate {
             dlg.photoBrowser(self, willDismissWithIndex: currentIndex, image: image)
         }
@@ -429,7 +429,7 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         })
     }
     
-    func photoBrowserCell(_ view: PhotoBrowserCell, didPanScale scale: CGFloat) {
+    public func photoBrowserCell(_ view: PhotoBrowserCell, didPanScale scale: CGFloat) {
         // 实测用scale的平方，效果比线性好些
         let alpha = scale * scale
         fadePresentationController?.maskAlpha = alpha
@@ -437,13 +437,13 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         coverStatusBar(alpha >= 1.0)
     }
     
-    func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
+    public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
         if let indexPath = collectionView.indexPath(for: cell) {
             photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
         }
     }
     
-    func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
+    public func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
         plugins.forEach {
             $0.photoBrowser(self, didLayout: cell)
         }

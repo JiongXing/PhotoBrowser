@@ -5,23 +5,19 @@
 
 # Features
 
+- [x] 支持缩放式转场
+- [x] 支持淡入淡出式转场
 - [x] 支持两级网络图片加载
 - [x] 支持自定义图片加载器
 - [x] 支持浏览 GIF 图片
 - [x] 支持浏览本地图片
 - [x] 支持浏览中修改数据源，刷新浏览器
-- [x] 支持缩放式转场
-- [x] 支持淡入淡出式转场
-- [x] 支持入场时放大，退场时淡出
+- [x] 支持在浏览场景自由添加视图
+- [x] 支持插件开发，自由添加需要的功能
 - [x] 支持光点样式的页码指示
 - [x] 支持数字样式的页码指示
 - [x] 支持长按手势，返回当前图片对象
-- [x] 支持在浏览场景自由添加视图
-- [x] 支持用户开发插件，自由添加需要的功能
-- [ ] 非 Kingfisher 依赖的可选方案
-- [ ] RxSwift 扩展
-- [ ] React Native 组件
-- [ ] 开放关键类与方法，支持继承，高度可定制
+- [  ] 支持 React Native 
 
 # Usage
 
@@ -55,7 +51,7 @@ browser.originPageIndex = index
 self.present(browser, animated: true, completion: nil)}
 ```
 
-如果想在浏览场景添加一些视图，可以自己开发插件。
+如果想在浏览场景添加一些视图，你可以自己开发插件。
 例子给出了添加图片描述和图片删除按钮的做法：
 ```swift
 let browser = PhotoBrowser()
@@ -91,7 +87,7 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) 
 ```
 
 
-使用缩放式动画时得必选协议方法：
+使用缩放式动画的必选协议方法：
 ```swift
 /// 缩放起始视图
 func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {

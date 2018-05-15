@@ -9,16 +9,16 @@
 import UIKit
 
 /// 缩放动画
-public class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
     /// 动画开始位置的视图
-    public var startView: UIView?
+    var startView: UIView?
     
     /// 动画结束位置的视图
-    public var endView: UIView?
+    var endView: UIView?
     
     /// 用于转场时的缩放视图
-    public var scaleView: UIView?
+    var scaleView: UIView?
     
     /// 初始化
     init(startView: UIView?, endView: UIView?, scaleView: UIView?) {
@@ -34,11 +34,11 @@ public class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
     // MARK: - UIViewControllerAnimatedTransitioning
     
-    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.25
     }
     
-    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         // 判断是presentataion动画还是dismissal动画
         guard let fromVC = transitionContext.viewController(forKey: .from),
             let toVC = transitionContext.viewController(forKey: .to) else {

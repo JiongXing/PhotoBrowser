@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol PhotoBrowserCellDelegate: NSObjectProtocol {
+public protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     /// 拖动时回调。scale:缩放比率
     func photoBrowserCell(_ cell: PhotoBrowserCell, didPanScale scale: CGFloat)
     
@@ -22,36 +22,36 @@ protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell)
 }
 
-public class PhotoBrowserCell: UICollectionViewCell {
+open class PhotoBrowserCell: UICollectionViewCell {
     
     //
     // MARK: - Public
     //
     
     /// 提供一个可用来关联对象的引用
-    public var associatedObject: Any? = nil
+    open var associatedObject: Any? = nil
     
     /// 代理
-    weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
+    open weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
     
     /// 网络图片加载器
-    public var photoLoader: PhotoLoader?
+    open var photoLoader: PhotoLoader?
     
     /// 显示图像
-    let imageView = UIImageView()
+    open let imageView = UIImageView()
     
     /// 保存原图url，用于点查看原图时使用
-    var rawUrl: URL?
+    open var rawUrl: URL?
     
     /// 捏合手势放大图片时的最大允许比例
-    var imageMaximumZoomScale: CGFloat = 2.0 {
+    open var imageMaximumZoomScale: CGFloat = 2.0 {
         didSet {
             self.scrollView.maximumZoomScale = imageMaximumZoomScale
         }
     }
     
     /// 双击放大图片时的目标比例
-    var imageZoomScaleForDoubleTap: CGFloat = 2.0
+    open var imageZoomScaleForDoubleTap: CGFloat = 2.0
     
     //
     // MARK: - Private
@@ -60,13 +60,13 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
-    private let scrollView = UIScrollView()
+    open let scrollView = UIScrollView()
     
     /// 加载进度指示器
-    private let progressView = PhotoBrowserProgressView()
+    open let progressView = PhotoBrowserProgressView()
     
     /// 查看原图按钮
-    private lazy var rawImageButton: UIButton = { [unowned self] in
+    open lazy var rawImageButton: UIButton = { [unowned self] in
         let button = UIButton(type: .custom)
         button.setTitleColor(UIColor.white, for: .normal)
         button.setTitleColor(UIColor.white, for: .highlighted)
@@ -114,7 +114,7 @@ public class PhotoBrowserCell: UICollectionViewCell {
     /// 记录pan手势开始时，手势位置
     private var beganTouch = CGPoint.zero
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(scrollView)
         scrollView.delegate = self
@@ -151,23 +151,17 @@ public class PhotoBrowserCell: UICollectionViewCell {
         scrollView.addGestureRecognizer(pan)
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         layout()
     }
-}
-
-//
-// MARK: - Data & Layout
-//
-
-extension PhotoBrowserCell {
+    
     /// 布局
-    private func layout() {
+    open func layout() {
         scrollView.frame = contentView.bounds
         scrollView.setZoomScale(1.0, animated: false)
         imageView.frame = fitFrame
@@ -185,7 +179,7 @@ extension PhotoBrowserCell {
     }
     
     /// 设置图片
-    func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+    open func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 保存/更新原图url
         self.rawUrl = rawUrl
         
@@ -234,14 +228,14 @@ extension PhotoBrowserCell {
 
 extension PhotoBrowserCell {
     /// 响应单击
-    @objc func onSingleTap() {
+    @objc open func onSingleTap() {
         if let dlg = photoBrowserCellDelegate {
             dlg.photoBrowserCell(self, didSingleTap: imageView.image)
         }
     }
     
     /// 响应双击
-    @objc func onDoubleTap(_ dbTap: UITapGestureRecognizer) {
+    @objc open func onDoubleTap(_ dbTap: UITapGestureRecognizer) {
         // 如果当前没有任何缩放，则放大到目标比例
         // 否则重置到原比例
         if scrollView.zoomScale == 1.0 {
@@ -258,7 +252,7 @@ extension PhotoBrowserCell {
     }
     
     /// 响应拖动
-    @objc func onPan(_ pan: UIPanGestureRecognizer) {
+    @objc open func onPan(_ pan: UIPanGestureRecognizer) {
         guard imageView.image != nil else {
             return
         }
@@ -327,14 +321,14 @@ extension PhotoBrowserCell {
     }
     
     /// 响应长按
-    @objc func onLongPress(_ press: UILongPressGestureRecognizer) {
+    @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
         if press.state == .began, let dlg = photoBrowserCellDelegate, let image = imageView.image {
             dlg.photoBrowserCell(self, didLongPressWith: image)
         }
     }
     
     /// 响应查看原图按钮
-    @objc func onRawImageButtonTap() {
+    @objc open func onRawImageButtonTap() {
         guard let url = rawUrl else { return }
         rawImageButton.isHidden = true
         loadImage(withPlaceholder: imageView.image, url: url, completion: { [weak self] in
@@ -348,11 +342,11 @@ extension PhotoBrowserCell {
 //
 
 extension PhotoBrowserCell: UIScrollViewDelegate {
-    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
     
-    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+    open func scrollViewDidZoom(_ scrollView: UIScrollView) {
         imageView.center = centerOfContentSize
     }
 }
@@ -362,7 +356,7 @@ extension PhotoBrowserCell: UIScrollViewDelegate {
 //
 
 extension PhotoBrowserCell: UIGestureRecognizerDelegate {
-    public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+    open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // 只响应pan手势
         guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
             return true

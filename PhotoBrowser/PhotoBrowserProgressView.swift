@@ -8,10 +8,10 @@
 
 import UIKit
 
-public class PhotoBrowserProgressView: UIView {
+open class PhotoBrowserProgressView: UIView {
 
     /// 进度
-    public var progress: CGFloat = 0 {
+    open var progress: CGFloat = 0 {
         didSet {
             fanshapedLayer.path = makeProgressPath(progress).cgPath
         }
@@ -23,7 +23,7 @@ public class PhotoBrowserProgressView: UIView {
     /// 扇形区
     private var fanshapedLayer: CAShapeLayer!
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         if self.frame.size.equalTo(.zero) {
             self.frame.size = CGSize(width: 50, height: 50)
@@ -32,7 +32,7 @@ public class PhotoBrowserProgressView: UIView {
         progress = 0
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
