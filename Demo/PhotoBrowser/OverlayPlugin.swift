@@ -17,9 +17,9 @@ class OverlayPlugin: PhotoBrowserPlugin {
     
     /// 视图数据源
     var dataSource = [AdditionalModel(showButton: false, text: nil),
+                      AdditionalModel(showButton: true, text: "   啊啊啊~"),
                       AdditionalModel(showButton: false, text: nil),
                       AdditionalModel(showButton: false, text: nil),
-                      AdditionalModel(showButton: true, text: nil),
                       AdditionalModel(showButton: false, text: nil),
                       AdditionalModel(showButton: true, text: "   喵喵进化~"),
                       AdditionalModel(showButton: false, text: nil),
@@ -34,7 +34,6 @@ class OverlayPlugin: PhotoBrowserPlugin {
             view.didTouchDeleteButton = { [weak self] index in
                 self?.dataSource.remove(at: index)
                 self?.didTouchDeleteButton?(index)
-                print("删除model")
             }
             cell.contentView.addSubview(view)
             cell.associatedObject = view
