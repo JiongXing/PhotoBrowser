@@ -20,6 +20,15 @@ public protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     
     /// Layout 时回调
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell)
+    
+    /// 即将加载图片
+    func photoBrowserCellWillLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
+    
+    /// 正在加载图片
+    func photoBrowserCellLoadingImage(_ cell: PhotoBrowserCell, receivedSize: Int64, totalSize: Int64)
+    
+    /// 加载图片完成
+    func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
 }
 
 open class PhotoBrowserCell: UICollectionViewCell {
@@ -32,7 +41,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
     open var associatedObjects: [String: Any] = [:]
     
     /// 代理
-    open weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?
+    open weak var cellDelegate: PhotoBrowserCellDelegate?
     
     /// 网络图片加载器
     open var photoLoader: PhotoLoader?
@@ -61,9 +70,6 @@ open class PhotoBrowserCell: UICollectionViewCell {
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
     open let scrollView = UIScrollView()
-    
-    /// 加载进度指示器
-    open let progressView = PhotoBrowserProgressView()
     
     /// 查看原图按钮
     open lazy var rawImageButton: UIButton = { [unowned self] in
@@ -128,9 +134,6 @@ open class PhotoBrowserCell: UICollectionViewCell {
         scrollView.addSubview(imageView)
         imageView.clipsToBounds = true
         
-        contentView.addSubview(progressView)
-        progressView.isHidden = true
-        
         // 长按手势
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
         contentView.addGestureRecognizer(longPress)
@@ -161,12 +164,11 @@ open class PhotoBrowserCell: UICollectionViewCell {
     }
     
     /// 布局
-    open func layout() {
+    private func layout() {
         scrollView.frame = contentView.bounds
         scrollView.setZoomScale(1.0, animated: false)
         imageView.frame = fitFrame
         scrollView.setZoomScale(1.0, animated: false)
-        progressView.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.midY)
         
         // 查看原图按钮
         if !rawImageButton.isHidden {
@@ -175,11 +177,11 @@ open class PhotoBrowserCell: UICollectionViewCell {
             rawImageButton.bounds.size.width += 14
             rawImageButton.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.height - 20 - rawImageButton.bounds.height)
         }
-        photoBrowserCellDelegate?.photoBrowserCellDidLayout(self)
+        cellDelegate?.photoBrowserCellDidLayout(self)
     }
     
     /// 设置图片
-    open func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+    func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 保存/更新原图url
         self.rawUrl = rawUrl
         
@@ -206,15 +208,15 @@ open class PhotoBrowserCell: UICollectionViewCell {
     
     /// 加载图片
     private func loadImage(withPlaceholder placeholder: UIImage?, url: URL?, completion: (() -> Void)?) {
-        // 显示加载进度
-        self.progressView.isHidden = false
+        cellDelegate?.photoBrowserCellWillLoadImage(self, placeholder: placeholder, url: url)
         photoLoader?.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { [weak self] (receivedSize, totalSize) in
-            if totalSize > 0 {
-                self?.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
+            if let `self` = self {
+                self.cellDelegate?.photoBrowserCellLoadingImage(self, receivedSize: receivedSize, totalSize: totalSize)
             }
             }, completionHandler: { [weak self] in
-                // 隐藏加载进度
-                self?.progressView.isHidden = true
+                if let `self` = self {
+                    self.cellDelegate?.photoBrowserCellDidLoadImage(self, placeholder: placeholder, url: url)
+                }
                 if let completion = completion {
                     completion()
                 }
@@ -229,7 +231,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
 extension PhotoBrowserCell {
     /// 响应单击
     @objc open func onSingleTap() {
-        if let dlg = photoBrowserCellDelegate {
+        if let dlg = cellDelegate {
             dlg.photoBrowserCell(self, didSingleTap: imageView.image)
         }
     }
@@ -264,7 +266,7 @@ extension PhotoBrowserCell {
             let result = panResult(pan)
             imageView.frame = result.0
             // 通知代理，发生了缩放。代理可依scale值改变背景蒙板alpha值
-            if let dlg = photoBrowserCellDelegate {
+            if let dlg = cellDelegate {
                 dlg.photoBrowserCell(self, didPanScale: result.1)
             }
         case .ended, .cancelled:
@@ -306,7 +308,7 @@ extension PhotoBrowserCell {
     }
     
     private func endPan() {
-        if let dlg = photoBrowserCellDelegate {
+        if let dlg = cellDelegate {
             dlg.photoBrowserCell(self, didPanScale: 1.0)
         }
         // 如果图片当前显示的size小于原size，则重置为原size
@@ -323,7 +325,7 @@ extension PhotoBrowserCell {
     
     /// 响应长按
     @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
-        if press.state == .began, let dlg = photoBrowserCellDelegate, let image = imageView.image {
+        if press.state == .began, let dlg = cellDelegate, let image = imageView.image {
             dlg.photoBrowserCell(self, didLongPressWith: image)
         }
     }

@@ -10,7 +10,7 @@ import Foundation
 import JXPhotoBrowser
 
 /// 附加视图插件
-class OverlayPlugin: PhotoBrowserPlugin {
+class OverlayPlugin: PhotoBrowserCellPlugin {
     
     /// 点删除按钮回调
     var didTouchDeleteButton: ((_ index: Int) -> Void)?
@@ -27,10 +27,9 @@ class OverlayPlugin: PhotoBrowserPlugin {
                              AdditionalModel(showButton: false, text: nil)]
     
     /// 每次取复用 cell 时会调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {
+    func photoBrowserCellDidReused(_ cell: PhotoBrowserCell, at index: Int) {
         let additionalView = (cell.associatedObjects["OverlayPlugin"] as? AdditionalView) ?? {
             let view = AdditionalView()
-            view.index = index
             view.didTouchDeleteButton = { [weak self] index in
                 OverlayPlugin.dataSource.remove(at: index)
                 self?.didTouchDeleteButton?(index)
@@ -38,12 +37,13 @@ class OverlayPlugin: PhotoBrowserPlugin {
             cell.contentView.addSubview(view)
             cell.associatedObjects["OverlayPlugin"] = view
             return view
-        }()
+            }()
         additionalView.configure(OverlayPlugin.dataSource[index])
+        additionalView.index = index
     }
-
+    
     /// PhotoBrowserCell 执行布局方法时调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell) {
+    func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
         if let view = cell.associatedObjects["OverlayPlugin"] as? AdditionalView {
             let height: CGFloat = 100
             view.frame = CGRect(x: 0,

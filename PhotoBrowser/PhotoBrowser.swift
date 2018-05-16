@@ -41,6 +41,9 @@ open class PhotoBrowser: UIViewController {
     /// 插件组
     open var plugins: [PhotoBrowserPlugin] = []
     
+    /// Cell 插件组
+    open var cellPlugins: [PhotoBrowserCellPlugin] = []
+    
     //
     // MARK: - Private Properties
     //
@@ -126,6 +129,8 @@ open class PhotoBrowser: UIViewController {
         self.photoLoader = photoLoader
         self.plugins = plugins
         self.originPageIndex = originPageIndex
+        // 默认使用loading插件
+        self.cellPlugins = [PhotoBrowserProgressViewPlugin()]
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -295,18 +300,18 @@ extension PhotoBrowser: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NSStringFromClass(PhotoBrowserCell.self), for: indexPath) as! PhotoBrowserCell
         cell.imageView.contentMode = imageScaleMode
-        cell.photoBrowserCellDelegate = self
+        cell.cellDelegate = self
         cell.photoLoader = photoLoader
         cell.imageMaximumZoomScale = imageMaximumZoomScale
         cell.imageZoomScaleForDoubleTap = imageZoomScaleForDoubleTap
+        cellPlugins.forEach {
+            $0.photoBrowserCellDidReused(cell, at: indexPath.item)
+        }
         if let local = localImage(for: indexPath.item) {
             cell.setImage(local, highQualityUrl: nil, rawUrl: nil)
         } else {
             let (image, highQualityUrl, rawUrl) = imageFor(index: indexPath.item)
             cell.setImage(image, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
-        }
-        plugins.forEach {
-            $0.photoBrowser(self, reusableCell: cell, atIndex: indexPath.item)
         }
         return cell
     }
@@ -337,10 +342,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
 extension PhotoBrowser: UICollectionViewDelegate {
     /// 减速完成后，计算当前页
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let offsetX = scrollView.contentOffset.x
-//        let width = scrollView.frame.width + photoSpacing
-        let width = scrollView.frame.width
-        currentIndex = Int(offsetX / width)
+        currentIndex = Int(scrollView.contentOffset.x / scrollView.frame.width)
     }
     
     /// 滑动中
@@ -428,6 +430,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
 //
 
 extension PhotoBrowser: PhotoBrowserCellDelegate {
+
     public func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?) {
         if let dlg = photoBrowserDelegate {
             dlg.photoBrowser(self, willDismissWithIndex: currentIndex, image: image)
@@ -455,8 +458,26 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
     }
     
     public func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
-        plugins.forEach {
-            $0.photoBrowser(self, didLayout: cell)
+        cellPlugins.forEach {
+            $0.photoBrowserCellDidLayout(cell)
+        }
+    }
+    
+    public func photoBrowserCellWillLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?) {
+        cellPlugins.forEach {
+            $0.photoBrowserCellWillLoadImage(cell, placeholder: placeholder, url: url)
+        }
+    }
+    
+    public func photoBrowserCellLoadingImage(_ cell: PhotoBrowserCell, receivedSize: Int64, totalSize: Int64) {
+        cellPlugins.forEach {
+            $0.photoBrowserCellLoadingImage(cell, receivedSize: receivedSize, totalSize: totalSize)
+        }
+    }
+    
+    public func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?) {
+        cellPlugins.forEach {
+            $0.photoBrowserCellDidLoadImage(cell, placeholder: placeholder, url: url)
         }
     }
 }

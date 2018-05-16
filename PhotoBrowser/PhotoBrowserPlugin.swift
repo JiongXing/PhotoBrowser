@@ -17,12 +17,6 @@ public protocol PhotoBrowserPlugin {
     /// 每次取图片总数量时会调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos number: Int)
     
-    /// 每次取复用 cell 时会调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int)
-    
-    /// PhotoBrowserCell 执行布局方法时调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell)
-    
     /// 执行 viewDidLoad 时调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLoad view: UIView)
     

@@ -135,7 +135,7 @@ extension MomentsViewController: UICollectionViewDelegate {
             self?.collectionView?.reloadData()
             weakBrowser?.reloadData()
         }
-        browser.plugins.append(overlayPlugin)
+        browser.cellPlugins.append(overlayPlugin)
         // 指定打开图片组中的哪张
         browser.originPageIndex = index
         // 展示

@@ -37,6 +37,8 @@
 		896BB59E9F17447AE58B08D86C503D8C /* Kingfisher-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCAEDAC7F43D1E03236DD2096D0220DA /* Kingfisher-dummy.m */; };
 		8C9FEB2EE75D7AF216E48805BCF7E6B1 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88C2DC201E57C6FC489FB78275D9E14D /* CFNetwork.framework */; };
 		8EC8D7EFFB6DDE8CD0595F4FC6E0DDC0 /* TopMostViewControllerGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45D2BC79076F003DDFBF021546B09CF /* TopMostViewControllerGetter.swift */; };
+		94A66E8E20ABE17500390AC9 /* PhotoBrowserCellPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A66E8D20ABE17500390AC9 /* PhotoBrowserCellPlugin.swift */; };
+		94A66E9020AC2B5300390AC9 /* PhotoBrowserProgressViewPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A66E8F20AC2B5300390AC9 /* PhotoBrowserProgressViewPlugin.swift */; };
 		9963711920F2113545938D622F340481 /* FormatIndicatedCacheSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51313B06008A49CEE34BA3780BDE1DF3 /* FormatIndicatedCacheSerializer.swift */; };
 		9E05159FD2089F3DBA6E3C4AF37C8607 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02DA0EE7A103885B0606126A579FBFF3 /* ImageDownloader.swift */; };
 		A1161E4B04B6EB03D71FCED26D1CE688 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11373FF82ED248D8BE23AE3AAA7840D6 /* Filter.swift */; };
@@ -128,6 +130,8 @@
 		91647A8F0DB816B83E9D56525FA36939 /* RequestModifier.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RequestModifier.swift; path = Sources/RequestModifier.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		940EE60846F549F0E37CDE1554014466 /* JXPhotoBrowser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JXPhotoBrowser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		94A66E8D20ABE17500390AC9 /* PhotoBrowserCellPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotoBrowserCellPlugin.swift; path = PhotoBrowser/PhotoBrowserCellPlugin.swift; sourceTree = "<group>"; };
+		94A66E8F20AC2B5300390AC9 /* PhotoBrowserProgressViewPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotoBrowserProgressViewPlugin.swift; path = PhotoBrowser/PhotoBrowserProgressViewPlugin.swift; sourceTree = "<group>"; };
 		98A2FFCB11F4550A98E9C35342BB83F1 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		A21BB68CFF1A90165701501253D0DAE9 /* Kingfisher.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Kingfisher.modulemap; sourceTree = "<group>"; };
 		A6915372D6C183E4ADBAD6DDB4BA5999 /* ImageModifier.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageModifier.swift; path = Sources/ImageModifier.swift; sourceTree = "<group>"; };
@@ -236,7 +240,9 @@
 				70B3788DB5D5B7CDEEE9AA9ACDBC784D /* DefaultPageControlPlugin.swift */,
 				2AB518B6E69E116A56CC2DA401EC5C11 /* NumberPageControlPlugin.swift */,
 				D7044E63744CD1771ACB4235EFEF2076 /* PhotoBrowserCell.swift */,
+				94A66E8D20ABE17500390AC9 /* PhotoBrowserCellPlugin.swift */,
 				EE101ACD95905EAA49DE5E08834A5750 /* PhotoBrowserProgressView.swift */,
+				94A66E8F20AC2B5300390AC9 /* PhotoBrowserProgressViewPlugin.swift */,
 				F45D2BC79076F003DDFBF021546B09CF /* TopMostViewControllerGetter.swift */,
 				9D49BF3CC2FF9D90D25A257707A76294 /* Pod */,
 				90EB79524C9175B951ECD105C83F9F4A /* Support Files */,
@@ -490,6 +496,7 @@
 				E21276F29B60865D4183FFC2C33BAE3E /* FadeAnimator.swift in Sources */,
 				D073E2495C30FC481D87148D43EC484E /* FadePresentationController.swift in Sources */,
 				7A208AEE6A8ABC9FD55B674E98FE36ED /* JXPhotoBrowser-dummy.m in Sources */,
+				94A66E9020AC2B5300390AC9 /* PhotoBrowserProgressViewPlugin.swift in Sources */,
 				562542A34E5EC7B39E2AF47FF50E7870 /* KingfisherPhotoLoader.swift in Sources */,
 				CA22E341BF9F3CC9C37ADA7EF8F10116 /* NumberPageControlPlugin.swift in Sources */,
 				5D14BD344926104B53260E36758E2EFB /* PhotoBrowser.swift in Sources */,
@@ -501,6 +508,7 @@
 				436A50600E6691D62E870BB4A0E9BCB6 /* PhotoLoader.swift in Sources */,
 				4A1F0E9CCC0D205B53D1F78F345532F8 /* ScaleAnimator.swift in Sources */,
 				2ACC6E7D5CFE4AC4020BD509D3E11D59 /* ScalePresentationController.swift in Sources */,
+				94A66E8E20ABE17500390AC9 /* PhotoBrowserCellPlugin.swift in Sources */,
 				8EC8D7EFFB6DDE8CD0595F4FC6E0DDC0 /* TopMostViewControllerGetter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
