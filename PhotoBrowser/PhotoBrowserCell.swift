@@ -28,8 +28,8 @@ open class PhotoBrowserCell: UICollectionViewCell {
     // MARK: - Public
     //
     
-    /// 提供一个可用来关联对象的引用
-    open var associatedObject: Any? = nil
+    /// 可用来关联插件对象
+    open var associatedObjects: [String: Any] = [:]
     
     /// 代理
     open weak var photoBrowserCellDelegate: PhotoBrowserCellDelegate?

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'JXPhotoBrowser'
-  s.version = '0.9.1'
+  s.version = '0.9.2'
   s.license = 'MIT'
   s.summary = 'Elegant photo browser in Swift.'
   s.homepage = 'https://github.com/JiongXing/PhotoBrowser'

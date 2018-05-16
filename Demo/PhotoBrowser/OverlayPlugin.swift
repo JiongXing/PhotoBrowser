@@ -28,7 +28,7 @@ class OverlayPlugin: PhotoBrowserPlugin {
     
     /// 每次取复用 cell 时会调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, reusableCell cell: PhotoBrowserCell, atIndex index: Int) {
-        let additionalView = (cell.associatedObject as? AdditionalView) ?? {
+        let additionalView = (cell.associatedObjects["OverlayPlugin"] as? AdditionalView) ?? {
             let view = AdditionalView()
             view.index = index
             view.didTouchDeleteButton = { [weak self] index in
@@ -36,7 +36,7 @@ class OverlayPlugin: PhotoBrowserPlugin {
                 self?.didTouchDeleteButton?(index)
             }
             cell.contentView.addSubview(view)
-            cell.associatedObject = view
+            cell.associatedObjects["OverlayPlugin"] = view
             return view
         }()
         additionalView.configure(OverlayPlugin.dataSource[index])
@@ -44,7 +44,7 @@ class OverlayPlugin: PhotoBrowserPlugin {
 
     /// PhotoBrowserCell 执行布局方法时调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLayout cell: PhotoBrowserCell) {
-        if let view = cell.associatedObject as? AdditionalView {
+        if let view = cell.associatedObjects["OverlayPlugin"] as? AdditionalView {
             let height: CGFloat = 100
             view.frame = CGRect(x: 0,
                                 y: cell.contentView.bounds.height - height,
