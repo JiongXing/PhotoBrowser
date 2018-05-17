@@ -1,5 +1,5 @@
 //
-//  PhotoBrowserProgressView.swift
+//  ProgressView.swift
 //  PhotoBrowser
 //
 //  Created by JiongXing on 2017/4/5.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class PhotoBrowserProgressView: UIView {
+open class ProgressView: UIView {
 
     /// 进度
     open var progress: CGFloat = 0 {

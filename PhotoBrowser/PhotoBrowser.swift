@@ -112,12 +112,10 @@ open class PhotoBrowser: UIViewController {
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
-    /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
                 photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
-                plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                 originPageIndex: Int = 0) {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
@@ -127,10 +125,9 @@ open class PhotoBrowser: UIViewController {
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
         self.photoLoader = photoLoader
-        self.plugins = plugins
         self.originPageIndex = originPageIndex
-        // 默认使用loading插件
-        self.cellPlugins = [PhotoBrowserProgressViewPlugin()]
+        // 默认使用图片加载进度插件和查看原图插件
+        self.cellPlugins = [ProgressViewPlugin(), RawImageButtonPlugin()]
     }
     
     public required init?(coder aDecoder: NSCoder) {
@@ -170,8 +167,8 @@ open class PhotoBrowser: UIViewController {
         let vc = PhotoBrowser(animationType: animationType,
                               delegate: delegate,
                               photoLoader: photoLoader,
-                              plugins: plugins,
                               originPageIndex: originPageIndex)
+        vc.plugins = plugins
         vc.show(from: fromViewController)
     }
     
@@ -460,6 +457,12 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
     public func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
         cellPlugins.forEach {
             $0.photoBrowserCellDidLayout(cell)
+        }
+    }
+    
+    public func photoBrowserCellSetImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
+        cellPlugins.forEach {
+            $0.photoBrowserCellSetImage(cell, placeholder: placeholder, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
         }
     }
     

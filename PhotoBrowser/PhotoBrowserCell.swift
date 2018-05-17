@@ -21,6 +21,9 @@ public protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     /// Layout 时回调
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell)
     
+    /// 设置图片资源时回调
+    func photoBrowserCellSetImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?)
+    
     /// 即将加载图片
     func photoBrowserCellWillLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
     
@@ -71,22 +74,6 @@ open class PhotoBrowserCell: UICollectionViewCell {
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
     open let scrollView = UIScrollView()
     
-    /// 查看原图按钮
-    open lazy var rawImageButton: UIButton = { [unowned self] in
-        let button = UIButton(type: .custom)
-        button.setTitleColor(UIColor.white, for: .normal)
-        button.setTitleColor(UIColor.white, for: .highlighted)
-        button.setTitle("查看原图", for: .normal)
-        button.setTitle("查看原图", for: .highlighted)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        button.layer.borderColor = UIColor.lightGray.cgColor
-        button.layer.borderWidth = 1
-        button.layer.cornerRadius = 4
-        button.layer.masksToBounds = true
-        button.addTarget(self, action: #selector(onRawImageButtonTap), for: .touchUpInside)
-        return button
-    }()
-    
     /// 计算contentSize应处于的中心位置
     private var centerOfContentSize: CGPoint {
         let deltaWidth = bounds.width - scrollView.contentSize.width
@@ -119,6 +106,10 @@ open class PhotoBrowserCell: UICollectionViewCell {
     
     /// 记录pan手势开始时，手势位置
     private var beganTouch = CGPoint.zero
+    
+    //
+    // MARK: - Life Cycle
+    //
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -169,24 +160,20 @@ open class PhotoBrowserCell: UICollectionViewCell {
         scrollView.setZoomScale(1.0, animated: false)
         imageView.frame = fitFrame
         scrollView.setZoomScale(1.0, animated: false)
-        
-        // 查看原图按钮
-        if !rawImageButton.isHidden {
-            contentView.addSubview(rawImageButton)
-            rawImageButton.sizeToFit()
-            rawImageButton.bounds.size.width += 14
-            rawImageButton.center = CGPoint(x: contentView.bounds.midX, y: contentView.bounds.height - 20 - rawImageButton.bounds.height)
-        }
+
         cellDelegate?.photoBrowserCellDidLayout(self)
     }
     
-    /// 设置图片
+    //
+    // MARK: - Load Data
+    //
+    
+    /// 设置图片资源
     func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 保存/更新原图url
         self.rawUrl = rawUrl
         
-        // 重置查看原图按钮为隐藏
-        rawImageButton.isHidden = true
+        cellDelegate?.photoBrowserCellSetImage(self, placeholder: placeholder, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
         
         // 若存在原图缓存，直接显示原图
         if let url = rawUrl,
@@ -200,7 +187,6 @@ open class PhotoBrowserCell: UICollectionViewCell {
         
         // 加载大图
         loadImage(withPlaceholder: placeholder, url: highQualityUrl, completion: { [weak self] in
-            self?.rawImageButton.isHidden = (rawUrl == nil)
             self?.layout()
         })
         layout()
@@ -220,6 +206,14 @@ open class PhotoBrowserCell: UICollectionViewCell {
                 if let completion = completion {
                     completion()
                 }
+        })
+    }
+    
+    /// 加载原图
+    open func loadRawImage() {
+        guard let url = rawUrl else { return }
+        loadImage(withPlaceholder: imageView.image, url: url, completion: { [weak self] in
+            self?.layout()
         })
     }
 }
@@ -328,15 +322,6 @@ extension PhotoBrowserCell {
         if press.state == .began, let dlg = cellDelegate, let image = imageView.image {
             dlg.photoBrowserCell(self, didLongPressWith: image)
         }
-    }
-    
-    /// 响应查看原图按钮
-    @objc open func onRawImageButtonTap() {
-        guard let url = rawUrl else { return }
-        rawImageButton.isHidden = true
-        loadImage(withPlaceholder: imageView.image, url: url, completion: { [weak self] in
-            self?.layout()
-        })
     }
 }
 
