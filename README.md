@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v0.9.3-blue.svg)
+![](https://img.shields.io/badge/pod-v1.0.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # 特性
@@ -20,7 +20,7 @@
 - [x] 插件式集成光点型的页码指示器
 - [x] 插件式集成数字型的页码指示器
 - [x] 插件式集成图片加载进度指示器
-- [ ] 插件式集成查看原图按钮
+- [x] 插件式集成查看原图按钮
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 

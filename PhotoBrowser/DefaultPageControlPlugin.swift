@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 光点型页码指示器
 open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     
     /// 中心点Y坐标，距离底部值

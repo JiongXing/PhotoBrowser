@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 图片加载进度插件
 open class ProgressViewPlugin: PhotoBrowserCellPlugin {
     
     /// 每次取复用 cell 时会调用

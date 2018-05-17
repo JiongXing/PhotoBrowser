@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 数字型页码指示器
 open class NumberPageControlPlugin: PhotoBrowserPlugin {
     /// 字体
     open var font = UIFont.systemFont(ofSize: 17)

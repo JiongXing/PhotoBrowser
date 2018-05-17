@@ -42,6 +42,7 @@ open class PhotoBrowser: UIViewController {
     open var plugins: [PhotoBrowserPlugin] = []
     
     /// Cell 插件组
+    /// 初始化默认使用`图片加载进度插件`和`查看原图插件`
     open var cellPlugins: [PhotoBrowserCellPlugin] = []
     
     //
@@ -126,7 +127,7 @@ open class PhotoBrowser: UIViewController {
         self.photoBrowserDelegate = delegate
         self.photoLoader = photoLoader
         self.originPageIndex = originPageIndex
-        // 默认使用图片加载进度插件和查看原图插件
+        // 默认使用`图片加载进度插件`和`查看原图插件`
         self.cellPlugins = [ProgressViewPlugin(), RawImageButtonPlugin()]
     }
     
