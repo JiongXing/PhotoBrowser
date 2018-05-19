@@ -26,6 +26,7 @@
 
 ## 特别告示
 由于v1.0相比之前改动比较大，如果大家升级后有疑问，解决不了的，请留言或直接联系我，我会尽可能提供帮助，谢谢~
+注：部分协议方法有改动，或已重命名，对照新方法修改一下就好了。
 
 ## 效果
 
@@ -268,24 +269,6 @@ public func show(index: Int) {
     self.modalPresentationCapturesStatusBarAppearance = true
     presentingVC.present(self, animated: true, completion: nil)
 }
-```
-# 简化使用
-现在我们调起图片浏览器的姿势是这样的：
-```swift
-let browser = PhotoBrowser(showByViewController: self, , delegate: self)
-browser.show(index: index)
-```
-还需要写两行代码，不爽，弄成一行：
-```swift
-/// 便利的展示方法，合并init和show两个步骤
-public class func show(byViewController presentingVC: UIViewController, delegate: PhotoBrowserDelegate, index: Int) {
-    let browser = PhotoBrowser(showByViewController: presentingVC, delegate: delegate)
-    browser.show(index: index)
-}
-```
-现在，我们调起图片浏览器的姿势是这样的：
-```swift
-PhotoBrowser.show(byViewController: self, delegate: self, index: indexPath.item)
 ```
 
 # 横向滑动布局
