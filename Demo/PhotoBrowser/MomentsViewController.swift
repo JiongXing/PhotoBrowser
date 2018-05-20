@@ -139,7 +139,11 @@ extension MomentsViewController: UICollectionViewDelegate {
         // 指定打开图片组中的哪张
         browser.originPageIndex = index
         // 展示
-        self.present(browser, animated: true, completion: nil)
+        browser.show()
+        /* 或者自己 present 展示
+         self.present(browser, animated: true, completion: nil)
+         */
+        
         /*
         // 可主动关闭图片浏览器
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {

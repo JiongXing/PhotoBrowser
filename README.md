@@ -25,8 +25,8 @@
 - [ ] 支持 React Native 
 
 ## 特别告示
-由于v1.0相比之前改动比较大，如果大家升级后有疑问，解决不了的，请留言或直接联系我，我会尽可能提供帮助，谢谢~
-注：部分协议方法有改动，或已重命名，对照新方法修改一下就好了。
+由于v1.0相比之前改动比较大，如果有疑问，请留言或直接联系我，我会尽可能提供帮助，谢谢~
+注：部分协议方法有改动。
 
 ## 效果
 
@@ -61,7 +61,10 @@ browser.plugins.append(NumberPageControlPlugin())
 // 指定打开图片组中的哪张
 browser.originPageIndex = index
 // 展示
-self.present(browser, animated: true, completion: nil)}
+browser.show()
+/* 或者自己 present 展示
+ self.present(browser, animated: true, completion: nil)
+ */
 ```
 
 如果想在浏览场景添加一些视图，你可以自己开发插件。
