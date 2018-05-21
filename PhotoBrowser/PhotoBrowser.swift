@@ -181,9 +181,15 @@ open class PhotoBrowser: UIViewController {
     
     /// 删除某项
     open func deleteItem(at index: Int) {
-        if collectionView.numberOfItems(inSection: 0) > 1 {
+        let numberOfItems = collectionView.numberOfItems(inSection: 0)
+        if numberOfItems > 1 {
             collectionView.deleteItems(at: [IndexPath(row: index, section: 0)])
-            scrollViewDidEndDecelerating(collectionView)
+            if numberOfItems > 2 {
+                currentIndex = Int(collectionView.contentOffset.x / collectionView.bounds.width)
+            } else {
+                // 修正currentIndex。删完后只剩下一页时，强制置0
+                currentIndex = 0
+            }
         } else {
             dismiss(animated: true)
         }
@@ -357,7 +363,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
 extension PhotoBrowser: UICollectionViewDelegate {
     /// 减速完成后，计算当前页
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        currentIndex = Int(scrollView.contentOffset.x / scrollView.frame.width)
+        currentIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
     }
     
     /// 滑动中

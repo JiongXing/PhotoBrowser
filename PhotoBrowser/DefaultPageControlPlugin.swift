@@ -50,5 +50,6 @@ open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
         pageControl.sizeToFit()
         pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - centerBottomY)
+        pageControl.isHidden = totalPages <= 1
     }
 }

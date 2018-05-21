@@ -54,6 +54,7 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
         layout()
+//        numberLabel.isHidden = totalPages <= 1
     }
     
     open func layout() {
