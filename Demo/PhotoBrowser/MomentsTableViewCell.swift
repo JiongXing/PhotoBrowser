@@ -13,6 +13,10 @@ class MomentsTableViewCell: UITableViewCell {
     
     var thumbnailImageUrls: [String] = []
     var highQualityImageUrls: [String] = []
+    var overlayModels: [OverlayModel] = []
+    
+    /// 点删除按钮回调
+    var didTouchDeleteButton: ((_ index: Int) -> Void)?
     
     lazy var flowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -26,6 +30,8 @@ class MomentsTableViewCell: UITableViewCell {
         view.backgroundColor = UIColor.white
         return view
     }()
+    
+    private weak var showingBrowser: PhotoBrowser?
 
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -71,6 +77,12 @@ class MomentsTableViewCell: UITableViewCell {
     
     func reloadData() {
         collectionView.reloadData()
+        showingBrowser?.reloadData()
+    }
+    
+    func deleteItem(at index: Int) {
+        collectionView.reloadData()
+        showingBrowser?.deleteItem(at: index)
     }
 }
 
@@ -108,26 +120,32 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         // 数字型页码指示器
         browser.plugins.append(NumberPageControlPlugin())
         // 装配附加视图插件
-        weak var weakBrowser = browser
-        let overlayPlugin = OverlayPlugin()
-        // 点击删除按钮回调
-        overlayPlugin.didTouchDeleteButton = { [weak self] index in
-            self?.thumbnailImageUrls.remove(at: index)
-            self?.highQualityImageUrls.remove(at: index)
-            self?.collectionView.reloadData()
-            weakBrowser?.reloadData()
-        }
-        browser.cellPlugins.append(overlayPlugin)
+        setupOverlayPlugin(on: browser, index: index)
         // 指定打开图片组中的哪张
         browser.originPageIndex = index
         // 展示
         browser.show()
+        showingBrowser = browser
         
-        /*
-         // 可主动关闭图片浏览器
-         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+        // 可主动关闭图片浏览器
+        /*DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             browser.dismiss(animated: false)
-         }*/
+        }*/
+    }
+    
+    /// 装配附加视图插件
+    private func setupOverlayPlugin(on browser: PhotoBrowser, index: Int) {
+        guard overlayModels.count > index else {
+            return
+        }
+        let overlayPlugin = OverlayPlugin()
+        overlayPlugin.dataSourceProvider = { [unowned self] index in
+            return self.overlayModels[index]
+        }
+        overlayPlugin.didTouchDeleteButton = { [unowned self] index in
+            self.didTouchDeleteButton?(index)
+        }
+        browser.cellPlugins.append(overlayPlugin)
     }
 }
 
@@ -190,5 +208,9 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
         actionSheet.addAction(saveImageAction)
         actionSheet.addAction(cancelAction)
         photoBrowser.present(actionSheet, animated: true, completion: nil)
+    }
+    
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didDismissWithIndex index: Int, image: UIImage?) {
+        showingBrowser = nil
     }
 }

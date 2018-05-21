@@ -149,6 +149,7 @@ open class PhotoBrowser: UIViewController {
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
     open func dismiss(animated: Bool) {
+        coverStatusBar(false)
         dismiss(animated: animated, completion: nil)
     }
     
@@ -176,6 +177,16 @@ open class PhotoBrowser: UIViewController {
     /// 重新加载数据源
     open func reloadData() {
         collectionView.reloadData()
+    }
+    
+    /// 删除某项
+    open func deleteItem(at index: Int) {
+        if collectionView.numberOfItems(inSection: 0) > 1 {
+            collectionView.deleteItems(at: [IndexPath(row: index, section: 0)])
+            scrollViewDidEndDecelerating(collectionView)
+        } else {
+            dismiss(animated: true)
+        }
     }
     
     //
@@ -217,12 +228,18 @@ open class PhotoBrowser: UIViewController {
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         layoutViews()
-        // 屏幕旋转后的调整
-        let indexPath = IndexPath.init(item: self.currentIndex, section: 0)
-        self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
         plugins.forEach {
             $0.photoBrowser(self, viewDidLayoutSubviews: view)
         }
+    }
+    
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        // 屏幕旋转处理
+        DispatchQueue.main.asyncAfter(deadline: .now() + coordinator.transitionDuration, execute: {
+            let indexPath = IndexPath(item: self.currentIndex, section: 0)
+            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+        })
     }
     
     open override func viewWillDisappear(_ animated: Bool) {

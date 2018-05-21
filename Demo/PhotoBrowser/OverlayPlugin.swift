@@ -16,45 +16,37 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
     var didTouchDeleteButton: ((_ index: Int) -> Void)?
     
     /// 视图数据源
-    static var dataSource = [AdditionalModel(showButton: false, text: nil),
-                             AdditionalModel(showButton: true, text: "   啊啊啊~"),
-                             AdditionalModel(showButton: false, text: nil),
-                             AdditionalModel(showButton: false, text: nil),
-                             AdditionalModel(showButton: false, text: nil),
-                             AdditionalModel(showButton: true, text: "   喵喵进化~"),
-                             AdditionalModel(showButton: false, text: nil),
-                             AdditionalModel(showButton: false, text: "   抱抱大腿~"),
-                             AdditionalModel(showButton: false, text: nil)]
+    var dataSourceProvider: ((_ index: Int) -> OverlayModel)?
     
     /// 每次取复用 cell 时会调用
     func photoBrowserCellDidReused(_ cell: PhotoBrowserCell, at index: Int) {
-        let additionalView = (cell.associatedObjects["OverlayPlugin"] as? AdditionalView) ?? {
-            let view = AdditionalView()
-            view.didTouchDeleteButton = { [weak self] index in
-                OverlayPlugin.dataSource.remove(at: index)
-                self?.didTouchDeleteButton?(index)
+        let additionalView = (cell.associatedObjects["OverlayPlugin"] as? OverlayView) ?? {
+            let view = OverlayView()
+            view.didTouchDeleteButton = { [unowned self] index in
+                self.didTouchDeleteButton?(index)
             }
             cell.contentView.addSubview(view)
             cell.associatedObjects["OverlayPlugin"] = view
             return view
             }()
-        additionalView.configure(OverlayPlugin.dataSource[index])
+        if let provider = dataSourceProvider {
+            additionalView.configure(provider(index))
+        }
         additionalView.index = index
     }
     
     /// PhotoBrowserCell 执行布局方法时调用
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
-        if let view = cell.associatedObjects["OverlayPlugin"] as? AdditionalView {
+        if let view = cell.associatedObjects["OverlayPlugin"] as? OverlayView {
             let height: CGFloat = 100
             view.frame = CGRect(x: 0,
                                 y: cell.contentView.bounds.height - height,
                                 width: cell.contentView.bounds.width,
                                 height: height)
-            view.setNeedsLayout()
         }
     }
     
-    class AdditionalView: UIView {
+    class OverlayView: UIView {
         /// 所在 cell 索引
         var index = 0
         
@@ -104,15 +96,10 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
             didTouchDeleteButton?(index)
         }
         
-        func configure(_ model: AdditionalModel) {
+        func configure(_ model: OverlayModel) {
             button.isHidden = !model.showButton
             label.text = model.text
             label.isHidden = model.text == nil
         }
-    }
-    
-    struct AdditionalModel {
-        let showButton: Bool
-        let text: String?
     }
 }
