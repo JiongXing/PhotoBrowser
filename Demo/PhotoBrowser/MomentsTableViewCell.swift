@@ -122,9 +122,6 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         browser.originPageIndex = index
         // 展示
         browser.show()
-        /* 或者自己 present 展示
-         self.present(browser, animated: true, completion: nil)
-         */
         
         /*
          // 可主动关闭图片浏览器
