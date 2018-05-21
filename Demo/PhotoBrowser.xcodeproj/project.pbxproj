@@ -15,6 +15,7 @@
 		945391781E713A4C00A9AF66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 945391761E713A4C00A9AF66 /* LaunchScreen.storyboard */; };
 		9453919C1E713CCC00A9AF66 /* MomentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */; };
 		9488C09F546D256A892E5FFC /* Pods_PhotoBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 363546FCAE096417DD0438DC /* Pods_PhotoBrowser.framework */; };
+		9490B44920B26291004E91A2 /* MomentsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */; };
 		94E6460420A894F80056B65F /* OverlayPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E6460320A894F80056B65F /* OverlayPlugin.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,7 @@
 		945391771E713A4C00A9AF66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		945391791E713A4C00A9AF66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentsViewController.swift; sourceTree = "<group>"; };
+		9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MomentsTableViewCell.swift; sourceTree = "<group>"; };
 		94E6460320A894F80056B65F /* OverlayPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,6 +93,7 @@
 			children = (
 				9453916D1E713A4C00A9AF66 /* AppDelegate.swift */,
 				9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */,
+				9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */,
 				943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */,
 				94E6460320A894F80056B65F /* OverlayPlugin.swift */,
 				945391741E713A4C00A9AF66 /* Assets.xcassets */,
@@ -227,6 +230,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9453916E1E713A4C00A9AF66 /* AppDelegate.swift in Sources */,
+				9490B44920B26291004E91A2 /* MomentsTableViewCell.swift in Sources */,
 				94E6460420A894F80056B65F /* OverlayPlugin.swift in Sources */,
 				9453919C1E713CCC00A9AF66 /* MomentsViewController.swift in Sources */,
 				943AB24A1E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift in Sources */,
