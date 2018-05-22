@@ -12,7 +12,7 @@ public protocol PhotoBrowserPlugin {
     func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int)
     
     /// 滑动时调用
-    func photoBrowser(_ photoBrowser: PhotoBrowser, scrollView: UIScrollView)
+    func photoBrowser(_ photoBrowser: PhotoBrowser, scrollViewDidScroll: UIScrollView)
     
     /// 每次取图片总数量时会调用
     func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos number: Int)
@@ -44,7 +44,7 @@ extension PhotoBrowserPlugin {
     public func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int) {}
     
     /// 滑动时调用
-    public func photoBrowser(_ photoBrowser: PhotoBrowser, scrollView: UIScrollView) {}
+    public func photoBrowser(_ photoBrowser: PhotoBrowser, scrollViewDidScroll: UIScrollView) {}
     
     /// 每次取图片总数量时会调用
     public func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos number: Int) {}

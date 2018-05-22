@@ -4,7 +4,6 @@
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # 特性
-
 - [x] 支持缩放式转场动画
 - [x] 支持淡入淡出式转场动画
 - [x] 支持下滑手势渐变关闭浏览器
@@ -25,8 +24,25 @@
 - [ ] 支持 React Native 
 
 ## 特别告示
-由于v1.0相比之前改动比较大，如果有疑问，请留言或直接联系我，我会尽可能提供帮助，谢谢~
+由于v1.0相比之前改动比较大，如果有疑问，请留言或直接联系我，我会尽可能提供帮助，谢谢~ 
 注：部分协议方法有改动。
+
+## 版本更新记录
+
+### v1.1.0 
+**2018/5/22**
+
+- 新增`PhotoBrowser.deleteItem(at index: Int)`，支持删除动画
+- 优化`PhotoBrowser.reloadData`，更好支持数据源删减操作
+- 优化对屏幕旋转的处理
+- 优化`PhotoBrowser.viewDidLayoutSubviews`
+- 优化`PhotoBrowser.dismiss`
+- 重命名`PhotoBrowserPlugin`协议的`photoBrowser(_:, scrollView:)`方法为：
+`photoBrowser(_:, scrollViewDidScroll:)`
+
+### v1.0.0 
+**2018/5/17**
+- 完成基础功能的设计实现
 
 ## 效果
 

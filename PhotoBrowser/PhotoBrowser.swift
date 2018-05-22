@@ -177,20 +177,22 @@ open class PhotoBrowser: UIViewController {
     /// 重新加载数据源
     open func reloadData() {
         collectionView.reloadData()
+        checkAndRefreshCurrentIndex()
     }
     
     /// 删除某项
     open func deleteItem(at index: Int) {
+        collectionView.deleteItems(at: [IndexPath(row: index, section: 0)])
+        checkAndRefreshCurrentIndex()
+    }
+    
+    /// 检查 numberOfItems，更新 currentIndex
+    private func checkAndRefreshCurrentIndex() {
         let numberOfItems = collectionView.numberOfItems(inSection: 0)
-        if numberOfItems > 1 {
-            collectionView.deleteItems(at: [IndexPath(row: index, section: 0)])
-            if numberOfItems > 2 {
-                currentIndex = Int(collectionView.contentOffset.x / collectionView.bounds.width)
-            } else {
-                // 修正currentIndex。删完后只剩下一页时，强制置0
-                currentIndex = 0
-            }
-        } else {
+        if currentIndex > (numberOfItems - 1) {
+            currentIndex = numberOfItems - 1
+        }
+        if numberOfItems == 0 {
             dismiss(animated: true)
         }
     }
@@ -369,7 +371,7 @@ extension PhotoBrowser: UICollectionViewDelegate {
     /// 滑动中
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         plugins.forEach {
-            $0.photoBrowser(self, scrollView: scrollView)
+            $0.photoBrowser(self, scrollViewDidScroll: scrollView)
         }
     }
 }
