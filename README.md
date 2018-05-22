@@ -29,7 +29,8 @@
 
 ## 版本更新记录
 
-### v1.1.0 2018/5/22
+### Version 1.1.0 
+**2018/5/22**
 - 重构本地图片浏览方法
     - 由原来的通过协议方式取本地图片，改为直接在打开图片浏览时传入图片组
     - 删除`PhotoBrowserDelegate.photoBrowser(_:, localImageForIndex:)`
@@ -46,7 +47,8 @@
     - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originViewForIndex:)`重命名为`photoBrowser(_:, thumbnailViewForIndex:)`
     - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originImageForIndex:)`重命名为`photoBrowser(_:, thumbnailImageForIndex:)`
 
-### v1.0.0 2018/5/17
+### Version 1.0.0 
+**2018/5/17**
 - 完成基础功能的设计实现
 
 ## 效果
@@ -115,26 +117,18 @@ browser.plugins.append(overlayPlugin)
 
 ## 图片浏览器协议
 
-必选协议方法：
+浏览非本地图片时的必选协议方法
 ```swift
 /// 共有多少张图片
 func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
     return thumbnailImageUrls.count
 }
-
-/// 各缩略图图片，也是图片加载完成前的 placeholder
-func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage? {
-    let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
-    return cell?.imageView.image
-}
-
 ```
-
 
 使用缩放式动画的必选协议方法：
 ```swift
 /// 各缩略图所在 view
-func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -> UIView? {
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
     return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
 }
 
@@ -142,6 +136,12 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -
 
 可选协议方法：
 ```swift
+/// 各缩略图图片，也是图片加载完成前的 placeholder
+func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
+    let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
+    return cell?.imageView.image
+}
+
 /// 高清图
 func photoBrowser(_ photoBrowser: PhotoBrowser, highQualityUrlForIndex index: Int) -> URL? {
     return URL(string: highQualityImageUrls[index])
@@ -169,23 +169,6 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
     actionSheet.addAction(cancelAction)
     photoBrowser.present(actionSheet, animated: true, completion: nil)
 }
-```
-
-## 初始参数
-```swift
-/// 展示，传入完整参数
-/// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
-/// - parameter delegate: 浏览器协议代理
-/// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
-/// - parameter plugins: 插件组，默认加载一个光点型页码指示器
-/// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
-/// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层 VC。
-public class func show(animationType: AnimationType = .scale,
-                       delegate: PhotoBrowserDelegate,
-                       photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
-                       plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
-                       originPageIndex: Int,
-                       fromViewController: UIViewController? = TopMostViewControllerGetter.topMost)
 ```
 
 # Requirements
