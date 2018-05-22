@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.0.1-blue.svg)
+![](https://img.shields.io/badge/pod-v1.1.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # 特性
@@ -29,19 +29,24 @@
 
 ## 版本更新记录
 
-### v1.1.0 
-**2018/5/22**
-
+### v1.1.0 2018/5/22
+- 重构本地图片浏览方法
+    - 由原来的通过协议方式取本地图片，改为直接在打开图片浏览时传入图片组
+    - 删除`PhotoBrowserDelegate.photoBrowser(_:, localImageForIndex:)`
+    - 新增`PhotoBrowser.localImages`属性，接收传入的图片组
+    - 新增`PhotoBrowser.show(localImages:)`类方法，一行代码打开图片浏览器
 - 新增`PhotoBrowser.deleteItem(at index: Int)`，支持删除动画
 - 优化`PhotoBrowser.reloadData`，更好支持数据源删减操作
-- 优化对屏幕旋转的处理
+- 优化`PhotoBrowser.viewWillTransition`，处理屏幕旋转
 - 优化`PhotoBrowser.viewDidLayoutSubviews`
-- 优化`PhotoBrowser.dismiss`
-- 重命名`PhotoBrowserPlugin`协议的`photoBrowser(_:, scrollView:)`方法为：
-`photoBrowser(_:, scrollViewDidScroll:)`
+- 优化`PhotoBrowser.dismiss`，修复状态栏显示问题
+- `PhotoBrowser.photoLoader`属性不再是可选，必须给值
+- 为了更准确表达方法含义，重命名以下协议方法（请原谅我再一次改方法名 >o<）：
+    - `PhotoBrowserPlugin`协议：`photoBrowser(_:, scrollView:)`重命名为`photoBrowser(_:, scrollViewDidScroll:)`
+    - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originViewForIndex:)`重命名为`photoBrowser(_:, thumbnailViewForIndex:)`
+    - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originImageForIndex:)`重命名为`photoBrowser(_:, thumbnailImageForIndex:)`
 
-### v1.0.0 
-**2018/5/17**
+### v1.0.0 2018/5/17
 - 完成基础功能的设计实现
 
 ## 效果
@@ -82,6 +87,13 @@ browser.show()
  viewController.present(browser, animated: true, completion: nil)
  */
 ```
+
+如果只是浏览本地图片的话，可以更简单。
+默认使用`.fade`转场动画，不需要实现任何协议方法，一行代码打开图片浏览器：
+```swift
+PhotoBrowser.show(localImages: localImages, originPageIndex: index)
+```
+如果想使用`.scale`转场动画浏览本地图片，只需要传入`delegate`，然后实现`photoBrowser(_:, thumbnailViewForIndex:)`协议方法即可。
 
 如果想在浏览场景添加一些视图，你可以自己开发插件。
 例子给出了添加图片描述和图片删除按钮的做法：

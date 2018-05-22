@@ -21,6 +21,8 @@ class FadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         // 判断是 presentataion 动画还是 dismissal 动画
         guard let fromVC = transitionContext.viewController(forKey: .from),
             let toVC = transitionContext.viewController(forKey: .to) else {
+                print("获取 viewController 失败")
+                transitionContext.completeTransition(false)
                 return
         }
         let presentation = (toVC.presentingViewController == fromVC)
@@ -28,6 +30,8 @@ class FadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         // 取所要打开的控制器视图
         guard let openingView = transitionContext.view(forKey: presentation ? .to : .from) else {
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+            print("获取 所要打开的控制器视图 失败")
+            transitionContext.completeTransition(false)
             return
         }
         // presentation转场，需要把目标视图添加到视图栈

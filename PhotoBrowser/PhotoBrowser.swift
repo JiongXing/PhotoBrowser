@@ -17,8 +17,8 @@ open class PhotoBrowser: UIViewController {
     /// 实现了PhotoBrowserDelegate协议的对象
     open weak var photoBrowserDelegate: PhotoBrowserDelegate?
     
-    /// 网络图片加载器
-    open var photoLoader: PhotoLoader?
+    /// 图片加载器
+    open var photoLoader: PhotoLoader
     
     /// 左右两张图之间的间隙
     open var photoSpacing: CGFloat = 30
@@ -37,6 +37,9 @@ open class PhotoBrowser: UIViewController {
     
     /// 打开时的初始页码，第一页为 0.
     open var originPageIndex: Int = 0
+    
+    /// 本地图片组
+    open var localImages: [UIImage]? = nil
     
     /// 插件组
     open var plugins: [PhotoBrowserPlugin] = []
@@ -61,7 +64,7 @@ open class PhotoBrowser: UIViewController {
     
     /// 当前正在显示视图的前一个页面关联视图
     private var relatedView: UIView? {
-        return photoBrowserDelegate?.photoBrowser(self, originViewForIndex: currentIndex)
+        return photoBrowserDelegate?.photoBrowser(self, thumbnailViewForIndex: currentIndex)
     }
     
     /// 转场协调器
@@ -116,8 +119,9 @@ open class PhotoBrowser: UIViewController {
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
-                photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                photoLoader: PhotoLoader = KingfisherPhotoLoader(),
                 originPageIndex: Int = 0) {
+        self.photoLoader = photoLoader
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
@@ -125,7 +129,6 @@ open class PhotoBrowser: UIViewController {
         
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
-        self.photoLoader = photoLoader
         self.originPageIndex = originPageIndex
         // 默认使用`图片加载进度插件`和`查看原图插件`
         self.cellPlugins = [ProgressViewPlugin(), RawImageButtonPlugin()]
@@ -159,19 +162,45 @@ open class PhotoBrowser: UIViewController {
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
-    /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层 VC。
+    /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层VC。
+    /// - returns:  所创建的图片浏览器
+    @discardableResult
     open class func show(animationType: AnimationType = .scale,
                          delegate: PhotoBrowserDelegate,
-                         photoLoader: PhotoLoader? = KingfisherPhotoLoader(),
+                         photoLoader: PhotoLoader = KingfisherPhotoLoader(),
                          plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                          originPageIndex: Int,
-                         fromViewController: UIViewController? = TopMostViewControllerGetter.topMost) {
+                         fromViewController: UIViewController? = TopMostViewControllerGetter.topMost
+        ) -> PhotoBrowser {
         let vc = PhotoBrowser(animationType: animationType,
                               delegate: delegate,
                               photoLoader: photoLoader,
                               originPageIndex: originPageIndex)
         vc.plugins = plugins
         vc.show(from: fromViewController)
+        return vc
+    }
+    
+    /// 展示本地图片
+    /// - parameter localImages: 本地图片组
+    /// - parameter animationType: 转场动画类型，默认为缩放动画`fade`
+    /// - parameter delegate: 浏览器协议代理
+    /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
+    /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
+    /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层VC。
+    /// - returns:  所创建的图片浏览器
+    @discardableResult
+    open class func show(localImages: [UIImage],
+                         animationType: AnimationType = .fade,
+                         plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
+                         originPageIndex: Int,
+                         fromViewController: UIViewController? = TopMostViewControllerGetter.topMost
+        ) -> PhotoBrowser {
+        let vc = PhotoBrowser(animationType: animationType, originPageIndex: originPageIndex)
+        vc.localImages = localImages
+        vc.plugins = plugins
+        vc.show(from: fromViewController)
+        return vc
     }
     
     /// 重新加载数据源
@@ -313,7 +342,12 @@ open class PhotoBrowser: UIViewController {
 
 extension PhotoBrowser: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let number = photoBrowserDelegate?.numberOfPhotos(in: self) ?? 0
+        var number = 0
+        if let localCount = localImages?.count {
+            number = localCount
+        } else if let dlgNumber = photoBrowserDelegate?.numberOfPhotos(in: self) {
+            number = dlgNumber
+        }
         plugins.forEach {
             $0.photoBrowser(self, numberOfPhotos: number)
         }
@@ -341,7 +375,13 @@ extension PhotoBrowser: UICollectionViewDataSource {
     
     /// 尝试取本地图片
     private func localImage(for index: Int) -> UIImage? {
-        return photoBrowserDelegate?.photoBrowser(self, localImageForIndex: index)
+        guard let images = localImages else {
+            return nil
+        }
+        guard index < images.count else {
+            return nil
+        }
+        return images[index]
     }
     
     private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
@@ -349,7 +389,7 @@ extension PhotoBrowser: UICollectionViewDataSource {
             return (nil, nil, nil)
         }
         // 缩略图
-        let originImage = delegate.photoBrowser(self, originImageForIndex: index)
+        let originImage = delegate.photoBrowser(self, thumbnailImageForIndex: index)
         // 高清图url
         let highQualityUrl = delegate.photoBrowser(self, highQualityUrlForIndex: index)
         // 原图url

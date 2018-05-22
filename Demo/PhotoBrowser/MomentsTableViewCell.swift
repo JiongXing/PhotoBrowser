@@ -105,8 +105,12 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         
         // 也可以先创建，然后传参，再打开
         openPhotoBrowserWithInstanceMethod(index: indexPath.item)
+        
+        // 浏览本地图片
+        // openPhotoBrowserWithLocalImage(index: indexPath.item)
     }
     
+    /// 逐个属性配置
     private func openPhotoBrowserWithInstanceMethod(index: Int) {
         // 创建图片浏览器
         let browser = PhotoBrowser()
@@ -133,6 +137,16 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         }*/
     }
     
+    /// 本地图片
+    private func openPhotoBrowserWithLocalImage(index: Int) {
+        var localImages: [UIImage] = []
+        (0..<9).forEach { _ in
+            localImages.append(UIImage(named: "xingkong")!)
+        }
+        // 默认使用 .fade 转场动画，不需要实现任何协议方法
+        PhotoBrowser.show(localImages: localImages, originPageIndex: index)
+    }
+    
     /// 装配附加视图插件
     private func setupOverlayPlugin(on browser: PhotoBrowser, index: Int) {
         guard overlayModels.count > index else {
@@ -157,13 +171,13 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
     }
     
     /// 各缩略图图片，也是图片加载完成前的 placeholder
-    func photoBrowser(_ photoBrowser: PhotoBrowser, originImageForIndex index: Int) -> UIImage? {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
         let cell = collectionView.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
         return cell?.imageView.image
     }
     
     /// 各缩略图所在 view
-    func photoBrowser(_ photoBrowser: PhotoBrowser, originViewForIndex index: Int) -> UIView? {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
         return collectionView.cellForItem(at: IndexPath(item: index, section: 0))
     }
     
@@ -183,16 +197,6 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
          // 测试原图
          if index == 5 {
          return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
-         }*/
-        return nil
-    }
-    
-    /// 加载本地图片，本地图片的展示将优先于网络图片
-    func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
-        /*
-         // 测试本地图
-         if index == 3 {
-         return UIImage(named: "xingkong")
          }*/
         return nil
     }
