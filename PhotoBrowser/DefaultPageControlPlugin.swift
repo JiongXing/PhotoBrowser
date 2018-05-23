@@ -30,13 +30,12 @@ open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int) {
         currentPage = index
-        pageControl.currentPage = index
+        layout()
     }
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos count: Int) {
         totalPages = count
-        pageControl.numberOfPages = count
-        pageControl.currentPage = currentPage
+        layout()
     }
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidAppear view: UIView, animated: Bool) {
@@ -48,8 +47,20 @@ open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     }
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
-        pageControl.sizeToFit()
-        pageControl.center = CGPoint(x: view.bounds.midX, y: view.bounds.maxY - centerBottomY)
+        layout()
         pageControl.isHidden = totalPages <= 1
+    }
+    
+    private func layout() {
+        pageControl.numberOfPages = totalPages
+        pageControl.currentPage = currentPage
+        pageControl.sizeToFit()
+        guard let superView = pageControl.superview else { return }
+        var offsetY: CGFloat = 0
+        if #available(iOS 11.0, *) {
+            offsetY = superView.safeAreaInsets.bottom
+        }
+        pageControl.center = CGPoint(x: superView.bounds.midX,
+                                     y: superView.bounds.maxY - (centerBottomY + offsetY))
     }
 }

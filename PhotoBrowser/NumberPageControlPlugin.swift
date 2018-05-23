@@ -16,7 +16,7 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
     open var textColor = UIColor.white
     
     /// 中心点Y坐标
-    open var centerY: CGFloat = 30
+    open var centerY: CGFloat = 20
     
     /// 数字指示
     open lazy var numberLabel: UILabel = {
@@ -54,13 +54,18 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
     
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
         layout()
-//        numberLabel.isHidden = totalPages <= 1
+        numberLabel.isHidden = totalPages <= 1
     }
     
-    open func layout() {
+    private func layout() {
         numberLabel.text = "\(currentPage + 1) / \(totalPages)"
         numberLabel.sizeToFit()
         guard let superView = numberLabel.superview else { return }
-        numberLabel.center = CGPoint(x: superView.bounds.midX, y: superView.bounds.minY + centerY)
+        var offsetY: CGFloat = 0
+        if #available(iOS 11.0, *) {
+            offsetY = superView.safeAreaInsets.top
+        }
+        numberLabel.center = CGPoint(x: superView.bounds.midX,
+                                     y: superView.bounds.minY + (centerY + offsetY))
     }
 }
