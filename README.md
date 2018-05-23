@@ -25,7 +25,7 @@
 
 ## 版本更新记录
 
-## Version 1.1.1
+### Version 1.1.1
 **2018/5/23**
 - 修正`DefaultPageControlPlugin`和`NumberPageControlPlugin`在`iPhoneX`上的偏移
 
