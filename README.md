@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.1.0-blue.svg)
+![](https://img.shields.io/badge/pod-v1.1.1-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # 特性
@@ -23,11 +23,11 @@
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 
-## 特别告示
-由于v1.0相比之前改动比较大，如果有疑问，请留言或直接联系我，我会尽可能提供帮助，谢谢~ 
-注：部分协议方法有改动。
-
 ## 版本更新记录
+
+## Version 1.1.1
+**2018/5/23**
+- 修正`DefaultPageControlPlugin`和`NumberPageControlPlugin`在`iPhoneX`上的偏移
 
 ### Version 1.1.0 
 **2018/5/22**
@@ -49,7 +49,7 @@
 
 ### Version 1.0.0 
 **2018/5/17**
-- 完成基础功能的设计实现
+- 完成基础功能的设计&实现
 
 ## 效果
 
@@ -102,16 +102,15 @@ PhotoBrowser.show(localImages: localImages, originPageIndex: index)
 ```swift
 let browser = PhotoBrowser()
 // 装配附加视图插件
-weak var weakBrowser = browser
 let overlayPlugin = OverlayPlugin()
-// 点击删除按钮回调
-overlayPlugin.didTouchDeleteButton = { [weak self] index in
-    self?.thumbnailImageUrls.remove(at: index)
-    self?.highQualityImageUrls.remove(at: index)
-    self?.collectionView?.reloadData()
-    weakBrowser?.reloadData()
+overlayPlugin.dataSourceProvider = { [unowned self] index in
+	// 附加视图数据源
+    return self.overlayModels[index]
 }
-browser.plugins.append(overlayPlugin)
+overlayPlugin.didTouchDeleteButton = { [unowned self] index in
+	// 删除操作
+}
+browser.cellPlugins.append(overlayPlugin)
 
 ```
 
