@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.1.1-blue.svg)
+![](https://img.shields.io/badge/pod-v1.1.2-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -23,6 +23,10 @@
 - [ ] 自定义图片加载器时不必引入`Kingfisher`
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
+
+# Special Notice
+> v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
+如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
 # Requirements
 - iOS 8.0+
@@ -165,10 +169,6 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
 ```
 
 # Version History
-
-## Special Notice
-> v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
-如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
 ## Version 1.1.1
 **2018/5/23**

@@ -423,10 +423,18 @@ extension PhotoBrowser: UICollectionViewDelegate {
 extension PhotoBrowser: UIViewControllerTransitioningDelegate {
     /// 提供进场动画
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        // 立即布局
+        setupViews()
+        layoutViews()
+        // 立即加载collectionView
+        let indexPath = IndexPath(item: currentIndex, section: 0)
+        collectionView.reloadData()
+        collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+        collectionView.layoutIfNeeded()
         // 枚举动画类型
         switch animationType {
         case .scale:
-            return makeScalePresentationAnimator()
+            return makeScalePresentationAnimator(indexPath: indexPath)
         case .fade:
             return FadeAnimator()
         }
@@ -459,15 +467,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
     }
     
     /// 创建缩放型进场动画
-    private func makeScalePresentationAnimator() -> UIViewControllerAnimatedTransitioning {
-        // 立即布局
-        setupViews()
-        layoutViews()
-        // 立即加载collectionView
-        let indexPath = IndexPath(item: currentIndex, section: 0)
-        collectionView.reloadData()
-        collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
-        collectionView.layoutIfNeeded()
+    private func makeScalePresentationAnimator(indexPath: IndexPath) -> UIViewControllerAnimatedTransitioning {
         let cell = collectionView.cellForItem(at: indexPath) as? PhotoBrowserCell
         let imageView = UIImageView(image: cell?.imageView.image)
         imageView.contentMode = imageScaleMode
