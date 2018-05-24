@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/pod-v1.1.1-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
-# 特性
+# Features
 - [x] 支持缩放式转场动画
 - [x] 支持淡入淡出式转场动画
 - [x] 支持下滑手势渐变关闭浏览器
@@ -24,11 +24,11 @@
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 
-# 要求
+# Requirements
 - iOS 8.0+
 - Swift 4
 
-# 安装
+# Installation
 
 ## CocoaPods
 更新你的本地仓库以同步最新版本
@@ -47,9 +47,9 @@ github "onevcat/Kingfisher"
 github "JiongXing/PhotoBrowser"
 ```
 
-# 版本更新记录
+# Version History
 
-## 特别通知
+## Special Notice
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
