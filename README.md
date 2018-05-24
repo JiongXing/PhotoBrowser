@@ -47,8 +47,6 @@ github "onevcat/Kingfisher"
 github "JiongXing/PhotoBrowser"
 ```
 
-## Use Effect
-
 ![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
 
 # Usage
