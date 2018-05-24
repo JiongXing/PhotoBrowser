@@ -20,6 +20,7 @@
 - [x] 插件式集成数字型的页码指示器
 - [x] 插件式集成图片加载进度指示器
 - [x] 插件式集成查看原图按钮
+- [ ] 自定义图片加载器时不必引入`Kingfisher`
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 
@@ -104,11 +105,11 @@ let browser = PhotoBrowser()
 // 装配附加视图插件
 let overlayPlugin = OverlayPlugin()
 overlayPlugin.dataSourceProvider = { [unowned self] index in
-	// 附加视图数据源
+    // 附加视图数据源
     return self.overlayModels[index]
 }
 overlayPlugin.didTouchDeleteButton = { [unowned self] index in
-	// 删除操作
+    // 删除操作
 }
 browser.cellPlugins.append(overlayPlugin)
 
