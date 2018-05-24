@@ -47,43 +47,11 @@ github "onevcat/Kingfisher"
 github "JiongXing/PhotoBrowser"
 ```
 
-# Version History
-
-## Special Notice
-> v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
-如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
-
-## Version 1.1.1
-**2018/5/23**
-- 修正`DefaultPageControlPlugin`和`NumberPageControlPlugin`在`iPhoneX`上的偏移
-
-## Version 1.1.0 
-**2018/5/22**
-- 重构本地图片浏览方法
-    - 由原来的通过协议方式取本地图片，改为直接在打开图片浏览时传入图片组
-    - 删除`PhotoBrowserDelegate.photoBrowser(_:, localImageForIndex:)`
-    - 新增`PhotoBrowser.localImages`属性，接收传入的图片组
-    - 新增`PhotoBrowser.show(localImages:)`类方法，一行代码打开图片浏览器
-- 新增`PhotoBrowser.deleteItem(at index: Int)`，支持删除动画
-- 优化`PhotoBrowser.reloadData`，更好支持数据源删减操作
-- 优化`PhotoBrowser.viewWillTransition`，处理屏幕旋转
-- 优化`PhotoBrowser.viewDidLayoutSubviews`
-- 优化`PhotoBrowser.dismiss`，修复状态栏显示问题
-- `PhotoBrowser.photoLoader`属性不再是可选，必须给值
-- 为了更准确表达方法含义，重命名以下协议方法（请原谅我再一次改方法名 >o<）：
-    - `PhotoBrowserPlugin`协议：`photoBrowser(_:, scrollView:)`重命名为`photoBrowser(_:, scrollViewDidScroll:)`
-    - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originViewForIndex:)`重命名为`photoBrowser(_:, thumbnailViewForIndex:)`
-    - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originImageForIndex:)`重命名为`photoBrowser(_:, thumbnailImageForIndex:)`
-
-## Version 1.0.0 
-**2018/5/17**
-- 完成基础功能的设计&实现
-
-## 效果
+## Use Effect
 
 ![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
 
-# 使用
+# Usage
 
 ## 初始化 & 展示
 
@@ -197,6 +165,38 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
     photoBrowser.present(actionSheet, animated: true, completion: nil)
 }
 ```
+
+# Version History
+
+## Special Notice
+> v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
+如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
+
+## Version 1.1.1
+**2018/5/23**
+- 修正`DefaultPageControlPlugin`和`NumberPageControlPlugin`在`iPhoneX`上的偏移
+
+## Version 1.1.0 
+**2018/5/22**
+- 重构本地图片浏览方法
+    - 由原来的通过协议方式取本地图片，改为直接在打开图片浏览时传入图片组
+    - 删除`PhotoBrowserDelegate.photoBrowser(_:, localImageForIndex:)`
+    - 新增`PhotoBrowser.localImages`属性，接收传入的图片组
+    - 新增`PhotoBrowser.show(localImages:)`类方法，一行代码打开图片浏览器
+- 新增`PhotoBrowser.deleteItem(at index: Int)`，支持删除动画
+- 优化`PhotoBrowser.reloadData`，更好支持数据源删减操作
+- 优化`PhotoBrowser.viewWillTransition`，处理屏幕旋转
+- 优化`PhotoBrowser.viewDidLayoutSubviews`
+- 优化`PhotoBrowser.dismiss`，修复状态栏显示问题
+- `PhotoBrowser.photoLoader`属性不再是可选，必须给值
+- 为了更准确表达方法含义，重命名以下协议方法（请原谅我再一次改方法名 >o<）：
+    - `PhotoBrowserPlugin`协议：`photoBrowser(_:, scrollView:)`重命名为`photoBrowser(_:, scrollViewDidScroll:)`
+    - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originViewForIndex:)`重命名为`photoBrowser(_:, thumbnailViewForIndex:)`
+    - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originImageForIndex:)`重命名为`photoBrowser(_:, thumbnailImageForIndex:)`
+
+## Version 1.0.0 
+**2018/5/17**
+- 完成基础功能的设计&实现
 
 # 以下是初版实现原理
 # 缘起
