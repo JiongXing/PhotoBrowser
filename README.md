@@ -170,6 +170,10 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
 
 # Version History
 
+## Version 1.1.2
+**2018/5/24**
+- 修复`.fade模式`下的`originPageIndex`无效问题
+
 ## Version 1.1.1
 **2018/5/23**
 - 修正`DefaultPageControlPlugin`和`NumberPageControlPlugin`在`iPhoneX`上的偏移
