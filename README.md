@@ -24,17 +24,40 @@
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 
-## 版本更新记录
+# Requirements
+- iOS 8.0+
+- Swift 4
 
-### 特别通知
+# Installation
+
+## CocoaPods
+更新你的本地仓库以同步最新版本
+```
+pod repo update
+```
+在你项目的Podfile中配置
+```
+pod 'JXPhotoBrowser'
+```
+
+## Carthage
+本库依赖Kingfisher，需一并引入。在你项目的Cartfile中配置
+```
+github "onevcat/Kingfisher"
+github "JiongXing/PhotoBrowser"
+```
+
+# 版本更新记录
+
+## 特别通知
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
-### Version 1.1.1
+## Version 1.1.1
 **2018/5/23**
 - 修正`DefaultPageControlPlugin`和`NumberPageControlPlugin`在`iPhoneX`上的偏移
 
-### Version 1.1.0 
+## Version 1.1.0 
 **2018/5/22**
 - 重构本地图片浏览方法
     - 由原来的通过协议方式取本地图片，改为直接在打开图片浏览时传入图片组
@@ -52,7 +75,7 @@
     - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originViewForIndex:)`重命名为`photoBrowser(_:, thumbnailViewForIndex:)`
     - `PhotoPhotoBrowserDelegate`协议：`photoBrowser(_:, originImageForIndex:)`重命名为`photoBrowser(_:, thumbnailImageForIndex:)`
 
-### Version 1.0.0 
+## Version 1.0.0 
 **2018/5/17**
 - 完成基础功能的设计&实现
 
@@ -173,29 +196,6 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
     actionSheet.addAction(cancelAction)
     photoBrowser.present(actionSheet, animated: true, completion: nil)
 }
-```
-
-# Requirements
-- iOS 8.0+
-- Swift 4
-
-# Installation
-
-## CocoaPods
-更新你的本地仓库以同步最新版本
-```
-pod repo update
-```
-在你项目的Podfile中配置
-```
-pod 'JXPhotoBrowser'
-```
-
-## Carthage
-本库依赖Kingfisher，需一并引入。在你项目的Cartfile中配置
-```
-github "onevcat/Kingfisher"
-github "JiongXing/PhotoBrowser"
 ```
 
 # 以下是初版实现原理
