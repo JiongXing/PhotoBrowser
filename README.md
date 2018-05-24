@@ -24,11 +24,11 @@
 - [ ] 支持浏览短视频
 - [ ] 支持 React Native 
 
-# Requirements
+# 要求
 - iOS 8.0+
 - Swift 4
 
-# Installation
+# 安装
 
 ## CocoaPods
 更新你的本地仓库以同步最新版本
