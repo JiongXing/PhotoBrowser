@@ -10,8 +10,9 @@ import Foundation
 /// 光点型页码指示器
 open class DefaultPageControlPlugin: PhotoBrowserPlugin {
     
-    /// 中心点Y坐标，距离底部值
-    open var centerBottomY: CGFloat = 20
+    /// 可指定中心点Y坐标，距离底部值。
+    /// 若不指定，默认为20
+    open var centerBottomY: CGFloat?
     
     /// 页码指示器
     open lazy var pageControl: UIPageControl = {
@@ -56,11 +57,21 @@ open class DefaultPageControlPlugin: PhotoBrowserPlugin {
         pageControl.currentPage = currentPage
         pageControl.sizeToFit()
         guard let superView = pageControl.superview else { return }
+        pageControl.center = CGPoint(x: superView.bounds.midX,
+                                     y: superView.bounds.maxY - pageControlBottomOffsetY)
+    }
+    
+    private var pageControlBottomOffsetY: CGFloat {
+        if let bottomY = centerBottomY {
+            return bottomY
+        }
+        guard let superView = pageControl.superview else {
+            return 0
+        }
         var offsetY: CGFloat = 0
         if #available(iOS 11.0, *) {
             offsetY = superView.safeAreaInsets.bottom
         }
-        pageControl.center = CGPoint(x: superView.bounds.midX,
-                                     y: superView.bounds.maxY - (centerBottomY + offsetY))
+        return 20 + offsetY
     }
 }

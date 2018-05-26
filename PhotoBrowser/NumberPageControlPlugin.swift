@@ -15,8 +15,9 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
     /// 字颜色
     open var textColor = UIColor.white
     
-    /// 中心点Y坐标
-    open var centerY: CGFloat = 20
+    /// 可指定中心点Y坐标
+    /// 若不指定，默认为20
+    open var centerY: CGFloat?
     
     /// 数字指示
     open lazy var numberLabel: UILabel = {
@@ -61,11 +62,21 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
         numberLabel.text = "\(currentPage + 1) / \(totalPages)"
         numberLabel.sizeToFit()
         guard let superView = numberLabel.superview else { return }
+        numberLabel.center = CGPoint(x: superView.bounds.midX,
+                                     y: superView.bounds.minY + pageControlOffsetY)
+    }
+    
+    private var pageControlOffsetY: CGFloat {
+        if let centerY = centerY {
+            return centerY
+        }
+        guard let superView = numberLabel.superview else {
+            return 0
+        }
         var offsetY: CGFloat = 0
         if #available(iOS 11.0, *) {
             offsetY = superView.safeAreaInsets.top
         }
-        numberLabel.center = CGPoint(x: superView.bounds.midX,
-                                     y: superView.bounds.minY + (centerY + offsetY))
+        return 20 + offsetY
     }
 }
