@@ -11,69 +11,69 @@ import UIKit
 public protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     /// 拖动时回调。scale:缩放比率
     func photoBrowserCell(_ cell: PhotoBrowserCell, didPanScale scale: CGFloat)
-    
+
     /// 单击时回调
     func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?)
-    
+
     /// 长按时回调
     func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
-    
+
     /// Layout 时回调
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell)
-    
+
     /// 设置图片资源时回调
     func photoBrowserCellSetImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?)
-    
+
     /// 即将加载图片
     func photoBrowserCellWillLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
-    
+
     /// 正在加载图片
     func photoBrowserCellLoadingImage(_ cell: PhotoBrowserCell, receivedSize: Int64, totalSize: Int64)
-    
+
     /// 加载图片完成
     func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
 }
 
 open class PhotoBrowserCell: UICollectionViewCell {
-    
+
     //
     // MARK: - Public
     //
-    
+
     /// 可用来关联插件对象
     open var associatedObjects: [String: Any] = [:]
-    
+
     /// 代理
     open weak var cellDelegate: PhotoBrowserCellDelegate?
-    
+
     /// 网络图片加载器
     open var photoLoader: PhotoLoader?
-    
+
     /// 显示图像
     open let imageView = UIImageView()
-    
+
     /// 保存原图url，用于点查看原图时使用
     open var rawUrl: URL?
-    
+
     /// 捏合手势放大图片时的最大允许比例
     open var imageMaximumZoomScale: CGFloat = 2.0 {
         didSet {
             self.scrollView.maximumZoomScale = imageMaximumZoomScale
         }
     }
-    
+
     /// 双击放大图片时的目标比例
     open var imageZoomScaleForDoubleTap: CGFloat = 2.0
-    
+
     //
     // MARK: - Private
     //
-    
+
     /// 内嵌容器。本类不能继承UIScrollView。
     /// 因为实测UIScrollView遵循了UIGestureRecognizerDelegate协议，而本类也需要遵循此协议，
     /// 若继承UIScrollView则会覆盖UIScrollView的协议实现，故只内嵌而不继承。
     open let scrollView = UIScrollView()
-    
+
     /// 计算contentSize应处于的中心位置
     private var centerOfContentSize: CGPoint {
         let deltaWidth = bounds.width - scrollView.contentSize.width
@@ -83,7 +83,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
         return CGPoint(x: scrollView.contentSize.width * 0.5 + offsetX,
                        y: scrollView.contentSize.height * 0.5 + offsetY)
     }
-    
+
     /// 取图片适屏size
     private var fitSize: CGSize {
         guard let image = imageView.image else {
@@ -93,24 +93,24 @@ open class PhotoBrowserCell: UICollectionViewCell {
         let scale = image.size.height / image.size.width
         return CGSize(width: width, height: scale * width)
     }
-    
+
     /// 取图片适屏frame
     private var fitFrame: CGRect {
         let size = fitSize
         let y = (scrollView.bounds.height - size.height) > 0 ? (scrollView.bounds.height - size.height) * 0.5 : 0
         return CGRect(x: 0, y: y, width: size.width, height: size.height)
     }
-    
+
     /// 记录pan手势开始时imageView的位置
     private var beganFrame = CGRect.zero
-    
+
     /// 记录pan手势开始时，手势位置
     private var beganTouch = CGPoint.zero
-    
+
     //
     // MARK: - Life Cycle
     //
-    
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(scrollView)
@@ -124,36 +124,36 @@ open class PhotoBrowserCell: UICollectionViewCell {
 
         scrollView.addSubview(imageView)
         imageView.clipsToBounds = true
-        
+
         // 长按手势
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
         contentView.addGestureRecognizer(longPress)
-        
+
         // 双击手势
         let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleTap(_:)))
         doubleTap.numberOfTapsRequired = 2
         contentView.addGestureRecognizer(doubleTap)
-        
+
         // 单击手势
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(onSingleTap))
         contentView.addGestureRecognizer(singleTap)
         singleTap.require(toFail: doubleTap)
-        
+
         // 拖动手势
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
         pan.delegate = self
         scrollView.addGestureRecognizer(pan)
     }
-    
+
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     open override func layoutSubviews() {
         super.layoutSubviews()
         layout()
     }
-    
+
     /// 布局
     private func layout() {
         scrollView.frame = contentView.bounds
@@ -163,18 +163,18 @@ open class PhotoBrowserCell: UICollectionViewCell {
 
         cellDelegate?.photoBrowserCellDidLayout(self)
     }
-    
+
     //
     // MARK: - Load Data
     //
-    
+
     /// 设置图片资源
     func setImage(_ placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 保存/更新原图url
         self.rawUrl = rawUrl
-        
+
         cellDelegate?.photoBrowserCellSetImage(self, placeholder: placeholder, highQualityUrl: highQualityUrl, rawUrl: rawUrl)
-        
+
         // 若存在原图缓存，直接显示原图
         if let url = rawUrl,
             let isCached = photoLoader?.isImageCached(on: imageView, url: url),
@@ -184,14 +184,14 @@ open class PhotoBrowserCell: UICollectionViewCell {
             })
             return
         }
-        
+
         // 加载大图
         loadImage(withPlaceholder: placeholder, url: highQualityUrl, completion: { [weak self] in
             self?.layout()
         })
         layout()
     }
-    
+
     /// 加载图片
     private func loadImage(withPlaceholder placeholder: UIImage?, url: URL?, completion: (() -> Void)?) {
         cellDelegate?.photoBrowserCellWillLoadImage(self, placeholder: placeholder, url: url)
@@ -208,7 +208,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
                 }
         })
     }
-    
+
     /// 加载原图
     open func loadRawImage() {
         guard let url = rawUrl else { return }
@@ -229,7 +229,7 @@ extension PhotoBrowserCell {
             dlg.photoBrowserCell(self, didSingleTap: imageView.image)
         }
     }
-    
+
     /// 响应双击
     @objc open func onDoubleTap(_ dbTap: UITapGestureRecognizer) {
         // 如果当前没有任何缩放，则放大到目标比例
@@ -246,7 +246,7 @@ extension PhotoBrowserCell {
             scrollView.setZoomScale(1.0, animated: true)
         }
     }
-    
+
     /// 响应拖动
     @objc open func onPan(_ pan: UIPanGestureRecognizer) {
         guard imageView.image != nil else {
@@ -276,31 +276,31 @@ extension PhotoBrowserCell {
             endPan()
         }
     }
-    
+
     private func panResult(_ pan: UIPanGestureRecognizer) -> (CGRect, CGFloat) {
         // 拖动偏移量
         let translation = pan.translation(in: scrollView)
         let currentTouch = pan.location(in: scrollView)
-        
+
         // 由下拉的偏移值决定缩放比例，越往下偏移，缩得越小。scale值区间[0.3, 1.0]
         let scale = min(1.0, max(0.3, 1 - translation.y / bounds.height))
-        
+
         let width = beganFrame.size.width * scale
         let height = beganFrame.size.height * scale
-        
+
         // 计算x和y。保持手指在图片上的相对位置不变。
         // 即如果手势开始时，手指在图片X轴三分之一处，那么在移动图片时，保持手指始终位于图片X轴的三分之一处
         let xRate = (beganTouch.x - beganFrame.origin.x) / beganFrame.size.width
         let currentTouchDeltaX = xRate * width
         let x = currentTouch.x - currentTouchDeltaX
-        
+
         let yRate = (beganTouch.y - beganFrame.origin.y) / beganFrame.size.height
         let currentTouchDeltaY = yRate * height
         let y = currentTouch.y - currentTouchDeltaY
-        
+
         return (CGRect(x: x, y: y, width: width, height: height), scale)
     }
-    
+
     private func endPan() {
         if let dlg = cellDelegate {
             dlg.photoBrowserCell(self, didPanScale: 1.0)
@@ -316,7 +316,7 @@ extension PhotoBrowserCell {
             }
         }
     }
-    
+
     /// 响应长按
     @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
         if press.state == .began, let dlg = cellDelegate, let image = imageView.image {
@@ -333,7 +333,7 @@ extension PhotoBrowserCell: UIScrollViewDelegate {
     open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
-    
+
     open func scrollViewDidZoom(_ scrollView: UIScrollView) {
         imageView.center = centerOfContentSize
     }

@@ -1,4 +1,3 @@
-
 //
 //  MomentsViewController.swift
 //  PhotoBrowser
@@ -8,13 +7,14 @@
 //
 
 import UIKit
+import JXPhotoBrowser
 
 class MomentsViewController: UITableViewController {
-    
+
     private var thumbnailImageSections: [[String]] = []
     private var highQualityImageSections: [[String]] = []
     private var overlayModelSections: [[OverlayModel]] = []
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         (0..<6).forEach { _ in
@@ -53,32 +53,32 @@ class MomentsViewController: UITableViewController {
             OverlayModel(showButton: true, text: "   抱抱大腿~"),
             OverlayModel(showButton: true, text: nil)
         ]
-        tableView.register(MomentsTableViewCell.self, forCellReuseIdentifier: NSStringFromClass(MomentsTableViewCell.self))
+        tableView.register(MomentsTableViewCell.self, forCellReuseIdentifier: String(describing: MomentsTableViewCell.self))
         tableView.tableFooterView = UIView()
     }
-    
+
     override var shouldAutorotate: Bool {
         return true
     }
-    
+
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .all
     }
-    
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         DispatchQueue.main.asyncAfter(deadline: .now() + coordinator.transitionDuration) {
             self.tableView.reloadData()
         }
     }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return thumbnailImageSections.count
     }
-    
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = (tableView.dequeueReusableCell(withIdentifier:
-            NSStringFromClass(MomentsTableViewCell.self)) as? MomentsTableViewCell)
+            String(describing: MomentsTableViewCell.self)) as? MomentsTableViewCell)
             ?? MomentsTableViewCell()
         cell.didTouchDeleteButton = { [weak self] index in
             self?.thumbnailImageSections[indexPath.row].remove(at: index)
@@ -91,16 +91,16 @@ class MomentsViewController: UITableViewController {
         cell.reloadData()
         return cell
     }
-    
+
     private func configureCellData(cell: MomentsTableViewCell, indexPath: IndexPath) {
         cell.thumbnailImageUrls = thumbnailImageSections[indexPath.row]
         cell.highQualityImageUrls = highQualityImageSections[indexPath.row]
         cell.overlayModels = overlayModelSections[indexPath.row]
     }
-    
+
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let cell = (tableView.dequeueReusableCell(withIdentifier:
-            NSStringFromClass(MomentsTableViewCell.self)) as? MomentsTableViewCell)
+            String(describing: MomentsTableViewCell.self)) as? MomentsTableViewCell)
             ?? MomentsTableViewCell()
         return cell.height(for: tableView.bounds.width)
     }

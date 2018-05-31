@@ -11,14 +11,14 @@ import Foundation
 open class NumberPageControlPlugin: PhotoBrowserPlugin {
     /// 字体
     open var font = UIFont.systemFont(ofSize: 17)
-    
+
     /// 字颜色
     open var textColor = UIColor.white
-    
+
     /// 可指定中心点Y坐标
     /// 若不指定，默认为20
     open var centerY: CGFloat?
-    
+
     /// 数字指示
     open lazy var numberLabel: UILabel = {
         let view = UILabel()
@@ -26,25 +26,25 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
         view.textColor = textColor
         return view
     }()
-    
+
     /// 总页码
     open var totalPages = 0
-    
+
     /// 当前页码
     open var currentPage = 0
-    
+
     public init() {}
-    
+
     open func photoBrowser(_ photoBrowser: PhotoBrowser, numberOfPhotos count: Int) {
         totalPages = count
         layout()
     }
-    
+
     open func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int) {
         currentPage = index
         layout()
     }
-    
+
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidAppear view: UIView, animated: Bool) {
         // 页面出来后，再显示页码指示器
         // 多于一张图才显示
@@ -52,12 +52,12 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
             view.addSubview(numberLabel)
         }
     }
-    
+
     open func photoBrowser(_ photoBrowser: PhotoBrowser, viewDidLayoutSubviews view: UIView) {
         layout()
         numberLabel.isHidden = totalPages <= 1
     }
-    
+
     private func layout() {
         numberLabel.text = "\(currentPage + 1) / \(totalPages)"
         numberLabel.sizeToFit()
@@ -65,7 +65,7 @@ open class NumberPageControlPlugin: PhotoBrowserPlugin {
         numberLabel.center = CGPoint(x: superView.bounds.midX,
                                      y: superView.bounds.minY + pageControlOffsetY)
     }
-    
+
     private var pageControlOffsetY: CGFloat {
         if let centerY = centerY {
             return centerY

@@ -15,12 +15,12 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
             cell.associatedObjects["RawImageButton"] = makeRawImageButton()
         }
     }
-    
+
     public func photoBrowserCellSetImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, highQualityUrl: URL?, rawUrl: URL?) {
         // 隐藏按钮
         rawImageButton(for: cell)?.isHidden = true
     }
-    
+
     public func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
         if let button = rawImageButton(for: cell), !button.isHidden {
             cell.contentView.addSubview(button)
@@ -30,7 +30,7 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
                                     y: cell.contentView.bounds.height - 25 - button.bounds.height)
         }
     }
-    
+
     public func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?) {
         if let rawUrl = cell.rawUrl {
             if let url = url, url != rawUrl {
@@ -39,11 +39,11 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
             }
         }
     }
-    
+
     private func rawImageButton(for cell: PhotoBrowserCell) -> UIButton? {
         return cell.associatedObjects["RawImageButton"] as? UIButton
     }
-    
+
     private func makeRawImageButton() -> UIButton {
         let button = UIButton(type: .custom)
         button.setTitleColor(UIColor.white, for: .normal)
@@ -58,7 +58,7 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
         button.addTarget(self, action: #selector(onRawImageButton), for: .touchUpInside)
         return button
     }
-    
+
     /// 响应查看原图按钮
     @objc open func onRawImageButton(_ button: UIButton) {
         var photoBrowserCell: PhotoBrowserCell? = nil
