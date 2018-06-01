@@ -13,11 +13,11 @@ class ScalePresentationController: UIPresentationController {
     /// 动画结束后需要隐藏的view
     var currentHiddenView: UIView?
 
+    /// 转场动画开始前，是否隐藏view
+    var prefersRelatedViewHidden: Bool = true
+
     /// 暂存需隐藏的view的原alpha值
     private var currentHiddenViewOriginAlpha: CGFloat?
-
-    /// 动画开始前，是否隐藏原来的关联试图
-    private var hideRelatedView: Bool = true
 
     /// 蒙板
     private var maskView: UIView = {
@@ -27,14 +27,13 @@ class ScalePresentationController: UIPresentationController {
     }()
 
     /// 更新动画结束后需要隐藏的view
-    func updateCurrentHiddenView(_ view: UIView?, hideRelatedView: Bool) {
+    func updateCurrentHiddenView(_ view: UIView?) {
         // 重新显示前一个隐藏视图。??后的1.0不会生效，仅为语法而写。
         currentHiddenView?.alpha = currentHiddenViewOriginAlpha ?? 1.0
         // 隐藏新视图
         currentHiddenView = view
         currentHiddenViewOriginAlpha = view?.alpha
-        self.hideRelatedView = hideRelatedView
-        view?.alpha = hideRelatedView ? 0.01 : 1.0
+        view?.alpha = prefersRelatedViewHidden ? 0.01 : 1.0
     }
     override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
@@ -44,7 +43,7 @@ class ScalePresentationController: UIPresentationController {
         maskView.frame = containerView.bounds
         maskView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         maskView.alpha = 0
-        if hideRelatedView {
+        if prefersRelatedViewHidden {
             currentHiddenView?.alpha = 0.01
         }
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
@@ -54,13 +53,13 @@ class ScalePresentationController: UIPresentationController {
 
     override func dismissalTransitionWillBegin() {
         super.dismissalTransitionWillBegin()
-        if hideRelatedView {
+        if prefersRelatedViewHidden {
             currentHiddenView?.alpha = 0.01
         }
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
             self.maskView.alpha = 0
         }, completion: { _ in
-            self.currentHiddenView?.alpha = 1.0
+            self.currentHiddenView?.alpha = self.currentHiddenViewOriginAlpha ?? 1.0
         })
     }
 }

@@ -33,7 +33,10 @@ open class PhotoBrowser: UIViewController {
     open var imageZoomScaleForDoubleTap: CGFloat = 2.0
 
     /// 转场动画类型
-    open var animationType: AnimationType = .scale(hideRelatedView: true)
+    open var animationType: AnimationType = .scale
+
+    /// 动画类型为scale时，原来的视图是否隐藏
+    open var prefersRelatedViewHidden: Bool = true
 
     /// 打开时的初始页码，第一页为 0.
     open var originPageIndex: Int = 0
@@ -55,9 +58,7 @@ open class PhotoBrowser: UIViewController {
     /// 当前显示的图片序号，从0开始
     private var currentIndex = 0 {
         didSet {
-            if case let .scale(hideRelatedView) = self.animationType {
-                scalePresentationController?.updateCurrentHiddenView(relatedView, hideRelatedView: hideRelatedView)
-            }
+            scalePresentationController?.updateCurrentHiddenView(relatedView)
             plugins.forEach {
                 $0.photoBrowser(self, didChangedPageIndex: currentIndex)
             }
@@ -119,7 +120,7 @@ open class PhotoBrowser: UIViewController {
     /// - parameter delegate: 浏览器协议代理
     /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
-    public init(animationType: AnimationType = .scale(hideRelatedView: true),
+    public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
                 photoLoader: PhotoLoader = KingfisherPhotoLoader(),
                 originPageIndex: Int = 0) {
@@ -167,7 +168,7 @@ open class PhotoBrowser: UIViewController {
     /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层VC。
     /// - returns:  所创建的图片浏览器
     @discardableResult
-    open class func show(animationType: AnimationType = .scale(hideRelatedView: true),
+    open class func show(animationType: AnimationType = .scale,
                          delegate: PhotoBrowserDelegate,
                          photoLoader: PhotoLoader = KingfisherPhotoLoader(),
                          plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
@@ -457,6 +458,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
         switch animationType {
         case .scale:
             let controller = ScalePresentationController(presentedViewController: presented, presenting: presenting)
+            controller.prefersRelatedViewHidden = prefersRelatedViewHidden
             controller.currentHiddenView = relatedView
             fadePresentationController = controller
             scalePresentationController = controller
