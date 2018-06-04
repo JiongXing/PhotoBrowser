@@ -210,7 +210,8 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
 
 # 初版实现思路
 
-[传送门](BLOG.md)
+记录了初版实现思路：[ARTICLE](ARTICLE.md)
 
+# 感谢
 
 若使用过程中有任何问题，请issues我。 ^_^
