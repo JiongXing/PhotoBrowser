@@ -9,15 +9,15 @@ import Foundation
 
 /// 透明渐变动画
 class FadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-    
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.25
     }
-    
+
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         // 转场容器
         let containerView = transitionContext.containerView
-        
+
         // 判断是 presentataion 动画还是 dismissal 动画
         guard let fromVC = transitionContext.viewController(forKey: .from),
             let toVC = transitionContext.viewController(forKey: .to) else {
@@ -26,7 +26,7 @@ class FadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                 return
         }
         let presentation = (toVC.presentingViewController == fromVC)
-        
+
         // 取所要打开的控制器视图
         guard let openingView = transitionContext.view(forKey: presentation ? .to : .from) else {
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)

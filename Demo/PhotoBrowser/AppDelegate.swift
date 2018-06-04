@@ -4,7 +4,7 @@
 //
 //  Created by JiongXing on 2017/3/9.
 //  Copyright © 2017年 JiongXing. All rights reserved.
-//
+//  
 
 import UIKit
 
@@ -13,17 +13,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = MomentsViewController()
         window.backgroundColor = UIColor.white
-        
+
         self.window = window
         window.makeKeyAndVisible()
         return true
     }
-    
+
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return .all
     }
@@ -50,6 +49,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
 }
-

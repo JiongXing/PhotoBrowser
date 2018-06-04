@@ -11,13 +11,13 @@ import JXPhotoBrowser
 
 /// 附加视图插件
 class OverlayPlugin: PhotoBrowserCellPlugin {
-    
+
     /// 点删除按钮回调
     var didTouchDeleteButton: ((_ index: Int) -> Void)?
-    
+
     /// 视图数据源
     var dataSourceProvider: ((_ index: Int) -> OverlayModel)?
-    
+
     /// 每次取复用 cell 时会调用
     func photoBrowserCellDidReused(_ cell: PhotoBrowserCell, at index: Int) {
         let additionalView = (cell.associatedObjects["OverlayPlugin"] as? OverlayView) ?? {
@@ -34,7 +34,7 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
         }
         additionalView.index = index
     }
-    
+
     /// PhotoBrowserCell 执行布局方法时调用
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell) {
         if let view = cell.associatedObjects["OverlayPlugin"] as? OverlayView {
@@ -45,14 +45,14 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
                                 height: height)
         }
     }
-    
+
     class OverlayView: UIView {
         /// 所在 cell 索引
         var index = 0
-        
+
         /// 点删除按钮回调
         var didTouchDeleteButton: ((_ index: Int) -> Void)?
-        
+
         /// 文本视图
         lazy var label: UILabel = {
             let lab = UILabel()
@@ -62,7 +62,7 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
             lab.numberOfLines = 0
             return lab
         }()
-        
+
         /// 按钮
         lazy var button: UIButton = {
             let btn = UIButton(type: .custom)
@@ -71,18 +71,18 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
             btn.setTitle("删除", for: .normal)
             return btn
         }()
-        
+
         init() {
             super.init(frame: .zero)
             addSubview(label)
             addSubview(button)
             button.addTarget(self, action: #selector(onButton), for: .touchUpInside)
         }
-        
+
         required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-        
+
         override func layoutSubviews() {
             super.layoutSubviews()
             label.frame = self.bounds
@@ -91,11 +91,11 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
             let y = self.bounds.height - 20 - button.bounds.height
             button.frame = CGRect(x: x, y: y, width: button.bounds.width, height: button.bounds.height)
         }
-        
+
         @objc private func onButton() {
             didTouchDeleteButton?(index)
         }
-        
+
         func configure(_ model: OverlayModel) {
             button.isHidden = !model.showButton
             label.text = model.text

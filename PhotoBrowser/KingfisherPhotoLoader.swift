@@ -9,9 +9,9 @@ import Foundation
 import Kingfisher
 
 open class KingfisherPhotoLoader: PhotoLoader {
-    
+
     public init() {}
-    
+
     open func isImageCached(on imageView: UIImageView, url: URL) -> Bool {
         let result = KingfisherManager.shared.cache.imageCachedType(forKey: url.cacheKey)
         switch result {
@@ -23,7 +23,7 @@ open class KingfisherPhotoLoader: PhotoLoader {
             return true
         }
     }
-    
+
     open func setImage(on imageView: UIImageView, url: URL?, placeholder: UIImage?, progressBlock: @escaping (Int64, Int64) -> Void, completionHandler: @escaping () -> Void) {
         imageView.kf.setImage(with: url, placeholder: placeholder, options: nil, progressBlock: { (receivedSize, totalSize) in
             progressBlock(receivedSize, totalSize)

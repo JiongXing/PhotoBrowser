@@ -9,7 +9,7 @@ import Foundation
 
 /// 转场协调器协议
 protocol PhotoBrowserPresentationController: class {
-    
+
     /// 蒙板 alpha 值
-    var maskAlpha: CGFloat { set get }
+    var maskAlpha: CGFloat { get set }
 }

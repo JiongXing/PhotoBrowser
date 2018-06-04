@@ -16,13 +16,13 @@ open class ProgressView: UIView {
             fanshapedLayer.path = makeProgressPath(progress).cgPath
         }
     }
-    
+
     /// 外边界
     private var circleLayer: CAShapeLayer!
-    
+
     /// 扇形区
     private var fanshapedLayer: CAShapeLayer!
-    
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
         if self.frame.size.equalTo(.zero) {
@@ -31,33 +31,33 @@ open class ProgressView: UIView {
         setupUI()
         progress = 0
     }
-    
+
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         backgroundColor = UIColor.clear
         let strokeColor = UIColor(white: 1, alpha: 0.8).cgColor
-        
+
         circleLayer = CAShapeLayer()
         circleLayer.strokeColor = strokeColor
         circleLayer.fillColor = UIColor.clear.cgColor
         circleLayer.path = makeCirclePath().cgPath
         layer.addSublayer(circleLayer)
-        
+
         fanshapedLayer = CAShapeLayer()
         fanshapedLayer.fillColor = strokeColor
         layer.addSublayer(fanshapedLayer)
     }
-    
+
     private func makeCirclePath() -> UIBezierPath {
         let arcCenter = CGPoint(x: bounds.midX, y: bounds.midY)
         let path = UIBezierPath(arcCenter: arcCenter, radius: 25, startAngle: 0, endAngle: CGFloat.pi * 2, clockwise: true)
         path.lineWidth = 2
         return path
     }
-    
+
     private func makeProgressPath(_ progress: CGFloat) -> UIBezierPath {
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
         let radius = bounds.midY - 2.5
