@@ -129,9 +129,8 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         // 创建图片浏览器
         let browser = PhotoBrowser()
         // 提供两种动画效果：缩放`.scale`和渐变`.fade`。
+        // 如果希望`scale`动画不要隐藏关联缩略图，可使用`.scaleNoHiding`。
         browser.animationType = .scale
-        // scale 模式下是否隐藏原来视图
-        browser.prefersRelatedViewHidden = true
         // 浏览器协议实现者
         browser.photoBrowserDelegate = self
         // 装配页码指示器插件，提供了两种PageControl实现，若需要其它样式，可参照着自由定制

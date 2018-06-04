@@ -35,9 +35,6 @@ open class PhotoBrowser: UIViewController {
     /// 转场动画类型
     open var animationType: AnimationType = .scale
 
-    /// 动画类型为scale时，原来的视图是否隐藏
-    open var prefersRelatedViewHidden: Bool = true
-
     /// 打开时的初始页码，第一页为 0.
     open var originPageIndex: Int = 0
 
@@ -58,7 +55,9 @@ open class PhotoBrowser: UIViewController {
     /// 当前显示的图片序号，从0开始
     private var currentIndex = 0 {
         didSet {
-            scalePresentationController?.updateCurrentHiddenView(relatedView)
+            if animationType == .scale {
+                scalePresentationController?.updateCurrentHiddenView(relatedView)
+            }
             plugins.forEach {
                 $0.photoBrowser(self, didChangedPageIndex: currentIndex)
             }
@@ -436,7 +435,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
         collectionView.layoutIfNeeded()
         // 枚举动画类型
         switch animationType {
-        case .scale:
+        case .scale, .scaleNoHiding:
             return makeScalePresentationAnimator(indexPath: indexPath)
         case .fade:
             return FadeAnimator()
@@ -446,7 +445,7 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
     /// 提供退场动画
     public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch animationType {
-        case .scale:
+        case .scale, .scaleNoHiding:
             return makeDismissedAnimator()
         case .fade:
             return FadeAnimator()
@@ -458,8 +457,12 @@ extension PhotoBrowser: UIViewControllerTransitioningDelegate {
         switch animationType {
         case .scale:
             let controller = ScalePresentationController(presentedViewController: presented, presenting: presenting)
-            controller.prefersRelatedViewHidden = prefersRelatedViewHidden
             controller.currentHiddenView = relatedView
+            fadePresentationController = controller
+            scalePresentationController = controller
+            return controller
+        case .scaleNoHiding:
+            let controller = ScalePresentationController(presentedViewController: presented, presenting: presenting)
             fadePresentationController = controller
             scalePresentationController = controller
             return controller

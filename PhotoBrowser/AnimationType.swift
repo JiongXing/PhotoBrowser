@@ -11,6 +11,8 @@ import Foundation
 public enum AnimationType {
     /// 缩放
     case scale
+    /// 缩放，不隐藏关联缩略图
+    case scaleNoHiding
     /// 透明渐变
     case fade
 }
