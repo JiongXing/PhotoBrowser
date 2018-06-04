@@ -28,31 +28,6 @@
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
-# Requirements
-- iOS 8.0+
-- Swift 4
-
-# Installation
-
-## CocoaPods
-更新你的本地仓库以同步最新版本
-```
-pod repo update
-```
-在你项目的Podfile中配置
-```
-pod 'JXPhotoBrowser'
-```
-
-## Carthage
-本库依赖Kingfisher，需一并引入。在你项目的Cartfile中配置
-```
-github "onevcat/Kingfisher"
-github "JiongXing/PhotoBrowser"
-```
-
-![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
-
 # Version History
 
 ## Version 1.2.0
@@ -91,6 +66,31 @@ github "JiongXing/PhotoBrowser"
 ## Version 1.0.0 
 **2018/5/17**
 - 完成基础功能的设计&实现
+
+# Requirements
+- iOS 8.0+
+- Swift 4
+
+# Installation
+
+## CocoaPods
+更新你的本地仓库以同步最新版本
+```
+pod repo update
+```
+在你项目的Podfile中配置
+```
+pod 'JXPhotoBrowser'
+```
+
+## Carthage
+本库依赖Kingfisher，需一并引入。在你项目的Cartfile中配置
+```
+github "onevcat/Kingfisher"
+github "JiongXing/PhotoBrowser"
+```
+
+![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
 
 # Usage
 
