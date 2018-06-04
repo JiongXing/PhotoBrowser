@@ -32,6 +32,7 @@ class ScalePresentationController: UIPresentationController {
         currentHiddenViewOriginAlpha = view?.alpha
         view?.alpha = 0.01
     }
+    
     override func presentationTransitionWillBegin() {
         super.presentationTransitionWillBegin()
         guard let containerView = self.containerView else { return }
