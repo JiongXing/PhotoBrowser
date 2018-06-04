@@ -39,6 +39,7 @@ open class PhotoBrowser: UIViewController {
     open var originPageIndex: Int = 0
 
     /// 本地图片组
+    /// 优先级高于代理方法`func photoBrowser(_:, localImageForIndex:) -> UIImage?`
     open var localImages: [UIImage]?
 
     /// 插件组
@@ -194,11 +195,16 @@ open class PhotoBrowser: UIViewController {
     @discardableResult
     open class func show(localImages: [UIImage],
                          animationType: AnimationType = .fade,
+                         delegate: PhotoBrowserDelegate? = nil,
+                         photoLoader: PhotoLoader = KingfisherPhotoLoader(),
                          plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                          originPageIndex: Int,
                          fromViewController: UIViewController? = TopMostViewControllerGetter.topMost
         ) -> PhotoBrowser {
-        let vc = PhotoBrowser(animationType: animationType, originPageIndex: originPageIndex)
+        let vc = PhotoBrowser(animationType: animationType,
+                              delegate: delegate,
+                              photoLoader: photoLoader,
+                              originPageIndex: originPageIndex)
         vc.localImages = localImages
         vc.plugins = plugins
         vc.show(from: fromViewController)
@@ -377,13 +383,15 @@ extension PhotoBrowser: UICollectionViewDataSource {
 
     /// 尝试取本地图片
     private func localImage(for index: Int) -> UIImage? {
-        guard let images = localImages else {
-            return nil
-        }
-        guard index < images.count else {
-            return nil
+        guard let images = localImages, index < images.count else {
+            return localImageFromDelegate(for: index)
         }
         return images[index]
+    }
+    
+    /// 通过代理取本地图片
+    private func localImageFromDelegate(for index: Int) -> UIImage? {
+        return photoBrowserDelegate?.photoBrowser(self, localImageForIndex: index)
     }
 
     private func imageFor(index: Int) -> (UIImage?, highQualityUrl: URL?, rawUrl: URL?) {

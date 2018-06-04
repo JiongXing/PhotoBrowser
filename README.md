@@ -134,6 +134,9 @@ browser.show()
 PhotoBrowser.show(localImages: localImages, originPageIndex: index)
 ```
 如果想使用`.scale`转场动画浏览本地图片，只需要传入`delegate`，然后实现`photoBrowser(_:, thumbnailViewForIndex:)`协议方法即可。
+```swift
+PhotoBrowser.show(localImages: localImages, animationType: .scale, delegate: self, originPageIndex: index)
+```
 
 如果想在浏览场景添加一些视图，你可以自己开发插件。
 例子给出了添加图片描述和图片删除按钮的做法：

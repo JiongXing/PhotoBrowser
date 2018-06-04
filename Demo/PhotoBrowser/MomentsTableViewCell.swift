@@ -158,8 +158,12 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         (0..<9).forEach { _ in
             localImages.append(UIImage(named: "xingkong")!)
         }
+        
         // 默认使用 .fade 转场动画，不需要实现任何协议方法
-        PhotoBrowser.show(localImages: localImages, originPageIndex: index)
+        // PhotoBrowser.show(localImages: localImages, originPageIndex: index)
+        
+        // 如果要使用 .scale，需要实现协议
+        PhotoBrowser.show(localImages: localImages, animationType: .scale, delegate: self, originPageIndex: index)
     }
 
     /// 装配附加视图插件
@@ -214,6 +218,10 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
          return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
          }*/
         return nil
+    }
+    
+    func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
+        return index == 2 ? UIImage(named: "xingkong") : nil
     }
 
     /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作

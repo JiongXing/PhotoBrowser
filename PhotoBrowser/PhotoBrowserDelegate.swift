@@ -26,6 +26,11 @@ public protocol PhotoBrowserDelegate: class {
 
     /// 实现本方法以返回原图级质量的 url。当本代理方法有返回值时，自动显示查看原图按钮。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL?
+    
+    /// 实现本方法以返回本地大图。
+    /// 本地图片的展示将优先于网络图片。
+    /// 如果给 PhotoBrowser 设置了本地图片组 localImages，则本方法不生效。
+    func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage?
 
     /// 长按时回调。可选
     func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage)
