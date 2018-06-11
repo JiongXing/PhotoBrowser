@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.3.0-blue.svg)
+![](https://img.shields.io/badge/pod-v1.3.1-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -28,6 +28,10 @@
 
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
+
+## Version 1.3.1
+**2018/06/11**
+- 修复取`TopMostViewController`可能不正确的问题。
 
 ## Version 1.3.0
 **2018/06/04**

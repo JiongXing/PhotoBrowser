@@ -8,22 +8,15 @@
 import UIKit
 
 public struct TopMostViewControllerGetter {
-    private static var sharedApplication: UIApplication? {
-        let selector = NSSelectorFromString("sharedApplication")
-        return UIApplication.perform(selector)?.takeUnretainedValue() as? UIApplication
-    }
-
     /// Returns the current application's top most view controller.
     public static var topMost: UIViewController? {
-        guard let currentWindows = self.sharedApplication?.windows else { return nil }
         var rootViewController: UIViewController?
-        for window in currentWindows {
+        for window in UIApplication.shared.windows where !window.isHidden {
             if let windowRootViewController = window.rootViewController {
                 rootViewController = windowRootViewController
                 break
             }
         }
-
         return self.topMost(of: rootViewController)
     }
 

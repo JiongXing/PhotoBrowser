@@ -28,6 +28,7 @@
 		8586CF77D6602139070D6A91 /* Pods_PhotoBrowserTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoBrowserTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		94329C38207DA25300C83E5C /* JXPhotoBrowser.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = JXPhotoBrowser.podspec; path = ../JXPhotoBrowser.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		94329C3A207DA5A800C83E5C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		943A5C6020CE4A0500B92D92 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentsPhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		9453916A1E713A4C00A9AF66 /* PhotoBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9453916D1E713A4C00A9AF66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -66,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				94329C3A207DA5A800C83E5C /* README.md */,
+				943A5C6020CE4A0500B92D92 /* CHANGELOG.md */,
 				94329C38207DA25300C83E5C /* JXPhotoBrowser.podspec */,
 			);
 			name = MetaData;

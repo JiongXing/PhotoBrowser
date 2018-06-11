@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.3.1
+**2018/06/11**
+- 修复取`TopMostViewController`可能不正确的问题。
+
 ## Version 1.3.0
 **2018/06/04**
 - 在`scale`转场模式下，可选择不隐藏关联缩略图。设置`animationType = .scaleNoHiding`即可。
