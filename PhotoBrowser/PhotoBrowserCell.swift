@@ -298,7 +298,7 @@ extension PhotoBrowserCell {
         let currentTouchDeltaY = yRate * height
         let y = currentTouch.y - currentTouchDeltaY
 
-        return (CGRect(x: x, y: y, width: width, height: height), scale)
+        return (CGRect(x: x.isNaN ? 0 : x, y: y.isNaN ? 0 : y, width: width, height: height), scale)
     }
 
     private func endPan() {
