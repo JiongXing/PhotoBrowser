@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.3.2
+**2018/06/17**
+- 修复`locationInView`返回`nan`导致 crash 的问题。
+
 ## Version 1.3.1
 **2018/06/11**
 - 修复取`TopMostViewController`可能不正确的问题。
