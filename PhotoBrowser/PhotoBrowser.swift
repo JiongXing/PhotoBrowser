@@ -140,6 +140,83 @@ open class PhotoBrowser: UIViewController {
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    //
+    // MARK: - Life Cycle
+    //
+    
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViews()
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidLoad: view)
+        }
+        currentIndex = originPageIndex
+    }
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // 遮盖状态栏
+        coverStatusBar(true)
+        plugins.forEach {
+            $0.photoBrowser(self, viewWillAppear: view, animated: animated)
+        }
+    }
+    
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidAppear: view, animated: animated)
+        }
+    }
+    
+    open override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        plugins.forEach {
+            $0.photoBrowser(self, viewWillLayoutSubviews: view)
+        }
+    }
+    
+    open override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        layoutViews()
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidLayoutSubviews: view)
+        }
+    }
+    
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        // 屏幕旋转处理
+        DispatchQueue.main.asyncAfter(deadline: .now() + coordinator.transitionDuration, execute: {
+            let indexPath = IndexPath(item: self.currentIndex, section: 0)
+            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
+        })
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        plugins.forEach {
+            $0.photoBrowser(self, viewWillDisappear: view)
+        }
+    }
+    
+    open override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        plugins.forEach {
+            $0.photoBrowser(self, viewDidDisappear: view)
+        }
+    }
+    
+    /// 支持旋转
+    open override var shouldAutorotate: Bool {
+        return true
+    }
+    
+    /// 支持旋转的方向
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .all
+    }
 
     //
     // MARK: - Public Methods
@@ -222,93 +299,13 @@ open class PhotoBrowser: UIViewController {
         collectionView.deleteItems(at: [IndexPath(row: index, section: 0)])
         checkAndRefreshCurrentIndex()
     }
-
-    /// 检查 numberOfItems，更新 currentIndex
-    private func checkAndRefreshCurrentIndex() {
-        let numberOfItems = collectionView.numberOfItems(inSection: 0)
-        if currentIndex > (numberOfItems - 1) {
-            currentIndex = numberOfItems - 1
+    
+    /// 加载某项的原图。要求处于当前显示中项才可以查看。
+    open func loadRawImage(at index: Int) {
+        if let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0))
+            as? PhotoBrowserCell {
+            cell.loadRawImage()
         }
-        if numberOfItems == 0 {
-            dismiss(animated: true)
-        }
-    }
-
-    //
-    // MARK: - Life Cycle
-    //
-
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        setupViews()
-        plugins.forEach {
-            $0.photoBrowser(self, viewDidLoad: view)
-        }
-        currentIndex = originPageIndex
-    }
-
-    open override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // 遮盖状态栏
-        coverStatusBar(true)
-        plugins.forEach {
-            $0.photoBrowser(self, viewWillAppear: view, animated: animated)
-        }
-    }
-
-    open override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        plugins.forEach {
-            $0.photoBrowser(self, viewDidAppear: view, animated: animated)
-        }
-    }
-
-    open override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        plugins.forEach {
-            $0.photoBrowser(self, viewWillLayoutSubviews: view)
-        }
-    }
-
-    open override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        layoutViews()
-        plugins.forEach {
-            $0.photoBrowser(self, viewDidLayoutSubviews: view)
-        }
-    }
-
-    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        // 屏幕旋转处理
-        DispatchQueue.main.asyncAfter(deadline: .now() + coordinator.transitionDuration, execute: {
-            let indexPath = IndexPath(item: self.currentIndex, section: 0)
-            self.collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
-        })
-    }
-
-    open override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        plugins.forEach {
-            $0.photoBrowser(self, viewWillDisappear: view)
-        }
-    }
-
-    open override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        plugins.forEach {
-            $0.photoBrowser(self, viewDidDisappear: view)
-        }
-    }
-
-    /// 支持旋转
-    open override var shouldAutorotate: Bool {
-        return true
-    }
-
-    /// 支持旋转的方向
-    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .all
     }
 
     //
@@ -341,6 +338,17 @@ open class PhotoBrowser: UIViewController {
             return
         }
         window.windowLevel = cover ? UIWindowLevelStatusBar + 1 : originLevel
+    }
+    
+    /// 检查 numberOfItems，更新 currentIndex
+    private func checkAndRefreshCurrentIndex() {
+        let numberOfItems = collectionView.numberOfItems(inSection: 0)
+        if currentIndex > (numberOfItems - 1) {
+            currentIndex = numberOfItems - 1
+        }
+        if numberOfItems == 0 {
+            dismiss(animated: true)
+        }
     }
 }
 

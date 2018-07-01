@@ -213,10 +213,10 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
     /// 原图
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
         /*
-         // 测试原图
-         if index == 5 {
-         return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
-         }*/
+        // 测试原图
+        if index == 1 {
+            return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
+        }*/
         return nil
     }
     
@@ -230,6 +230,10 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
         let saveImageAction = UIAlertAction(title: "保存图片", style: .default) { (_) in
             print("保存图片：\(image)")
         }
+        /*let loadRawAction = UIAlertAction(title: "查看原图", style: .default) { (_) in
+            // 加载长按的原图
+            photoBrowser.loadRawImage(at: index)
+        }*/
         let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
 
         actionSheet.addAction(saveImageAction)
