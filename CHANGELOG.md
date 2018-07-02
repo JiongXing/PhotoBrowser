@@ -1,5 +1,10 @@
 # Version History
 
+## Version 1.3.3
+**2018/07/02**
+- 让查看原图按钮插件暴露一些常用属性，增加背景色，提高在白图上的辨识度。
+- 现在可以通过PhotoBrowser类主动调用加载原图方法。
+
 ## Version 1.3.2
 **2018/06/17**
 - 修复`locationInView`返回`nan`导致 crash 的问题。
