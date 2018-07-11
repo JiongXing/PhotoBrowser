@@ -16,6 +16,8 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
     
     public var buttonBackground = UIColor.black.withAlphaComponent(0.08)
 
+    public init() {}
+    
     public func photoBrowserCellDidReused(_ cell: PhotoBrowserCell, at index: Int) {
         if rawImageButton(for: cell) == nil {
             cell.associatedObjects["RawImageButton"] = makeRawImageButton()

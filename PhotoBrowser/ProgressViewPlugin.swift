@@ -9,6 +9,8 @@ import Foundation
 
 /// 图片加载进度插件
 open class ProgressViewPlugin: PhotoBrowserCellPlugin {
+    
+    public init() {}
 
     /// 每次取复用 cell 时会调用
     public func photoBrowserCellDidReused(_ cell: PhotoBrowserCell, at index: Int) {
