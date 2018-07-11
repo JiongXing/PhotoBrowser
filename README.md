@@ -29,6 +29,10 @@
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
+## Version 1.4.0
+**2018/07/11**
+- 现在可以自由选用Cell插件
+
 ## Version 1.3.3
 **2018/07/02**
 - 让查看原图按钮插件暴露一些常用属性，增加背景色，提高在白图上的辨识度。
@@ -191,6 +195,20 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
     actionSheet.addAction(cancelAction)
     photoBrowser.present(actionSheet, animated: true, completion: nil)
 }
+```
+
+## 如何选用/禁用加载进度指示器和查看原图按钮
+PhotoBrowser 的默认实现是同时选用了加载进度指示器和查看原图按钮：
+```swift
+browser.cellPlugins = [ProgressViewPlugin(), RawImageButtonPlugin()]
+```
+只选用加载进度指示器：
+```swift
+browser.cellPlugins = [ProgressViewPlugin()]
+```
+只选用查看原图按钮：
+```swift
+browser.cellPlugins = [RawImageButtonPlugin()]
 ```
 
 # 初版实现思路
