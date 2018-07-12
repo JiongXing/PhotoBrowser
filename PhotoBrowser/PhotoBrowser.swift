@@ -130,7 +130,6 @@ open class PhotoBrowser: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
-        self.modalPresentationCapturesStatusBarAppearance = true
 
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
@@ -224,8 +223,17 @@ open class PhotoBrowser: UIViewController {
 
     /// 展示图片浏览器
     /// - parameter presentingVC: 由谁 present 出图片浏览器
-    open func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost) {
-        viewController?.present(self, animated: true, completion: nil)
+    /// - parameter presentingVC: 由谁 present 出图片浏览器
+    open func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost,
+                   wrapped: UINavigationController? = nil) {
+        if let nav = wrapped {
+            self.transitioningDelegate = nil
+            nav.transitioningDelegate = self
+            nav.modalPresentationStyle = .custom
+            viewController?.present(nav, animated: true, completion: nil)
+        } else {
+            viewController?.present(self, animated: true, completion: nil)
+        }
     }
 
     /// 关闭浏览器

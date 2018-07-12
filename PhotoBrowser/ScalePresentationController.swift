@@ -25,7 +25,8 @@ class ScalePresentationController: UIPresentationController {
 
     /// 更新动画结束后需要隐藏的view
     func updateCurrentHiddenView(_ view: UIView?) {
-        // 重新显示前一个隐藏视图。??后的1.0不会生效，仅为语法而写。
+        // 重新显示前一个隐藏视图。
+        // 正常情况currentHiddenViewOriginAlpha必定有值。??后的1.0不会生效。
         currentHiddenView?.alpha = currentHiddenViewOriginAlpha ?? 1.0;
         // 隐藏新视图
         currentHiddenView = view

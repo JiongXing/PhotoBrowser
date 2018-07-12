@@ -62,15 +62,12 @@ class ScaleAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             return
         }
         let startFrame = startView.convert(startView.bounds, to: containerView)
-
-        // 暂不求endFrame
         var endFrame = startFrame
         var endAlpha: CGFloat = 0.0
 
         if let endView = self.endView {
             // 当前正在显示视图的前一个页面关联视图已经存在，此时分两种情况
-            // 1、该视图显示在屏幕内，作scale动画
-            // 2、该视图不显示在屏幕内，作fade动画
+            // 视图显示在屏幕内，作scale动画；否则作fade动画
             let relativeFrame = endView.convert(endView.bounds, to: nil)
             let keyWindowBounds =  UIScreen.main.bounds
             if keyWindowBounds.intersects(relativeFrame) {

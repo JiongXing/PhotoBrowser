@@ -122,6 +122,9 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
 
         // 浏览本地图片
         // openPhotoBrowserWithLocalImage(index: indexPath.item)
+        
+        // 带导航栏
+        // openPhotoBrowserWithNavigationController(index: indexPath.item)
     }
 
     /// 逐个属性配置
@@ -164,6 +167,13 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
         
         // 如果要使用 .scale，需要实现协议
         PhotoBrowser.show(localImages: localImages, animationType: .scale, delegate: self, originPageIndex: index)
+    }
+    
+    /// 带导航栏
+    private func openPhotoBrowserWithNavigationController(index: Int) {
+        let browser = PhotoBrowser(animationType: .fade, delegate: self, originPageIndex: index)
+        let nav = UINavigationController(rootViewController: browser)
+        browser.show(wrapped: nav)
     }
 
     /// 装配附加视图插件

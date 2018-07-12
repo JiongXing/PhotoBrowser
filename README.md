@@ -12,6 +12,7 @@
 - [ ] 支持 WebP
 - [x] 支持本地图片
 - [x] 支持自定义图片加载器
+- [x] 支持嵌入导航栏
 - [x] 支持屏幕旋转
 - [x] 支持修改数据源，刷新浏览器
 - [x] 支持长按返回当前图片对象
@@ -32,6 +33,7 @@
 ## Version 1.4.0
 **2018/07/11**
 - 现在可以自由选用Cell插件
+- 支持嵌入导航栏
 
 ## Version 1.3.3
 **2018/07/02**
@@ -209,6 +211,18 @@ browser.cellPlugins = [ProgressViewPlugin()]
 只选用查看原图按钮：
 ```swift
 browser.cellPlugins = [RawImageButtonPlugin()]
+```
+
+## 如何嵌入导航栏
+可以把 PhotoBrowser 嵌进你自己创建的导航控制器中。
+注意转场动画类型只能使用`.fade`。假如使用`.scale`类型，会发生转场完成后的顿挫现象，至今未找到解决办法。
+Demo示范代码：
+```
+func openPhotoBrowserWithNavigationController(index: Int) {
+    let browser = PhotoBrowser(animationType: .fade, delegate: self, originPageIndex: index)
+    let nav = UINavigationController(rootViewController: browser)
+    browser.show(wrapped: nav)
+}
 ```
 
 # 初版实现思路
