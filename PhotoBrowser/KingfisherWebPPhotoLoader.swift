@@ -14,7 +14,8 @@ open class KingfisherWebPPhotoLoader: PhotoLoader {
     public init() {}
     
     open func isImageCached(on imageView: UIImageView, url: URL) -> Bool {
-        let result = KingfisherManager.shared.cache.imageCachedType(forKey: url.cacheKey)
+        let result = KingfisherManager.shared.cache
+            .imageCachedType(forKey: url.cacheKey, processorIdentifier: "com.yeatse.WebPProcessor")
         switch result {
         case .none:
             return false
