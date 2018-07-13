@@ -1,0 +1,10 @@
+framework module KingfisherWebP {
+  umbrella header "KingfisherWebP-umbrella.h"
+
+  export *
+  module * { export * }
+
+  explicit module Private {
+    header "CGImage+WebP.h"
+  }
+}

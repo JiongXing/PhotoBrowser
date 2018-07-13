@@ -9,4 +9,5 @@ Pod::Spec.new do |s|
   s.source_files  = 'PhotoBrowser/*.swift'
   s.ios.deployment_target = '8.0'
   s.dependency 'Kingfisher'
+  s.dependency 'KingfisherWebP'
 end
