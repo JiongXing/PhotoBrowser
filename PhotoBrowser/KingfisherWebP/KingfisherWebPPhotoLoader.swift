@@ -1,5 +1,5 @@
 //
-//  KingfisherWebPPhotoLoader.swift
+//  KingfisherPhotoLoader.swift
 //  JXPhotoBrowser
 //
 //  Created by JiongXing on 2018/7/13.
@@ -9,7 +9,7 @@ import Foundation
 import Kingfisher
 import KingfisherWebP
 
-open class KingfisherWebPPhotoLoader: PhotoLoader {
+open class KingfisherPhotoLoader: PhotoLoader {
     
     public init() {}
     

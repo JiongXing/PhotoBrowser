@@ -131,7 +131,6 @@ extension MomentsTableViewCell: UICollectionViewDelegate {
     private func openPhotoBrowserWithInstanceMethod(index: Int) {
         // 创建图片浏览器
         let browser = PhotoBrowser()
-        browser.photoLoader = KingfisherWebPPhotoLoader()
         // 提供两种动画效果：缩放`.scale`和渐变`.fade`。
         // 如果希望`scale`动画不要隐藏关联缩略图，可使用`.scaleNoHiding`。
         browser.animationType = .scale
@@ -228,10 +227,11 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
         if index == 1 {
             return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
         }*/
+        /*
         // 测试WebP
         if index == 1 {
             return URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/resources/testwebp.webp")
-        }
+        }*/
         return nil
     }
     

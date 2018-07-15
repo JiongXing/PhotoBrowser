@@ -1,55 +1,27 @@
 PODS:
   - JXPhotoBrowser (1.3.3):
+    - JXPhotoBrowser/Kingfisher (= 1.3.3)
+  - JXPhotoBrowser/Core (1.3.3)
+  - JXPhotoBrowser/Kingfisher (1.3.3):
+    - JXPhotoBrowser/Core
     - Kingfisher
-    - KingfisherWebP
   - Kingfisher (4.8.0)
-  - KingfisherWebP (0.4.1):
-    - Kingfisher (~> 4.0)
-    - libwebp (>= 0.5.0)
-  - libwebp (0.6.1):
-    - libwebp/core (= 0.6.1)
-    - libwebp/dec (= 0.6.1)
-    - libwebp/demux (= 0.6.1)
-    - libwebp/dsp (= 0.6.1)
-    - libwebp/enc (= 0.6.1)
-    - libwebp/mux (= 0.6.1)
-    - libwebp/utils (= 0.6.1)
-    - libwebp/webp (= 0.6.1)
-  - libwebp/core (0.6.1):
-    - libwebp/webp
-  - libwebp/dec (0.6.1):
-    - libwebp/core
-  - libwebp/demux (0.6.1):
-    - libwebp/core
-  - libwebp/dsp (0.6.1):
-    - libwebp/core
-  - libwebp/enc (0.6.1):
-    - libwebp/core
-  - libwebp/mux (0.6.1):
-    - libwebp/core
-  - libwebp/utils (0.6.1):
-    - libwebp/core
-  - libwebp/webp (0.6.1)
 
 DEPENDENCIES:
   - JXPhotoBrowser (from `..`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - Kingfisher
-    - KingfisherWebP
-    - libwebp
 
 EXTERNAL SOURCES:
   JXPhotoBrowser:
     :path: ".."
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: 25541721263a3bd400207db181c85cfeddda8b2c
+  JXPhotoBrowser: cb56e1bbaf632a6f191b20e89caad21c40b5fe47
   Kingfisher: 976d828df2b24834c6a3f2fc4d82cdbd26552be1
-  KingfisherWebP: 3cf59fe4c258efc2084fda65eaae950487048259
-  libwebp: 7f01ad7a4375f9e82e56c8873cfcdc5776e5c757
 
 PODFILE CHECKSUM: 1a0b930a7ff67b15eb418594e9a8fc0394620716
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.5.0

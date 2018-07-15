@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.3.3-blue.svg)
+![](https://img.shields.io/badge/pod-v1.4.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -8,8 +8,8 @@
 - [x] 支持淡入淡出式转场动画
 - [x] 支持下滑手势渐变关闭浏览器
 - [x] 支持初始图、大图和原图三个级别
-- [x] 支持 GIF
-- [ ] 支持 WebP
+- [x] 支持`GIF`图片
+- [x] 支持`WebP`图片
 - [x] 支持本地图片
 - [x] 支持自定义图片加载器
 - [x] 支持嵌入导航栏
@@ -22,8 +22,8 @@
 - [x] 插件式集成数字型的页码指示器
 - [x] 插件式集成图片加载进度指示器
 - [x] 插件式集成查看原图按钮
-- [ ] 自定义图片加载器时不必引入`Kingfisher`
-- [ ] 支持浏览短视频
+- [x] 可以不依赖任何第三方图片加载库
+- [ ] 完美支持短视频浏览
 
 # Version History
 
@@ -31,9 +31,10 @@
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
 
 ## Version 1.4.0
-**2018/07/11**
+**2018/07/15**
 - 现在可以自由选用Cell插件
 - 支持嵌入导航栏
+- 支持谷歌`WebP`格式
 
 ## Version 1.3.3
 **2018/07/02**
@@ -224,6 +225,27 @@ func openPhotoBrowserWithNavigationController(index: Int) {
     browser.show(wrapped: nav)
 }
 ```
+
+## 如何加载`WebP`格式
+本库实现了一个 WebP 版的 KingfisherLoader，只需要指定 Subspec 即可：
+```
+pod 'JXPhotoBrowser/KingfisherWebP'
+```
+注意，`pod 'JXPhotoBrowser'`等同于`pod 'JXPhotoBrowser/Kingfisher'`，`Kingfisher`与`KingfisherWebP`两者二选一。
+
+
+## Error installing libwebp
+谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源是指向谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
+1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 0.6.1。
+2. `pod repo` 查看 master 的 path，进入目录搜索 libwebp，进入 libwebp/0.6.1，找到`libwebp.podspec.json`
+3. 打开`libwebp.podspec.json`，修改 source 地址：
+```
+"source": {
+    "git": "https://github.com/webmproject/libwebp",
+    "tag": "v0.6.1"
+  },
+```
+4. 回到你的项目目录，可以愉快地`pod install`了~
 
 # 初版实现思路
 

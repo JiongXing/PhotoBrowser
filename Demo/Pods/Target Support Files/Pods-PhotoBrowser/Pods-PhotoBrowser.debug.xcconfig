@@ -1,12 +1,11 @@
 ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
-FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/JXPhotoBrowser" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher" "${PODS_CONFIGURATION_BUILD_DIR}/KingfisherWebP" "${PODS_CONFIGURATION_BUILD_DIR}/libwebp"
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/JXPhotoBrowser" "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
-OTHER_CFLAGS = $(inherited) -iquote "${PODS_CONFIGURATION_BUILD_DIR}/JXPhotoBrowser/JXPhotoBrowser.framework/Headers" -iquote "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers" -iquote "${PODS_CONFIGURATION_BUILD_DIR}/KingfisherWebP/KingfisherWebP.framework/Headers" -iquote "${PODS_CONFIGURATION_BUILD_DIR}/libwebp/libwebp.framework/Headers"
-OTHER_LDFLAGS = $(inherited) -framework "JXPhotoBrowser" -framework "Kingfisher" -framework "KingfisherWebP" -framework "libwebp"
+OTHER_CFLAGS = $(inherited) -iquote "${PODS_CONFIGURATION_BUILD_DIR}/JXPhotoBrowser/JXPhotoBrowser.framework/Headers" -iquote "${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.framework/Headers"
+OTHER_LDFLAGS = $(inherited) -framework "JXPhotoBrowser" -framework "Kingfisher"
 OTHER_SWIFT_FLAGS = $(inherited) "-D" "COCOAPODS"
 PODS_BUILD_DIR = ${BUILD_DIR}
 PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
 PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
 PODS_ROOT = ${SRCROOT}/Pods
-USER_HEADER_SEARCH_PATHS = $(inherited) $(SRCROOT)/libwebp/src

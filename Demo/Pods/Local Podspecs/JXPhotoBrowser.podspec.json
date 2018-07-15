@@ -11,16 +11,38 @@
     "git": "https://github.com/JiongXing/PhotoBrowser.git",
     "tag": "1.3.3"
   },
-  "source_files": "PhotoBrowser/*.swift",
   "platforms": {
     "ios": "8.0"
   },
-  "dependencies": {
-    "Kingfisher": [
+  "default_subspecs": "Kingfisher",
+  "subspecs": [
+    {
+      "name": "Core",
+      "source_files": "PhotoBrowser/Core/*.swift"
+    },
+    {
+      "name": "Kingfisher",
+      "source_files": "PhotoBrowser/Kingfisher/*.swift",
+      "dependencies": {
+        "JXPhotoBrowser/Core": [
 
-    ],
-    "KingfisherWebP": [
+        ],
+        "Kingfisher": [
 
-    ]
-  }
+        ]
+      }
+    },
+    {
+      "name": "KingfisherWebP",
+      "source_files": "PhotoBrowser/KingfisherWebP/*.swift",
+      "dependencies": {
+        "JXPhotoBrowser/Core": [
+
+        ],
+        "KingfisherWebP": [
+
+        ]
+      }
+    }
+  ]
 }
