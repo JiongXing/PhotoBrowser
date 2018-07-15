@@ -8,10 +8,10 @@
 - [x] 支持淡入淡出式转场动画
 - [x] 支持下滑手势渐变关闭浏览器
 - [x] 支持初始图、大图和原图三个级别
-- [x] 支持`GIF`图片
-- [x] 支持`WebP`图片
+- [x] 支持`GIF`格式
+- [x] 支持`WebP`格式
 - [x] 支持本地图片
-- [x] 支持自定义图片加载器
+- [x] 支持自定义图片加载器，此时不依赖任何第三方框架
 - [x] 支持嵌入导航栏
 - [x] 支持屏幕旋转
 - [x] 支持修改数据源，刷新浏览器
@@ -22,7 +22,6 @@
 - [x] 插件式集成数字型的页码指示器
 - [x] 插件式集成图片加载进度指示器
 - [x] 插件式集成查看原图按钮
-- [x] 可以不依赖任何第三方图片加载库
 - [ ] 完美支持短视频浏览
 
 # Version History
@@ -35,6 +34,8 @@
 - 现在可以自由选用Cell插件
 - 支持嵌入导航栏
 - 支持谷歌`WebP`格式
+- Cell 插件协议增加 CellWillDisplay 和 CellDidEndDisplaying 回调
+- 图片下拉手势现在改为加在`cell.contentView`上
 
 ## Version 1.3.3
 **2018/07/02**
@@ -234,8 +235,8 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 注意，`pod 'JXPhotoBrowser'`等同于`pod 'JXPhotoBrowser/Kingfisher'`，`Kingfisher`与`KingfisherWebP`两者二选一。
 
 
-## Error installing libwebp
-谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源是指向谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
+## Install 出错：Error installing libwebp
+谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源指向了谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
 1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 0.6.1。
 2. `pod repo` 查看 master 的 path，进入目录搜索 libwebp，进入 libwebp/0.6.1，找到`libwebp.podspec.json`
 3. 打开`libwebp.podspec.json`，修改 source 地址：
@@ -246,6 +247,11 @@ pod 'JXPhotoBrowser/KingfisherWebP'
   },
 ```
 4. 回到你的项目目录，可以愉快地`pod install`了~
+
+## 不想使用 Kingfisher，如何自定义加载器
+1. 参考`KingfisherPhotoLoader`，写个类/结构体实现`PhotoLoader`协议。
+2. 在初始化`PhotoBrowser`时，给`PhotoLoader`参数传入你的加载器实例。
+3. 去除`Kingfisher`依赖：在你项目的`Podfile`中，改`pod 'JXPhotoBrowser'`为`pod 'JXPhotoBrowser/Core'`。
 
 # 初版实现思路
 

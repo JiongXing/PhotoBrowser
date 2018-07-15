@@ -9,6 +9,7 @@ PODS:
 
 DEPENDENCIES:
   - JXPhotoBrowser (from `..`)
+  - Kingfisher
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -22,6 +23,6 @@ SPEC CHECKSUMS:
   JXPhotoBrowser: cb56e1bbaf632a6f191b20e89caad21c40b5fe47
   Kingfisher: 976d828df2b24834c6a3f2fc4d82cdbd26552be1
 
-PODFILE CHECKSUM: 1a0b930a7ff67b15eb418594e9a8fc0394620716
+PODFILE CHECKSUM: bffe09b9b3f6f4f6d0752d8656aa9a734576a709
 
 COCOAPODS: 1.5.0

@@ -7,6 +7,7 @@
 //  
 
 import UIKit
+import Kingfisher
 import JXPhotoBrowser
 
 class MomentsTableViewCell: UITableViewCell {

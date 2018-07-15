@@ -5,6 +5,8 @@
 - 现在可以自由选用Cell插件
 - 支持嵌入导航栏
 - 支持谷歌`WebP`格式
+- Cell 插件协议增加 CellWillDisplay 和 CellDidEndDisplaying 回调
+- 图片下拉手势现在改为加在`cell.contentView`上
 
 ## Version 1.3.3
 **2018/07/02**

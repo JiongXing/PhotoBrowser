@@ -8,9 +8,9 @@
 import Foundation
 import Kingfisher
 
-@objc
+@objc(KingfisherPhotoLoader)
 open class KingfisherPhotoLoader: NSObject, PhotoLoader {
-
+   
     public override init() {}
 
     open func isImageCached(on imageView: UIImageView, url: URL) -> Bool {

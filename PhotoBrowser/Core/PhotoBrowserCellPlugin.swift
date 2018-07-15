@@ -26,6 +26,12 @@ public protocol PhotoBrowserCellPlugin {
 
     /// 加载图片完成
     func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?)
+    
+    /// cell willDisplay 时会调用
+    func photoBrowserCellWillDisplay(_ cell: PhotoBrowserCell, at index: Int)
+    
+    /// cell didEndDisplaying 时会调用
+    func photoBrowserCellDidEndDisplaying(_ cell: PhotoBrowserCell, at index: Int)
 }
 
 extension PhotoBrowserCellPlugin {
@@ -46,4 +52,10 @@ extension PhotoBrowserCellPlugin {
 
     /// 加载图片完成
     public func photoBrowserCellDidLoadImage(_ cell: PhotoBrowserCell, placeholder: UIImage?, url: URL?) {}
+    
+    /// cell willDisplay 时会调用
+    public func photoBrowserCellWillDisplay(_ cell: PhotoBrowserCell, at index: Int) {}
+    
+    /// cell didEndDisplaying 时会调用
+    public func photoBrowserCellDidEndDisplaying(_ cell: PhotoBrowserCell, at index: Int) {}
 }
