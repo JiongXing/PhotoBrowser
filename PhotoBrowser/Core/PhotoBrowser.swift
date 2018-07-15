@@ -320,6 +320,14 @@ open class PhotoBrowser: UIViewController {
             cell.loadRawImage()
         }
     }
+    
+    /// 滑到哪张图片
+    /// - parameter index: 图片序号，从0开始
+    open func scrollToItem(_ index: Int, at position: UICollectionViewScrollPosition, animated: Bool) {
+        currentIndex = index
+        let indexPath = IndexPath(item: index, section: 0)
+        collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
+    }
 
     //
     // MARK: - Private Methods
