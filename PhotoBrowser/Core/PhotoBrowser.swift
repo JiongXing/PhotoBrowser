@@ -120,17 +120,20 @@ open class PhotoBrowser: UIViewController {
     /// 初始化
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter photoLoader: 网络图片加载器，传 nil 则使用 KingfisherPhotoLoader
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     public init(animationType: AnimationType = .scale,
                 delegate: PhotoBrowserDelegate? = nil,
-                photoLoader: PhotoLoader = KingfisherPhotoLoader(),
+                photoLoader: PhotoLoader? = nil,
                 originPageIndex: Int = 0) {
-        self.photoLoader = photoLoader
+        self.photoLoader = photoLoader ?? {
+            let cls = NSClassFromString("KingfisherPhotoLoader")
+            assert(cls != nil, "请传入你实现的 photoLoader 或在 Podfile 选用 Kingfisher subspec!")
+            return (cls as! NSObject.Type).init() as! PhotoLoader
+            }()
         super.init(nibName: nil, bundle: nil)
         self.transitioningDelegate = self
         self.modalPresentationStyle = .custom
-        self.modalPresentationCapturesStatusBarAppearance = true
 
         self.animationType = animationType
         self.photoBrowserDelegate = delegate
@@ -224,8 +227,17 @@ open class PhotoBrowser: UIViewController {
 
     /// 展示图片浏览器
     /// - parameter presentingVC: 由谁 present 出图片浏览器
-    open func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost) {
-        viewController?.present(self, animated: true, completion: nil)
+    /// - parameter presentingVC: 由谁 present 出图片浏览器
+    open func show(from viewController: UIViewController? = TopMostViewControllerGetter.topMost,
+                   wrapped: UINavigationController? = nil) {
+        if let nav = wrapped {
+            self.transitioningDelegate = nil
+            nav.transitioningDelegate = self
+            nav.modalPresentationStyle = .custom
+            viewController?.present(nav, animated: true, completion: nil)
+        } else {
+            viewController?.present(self, animated: true, completion: nil)
+        }
     }
 
     /// 关闭浏览器
@@ -239,7 +251,7 @@ open class PhotoBrowser: UIViewController {
     /// 展示，传入完整参数
     /// - parameter animationType: 转场动画类型，默认为缩放动画`scale`
     /// - parameter delegate: 浏览器协议代理
-    /// - parameter photoLoader: 网络图片加载器，默认 KingfisherPhotoLoader
+    /// - parameter photoLoader: 网络图片加载器，传 nil 则使用 KingfisherPhotoLoader
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层VC。
@@ -247,7 +259,7 @@ open class PhotoBrowser: UIViewController {
     @discardableResult
     open class func show(animationType: AnimationType = .scale,
                          delegate: PhotoBrowserDelegate,
-                         photoLoader: PhotoLoader = KingfisherPhotoLoader(),
+                         photoLoader: PhotoLoader? = nil,
                          plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                          originPageIndex: Int,
                          fromViewController: UIViewController? = TopMostViewControllerGetter.topMost
@@ -265,6 +277,7 @@ open class PhotoBrowser: UIViewController {
     /// - parameter localImages: 本地图片组
     /// - parameter animationType: 转场动画类型，默认为缩放动画`fade`
     /// - parameter delegate: 浏览器协议代理
+    /// - parameter photoLoader: 图片加载器，传 nil 则使用 KingfisherPhotoLoader
     /// - parameter plugins: 插件组，默认加载一个光点型页码指示器
     /// - parameter originPageIndex: 打开时的初始页码，第一页为 0.
     /// - parameter fromViewController: 基于哪个 ViewController 执行 present。默认视图顶层VC。
@@ -273,7 +286,7 @@ open class PhotoBrowser: UIViewController {
     open class func show(localImages: [UIImage],
                          animationType: AnimationType = .fade,
                          delegate: PhotoBrowserDelegate? = nil,
-                         photoLoader: PhotoLoader = KingfisherPhotoLoader(),
+                         photoLoader: PhotoLoader? = nil,
                          plugins: [PhotoBrowserPlugin] = [DefaultPageControlPlugin()],
                          originPageIndex: Int,
                          fromViewController: UIViewController? = TopMostViewControllerGetter.topMost
@@ -413,6 +426,22 @@ extension PhotoBrowser: UICollectionViewDataSource {
         // 原图url
         let rawUrl = delegate.photoBrowser(self, rawUrlForIndex: index)
         return (originImage, highQualityUrl, rawUrl)
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let pbCell = cell as? PhotoBrowserCell {
+            cellPlugins.forEach {
+                $0.photoBrowserCellWillDisplay(pbCell, at: indexPath.item)
+            }
+        }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if let pbCell = cell as? PhotoBrowserCell {
+            cellPlugins.forEach {
+                $0.photoBrowserCellDidEndDisplaying(pbCell, at: indexPath.item)
+            }
+        }
     }
 }
 
