@@ -9,7 +9,15 @@ import Foundation
 
 /// 查看原图插件
 open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
+    
+    public var buttonTitle = "查看原图"
+    
+    public var buttonTitleColor = UIColor.white
+    
+    public var buttonBackground = UIColor.black.withAlphaComponent(0.08)
 
+    public init() {}
+    
     public func photoBrowserCellDidReused(_ cell: PhotoBrowserCell, at index: Int) {
         if rawImageButton(for: cell) == nil {
             cell.associatedObjects["RawImageButton"] = makeRawImageButton()
@@ -46,13 +54,14 @@ open class RawImageButtonPlugin: PhotoBrowserCellPlugin {
 
     private func makeRawImageButton() -> UIButton {
         let button = UIButton(type: .custom)
-        button.setTitleColor(UIColor.white, for: .normal)
-        button.setTitleColor(UIColor.white, for: .highlighted)
-        button.setTitle("查看原图", for: .normal)
-        button.setTitle("查看原图", for: .highlighted)
+        button.setTitleColor(buttonTitleColor, for: .normal)
+        button.setTitleColor(buttonTitleColor, for: .highlighted)
+        button.backgroundColor = buttonBackground
+        button.setTitle(buttonTitle, for: .normal)
+        button.setTitle(buttonTitle, for: .highlighted)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-        button.layer.borderColor = UIColor.lightGray.cgColor
-        button.layer.borderWidth = 1
+        button.layer.borderColor = buttonTitleColor.cgColor
+        button.layer.borderWidth = 1 / UIScreen.main.scale
         button.layer.cornerRadius = 4
         button.layer.masksToBounds = true
         button.addTarget(self, action: #selector(onRawImageButton), for: .touchUpInside)

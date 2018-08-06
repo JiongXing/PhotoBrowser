@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.3.1-blue.svg)
+![](https://img.shields.io/badge/pod-v1.4.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -8,10 +8,11 @@
 - [x] 支持淡入淡出式转场动画
 - [x] 支持下滑手势渐变关闭浏览器
 - [x] 支持初始图、大图和原图三个级别
-- [x] 支持 GIF
-- [ ] 支持 WebP
+- [x] 支持`GIF`格式
+- [x] 支持`WebP`格式
 - [x] 支持本地图片
-- [x] 支持自定义图片加载器
+- [x] 支持自定义图片加载器，此时不依赖任何第三方框架
+- [x] 支持嵌入导航栏
 - [x] 支持屏幕旋转
 - [x] 支持修改数据源，刷新浏览器
 - [x] 支持长按返回当前图片对象
@@ -21,14 +22,30 @@
 - [x] 插件式集成数字型的页码指示器
 - [x] 插件式集成图片加载进度指示器
 - [x] 插件式集成查看原图按钮
-- [ ] 自定义图片加载器时不必引入`Kingfisher`
-- [ ] 支持浏览短视频
-- [ ] 支持 React Native 
+- [ ] 完美支持短视频浏览
 
 # Version History
 
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
+
+## Version 1.4.0
+**2018/07/15**
+- 现在可以自由选用Cell插件
+- 支持嵌入导航栏
+- 支持谷歌`WebP`格式
+- Cell 插件协议增加 CellWillDisplay 和 CellDidEndDisplaying 回调
+- 图片下拉手势现在改为加在`cell.contentView`上
+- 增加`scrollToItem()`方法，可随时控制滑动到哪张图片
+
+## Version 1.3.3
+**2018/07/02**
+- 让查看原图按钮插件暴露一些常用属性，增加背景色，提高在白图上的辨识度。
+- 现在可以通过PhotoBrowser类主动调用加载原图方法。
+
+## Version 1.3.2
+**2018/06/17**
+- 修复`locationInView`返回`nan`导致 crash 的问题。
 
 ## Version 1.3.1
 **2018/06/11**
@@ -38,10 +55,6 @@
 **2018/06/04**
 - 在`scale`转场模式下，可选择不隐藏关联缩略图。设置`animationType = .scaleNoHiding`即可。
 - 对于浏览本地图片，现在同时支持传图片组和通过代理取本地图片两种方式。
-
-## Version 1.2.0
-**2018/5/26**
-- 优化`DefaultPageControlPlugin.centerBottomY`和`NumberPageControlPlugin.centerY`为可选属性。在这两个属性为`nil`时，将使用默认值，并进行`iPhoneX`适配。如果用户为这两个属性赋了值，则框架认为用户自行完成了适配，将直接使用所赋值。
 
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 
@@ -188,6 +201,58 @@ func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int,
     photoBrowser.present(actionSheet, animated: true, completion: nil)
 }
 ```
+
+## 如何选用/禁用加载进度指示器和查看原图按钮
+PhotoBrowser 的默认实现是同时选用了加载进度指示器和查看原图按钮：
+```swift
+browser.cellPlugins = [ProgressViewPlugin(), RawImageButtonPlugin()]
+```
+只选用加载进度指示器：
+```swift
+browser.cellPlugins = [ProgressViewPlugin()]
+```
+只选用查看原图按钮：
+```swift
+browser.cellPlugins = [RawImageButtonPlugin()]
+```
+
+## 如何嵌入导航栏
+可以把 PhotoBrowser 嵌进你自己创建的导航控制器中。
+注意转场动画类型只能使用`.fade`。假如使用`.scale`类型，会发生转场完成后的顿挫现象，至今未找到解决办法。
+Demo示范代码：
+```
+func openPhotoBrowserWithNavigationController(index: Int) {
+    let browser = PhotoBrowser(animationType: .fade, delegate: self, originPageIndex: index)
+    let nav = UINavigationController(rootViewController: browser)
+    browser.show(wrapped: nav)
+}
+```
+
+## 如何加载`WebP`格式
+本库实现了一个 WebP 版的 KingfisherLoader，只需要指定 Subspec 即可：
+```
+pod 'JXPhotoBrowser/KingfisherWebP'
+```
+注意，`pod 'JXPhotoBrowser'`等同于`pod 'JXPhotoBrowser/Kingfisher'`，`Kingfisher`与`KingfisherWebP`两者二选一。
+
+
+## Install 出错：Error installing libwebp
+谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源指向了谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
+1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 0.6.1。
+2. `pod repo` 查看 master 的 path，进入目录搜索 libwebp，进入 libwebp/0.6.1，找到`libwebp.podspec.json`
+3. 打开`libwebp.podspec.json`，修改 source 地址：
+```
+"source": {
+    "git": "https://github.com/webmproject/libwebp",
+    "tag": "v0.6.1"
+  },
+```
+4. 回到你的项目目录，可以愉快地`pod install`了~
+
+## 不想使用 Kingfisher，如何自定义加载器
+1. 参考`KingfisherPhotoLoader`，写个类/结构体实现`PhotoLoader`协议。
+2. 在初始化`PhotoBrowser`时，给`PhotoLoader`参数传入你的加载器实例。
+3. 去除`Kingfisher`依赖：在你项目的`Podfile`中，改`pod 'JXPhotoBrowser'`为`pod 'JXPhotoBrowser/Core'`。
 
 # 初版实现思路
 

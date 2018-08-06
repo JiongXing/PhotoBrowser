@@ -1,5 +1,23 @@
 # Version History
 
+## Version 1.4.0
+**2018/07/15**
+- 现在可以自由选用Cell插件
+- 支持嵌入导航栏
+- 支持谷歌`WebP`格式
+- Cell 插件协议增加 CellWillDisplay 和 CellDidEndDisplaying 回调
+- 图片下拉手势现在改为加在`cell.contentView`上
+- 增加`scrollToItem()`方法，可随时控制滑动到哪张图片
+
+## Version 1.3.3
+**2018/07/02**
+- 让查看原图按钮插件暴露一些常用属性，增加背景色，提高在白图上的辨识度。
+- 现在可以通过PhotoBrowser类主动调用加载原图方法。
+
+## Version 1.3.2
+**2018/06/17**
+- 修复`locationInView`返回`nan`导致 crash 的问题。
+
 ## Version 1.3.1
 **2018/06/11**
 - 修复取`TopMostViewController`可能不正确的问题。

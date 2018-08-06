@@ -142,7 +142,7 @@ open class PhotoBrowserCell: UICollectionViewCell {
         // 拖动手势
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
         pan.delegate = self
-        scrollView.addGestureRecognizer(pan)
+        contentView.addGestureRecognizer(pan)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -362,6 +362,7 @@ extension PhotoBrowserCell: UIGestureRecognizerDelegate {
         if scrollView.contentOffset.y > 0 {
             return false
         }
+        // 响应允许范围内的下滑手势
         return true
     }
 }
