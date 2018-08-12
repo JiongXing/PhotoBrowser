@@ -128,7 +128,7 @@ open class PhotoBrowser: UIViewController {
                 originPageIndex: Int = 0) {
         self.photoLoader = photoLoader ?? {
             let cls = NSClassFromString("KingfisherPhotoLoader")
-            assert(cls != nil, "请传入你实现的 photoLoader 或在 Podfile 选用 Kingfisher subspec!")
+            assert(cls != nil, "请传入你实现的 photoLoader 或在 Podfile 中添加 PhotoBrowser/Kingfisher")
             return (cls as! NSObject.Type).init() as! PhotoLoader
             }()
         super.init(nibName: nil, bundle: nil)
