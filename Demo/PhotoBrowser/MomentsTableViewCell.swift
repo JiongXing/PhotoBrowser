@@ -223,11 +223,11 @@ extension MomentsTableViewCell: PhotoBrowserDelegate {
 
     /// 原图
     func photoBrowser(_ photoBrowser: PhotoBrowser, rawUrlForIndex index: Int) -> URL? {
-        /*
+        
         // 测试原图
         if index == 1 {
             return URL(string: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg")
-        }*/
+        }
         /*
         // 测试WebP
         if index == 1 {
