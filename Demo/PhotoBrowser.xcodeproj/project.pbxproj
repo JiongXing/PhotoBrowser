@@ -10,6 +10,7 @@
 		94329C39207DA25300C83E5C /* JXPhotoBrowser.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 94329C38207DA25300C83E5C /* JXPhotoBrowser.podspec */; };
 		94329C3B207DA5A800C83E5C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 94329C3A207DA5A800C83E5C /* README.md */; };
 		943AB24A1E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */; };
+		944B8C3A21208B8A007E9449 /* LocalImageLazyLoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944B8C3921208B8A007E9449 /* LocalImageLazyLoadViewController.swift */; };
 		9453916E1E713A4C00A9AF66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9453916D1E713A4C00A9AF66 /* AppDelegate.swift */; };
 		945391751E713A4C00A9AF66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 945391741E713A4C00A9AF66 /* Assets.xcassets */; };
 		945391781E713A4C00A9AF66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 945391761E713A4C00A9AF66 /* LaunchScreen.storyboard */; };
@@ -17,6 +18,10 @@
 		9488C09F546D256A892E5FFC /* Pods_PhotoBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 363546FCAE096417DD0438DC /* Pods_PhotoBrowser.framework */; };
 		9490B44920B26291004E91A2 /* MomentsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */; };
 		9490B44B20B295B0004E91A2 /* OverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44A20B295B0004E91A2 /* OverlayModel.swift */; };
+		94B749A1212066C70011ABA0 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B749A0212066C70011ABA0 /* HomeViewController.swift */; };
+		94B749A521206EDC0011ABA0 /* BaseCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B749A421206EDC0011ABA0 /* BaseCollectionViewController.swift */; };
+		94B749A7212074BA0011ABA0 /* PhotoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B749A6212074BA0011ABA0 /* PhotoModel.swift */; };
+		94B749A92120851A0011ABA0 /* LocalImageFullLoadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B749A82120851A0011ABA0 /* LocalImageFullLoadViewController.swift */; };
 		94E6460420A894F80056B65F /* OverlayPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E6460320A894F80056B65F /* OverlayPlugin.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +35,7 @@
 		94329C3A207DA5A800C83E5C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		943A5C6020CE4A0500B92D92 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentsPhotoCollectionViewCell.swift; sourceTree = "<group>"; };
+		944B8C3921208B8A007E9449 /* LocalImageLazyLoadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalImageLazyLoadViewController.swift; sourceTree = "<group>"; };
 		9453916A1E713A4C00A9AF66 /* PhotoBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9453916D1E713A4C00A9AF66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		945391741E713A4C00A9AF66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -38,6 +44,10 @@
 		9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentsViewController.swift; sourceTree = "<group>"; };
 		9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MomentsTableViewCell.swift; sourceTree = "<group>"; };
 		9490B44A20B295B0004E91A2 /* OverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayModel.swift; sourceTree = "<group>"; };
+		94B749A0212066C70011ABA0 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		94B749A421206EDC0011ABA0 /* BaseCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseCollectionViewController.swift; sourceTree = "<group>"; };
+		94B749A6212074BA0011ABA0 /* PhotoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoModel.swift; sourceTree = "<group>"; };
+		94B749A82120851A0011ABA0 /* LocalImageFullLoadViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalImageFullLoadViewController.swift; sourceTree = "<group>"; };
 		94E6460320A894F80056B65F /* OverlayPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -96,6 +106,11 @@
 			isa = PBXGroup;
 			children = (
 				9453916D1E713A4C00A9AF66 /* AppDelegate.swift */,
+				94B749A0212066C70011ABA0 /* HomeViewController.swift */,
+				94B749A421206EDC0011ABA0 /* BaseCollectionViewController.swift */,
+				94B749A6212074BA0011ABA0 /* PhotoModel.swift */,
+				94B749A82120851A0011ABA0 /* LocalImageFullLoadViewController.swift */,
+				944B8C3921208B8A007E9449 /* LocalImageLazyLoadViewController.swift */,
 				9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */,
 				9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */,
 				943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */,
@@ -239,7 +254,12 @@
 				94E6460420A894F80056B65F /* OverlayPlugin.swift in Sources */,
 				9453919C1E713CCC00A9AF66 /* MomentsViewController.swift in Sources */,
 				9490B44B20B295B0004E91A2 /* OverlayModel.swift in Sources */,
+				944B8C3A21208B8A007E9449 /* LocalImageLazyLoadViewController.swift in Sources */,
+				94B749A521206EDC0011ABA0 /* BaseCollectionViewController.swift in Sources */,
+				94B749A1212066C70011ABA0 /* HomeViewController.swift in Sources */,
+				94B749A7212074BA0011ABA0 /* PhotoModel.swift in Sources */,
 				943AB24A1E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift in Sources */,
+				94B749A92120851A0011ABA0 /* LocalImageFullLoadViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
