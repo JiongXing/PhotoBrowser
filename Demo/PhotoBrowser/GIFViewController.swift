@@ -25,8 +25,7 @@ final class GIFViewController: BaseCollectionViewController {
                            rawUrl: nil, localName: nil),
                 PhotoModel(thumbnailUrl: "http://wx2.sinaimg.cn/thumbnail/bfc243a3gy1febm7sdk4lj20ib0i714u.jpg",
                            highQualityUrl: "http://img.gaoxiaogif.cn/GaoxiaoGiffiles/images/2015/07/10/maomiqiangqianbuhuan.gif",
-                           rawUrl: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg",
-                           localName: nil),
+                           rawUrl: nil, localName: nil),
         ]
     }
     

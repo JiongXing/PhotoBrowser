@@ -25,7 +25,8 @@ final class RawImageViewController: BaseCollectionViewController {
                            rawUrl: nil, localName: nil),
                 PhotoModel(thumbnailUrl: "http://wx2.sinaimg.cn/thumbnail/bfc243a3gy1febm7sdk4lj20ib0i714u.jpg",
                            highQualityUrl: "http://wx2.sinaimg.cn/large/bfc243a3gy1febm7sdk4lj20ib0i714u.jpg",
-                           rawUrl: nil, localName: nil),
+                           rawUrl: "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg",
+                           localName: nil),
         ]
     }
     

@@ -18,6 +18,9 @@
 		945890902121CC4D00DDAAA5 /* NetworkImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9458908F2121CC4D00DDAAA5 /* NetworkImageViewController.swift */; };
 		945890922121D27E00DDAAA5 /* RawImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890912121D27E00DDAAA5 /* RawImageViewController.swift */; };
 		945890942121DBDB00DDAAA5 /* GIFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890932121DBDB00DDAAA5 /* GIFViewController.swift */; };
+		945890962121E02100DDAAA5 /* WebPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890952121E02100DDAAA5 /* WebPViewController.swift */; };
+		945890982121E2BD00DDAAA5 /* LongPressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890972121E2BD00DDAAA5 /* LongPressViewController.swift */; };
+		9458909A2121E50E00DDAAA5 /* CellPluginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890992121E50E00DDAAA5 /* CellPluginViewController.swift */; };
 		9488C09F546D256A892E5FFC /* Pods_PhotoBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 363546FCAE096417DD0438DC /* Pods_PhotoBrowser.framework */; };
 		9490B44920B26291004E91A2 /* MomentsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */; };
 		9490B44B20B295B0004E91A2 /* OverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44A20B295B0004E91A2 /* OverlayModel.swift */; };
@@ -48,6 +51,9 @@
 		9458908F2121CC4D00DDAAA5 /* NetworkImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkImageViewController.swift; sourceTree = "<group>"; };
 		945890912121D27E00DDAAA5 /* RawImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawImageViewController.swift; sourceTree = "<group>"; };
 		945890932121DBDB00DDAAA5 /* GIFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFViewController.swift; sourceTree = "<group>"; };
+		945890952121E02100DDAAA5 /* WebPViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPViewController.swift; sourceTree = "<group>"; };
+		945890972121E2BD00DDAAA5 /* LongPressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressViewController.swift; sourceTree = "<group>"; };
+		945890992121E50E00DDAAA5 /* CellPluginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellPluginViewController.swift; sourceTree = "<group>"; };
 		9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MomentsTableViewCell.swift; sourceTree = "<group>"; };
 		9490B44A20B295B0004E91A2 /* OverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayModel.swift; sourceTree = "<group>"; };
 		94B749A0212066C70011ABA0 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -119,7 +125,10 @@
 				944B8C3921208B8A007E9449 /* LocalImageLazyLoadViewController.swift */,
 				9458908F2121CC4D00DDAAA5 /* NetworkImageViewController.swift */,
 				945890912121D27E00DDAAA5 /* RawImageViewController.swift */,
+				945890972121E2BD00DDAAA5 /* LongPressViewController.swift */,
 				945890932121DBDB00DDAAA5 /* GIFViewController.swift */,
+				945890952121E02100DDAAA5 /* WebPViewController.swift */,
+				945890992121E50E00DDAAA5 /* CellPluginViewController.swift */,
 				9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */,
 				9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */,
 				943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */,
@@ -222,11 +231,15 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-PhotoBrowser/Pods-PhotoBrowser-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/JXPhotoBrowser/JXPhotoBrowser.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
+				"${BUILT_PRODUCTS_DIR}/KingfisherWebP/KingfisherWebP.framework",
+				"${BUILT_PRODUCTS_DIR}/libwebp/libwebp.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JXPhotoBrowser.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KingfisherWebP.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libwebp.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -262,7 +275,10 @@
 				9490B44920B26291004E91A2 /* MomentsTableViewCell.swift in Sources */,
 				94E6460420A894F80056B65F /* OverlayPlugin.swift in Sources */,
 				9453919C1E713CCC00A9AF66 /* MomentsViewController.swift in Sources */,
+				945890982121E2BD00DDAAA5 /* LongPressViewController.swift in Sources */,
+				9458909A2121E50E00DDAAA5 /* CellPluginViewController.swift in Sources */,
 				9490B44B20B295B0004E91A2 /* OverlayModel.swift in Sources */,
+				945890962121E02100DDAAA5 /* WebPViewController.swift in Sources */,
 				944B8C3A21208B8A007E9449 /* LocalImageLazyLoadViewController.swift in Sources */,
 				94B749A521206EDC0011ABA0 /* BaseCollectionViewController.swift in Sources */,
 				94B749A1212066C70011ABA0 /* HomeViewController.swift in Sources */,

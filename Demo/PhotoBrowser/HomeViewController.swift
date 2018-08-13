@@ -15,7 +15,10 @@ final class HomeViewController: UITableViewController {
             LocalImageLazyLoadViewController(),
             NetworkImageViewController(),
             RawImageViewController(),
+            LongPressViewController(),
             GIFViewController(),
+            WebPViewController(),
+            CellPluginViewController(),
         ]
     
     private let reusedId = "reused"
