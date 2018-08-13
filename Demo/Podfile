@@ -4,6 +4,9 @@ target 'PhotoBrowser' do
   use_frameworks!
   inhibit_all_warnings!
   pod 'Kingfisher'
+  ## 普通图片
   # pod 'JXPhotoBrowser', :path => '..'
+  
+  ## WebP格式的图片
   pod 'JXPhotoBrowser/KingfisherWebP', :path => '..'
 end

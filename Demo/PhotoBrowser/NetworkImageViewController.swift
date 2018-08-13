@@ -48,7 +48,7 @@ final class NetworkImageViewController: BaseCollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reusedId, for: indexPath) as! MomentsPhotoCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reusedId, for: indexPath) as! BaseCollectionViewCell
         if let urlString = dataSource[indexPath.item].thumbnailUrl {
             cell.imageView.kf.setImage(with: URL(string: urlString))
         }
@@ -79,7 +79,7 @@ extension NetworkImageViewController: PhotoBrowserDelegate {
     
     /// 缩略图图片，在加载完成之前用作 placeholder 显示
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
-        let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? MomentsPhotoCollectionViewCell
+        let cell = collectionView?.cellForItem(at: IndexPath(item: index, section: 0)) as? BaseCollectionViewCell
         return cell?.imageView.image
     }
     

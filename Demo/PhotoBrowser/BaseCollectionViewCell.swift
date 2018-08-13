@@ -1,5 +1,5 @@
 //
-//  MomentsPhotoCollectionViewCell.swift
+//  BaseCollectionViewCell.swift
 //  PhotoBrowser
 //
 //  Created by JiongXing on 2017/3/10.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MomentsPhotoCollectionViewCell: UICollectionViewCell {
+class BaseCollectionViewCell: UICollectionViewCell {
 
     lazy var imageView: UIImageView = {
         let iv = UIImageView()

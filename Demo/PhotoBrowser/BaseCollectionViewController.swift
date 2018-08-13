@@ -63,7 +63,7 @@ class BaseCollectionViewController: UICollectionViewController {
         }
         
         collectionView?.backgroundColor = .white
-        collectionView?.register(MomentsPhotoCollectionViewCell.self, forCellWithReuseIdentifier: reusedId)
+        collectionView?.register(BaseCollectionViewCell.self, forCellWithReuseIdentifier: reusedId)
     }
     
     override func viewWillLayoutSubviews() {
