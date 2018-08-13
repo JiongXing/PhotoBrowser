@@ -15,9 +15,8 @@ final class LocalImageFullLoadViewController: BaseCollectionViewController {
         return  "动画:"
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationItem.title = "本地图片-全量加载"
+    override var name: String {
+        return "本地图片-全量加载"
     }
     
     override func makeDataSource() -> [PhotoModel] {
@@ -27,6 +26,14 @@ final class LocalImageFullLoadViewController: BaseCollectionViewController {
             result.append(model)
         }
         return result
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reusedId, for: indexPath) as! MomentsPhotoCollectionViewCell
+        if let imageName = dataSource[indexPath.item].localName {
+            cell.imageView.image = UIImage(named: imageName)
+        }
+        return cell
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -41,18 +48,23 @@ final class LocalImageFullLoadViewController: BaseCollectionViewController {
         }
         // 是否用动画
         if isSWitchOn {
+            // .scale 动画，需要设置 delegate 以获取缩略图
             PhotoBrowser.show(localImages: images, animationType: .scale, delegate: self, originPageIndex: indexPath.item, fromViewController: self)
         } else {
+            // 不需要设置 delegate
             PhotoBrowser.show(localImages: images, originPageIndex: indexPath.item)
         }
     }
 }
 
 extension LocalImageFullLoadViewController: PhotoBrowserDelegate {
+    /// 缩略图所在 view
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
         return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
     
+    /// 缩略图图片，在加载完成之前用作 placeholder 显示
+    /// 返回 nil 直接显示本地图片
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
         return nil
     }

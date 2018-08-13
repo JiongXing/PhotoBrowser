@@ -15,9 +15,8 @@ final class LocalImageLazyLoadViewController: BaseCollectionViewController {
         return  "动画:"
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationItem.title = "本地图片-懒加载"
+    override var name: String {
+        return "本地图片-懒加载"
     }
     
     override func makeDataSource() -> [PhotoModel] {
@@ -29,27 +28,41 @@ final class LocalImageLazyLoadViewController: BaseCollectionViewController {
         return result
     }
     
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reusedId, for: indexPath) as! MomentsPhotoCollectionViewCell
+        if let imageName = dataSource[indexPath.item].localName {
+            cell.imageView.image = UIImage(named: imageName)
+        }
+        return cell
+    }
+    
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: false)
-        
+        // 创建图片浏览器
         let browser = PhotoBrowser(animationType: isSWitchOn ? .scale : .fade, delegate: self, originPageIndex: indexPath.item)
+        // 显示
         browser.show(from: self)
     }
 }
 
 extension LocalImageLazyLoadViewController: PhotoBrowserDelegate {
+    /// 图片总数量
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
         return dataSource.count
     }
     
+    /// 缩略图所在 view
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailViewForIndex index: Int) -> UIView? {
         return collectionView?.cellForItem(at: IndexPath(item: index, section: 0))
     }
     
+    /// 缩略图图片，在加载完成之前用作 placeholder 显示
+    /// 返回 nil 直接显示本地图片
     func photoBrowser(_ photoBrowser: PhotoBrowser, thumbnailImageForIndex index: Int) -> UIImage? {
         return nil
     }
     
+    /// 本地图片
     func photoBrowser(_ photoBrowser: PhotoBrowser, localImageForIndex index: Int) -> UIImage? {
         if let name = dataSource[index].localName {
             return UIImage(named: name)

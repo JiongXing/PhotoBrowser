@@ -15,6 +15,9 @@
 		945391751E713A4C00A9AF66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 945391741E713A4C00A9AF66 /* Assets.xcassets */; };
 		945391781E713A4C00A9AF66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 945391761E713A4C00A9AF66 /* LaunchScreen.storyboard */; };
 		9453919C1E713CCC00A9AF66 /* MomentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */; };
+		945890902121CC4D00DDAAA5 /* NetworkImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9458908F2121CC4D00DDAAA5 /* NetworkImageViewController.swift */; };
+		945890922121D27E00DDAAA5 /* RawImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890912121D27E00DDAAA5 /* RawImageViewController.swift */; };
+		945890942121DBDB00DDAAA5 /* GIFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945890932121DBDB00DDAAA5 /* GIFViewController.swift */; };
 		9488C09F546D256A892E5FFC /* Pods_PhotoBrowser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 363546FCAE096417DD0438DC /* Pods_PhotoBrowser.framework */; };
 		9490B44920B26291004E91A2 /* MomentsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */; };
 		9490B44B20B295B0004E91A2 /* OverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9490B44A20B295B0004E91A2 /* OverlayModel.swift */; };
@@ -42,6 +45,9 @@
 		945391771E713A4C00A9AF66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		945391791E713A4C00A9AF66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentsViewController.swift; sourceTree = "<group>"; };
+		9458908F2121CC4D00DDAAA5 /* NetworkImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkImageViewController.swift; sourceTree = "<group>"; };
+		945890912121D27E00DDAAA5 /* RawImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawImageViewController.swift; sourceTree = "<group>"; };
+		945890932121DBDB00DDAAA5 /* GIFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFViewController.swift; sourceTree = "<group>"; };
 		9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MomentsTableViewCell.swift; sourceTree = "<group>"; };
 		9490B44A20B295B0004E91A2 /* OverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayModel.swift; sourceTree = "<group>"; };
 		94B749A0212066C70011ABA0 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
@@ -111,6 +117,9 @@
 				94B749A6212074BA0011ABA0 /* PhotoModel.swift */,
 				94B749A82120851A0011ABA0 /* LocalImageFullLoadViewController.swift */,
 				944B8C3921208B8A007E9449 /* LocalImageLazyLoadViewController.swift */,
+				9458908F2121CC4D00DDAAA5 /* NetworkImageViewController.swift */,
+				945890912121D27E00DDAAA5 /* RawImageViewController.swift */,
+				945890932121DBDB00DDAAA5 /* GIFViewController.swift */,
 				9453919B1E713CCC00A9AF66 /* MomentsViewController.swift */,
 				9490B44820B26291004E91A2 /* MomentsTableViewCell.swift */,
 				943AB2491E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift */,
@@ -259,7 +268,10 @@
 				94B749A1212066C70011ABA0 /* HomeViewController.swift in Sources */,
 				94B749A7212074BA0011ABA0 /* PhotoModel.swift in Sources */,
 				943AB24A1E724A4E0019ABBA /* MomentsPhotoCollectionViewCell.swift in Sources */,
+				945890922121D27E00DDAAA5 /* RawImageViewController.swift in Sources */,
+				945890942121DBDB00DDAAA5 /* GIFViewController.swift in Sources */,
 				94B749A92120851A0011ABA0 /* LocalImageFullLoadViewController.swift in Sources */,
+				945890902121CC4D00DDAAA5 /* NetworkImageViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

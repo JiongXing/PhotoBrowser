@@ -29,9 +29,14 @@ class BaseCollectionViewController: UICollectionViewController {
         return false
     }
     
-    private var flowLayout: UICollectionViewFlowLayout
+    /// 名称
+    var name: String {
+        return ""
+    }
     
-    private let reusedId = "reused"
+    let reusedId = "reused"
+    
+    private var flowLayout: UICollectionViewFlowLayout
     
     init() {
         let flowLayout = UICollectionViewFlowLayout()
@@ -46,6 +51,7 @@ class BaseCollectionViewController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.title = name
         dataSource = makeDataSource()
         if let swiTitle = switchTitle {
             let titleItem = UIBarButtonItem(title: swiTitle, style: .plain, target: nil, action: nil)
@@ -79,20 +85,8 @@ class BaseCollectionViewController: UICollectionViewController {
     func makeDataSource() -> [PhotoModel] {
         return []
     }
-}
-
-extension BaseCollectionViewController {
+    
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.count
     }
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reusedId, for: indexPath) as! MomentsPhotoCollectionViewCell
-        if let imageName = dataSource[indexPath.item].localName {
-            cell.imageView.image = UIImage(named: imageName)
-        }
-        return cell
-    }
 }
-
-

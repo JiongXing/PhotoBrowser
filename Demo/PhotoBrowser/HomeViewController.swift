@@ -10,10 +10,13 @@ import UIKit
 
 final class HomeViewController: UITableViewController {
     
-    var dataSources: [[String: UIViewController]] = [
-        ["本地图片-全量加载": LocalImageFullLoadViewController()],
-        ["本地图片-懒加载": LocalImageLazyLoadViewController()],
-    ]
+    var dataSources: [BaseCollectionViewController] = [
+            LocalImageFullLoadViewController(),
+            LocalImageLazyLoadViewController(),
+            NetworkImageViewController(),
+            RawImageViewController(),
+            GIFViewController(),
+        ]
     
     private let reusedId = "reused"
     
@@ -33,15 +36,12 @@ extension HomeViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reusedId) ?? UITableViewCell.init(style: .default, reuseIdentifier: reusedId)
-        cell.textLabel?.text = dataSources[indexPath.row].first.map { $0.key }
+        cell.textLabel?.text = dataSources[indexPath.row].name
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        
-        if let vc = dataSources[indexPath.row].first.map({ $0.value }) {
-            navigationController?.pushViewController(vc, animated: true)
-        }
+        navigationController?.pushViewController(dataSources[indexPath.row], animated: true)
     }
 }
