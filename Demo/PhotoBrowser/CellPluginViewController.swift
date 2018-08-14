@@ -56,7 +56,6 @@ final class CellPluginViewController: BaseCollectionViewController {
         }
         weak var weakBrowser = browser
         overlayPlugin.didTouchDeleteButton = { [unowned self] index in
-            
             self.dataSource.remove(at: index)
             self.overlayModels.remove(at: index)
             self.collectionView?.reloadData()

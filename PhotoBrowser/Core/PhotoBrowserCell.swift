@@ -16,7 +16,7 @@ public protocol PhotoBrowserCellDelegate: NSObjectProtocol {
     func photoBrowserCell(_ cell: PhotoBrowserCell, didSingleTap image: UIImage?)
 
     /// 长按时回调
-    func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage)
+    func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage, gesture: UILongPressGestureRecognizer)
 
     /// Layout 时回调
     func photoBrowserCellDidLayout(_ cell: PhotoBrowserCell)
@@ -320,7 +320,7 @@ extension PhotoBrowserCell {
     /// 响应长按
     @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
         if press.state == .began, let dlg = cellDelegate, let image = imageView.image {
-            dlg.photoBrowserCell(self, didLongPressWith: image)
+            dlg.photoBrowserCell(self, didLongPressWith: image, gesture: press)
         }
     }
 }

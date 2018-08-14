@@ -83,11 +83,11 @@ extension LongPressViewController: PhotoBrowserDelegate {
     }
     
     /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作
-    func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage) {
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage, gesture: UILongPressGestureRecognizer) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let saveImageAction = UIAlertAction(title: "图片信息", style: .default) { (_) in
             // 图片信息
-            print("图片：\(image)")
+            print("图片：\(image)\n长按手势：\(gesture)")
         }
         actionSheet.addAction(saveImageAction)
         let loadRawAction = UIAlertAction(title: "查看原图", style: .default) { (_) in

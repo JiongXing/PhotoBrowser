@@ -573,9 +573,10 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         // 半透明时重现状态栏，否则遮盖状态栏
         coverStatusBar(alpha >= 1.0)
     }
-
-    public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
+    
+    public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage, gesture: UILongPressGestureRecognizer) {
         if let indexPath = collectionView.indexPath(for: cell) {
+            photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image, gesture: gesture)
             photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
         }
     }
