@@ -328,6 +328,21 @@ open class PhotoBrowser: UIViewController {
         let indexPath = IndexPath(item: index, section: 0)
         collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
     }
+    
+    /// 遮盖状态栏。以改变windowLevel的方式遮盖
+    /// - parameter cover: true-遮盖；false-不遮盖
+    open func coverStatusBar(_ cover: Bool) {
+        guard let window = view.window ?? UIApplication.shared.keyWindow else {
+            return
+        }
+        if originWindowLevel == nil {
+            originWindowLevel = window.windowLevel
+        }
+        guard let originLevel = originWindowLevel else {
+            return
+        }
+        window.windowLevel = cover ? UIWindowLevelStatusBar + 1 : originLevel
+    }
 
     //
     // MARK: - Private Methods
@@ -345,20 +360,6 @@ open class PhotoBrowser: UIViewController {
         collectionView.frame = view.bounds
         collectionView.frame.size.width = view.bounds.width + photoSpacing
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: photoSpacing)
-    }
-
-    /// 遮盖状态栏。以改变windowLevel的方式遮盖
-    private func coverStatusBar(_ cover: Bool) {
-        guard let window = view.window ?? UIApplication.shared.keyWindow else {
-            return
-        }
-        if originWindowLevel == nil {
-            originWindowLevel = window.windowLevel
-        }
-        guard let originLevel = originWindowLevel else {
-            return
-        }
-        window.windowLevel = cover ? UIWindowLevelStatusBar + 1 : originLevel
     }
     
     /// 检查 numberOfItems，更新 currentIndex
