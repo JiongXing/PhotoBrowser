@@ -19,6 +19,7 @@ final class HomeViewController: UITableViewController {
             GIFViewController(),
             WebPViewController(),
             CellPluginViewController(),
+            PopupViewController(),
         ]
     
     private let reusedId = "reused"

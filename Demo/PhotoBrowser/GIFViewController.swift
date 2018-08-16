@@ -13,7 +13,7 @@ import Kingfisher
 final class GIFViewController: BaseCollectionViewController {
     
     override var name: String {
-        return "GIF测试"
+        return "测试GIF"
     }
     
     override func makeDataSource() -> [PhotoModel] {

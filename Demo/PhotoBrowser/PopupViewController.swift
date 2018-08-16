@@ -1,39 +1,27 @@
 //
-//  CellPluginViewController.swift
+//  PopupViewController.swift
 //  PhotoBrowser
 //
 //  Created by JiongXing on 2018/8/14.
-//  Copyright © 2018年 JiongXing. All rights reserved.
+//  Copyright © 2018 JiongXing. All rights reserved.
 //
 
 import Foundation
 import JXPhotoBrowser
 import Kingfisher
 
-final class CellPluginViewController: BaseCollectionViewController {
+final class PopupViewController: BaseCollectionViewController {
     
     override var name: String {
-        return "测试Cell插件"
+        return "测试打开新页面"
     }
     
     override func makeDataSource() -> [PhotoModel] {
         return [PhotoModel(thumbnailUrl: "http://wx3.sinaimg.cn/thumbnail/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
                            highQualityUrl: "http://wx3.sinaimg.cn/large/bfc243a3gy1febm7nzbz7j20ib0iek5j.jpg",
-                           rawUrl: nil, localName: nil),
-                PhotoModel(thumbnailUrl: "http://wx1.sinaimg.cn/thumbnail/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
-                           highQualityUrl: "http://wx1.sinaimg.cn/large/bfc243a3gy1febm7orgqfj20i80ht15x.jpg",
-                           rawUrl: nil, localName: nil),
-                PhotoModel(thumbnailUrl: "http://wx2.sinaimg.cn/thumbnail/bfc243a3gy1febm7sdk4lj20ib0i714u.jpg",
-                           highQualityUrl: "http://wx2.sinaimg.cn/large/bfc243a3gy1febm7sdk4lj20ib0i714u.jpg",
-                           rawUrl: nil, localName: nil),
+                           rawUrl: nil, localName: nil)
         ]
     }
-    
-    var overlayModels = [
-        OverlayModel(showButton: true, text: "   咦发生什么事~"),
-        OverlayModel(showButton: true, text: "   求抱抱~"),
-        OverlayModel(showButton: true, text: "   我也要~")
-    ]
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reusedId, for: indexPath) as! BaseCollectionViewCell
@@ -47,27 +35,14 @@ final class CellPluginViewController: BaseCollectionViewController {
         collectionView.deselectItem(at: indexPath, animated: false)
         // 创建图片浏览器
         let browser = PhotoBrowser(animationType: .scale, delegate: self, originPageIndex: indexPath.item)
-        // 数字型页码指示器
-        browser.plugins = [NumberPageControlPlugin()]
-        // Cell插件，覆盖在Cell之上
-        let overlayPlugin = OverlayPlugin()
-        overlayPlugin.dataSourceProvider = { [unowned self] index in
-            return self.overlayModels[index]
-        }
-        weak var weakBrowser = browser
-        overlayPlugin.didTouchDeleteButton = { [unowned self] index in
-            self.dataSource.remove(at: index)
-            self.overlayModels.remove(at: index)
-            self.collectionView?.reloadData()
-            weakBrowser?.deleteItem(at: index)
-        }
-        browser.cellPlugins.append(overlayPlugin)
+        // 光点型页码指示器
+        browser.plugins = [DefaultPageControlPlugin()]
         // 显示
         browser.show(from: self)
     }
 }
 
-extension CellPluginViewController: PhotoBrowserDelegate {
+extension PopupViewController: PhotoBrowserDelegate {
     /// 图片总数量
     func numberOfPhotos(in photoBrowser: PhotoBrowser) -> Int {
         return dataSource.count
@@ -91,5 +66,32 @@ extension CellPluginViewController: PhotoBrowserDelegate {
         }
     }
     
+    /// 长按图片。你可以在此处得到当前图片，并可以做弹窗，保存图片等操作
+    func photoBrowser(_ photoBrowser: PhotoBrowser, didLongPressForIndex index: Int, image: UIImage, gesture: UILongPressGestureRecognizer) {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let saveImageAction = UIAlertAction(title: "图片信息", style: .default) { (_) in
+            let vc = PopupNewViewController()
+            let nav = UINavigationController(rootViewController: vc)
+            photoBrowser.present(nav, animated: true, completion: nil)
+        }
+        actionSheet.addAction(saveImageAction)
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+        actionSheet.addAction(cancelAction)
+        photoBrowser.present(actionSheet, animated: true, completion: nil)
+    }
 }
 
+extension PopupViewController {
+    class PopupNewViewController: UIViewController {
+        override func viewDidLoad() {
+            super.viewDidLoad()
+            title = "新页面"
+            view.backgroundColor = .white
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "关闭", style: .plain, target: self, action: #selector(onCloseButton))
+        }
+        
+        @objc private func onCloseButton() {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+}

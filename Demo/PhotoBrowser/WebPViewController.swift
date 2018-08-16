@@ -13,7 +13,7 @@ import Kingfisher
 final class WebPViewController: BaseCollectionViewController {
     
     override var name: String {
-        return "WebP测试"
+        return "测试WebP"
     }
     
     override func makeDataSource() -> [PhotoModel] {

@@ -199,6 +199,7 @@ open class PhotoBrowser: UIViewController {
     
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        coverStatusBar(false)
         plugins.forEach {
             $0.photoBrowser(self, viewWillDisappear: view)
         }
@@ -244,7 +245,6 @@ open class PhotoBrowser: UIViewController {
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
     open func dismiss(animated: Bool) {
-        coverStatusBar(false)
         dismiss(animated: animated, completion: nil)
     }
 
@@ -559,7 +559,6 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         if let dlg = photoBrowserDelegate {
             dlg.photoBrowser(self, willDismissWithIndex: currentIndex, image: image)
         }
-        coverStatusBar(false)
         dismiss(animated: true, completion: { [weak self] in
             if let `self` = self, let dlg = self.photoBrowserDelegate {
                 dlg.photoBrowser(self, didDismissWithIndex: self.currentIndex, image: image)
