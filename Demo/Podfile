@@ -8,5 +8,6 @@ target 'PhotoBrowser' do
   # pod 'JXPhotoBrowser', :path => '..'
   
   ## WebP格式的图片
+  pod 'libwebp'
   pod 'JXPhotoBrowser/KingfisherWebP', :path => '..'
 end
