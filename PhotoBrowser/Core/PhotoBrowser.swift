@@ -347,10 +347,13 @@ open class PhotoBrowser: UIViewController {
     //
     // MARK: - Private Methods
     //
-
+    
     /// 添加视图
     private func setupViews() {
         view.addSubview(collectionView)
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
     }
 
     /// 视图布局
