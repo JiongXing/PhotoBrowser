@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.4.0-blue.svg)
+![](https://img.shields.io/badge/pod-v1.5.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -28,6 +28,13 @@
 
 > v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
 如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
+
+## Version 1.5.0
+**2018/08/16**
+- 长按事件回调时返回手势对象
+- 打开新页面时自动还原状态栏显示，也可以主动控制隐藏/显示
+- 下移了光点型页码指示器在iPhoneX上的默认位置
+- 修复iPhoneX横屏显示问题
 
 ## Version 1.4.0
 **2018/07/15**
