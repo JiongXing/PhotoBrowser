@@ -8,6 +8,11 @@
 import Foundation
 
 public protocol PhotoBrowserPlugin {
+    
+    /// Previewing的Peek操作
+    @available(iOS 9.0, *)
+    var previewActionItems: [UIPreviewActionItem] {get}
+    
     /// 页码已改变
     func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int)
 
@@ -40,6 +45,11 @@ public protocol PhotoBrowserPlugin {
 }
 
 extension PhotoBrowserPlugin {
+    
+    /// Previewing的Peek操作
+    @available(iOS 9.0, *)
+    public var previewActionItems: [UIPreviewActionItem] { return [] }
+    
     /// 页码已改变
     public func photoBrowser(_ photoBrowser: PhotoBrowser, didChangedPageIndex index: Int) {}
 
