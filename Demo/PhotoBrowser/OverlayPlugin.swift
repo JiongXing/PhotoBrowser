@@ -88,7 +88,7 @@ class OverlayPlugin: PhotoBrowserCellPlugin {
             label.frame = self.bounds
             button.sizeToFit()
             let x = self.bounds.width - 20 - button.bounds.width
-            let y = self.bounds.height - 20 - button.bounds.height
+            let y = self.bounds.height - 30 - button.bounds.height
             button.frame = CGRect(x: x, y: y, width: button.bounds.width, height: button.bounds.height)
         }
 

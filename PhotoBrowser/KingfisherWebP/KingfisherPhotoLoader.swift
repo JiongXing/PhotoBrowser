@@ -9,9 +9,10 @@ import Foundation
 import Kingfisher
 import KingfisherWebP
 
-open class KingfisherPhotoLoader: PhotoLoader {
+@objc(KingfisherPhotoLoader)
+open class KingfisherPhotoLoader: NSObject, PhotoLoader {
     
-    public init() {}
+    public override init() {}
     
     open func isImageCached(on imageView: UIImageView, url: URL) -> Bool {
         let result = KingfisherManager.shared.cache

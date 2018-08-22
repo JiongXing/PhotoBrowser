@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// PhotoLoader 实现者必须是 NSObject 子类
 public protocol PhotoLoader {
     /// 是否有指定的缓存图片
     func isImageCached(on imageView: UIImageView, url: URL) -> Bool

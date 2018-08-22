@@ -128,7 +128,7 @@ open class PhotoBrowser: UIViewController {
                 originPageIndex: Int = 0) {
         self.photoLoader = photoLoader ?? {
             let cls = NSClassFromString("KingfisherPhotoLoader")
-            assert(cls != nil, "请传入你实现的 photoLoader 或在 Podfile 选用 Kingfisher subspec!")
+            assert(cls != nil, "请传入你实现的 photoLoader 或在 Podfile 中添加 PhotoBrowser/Kingfisher")
             return (cls as! NSObject.Type).init() as! PhotoLoader
             }()
         super.init(nibName: nil, bundle: nil)
@@ -199,6 +199,7 @@ open class PhotoBrowser: UIViewController {
     
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        coverStatusBar(false)
         plugins.forEach {
             $0.photoBrowser(self, viewWillDisappear: view)
         }
@@ -244,7 +245,6 @@ open class PhotoBrowser: UIViewController {
     /// 不会触发`浏览器即将关闭/浏览器已经关闭`回调
     /// - parameter animated: 是否需要关闭转场动画
     open func dismiss(animated: Bool) {
-        coverStatusBar(false)
         dismiss(animated: animated, completion: nil)
     }
 
@@ -328,27 +328,10 @@ open class PhotoBrowser: UIViewController {
         let indexPath = IndexPath(item: index, section: 0)
         collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
     }
-
-    //
-    // MARK: - Private Methods
-    //
-
-    /// 添加视图
-    private func setupViews() {
-        view.addSubview(collectionView)
-    }
-
-    /// 视图布局
-    private func layoutViews() {
-        flowLayout.minimumLineSpacing = photoSpacing
-        flowLayout.itemSize = view.bounds.size
-        collectionView.frame = view.bounds
-        collectionView.frame.size.width = view.bounds.width + photoSpacing
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: photoSpacing)
-    }
-
+    
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
-    private func coverStatusBar(_ cover: Bool) {
+    /// - parameter cover: true-遮盖；false-不遮盖
+    open func coverStatusBar(_ cover: Bool) {
         guard let window = view.window ?? UIApplication.shared.keyWindow else {
             return
         }
@@ -359,6 +342,27 @@ open class PhotoBrowser: UIViewController {
             return
         }
         window.windowLevel = cover ? UIWindowLevelStatusBar + 1 : originLevel
+    }
+
+    //
+    // MARK: - Private Methods
+    //
+    
+    /// 添加视图
+    private func setupViews() {
+        view.addSubview(collectionView)
+        if #available(iOS 11.0, *) {
+            collectionView.contentInsetAdjustmentBehavior = .never
+        }
+    }
+
+    /// 视图布局
+    private func layoutViews() {
+        flowLayout.minimumLineSpacing = photoSpacing
+        flowLayout.itemSize = view.bounds.size
+        collectionView.frame = view.bounds
+        collectionView.frame.size.width = view.bounds.width + photoSpacing
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: photoSpacing)
     }
     
     /// 检查 numberOfItems，更新 currentIndex
@@ -558,7 +562,6 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         if let dlg = photoBrowserDelegate {
             dlg.photoBrowser(self, willDismissWithIndex: currentIndex, image: image)
         }
-        coverStatusBar(false)
         dismiss(animated: true, completion: { [weak self] in
             if let `self` = self, let dlg = self.photoBrowserDelegate {
                 dlg.photoBrowser(self, didDismissWithIndex: self.currentIndex, image: image)
@@ -573,9 +576,10 @@ extension PhotoBrowser: PhotoBrowserCellDelegate {
         // 半透明时重现状态栏，否则遮盖状态栏
         coverStatusBar(alpha >= 1.0)
     }
-
-    public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage) {
+    
+    public func photoBrowserCell(_ cell: PhotoBrowserCell, didLongPressWith image: UIImage, gesture: UILongPressGestureRecognizer) {
         if let indexPath = collectionView.indexPath(for: cell) {
+            photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image, gesture: gesture)
             photoBrowserDelegate?.photoBrowser(self, didLongPressForIndex: indexPath.item, image: image)
         }
     }
