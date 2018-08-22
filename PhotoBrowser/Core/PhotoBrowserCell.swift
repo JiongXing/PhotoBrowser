@@ -142,7 +142,8 @@ open class PhotoBrowserCell: UICollectionViewCell {
         // 拖动手势
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
         pan.delegate = self
-        contentView.addGestureRecognizer(pan)
+        // 必须加在scrollView上。不能加在contentView上，否则长图下拉不能触发
+        scrollView.addGestureRecognizer(pan)
     }
 
     public required init?(coder aDecoder: NSCoder) {
