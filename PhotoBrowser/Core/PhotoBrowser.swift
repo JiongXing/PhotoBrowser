@@ -37,6 +37,9 @@ open class PhotoBrowser: UIViewController {
 
     /// 打开时的初始页码，第一页为 0.
     open var originPageIndex: Int = 0
+    
+    /// 是否处于Peek状态
+    open var isPreviewing = false
 
     /// 本地图片组
     /// 优先级高于代理方法`func photoBrowser(_:, localImageForIndex:) -> UIImage?`
@@ -50,6 +53,11 @@ open class PhotoBrowser: UIViewController {
     open lazy var cellPlugins: [PhotoBrowserCellPlugin] = {
         return [ProgressViewPlugin(), RawImageButtonPlugin()]
     }()
+    
+    @available(iOS 9.0, *)
+    open override var previewActionItems: [UIPreviewActionItem] {
+        return plugins.map({$0.previewActionItems}).reduce([UIPreviewActionItem](), +)
+    }
 
     //
     // MARK: - Private Properties
