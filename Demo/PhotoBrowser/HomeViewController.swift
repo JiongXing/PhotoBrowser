@@ -10,7 +10,12 @@ import UIKit
 
 final class HomeViewController: UITableViewController {
     
-    var dataSources: [BaseCollectionViewController] = [
+    var dataSources: [BaseCollectionViewController] = []
+    
+    private let reusedId = "reused"
+    
+    private func makeDataSource() -> [BaseCollectionViewController] {
+        return [
             LocalImageFullLoadViewController(),
             LocalImageLazyLoadViewController(),
             NetworkImageViewController(),
@@ -21,15 +26,19 @@ final class HomeViewController: UITableViewController {
             CellPluginViewController(),
             PopupViewController(),
         ]
-    
-    private let reusedId = "reused"
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "JXPhotoBrowser"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: reusedId)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // 这里每次回首页重建对象，生产中不推荐这样做，自行优化
+        dataSources = makeDataSource()
     }
 }
 

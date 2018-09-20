@@ -182,6 +182,7 @@
 					945391691E713A4C00A9AF66 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 4Z74PJAKUM;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -419,10 +420,10 @@
 				DEVELOPMENT_TEAM = 4Z74PJAKUM;
 				INFOPLIST_FILE = PhotoBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ljx.PhotoBrowser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ljx.PhotoBrowserDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -435,10 +436,10 @@
 				DEVELOPMENT_TEAM = 4Z74PJAKUM;
 				INFOPLIST_FILE = PhotoBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ljx.PhotoBrowser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ljx.PhotoBrowserDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};

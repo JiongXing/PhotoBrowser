@@ -78,7 +78,7 @@ class BaseCollectionViewController: UICollectionViewController {
         flowLayout.minimumLineSpacing = spacing
         flowLayout.minimumInteritemSpacing = spacing
         flowLayout.itemSize = CGSize(width: sideLength, height: sideLength)
-        flowLayout.sectionInset = UIEdgeInsetsMake(insetValue, insetValue, insetValue, insetValue)
+        flowLayout.sectionInset = UIEdgeInsets.init(top: insetValue, left: insetValue, bottom: insetValue, right: insetValue)
     }
     
     // 子类重写

@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.5.1-blue.svg)
+![](https://img.shields.io/badge/pod-v1.6.0-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -26,8 +26,10 @@
 
 # Version History
 
-> v1.0版本相比初版的实现已经发生较大的变化，除核心功能基本不变以外，我对外围代码作了大量重构。
-如果是从旧版升级而来的同学，有不明白的地方请留言或联系我，我会尽可能提供帮助~
+## Version 1.6.0
+**2018/09/20**
+- 更新到 Swift 4.2
+- 看图插件支持设置3D-Touch中Peek操作的选项
 
 ## Version 1.5.1
 **2018/08/22**
@@ -52,8 +54,9 @@
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 
 # Requirements
-- iOS 8.0+
-- Swift 4
+- iOS 8.0
+- Xcode 10
+- Swift 4.2
 
 # Installation
 
@@ -65,13 +68,6 @@ pod repo update
 在你项目的Podfile中配置
 ```
 pod 'JXPhotoBrowser'
-```
-
-## Carthage
-本库依赖Kingfisher，需一并引入。在你项目的Cartfile中配置
-```
-github "onevcat/Kingfisher"
-github "JiongXing/PhotoBrowser"
 ```
 
 ![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
@@ -231,13 +227,13 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 
 ## Install 出错：Error installing libwebp
 谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源指向了谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
-1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 0.6.1。
-2. `pod repo` 查看 master 的 path，进入目录搜索 libwebp，进入 libwebp/0.6.1，找到`libwebp.podspec.json`
+1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 1.0.0。
+2. `pod repo` 查看 master 的 path，进入目录搜索 libwebp，进入 libwebp -> 1.0.0，找到`libwebp.podspec.json`
 3. 打开`libwebp.podspec.json`，修改 source 地址：
 ```
 "source": {
     "git": "https://github.com/webmproject/libwebp",
-    "tag": "v0.6.1"
+    "tag": "v1.0.0
   },
 ```
 4. 回到你的项目目录，可以愉快地`pod install`了~

@@ -1590,70 +1590,7 @@
 			};
 			name = Debug;
 		};
-		23C86462BB3F3393B11507683957DFEF /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = EA21388FAD73D3551084ED2A8635B770 /* libwebp.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/libwebp/libwebp-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/libwebp/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/libwebp/libwebp.modulemap";
-				PRODUCT_MODULE_NAME = libwebp;
-				PRODUCT_NAME = libwebp;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		28571A22149BFF11696A95DF18A1DD2F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = EA21388FAD73D3551084ED2A8635B770 /* libwebp.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/libwebp/libwebp-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/libwebp/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/libwebp/libwebp.modulemap";
-				PRODUCT_MODULE_NAME = libwebp;
-				PRODUCT_NAME = libwebp;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		5170796323A8E55F68DA5AA6E04E832F /* Debug */ = {
+		550528533D6083EF64454DADAB926D1C /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 78E05CFD06FB2AC6D33D85B3F9D8D5C8 /* KingfisherWebP.xcconfig */;
 			buildSettings = {
@@ -1677,15 +1614,49 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Debug;
+			name = Release;
 		};
-		665C9CDA56B6E4DE9ACCDE99051F15D7 /* Debug */ = {
+		64BB8B6DA5372EE0DD3CE027241C8771 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 85DC479E8DC501D9BF8B974D53CA1D6C /* Kingfisher.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/Kingfisher/Kingfisher-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Kingfisher/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Kingfisher/Kingfisher.modulemap";
+				PRODUCT_MODULE_NAME = Kingfisher;
+				PRODUCT_NAME = Kingfisher;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		6E9026CFC439BABD20BEF11D6339D8D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F36BD3FD1B4E9FDAB4C90F8410E9E570 /* JXPhotoBrowser.xcconfig */;
 			buildSettings = {
@@ -1710,7 +1681,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1752,9 +1723,9 @@
 			};
 			name = Release;
 		};
-		9FFB489751DE617BD5735A1D4440B887 /* Release */ = {
+		96333B25568FB0631FAEF8BDC5A8C461 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 78E05CFD06FB2AC6D33D85B3F9D8D5C8 /* KingfisherWebP.xcconfig */;
+			baseConfigurationReference = EA21388FAD73D3551084ED2A8635B770 /* libwebp.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -1765,19 +1736,18 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/KingfisherWebP/KingfisherWebP-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/KingfisherWebP/Info.plist";
+				GCC_PREFIX_HEADER = "Target Support Files/libwebp/libwebp-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/libwebp/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/KingfisherWebP/KingfisherWebP.modulemap";
-				PRODUCT_MODULE_NAME = KingfisherWebP;
-				PRODUCT_NAME = KingfisherWebP;
+				MODULEMAP_FILE = "Target Support Files/libwebp/libwebp.modulemap";
+				PRODUCT_MODULE_NAME = libwebp;
+				PRODUCT_NAME = libwebp;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1820,7 +1790,39 @@
 			};
 			name = Debug;
 		};
-		B22DBF1D6C23DC88DDD1021EC8A2D915 /* Release */ = {
+		B68D90F615A7BF02C4EF862D6272B584 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 78E05CFD06FB2AC6D33D85B3F9D8D5C8 /* KingfisherWebP.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/KingfisherWebP/KingfisherWebP-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/KingfisherWebP/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/KingfisherWebP/KingfisherWebP.modulemap";
+				PRODUCT_MODULE_NAME = KingfisherWebP;
+				PRODUCT_NAME = KingfisherWebP;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		E04462958D7EECDAFFEB1D95298198A6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F36BD3FD1B4E9FDAB4C90F8410E9E570 /* JXPhotoBrowser.xcconfig */;
 			buildSettings = {
@@ -1845,7 +1847,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1853,9 +1855,9 @@
 			};
 			name = Release;
 		};
-		E08EE9700CA7E64DD451017226382F63 /* Release */ = {
+		E10B25838771953C38432248D1838BB7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 85DC479E8DC501D9BF8B974D53CA1D6C /* Kingfisher.xcconfig */;
+			baseConfigurationReference = EA21388FAD73D3551084ED2A8635B770 /* libwebp.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -1866,27 +1868,25 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/Kingfisher/Kingfisher-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Kingfisher/Info.plist";
+				GCC_PREFIX_HEADER = "Target Support Files/libwebp/libwebp-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/libwebp/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/Kingfisher/Kingfisher.modulemap";
-				PRODUCT_MODULE_NAME = Kingfisher;
-				PRODUCT_NAME = Kingfisher;
+				MODULEMAP_FILE = "Target Support Files/libwebp/libwebp.modulemap";
+				PRODUCT_MODULE_NAME = libwebp;
+				PRODUCT_NAME = libwebp;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Release;
+			name = Debug;
 		};
-		F1F492B3573624F37604F3390BECA552 /* Debug */ = {
+		E4DCF83A4ADE26251D780ED3446B0858 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 85DC479E8DC501D9BF8B974D53CA1D6C /* Kingfisher.xcconfig */;
 			buildSettings = {
@@ -1911,7 +1911,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -1991,8 +1991,8 @@
 		253BAAC144BD76FD6148CF0845B8787A /* Build configuration list for PBXNativeTarget "Kingfisher" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F1F492B3573624F37604F3390BECA552 /* Debug */,
-				E08EE9700CA7E64DD451017226382F63 /* Release */,
+				E4DCF83A4ADE26251D780ED3446B0858 /* Debug */,
+				64BB8B6DA5372EE0DD3CE027241C8771 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2009,8 +2009,8 @@
 		9FB163522228FEC8FAA8750D40E483AE /* Build configuration list for PBXNativeTarget "libwebp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				28571A22149BFF11696A95DF18A1DD2F /* Debug */,
-				23C86462BB3F3393B11507683957DFEF /* Release */,
+				E10B25838771953C38432248D1838BB7 /* Debug */,
+				96333B25568FB0631FAEF8BDC5A8C461 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2018,8 +2018,8 @@
 		D0BAFF93067CBE5A67B4D2D1E3002794 /* Build configuration list for PBXNativeTarget "KingfisherWebP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5170796323A8E55F68DA5AA6E04E832F /* Debug */,
-				9FFB489751DE617BD5735A1D4440B887 /* Release */,
+				B68D90F615A7BF02C4EF862D6272B584 /* Debug */,
+				550528533D6083EF64454DADAB926D1C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2027,8 +2027,8 @@
 		F977615592EB5B715465F170F3A0C54E /* Build configuration list for PBXNativeTarget "JXPhotoBrowser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				665C9CDA56B6E4DE9ACCDE99051F15D7 /* Debug */,
-				B22DBF1D6C23DC88DDD1021EC8A2D915 /* Release */,
+				6E9026CFC439BABD20BEF11D6339D8D9 /* Debug */,
+				E04462958D7EECDAFFEB1D95298198A6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -24,7 +24,7 @@ open class PhotoBrowser: UIViewController {
     open var photoSpacing: CGFloat = 30
 
     /// 图片缩放模式
-    open var imageScaleMode = UIViewContentMode.scaleAspectFill
+    open var imageScaleMode = UIView.ContentMode.scaleAspectFill
 
     /// 捏合手势放大图片时的最大允许比例
     open var imageMaximumZoomScale: CGFloat = 2.0
@@ -97,7 +97,7 @@ open class PhotoBrowser: UIViewController {
     private lazy var collectionView: UICollectionView = { [unowned self] in
         let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
         collectionView.backgroundColor = UIColor.clear
-        collectionView.decelerationRate = UIScrollViewDecelerationRateFast
+        collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.dataSource = self
@@ -109,7 +109,7 @@ open class PhotoBrowser: UIViewController {
     }()
 
     /// 保存原windowLevel
-    private lazy var originWindowLevel: UIWindowLevel? = { [weak self] in
+    private lazy var originWindowLevel: UIWindow.Level? = { [weak self] in
         let window = self?.view.window ?? UIApplication.shared.keyWindow
         return window?.windowLevel
     }()
@@ -331,7 +331,7 @@ open class PhotoBrowser: UIViewController {
     
     /// 滑到哪张图片
     /// - parameter index: 图片序号，从0开始
-    open func scrollToItem(_ index: Int, at position: UICollectionViewScrollPosition, animated: Bool) {
+    open func scrollToItem(_ index: Int, at position: UICollectionView.ScrollPosition, animated: Bool) {
         currentIndex = index
         let indexPath = IndexPath(item: index, section: 0)
         collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
@@ -349,7 +349,7 @@ open class PhotoBrowser: UIViewController {
         guard let originLevel = originWindowLevel else {
             return
         }
-        window.windowLevel = cover ? UIWindowLevelStatusBar + 1 : originLevel
+        window.windowLevel = cover ? UIWindow.Level.statusBar + 1 : originLevel
     }
 
     //
