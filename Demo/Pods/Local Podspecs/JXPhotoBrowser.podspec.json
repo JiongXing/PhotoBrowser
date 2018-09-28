@@ -1,6 +1,6 @@
 {
   "name": "JXPhotoBrowser",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "license": "MIT",
   "summary": "Elegant photo browser in Swift.",
   "homepage": "https://github.com/JiongXing/PhotoBrowser",
@@ -9,14 +9,12 @@
   },
   "source": {
     "git": "https://github.com/JiongXing/PhotoBrowser.git",
-    "tag": "1.6.0"
+    "tag": "1.6.1"
   },
   "platforms": {
     "ios": "8.0"
   },
-  "pod_target_xcconfig": {
-    "SWIFT_VERSION": "4.2"
-  },
+  "swift_version": "4.2",
   "default_subspecs": "Kingfisher",
   "subspecs": [
     {

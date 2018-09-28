@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 ![](https://img.shields.io/badge/platform-ios-lightgrey.svg)
-![](https://img.shields.io/badge/pod-v1.6.0-blue.svg)
+![](https://img.shields.io/badge/pod-v1.6.1-blue.svg)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 
 # Features
@@ -26,6 +26,10 @@
 
 # Version History
 
+## Version 1.6.1
+**2018/09/28**
+- 修正Cocoapods配置的Swift版本
+
 ## Version 1.6.0
 **2018/09/20**
 - 更新到 Swift 4.2
@@ -41,15 +45,6 @@
 - 打开新页面时自动还原状态栏显示，也可以主动控制隐藏/显示
 - 下移了光点型页码指示器在iPhoneX上的默认位置
 - 修复iPhoneX横屏显示问题
-
-## Version 1.4.0
-**2018/07/15**
-- 现在可以自由选用Cell插件
-- 支持嵌入导航栏
-- 支持谷歌`WebP`格式
-- Cell 插件协议增加 CellWillDisplay 和 CellDidEndDisplaying 回调
-- 图片下拉手势现在改为加在`cell.contentView`上
-- 增加`scrollToItem()`方法，可随时控制滑动到哪张图片
 
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 

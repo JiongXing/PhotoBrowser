@@ -1,5 +1,9 @@
 # Version History
 
+## Version 1.6.1
+**2018/09/28**
+- 修正Cocoapods配置的Swift版本
+
 ## Version 1.6.0
 **2018/09/20**
 - 更新到 Swift 4.2

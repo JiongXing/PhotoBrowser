@@ -1,13 +1,13 @@
 Pod::Spec.new do |s|
   s.name = 'JXPhotoBrowser'
-  s.version = '1.6.0'
+  s.version = '1.6.1'
   s.license = 'MIT'
   s.summary = 'Elegant photo browser in Swift.'
   s.homepage = 'https://github.com/JiongXing/PhotoBrowser'
   s.authors = { 'JiongXing' => '549235261@qq.com' }
   s.source = { :git => 'https://github.com/JiongXing/PhotoBrowser.git', :tag => s.version }
   s.ios.deployment_target = '8.0'
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.2' }
+  s.swift_version = '4.2'
 
   s.subspec 'Core' do |cs|
     cs.source_files = 'PhotoBrowser/Core/*.swift'
