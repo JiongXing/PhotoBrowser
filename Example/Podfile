@@ -1,0 +1,9 @@
+platform :ios, '9.0'
+use_frameworks!
+
+target 'JXPhotoBrowser_Example' do
+    pod 'Kingfisher'
+    pod 'JXPhotoBrowser', :path => '../'
+    pod 'JXPhotoBrowser/KingfisherWebP', :path => '../'
+
+end
