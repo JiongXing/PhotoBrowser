@@ -91,7 +91,7 @@ JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
 // 视图代理
 let delegate = JXPhotoBrowser.BaseDelegate()
 // 长按事件
-delegate.longPressedCallback = { index, image, gesture in
+delegate.longPressedCallback = { browser, index, image, gesture in
 	// ...
 }
 // 打开浏览器

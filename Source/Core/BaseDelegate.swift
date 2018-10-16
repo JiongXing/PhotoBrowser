@@ -17,8 +17,8 @@ extension JXPhotoBrowser {
         /// 图片内容缩张模式
         public var contentMode: UIView.ContentMode = .scaleAspectFill
         
-        /// 长按回调。回传参数分别是：图片序号，图片对象，手势对象
-        public var longPressedCallback: ((Int, UIImage?, UILongPressGestureRecognizer) -> Void)?
+        /// 长按回调。回传参数分别是：浏览器，图片序号，图片对象，手势对象
+        public var longPressedCallback: ((JXPhotoBrowser, Int, UIImage?, UILongPressGestureRecognizer) -> Void)?
         
         //
         // MARK: - 处理状态栏
@@ -45,7 +45,7 @@ extension JXPhotoBrowser {
             guard let originLevel = originWindowLevel else {
                 return
             }
-            window.windowLevel = cover ? UIWindow.Level.statusBar + 1 : originLevel
+            window.windowLevel = cover ? .statusBar : originLevel
         }
         
         //
@@ -82,7 +82,9 @@ extension JXPhotoBrowser {
             // 长按
             weak var weakCell = cell
             cell.longPressedCallback = { gesture in
-                self.longPressedCallback?(indexPath.item, weakCell?.imageView.image, gesture)
+                if let browser = self.browser {
+                    self.longPressedCallback?(browser, indexPath.item, weakCell?.imageView.image, gesture)
+                }
             }
         }
         

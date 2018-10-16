@@ -222,7 +222,7 @@ extension JXPhotoBrowser.BaseCell {
     
     /// 响应长按
     @objc private func onLongPress(_ press: UILongPressGestureRecognizer) {
-        if press.state == .recognized {
+        if press.state == .began {
             longPressedCallback?(press)
         }
     }

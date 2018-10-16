@@ -29,14 +29,14 @@ class LongPressedViewController: LocalImageViewController {
         // 视图代理
         let delegate = JXPhotoBrowser.BaseDelegate()
         // 长按事件
-        delegate.longPressedCallback = { index, image, gesture in
-            self.longPressed(image: image, gesture: gesture)
+        delegate.longPressedCallback = { browser, index, image, gesture in
+            self.longPressed(browser: browser, image: image, gesture: gesture)
         }
         // 打开浏览器
         JXPhotoBrowser(dataSource: dataSource, delegate: delegate).show(pageIndex: indexPath.item)
     }
     
-    private func longPressed(image: UIImage?, gesture: UILongPressGestureRecognizer) {
+    private func longPressed(browser: JXPhotoBrowser, image: UIImage?, gesture: UILongPressGestureRecognizer) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let saveImageAction = UIAlertAction(title: "图片信息", style: .default) { (_) in
             // 图片信息
@@ -45,6 +45,6 @@ class LongPressedViewController: LocalImageViewController {
         actionSheet.addAction(saveImageAction)
         let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
         actionSheet.addAction(cancelAction)
-        UIViewController.jx.topMost?.present(actionSheet, animated: true, completion: nil)
+        browser.present(actionSheet, animated: true, completion: nil)
     }
 }
