@@ -4,9 +4,11 @@
 [![License](https://img.shields.io/cocoapods/l/JXPhotoBrowser.svg?style=flat)](https://cocoapods.org/pods/JXPhotoBrowser)
 [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg?style=flat)](https://cocoapods.org/pods/JXPhotoBrowser)
 
-<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_1.png" width = "300" height = "597" div/>
-<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_2.png" width = "300" height = "597" div/>
-<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_3.png" width = "300" height = "597" div/>
+<div>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_1.png" width = "30%" div/>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_2.png" width = "30%" div/>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_3.png" width = "30%" div/>
+</div>
 
 # Version History
 
