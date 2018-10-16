@@ -17,10 +17,10 @@ extension JXPhotoBrowser {
         /// 字颜色
         open var textColor = UIColor.white
         
-        /// 可指定中心点Y坐标。默认值：iPhoneX为30，非iPhoneX为20
+        /// 可指定中心点Y坐标。默认值：iPhoneX为40，非iPhoneX为20
         open var centerY: CGFloat = {
             if #available(iOS 11.0, *) {
-                return 30
+                return 40
             }
             return 20
         }()

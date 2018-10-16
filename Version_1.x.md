@@ -63,7 +63,7 @@ pod repo update
 pod 'JXPhotoBrowser'
 ```
 
-![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/resources/Introduction.gif)
+![Introduction](https://github.com/JiongXing/PhotoBrowser/raw/master/Resources/Introduction.gif)
 
 # Usage
 
