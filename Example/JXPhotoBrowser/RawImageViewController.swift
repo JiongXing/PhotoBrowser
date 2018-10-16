@@ -72,7 +72,7 @@ class RawImageViewController: BaseCollectionViewController {
             return collectionView.cellForItem(at: indexPath)
         })
         // 打开浏览器
-        JXPhotoBrowser(dataSource: dataSource, delegate:delegate, transDelegate: trans)
+        JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
             .show(pageIndex: indexPath.item)
     }
 }

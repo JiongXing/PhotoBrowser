@@ -47,6 +47,6 @@ class LocalNumberControlViewController: BaseCollectionViewController {
         // 视图代理，实现了数字型页码指示器
         let delegate = JXPhotoBrowser.NumberPageControlDelegate()
         // 打开浏览器
-        JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexPath.item)
+        JXPhotoBrowser(dataSource: dataSource, delegate: delegate).show(pageIndex: indexPath.item)
     }
 }

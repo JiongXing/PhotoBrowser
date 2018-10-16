@@ -72,8 +72,8 @@ open class JXPhotoBrowser: UIViewController {
     }
     
     /// 初始化
-    /// - parameter dataSource: CollectionView 数据源
-    /// - parameter delegate: CollectionView 代理
+    /// - parameter dataSource: 数据源
+    /// - parameter delegate: 视图代理
     /// - parameter transDelegate: 转场动画代理
     public init(dataSource: JXPhotoBrowserDataSource,
                 delegate: JXPhotoBrowserDelegate = BaseDelegate(),
