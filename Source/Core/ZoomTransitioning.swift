@@ -23,19 +23,17 @@ extension JXPhotoBrowser {
         // MARK: - 用户传入 ZoomView 的前置页面 Frame
         //
         
-        public typealias FrameClosure = (_ browser: JXPhotoBrowser, _ transContainer: UIView) -> CGRect?
+        public typealias FrameClosure = (
+            _ browser: JXPhotoBrowser,
+            _ pageIndex: Int,
+            _ transContainer: UIView) -> CGRect?
         
-        /// present转场时，动画起始位置
-        public var presentingStartFrame: FrameClosure
+        /// 取前置视图的Frame
+        public var originFrameCallback: FrameClosure
         
-        /// dismiss转场时，动画结束位置
-        public var dismissingEndFrame: FrameClosure
-        
-        /// 初始化，传入动画 起始/结束 的前置页面 Frame
-        public init(presentingStartFrame: @escaping FrameClosure,
-                    dismissingEndFrame: @escaping FrameClosure) {
-            self.presentingStartFrame = presentingStartFrame
-            self.dismissingEndFrame = dismissingEndFrame
+        /// 初始化，传入动画 起始/结束 的前置视图 Frame
+        public init(originFrameCallback: @escaping FrameClosure) {
+            self.originFrameCallback = originFrameCallback
             super.init()
             setupPresenting()
             setupDismissing()
@@ -45,24 +43,20 @@ extension JXPhotoBrowser {
         // MARK: - 用户传入 ZoomView 的前置页面视图
         //
         
-        public typealias ViewClosure = (_ browser: JXPhotoBrowser, _ transContainer: UIView) -> UIView?
+        public typealias ViewClosure = (
+            _ browser: JXPhotoBrowser,
+            _ pageIndex: Int,
+            _ transContainer: UIView) -> UIView?
         
-        /// 初始化，传入动画 起始/结束 的前置页面视图
-        public convenience init(presentingStartView: @escaping ViewClosure,
-                    dismissingEndView: @escaping ViewClosure) {
-            let presentingStartFrame: FrameClosure = { (browser, view) -> CGRect? in
-                if let startView = presentingStartView(browser, view) {
-                    return startView.convert(startView.bounds, to: view)
+        /// 初始化，传入动画 起始/结束 的前置视图
+        public convenience init(originViewCallback: @escaping ViewClosure) {
+            let callback: FrameClosure = { (browser, index, view) -> CGRect? in
+                if let oriView = originViewCallback(browser, index, view) {
+                    return oriView.convert(oriView.bounds, to: view)
                 }
                 return nil
             }
-            let dismissingEndFrame: FrameClosure = { (browser, view) -> CGRect? in
-                if let endView = dismissingEndView(browser, view) {
-                    return endView.convert(endView.bounds, to: view)
-                }
-                return nil
-            }
-            self.init(presentingStartFrame: presentingStartFrame, dismissingEndFrame: dismissingEndFrame)
+            self.init(originFrameCallback: callback)
         }
         
         private func setupPresenting() {
@@ -77,10 +71,10 @@ extension JXPhotoBrowser {
                 view?.clipsToBounds = true
                 return view
             }, startFrame: { view -> CGRect? in
-                guard let browser = self?.browser else {
-                    return nil
+                if let browser = self?.browser {
+                    return self?.originFrameCallback(browser, browser.pageIndex, view)
                 }
-                return self?.presentingStartFrame(browser, view)
+                return nil
             }, endFrame: { view -> CGRect? in
                 if let contentView = self?.browser?.displayingContentView {
                     return contentView.convert(contentView.bounds, to: view)
@@ -106,10 +100,10 @@ extension JXPhotoBrowser {
                 }
                 return nil
             }, endFrame: { view -> CGRect? in
-                guard let browser = self?.browser else {
-                    return nil
+                if let browser = self?.browser {
+                    return self?.originFrameCallback(browser, browser.pageIndex, view)
                 }
-                return self?.dismissingEndFrame(browser, view)
+                return nil
             })
         }
     }

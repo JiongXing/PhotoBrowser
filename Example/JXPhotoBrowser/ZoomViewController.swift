@@ -47,12 +47,10 @@ class ZoomViewController: BaseCollectionViewController {
         // 视图代理，实现了光点型页码指示器
         let delegate = JXPhotoBrowser.DefaultPageControlDelegate()
         // 转场动画
-        let trans = JXPhotoBrowser.ZoomTransitioning(presentingStartView: { (_, _) -> UIView? in
+        let trans = JXPhotoBrowser.ZoomTransitioning { (browser, index, view) -> UIView? in
+            let indexPath = IndexPath(item: index, section: 0)
             return collectionView.cellForItem(at: indexPath)
-        }, dismissingEndView: { (browser, _) -> UIView? in
-            let indexPath = IndexPath(item: browser.pageIndex, section: 0)
-            return collectionView.cellForItem(at: indexPath)
-        })
+        }
         // 打开浏览器
         JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
             .show(pageIndex: indexPath.item)
