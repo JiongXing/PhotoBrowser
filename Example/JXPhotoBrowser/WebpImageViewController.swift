@@ -29,7 +29,7 @@ class WebpImageViewController: BaseCollectionViewController {
         let model = ResourceModel()
         model.firstLevelUrl = array[0][0]
         model.secondLevelUrl = array[0][1]
-        model.thirdLevelUrl = "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Resources/testwebp.webp"
+        model.thirdLevelUrl = "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Assets/testwebp.webp"
         result.append(model)
         return result
     }
