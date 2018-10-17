@@ -23,51 +23,10 @@
   "subspecs": [
     {
       "name": "Core",
-      "source_files": "Source/Core/*",
-      "dependencies": {
-        "JXPhotoBrowser/Protocol": [
-
-        ],
-        "JXPhotoBrowser/Animator": [
-
-        ],
-        "JXPhotoBrowser/Enhance": [
-
-        ],
-        "JXPhotoBrowser/Transition": [
-
-        ],
-        "JXPhotoBrowser/Networking": [
-
-        ],
-        "JXPhotoBrowser/Utils": [
-
-        ]
-      }
-    },
-    {
-      "name": "Protocol",
-      "source_files": "Source/Protocol/*"
-    },
-    {
-      "name": "Animator",
-      "source_files": "Source/Animator/*"
-    },
-    {
-      "name": "Enhance",
-      "source_files": "Source/Enhance/*"
-    },
-    {
-      "name": "Transition",
-      "source_files": "Source/Transition/*"
-    },
-    {
-      "name": "Networking",
-      "source_files": "Source/Networking/*"
-    },
-    {
-      "name": "Utils",
-      "source_files": "Source/Utils/*"
+      "source_files": [
+        "Source/Core/*",
+        "Source/Core/*/*"
+      ]
     },
     {
       "name": "Kingfisher",

@@ -17,37 +17,7 @@ Pod::Spec.new do |s|
     s.default_subspec = 'Kingfisher'
     
     s.subspec 'Core' do |ss|
-        ss.source_files = 'Source/Core/*'
-        ss.dependency 'JXPhotoBrowser/Protocol'
-        ss.dependency 'JXPhotoBrowser/Animator'
-        ss.dependency 'JXPhotoBrowser/Enhance'
-        ss.dependency 'JXPhotoBrowser/Transition'
-        ss.dependency 'JXPhotoBrowser/Networking'
-        ss.dependency 'JXPhotoBrowser/Utils'
-    end
-
-    s.subspec 'Protocol' do |ss|
-        ss.source_files = 'Source/Protocol/*'
-    end
-
-    s.subspec 'Animator' do |ss|
-        ss.source_files = 'Source/Animator/*'
-    end
-
-    s.subspec 'Enhance' do |ss|
-        ss.source_files = 'Source/Enhance/*'
-    end
-
-    s.subspec 'Transition' do |ss|
-        ss.source_files = 'Source/Transition/*'
-    end
-
-    s.subspec 'Networking' do |ss|
-        ss.source_files = 'Source/Networking/*'
-    end
-
-    s.subspec 'Utils' do |ss|
-        ss.source_files = 'Source/Utils/*'
+        ss.source_files = 'Source/Core/*', 'Source/Core/*/*'
     end
     
     s.subspec 'Kingfisher' do |ss|
