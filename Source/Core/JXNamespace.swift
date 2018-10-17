@@ -9,23 +9,23 @@ import Foundation
 
 /// 类型协议
 public protocol JXTypeWrapperProtocol {
-    associatedtype WrappedType
-    var wrappedValue: WrappedType { get }
-    init(value: WrappedType)
+    associatedtype JXWrappedType
+    var jxWrappedValue: JXWrappedType { get }
+    init(value: JXWrappedType)
 }
 
 public struct JXNamespaceWrapper<T>: JXTypeWrapperProtocol {
-    public let wrappedValue: T
+    public let jxWrappedValue: T
     public init(value: T) {
-        self.wrappedValue = value
+        self.jxWrappedValue = value
     }
 }
 
 /// 命名空间协议
 public protocol JXNamespaceWrappable {
-    associatedtype WrapperType
-    var jx: WrapperType { get }
-    static var jx: WrapperType.Type { get }
+    associatedtype JXWrappedType
+    var jx: JXWrappedType { get }
+    static var jx: JXWrappedType.Type { get }
 }
 
 extension JXNamespaceWrappable {

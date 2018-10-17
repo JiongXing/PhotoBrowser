@@ -10,7 +10,7 @@ import UIKit
 
 extension UIViewController: JXNamespaceWrappable {}
 
-extension JXTypeWrapperProtocol where WrappedType == UIViewController {
+extension JXTypeWrapperProtocol where JXWrappedType == UIViewController {
     
     /// Returns the current application's top most view controller.
     public static var topMost: UIViewController? {

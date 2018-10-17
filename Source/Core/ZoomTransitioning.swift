@@ -23,7 +23,7 @@ extension JXPhotoBrowser {
         // MARK: - 用户传入 ZoomView 的前置页面 Frame
         //
         
-        public typealias FrameClosure = (_ browser: JXPhotoBrowser, _ View: UIView) -> CGRect?
+        public typealias FrameClosure = (_ browser: JXPhotoBrowser, _ transContainer: UIView) -> CGRect?
         
         /// present转场时，动画起始位置
         public var presentingStartFrame: FrameClosure
@@ -45,7 +45,7 @@ extension JXPhotoBrowser {
         // MARK: - 用户传入 ZoomView 的前置页面视图
         //
         
-        public typealias ViewClosure = (_ browser: JXPhotoBrowser, _ View: UIView) -> UIView?
+        public typealias ViewClosure = (_ browser: JXPhotoBrowser, _ transContainer: UIView) -> UIView?
         
         /// 初始化，传入动画 起始/结束 的前置页面视图
         public convenience init(presentingStartView: @escaping ViewClosure,
