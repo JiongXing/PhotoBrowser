@@ -32,6 +32,7 @@ extension JXPhotoBrowser {
                              autoloadURLString: String?) {
             // 重置环境
             progressView.isHidden = true
+            progressView.progress = 0
             // url是否有效
             guard let urlString = autoloadURLString,let url = URL(string: urlString) else {
                 imageView.image = localImage

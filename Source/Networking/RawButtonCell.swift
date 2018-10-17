@@ -56,6 +56,7 @@ extension JXPhotoBrowser {
                              rawURLString: String?) {
             // 重置环境
             progressView.isHidden = true
+            progressView.progress = 0
             rawButton.isHidden = true
             // 保存原图链接
             self.rawURLString = rawURLString
