@@ -12,10 +12,11 @@
 
 # Version History
 
-## Version 2.0.1
-**2018/10/17**
+## Version 2.0.x
+**2018/10/18**
 - 重新设计了接口，使用起来更简单易懂。
 - 进行了大规模重构，代码更优雅，更易扩展，更易维护。
+- 注意如果是从1.x版本升级上来的，遇到无法编译情况，请清除Xcode的`Derived Data`
 
 ## Version 1.6.1
 1.x版本不再更新功能，若要使用，可参考：[Version_1.x](Version_1.x.md)
@@ -122,32 +123,25 @@ JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexP
 打开`JXPhotoBrowser`时，默认使用的转场动画是`Fade`渐变型的，如果想要`Zoom`缩张型，需要返回动画起始/结束位置给`Zoom`动画代理。
 本框架提供了两种方案，你可选择返回起始/结束视图，或选择返回起始/结束坐标。
 ```swift
-// 返回起始/结束视图
-let trans = JXPhotoBrowser.ZoomTransitioning(presentingStartView: { (_, _) -> UIView? in
+// 返回起始/结束 视图
+let trans = JXPhotoBrowser.ZoomTransitioning { (browser, index, view) -> UIView? in
+    let indexPath = IndexPath(item: index, section: 0)
     return collectionView.cellForItem(at: indexPath)
-}, dismissingEndView: { (browser, _) -> UIView? in
-    let indexPath = IndexPath(item: browser.pageIndex, section: 0)
-    return collectionView.cellForItem(at: indexPath)
-})
+}
 // 打开浏览器
 JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 	.show(pageIndex: indexPath.item)
 ```
 
 ```swift
-// 返回起始/结束坐标
-let trans = JXPhotoBrowser.ZoomTransitioning(presentingStartFrame: { (_, view) -> CGRect? in
+// 返回起始/结束 位置
+let trans = JXPhotoBrowser.ZoomTransitioning { (browser, index, view) -> CGRect? in
+    let indexPath = IndexPath(item: index, section: 0)
     if let cell = collectionView.cellForItem(at: indexPath) {
         return cell.convert(cell.bounds, to: view)
     }
     return nil
-}, dismissingEndFrame: { (browser, view) -> CGRect? in
-    let indexPath = IndexPath(item: browser.pageIndex, section: 0)
-    if let cell = collectionView.cellForItem(at: indexPath) {
-        return cell.convert(cell.bounds, to: view)
-    }
-    return nil
-})
+}
 // 打开浏览器
 JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 	.show(pageIndex: indexPath.item)
