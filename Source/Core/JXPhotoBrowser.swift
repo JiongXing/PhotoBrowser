@@ -67,7 +67,7 @@ open class JXPhotoBrowser: UIViewController {
     /// 销毁
     deinit {
         #if DEBUG
-        //print("deinit:\(self)")
+        print("deinit:\(self)")
         #endif
     }
     
@@ -114,6 +114,7 @@ open class JXPhotoBrowser: UIViewController {
         
         layout()
         collectionView.reloadData()
+        scrollToItem(pageIndex, at: .left, animated: false)
         collectionView.layoutIfNeeded()
         delegate.photoBrowserViewDidLoad(self)
     }
@@ -124,7 +125,6 @@ open class JXPhotoBrowser: UIViewController {
         collectionView.frame = view.bounds
         collectionView.frame.size.width = view.bounds.width + photoSpacing
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: photoSpacing)
-        scrollToItem(pageIndex, at: .left, animated: false)
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -166,6 +166,16 @@ open class JXPhotoBrowser: UIViewController {
     /// 支持旋转的方向
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .all
+    }
+    
+    /// 屏幕即将旋转回调
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        // 记录旋转前index
+        let index = pageIndex
+        DispatchQueue.main.asyncAfter(deadline: .now() + coordinator.transitionDuration, execute: {
+            self.scrollToItem(index, at: .left, animated: false)
+        })
     }
     
     /// 滑到哪张图片
