@@ -1,12 +1,12 @@
 
 Pod::Spec.new do |s|
     s.name             = 'JXPhotoBrowser'
-    s.version          = '2.0.4'
+    s.version          = '2.0.5'
     s.summary          = 'Elegant photo browser in Swift.'
     s.description      = 'Elegant photo browser in Swift. Inspired by WeChat.'
     
     s.homepage         = 'https://github.com/JiongXing/PhotoBrowser'
-    # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
+    s.screenshots     = 'https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_3.png'
     s.license          = { :type => 'MIT', :file => 'LICENSE' }
     s.author           = { 'JiongXing' => 'liangjiongxing@qq.com' }
     s.source           = { :git => 'https://github.com/JiongXing/PhotoBrowser.git', :tag => s.version.to_s }

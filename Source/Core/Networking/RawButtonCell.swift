@@ -85,7 +85,7 @@ extension JXPhotoBrowser {
         
         /// 响应查看原图按钮
         @objc open func onRawImageButton(_ button: UIButton) {
-            progressView.isHidden = false
+            self.rawButton.isHidden = true
             guard let urlString = rawURLString, let url = URL(string: urlString) else {
                 progressView.isHidden = true
                 return
@@ -93,12 +93,14 @@ extension JXPhotoBrowser {
             photoLoader?.setImage(on: imageView, url: url, placeholder: imageView.image, progressBlock: { receivedSize, totalSize in
                 if totalSize > 0 {
                     self.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
+                    if receivedSize < totalSize {
+                        self.progressView.isHidden = false
+                    }
                 } else {
                     self.progressView.progress = 0
                 }
             }) {
                 self.progressView.isHidden = true
-                self.rawButton.isHidden = true
                 self.setNeedsLayout()
             }
         }
