@@ -4,6 +4,30 @@
 [![License](https://img.shields.io/cocoapods/l/JXPhotoBrowser.svg?style=flat)](https://cocoapods.org/pods/JXPhotoBrowser)
 [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg?style=flat)](https://cocoapods.org/pods/JXPhotoBrowser)
 
+# Features
+- [x] 支持本地图片
+- [x] 支持初始图、高清图和原图三个级别
+- [x] 支持`GIF`格式
+- [x] 支持`WebP`格式
+- [x] 支持Fade渐变转场动画
+- [x] 支持Zoom缩放转场动画
+- [x] 支持下滑手势关闭浏览器
+- [x] 支持单击、双击、放大缩小、长按
+- [x] 支持屏幕旋转
+- [x] 支持继承图片浏览器
+- [x] 支持继承页视图Cell
+- [x] 支持自定义Cell注册到浏览器
+- [x] 支持自定义图片加载器
+- [x] 提供了基于`Kingfisher`的图片加载器实现
+- [x] 提供了基于`KingfisherWebP`的WebP图片加载器实现
+- [x] 提供了光点型的页码指示器的实现
+- [x] 提供了数字型的页码指示器的实现
+- [x] 提供了图片加载进度指示器的实现
+- [x] 提供了查看原图按钮的实现
+- [ ] 理论上支持浏览视频，需自己实现播放功能（待补充示例）
+- [ ] 理论上支持修改数据源（待补充示例）
+
+
 <div>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_1.png" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_2.png" width = "30%" div/>
