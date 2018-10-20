@@ -1,11 +1,11 @@
 PODS:
-  - JXPhotoBrowser (2.0.5):
-    - JXPhotoBrowser/Kingfisher (= 2.0.5)
-  - JXPhotoBrowser/Core (2.0.5)
-  - JXPhotoBrowser/Kingfisher (2.0.5):
+  - JXPhotoBrowser (2.0.6):
+    - JXPhotoBrowser/Kingfisher (= 2.0.6)
+  - JXPhotoBrowser/Core (2.0.6)
+  - JXPhotoBrowser/Kingfisher (2.0.6):
     - JXPhotoBrowser/Core
     - Kingfisher
-  - JXPhotoBrowser/KingfisherWebP (2.0.5):
+  - JXPhotoBrowser/KingfisherWebP (2.0.6):
     - JXPhotoBrowser/Core
     - KingfisherWebP
   - Kingfisher (4.10.0)
@@ -54,7 +54,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: da8ae4beed01e8602073454fc922b46f23de0d35
+  JXPhotoBrowser: 74180d6eff9908bdf1bf80ec44680c6e9e7a2b35
   Kingfisher: 43c4b802d8b5256cf1f4379e9cd10b329be6d3e2
   KingfisherWebP: 53632f3da248ccabd4999d775903d6ae0aaa7768
   libwebp: 1ad7cec76ed0a6db76a1ee4fbb08a15fbbdb8776

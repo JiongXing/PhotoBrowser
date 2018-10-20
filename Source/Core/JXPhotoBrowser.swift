@@ -64,13 +64,6 @@ open class JXPhotoBrowser: UIViewController {
     // MARK: - Life Cycle
     //
     
-    /// 销毁
-    deinit {
-        #if DEBUG
-        print("deinit:\(self)")
-        #endif
-    }
-    
     /// 初始化
     /// - parameter dataSource: 数据源
     /// - parameter delegate: 视图代理
