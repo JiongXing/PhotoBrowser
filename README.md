@@ -77,8 +77,8 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 ```swift
 open class JXPhotoBrowser: UIViewController {
     public init(dataSource: JXPhotoBrowserDataSource,
-                delegate: JXPhotoBrowserDelegate = BaseDelegate(),
-                transDelegate: JXPhotoBrowserTransitioningDelegate = FadeTransitioning())
+                delegate: JXPhotoBrowserDelegate = JXPhotoBrowserBaseDelegate(),
+                transDelegate: JXPhotoBrowserTransitioningDelegate = JXPhotoBrowserFadeTransitioning())
 }
 ```
 
@@ -100,7 +100,7 @@ JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
 项目例子展示了如何浏览本地图片：
 ```swift
 // 数据源
-let dataSource = JXPhotoBrowser.LocalDataSource(numberOfItems: {
+let dataSource = JXLocalDataSource(numberOfItems: {
     // 共有多少项
     return self.dataSource.count
 }, localImage: { index -> UIImage? in
@@ -117,7 +117,7 @@ JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
 默认实现了单击、双击、拖拽、长按事件。可以给视图代理设置长按事件的回调：
 ```swift
 // 视图代理
-let delegate = JXPhotoBrowser.BaseDelegate()
+let delegate = JXPhotoBrowserBaseDelegate()
 // 长按事件
 delegate.longPressedCallback = { browser, index, image, gesture in
 	// ...
@@ -130,7 +130,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate: delegate).show(pageIndex: index
 可通过自定义视图代理来增加控件
 ```swift
 // 视图代理，实现了光点型页码指示器
-let delegate = JXPhotoBrowser.DefaultPageControlDelegate()
+let delegate = JXDefaultPageControlDelegate()
 // 打开浏览器
 JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexPath.item)
 ```
@@ -138,7 +138,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexP
 ## 数字型页码指示器
 ```swift
 // 视图代理，实现了数字型页码指示器
-let delegate = JXPhotoBrowser.NumberPageControlDelegate()
+let delegate = JXNumberPageControlDelegate()
 // 打开浏览器
 JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexPath.item)
 ```
@@ -148,7 +148,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexP
 本框架提供了两种方案，你可选择返回起始/结束视图，或选择返回起始/结束坐标。
 ```swift
 // 返回起始/结束 视图
-let trans = JXPhotoBrowser.ZoomTransitioning { (browser, index, view) -> UIView? in
+let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
     let indexPath = IndexPath(item: index, section: 0)
     return collectionView.cellForItem(at: indexPath)
 }
@@ -159,7 +159,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 
 ```swift
 // 返回起始/结束 位置
-let trans = JXPhotoBrowser.ZoomTransitioning { (browser, index, view) -> CGRect? in
+let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> CGRect? in
     let indexPath = IndexPath(item: index, section: 0)
     if let cell = collectionView.cellForItem(at: indexPath) {
         return cell.convert(cell.bounds, to: view)
@@ -179,7 +179,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 // 网图加载器
 let loader = JXPhotoBrowser.KingfisherLoader()
 // 数据源
-let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, numberOfItems: { () -> Int in
+let dataSource = JXNetworkingDataSource(photoLoader: loader, numberOfItems: { () -> Int in
     return self.dataSource.count
 }, localImage: { index -> UIImage? in
     let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
@@ -198,7 +198,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 // 网图加载器
 let loader = JXPhotoBrowser.KingfisherLoader()
 // 数据源
-let dataSource = JXPhotoBrowser.RawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
+let dataSource = JXRawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
     return self.dataSource.count
 }, localImage: { index -> UIImage? in
     let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
@@ -217,7 +217,7 @@ JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 `Kingfisher`已支持加载`GIF`格式，所以可直接使用`KingfisherLoader`：
 ```swift
 // 网图加载器
-let loader = JXPhotoBrowser.KingfisherLoader()
+let loader = JXKingfisherLoader()
 let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
 ```
 
@@ -229,7 +229,7 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 然后使用它作为网图加载器：
 ```swift
 // 网图加载器，WebP加载器
-let loader = JXPhotoBrowser.KingfisherWebPLoader()
+let loader = JXKingfisherWebPLoader()
 let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
 ```
 

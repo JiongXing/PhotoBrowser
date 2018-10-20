@@ -1,5 +1,5 @@
 //
-//  BaseCell.swift
+//  JXPhotoBrowserBaseCell.swift
 //  JXPhotoBrowser
 //
 //  Created by JiongXing on 2018/10/14.
@@ -7,99 +7,97 @@
 
 import UIKit
 
-extension JXPhotoBrowser {
-    open class BaseCell: UICollectionViewCell {
-        /// ImageView
-        public let imageView = UIImageView()
-        
-        /// 图片缩放容器
-        public let imageContainer = UIScrollView()
-        
-        /// 图片允许的最大放大倍率
-        public var imageMaximumZoomScale: CGFloat = 2.0
-        
-        /// 单击时回调
-        public var clickCallback: ((UITapGestureRecognizer) -> Void)?
-        
-        /// 长按时回调
-        public var longPressedCallback: ((UILongPressGestureRecognizer) -> Void)?
-        
-        /// 图片拖动时回调
-        public var panChangedCallback: ((_ scale: CGFloat) -> Void)?
-        
-        /// 图片拖动松手回调。isDown: 是否向下
-        public var panReleasedCallback: ((_ isDown: Bool) -> Void)?
-        
-        /// 记录pan手势开始时imageView的位置
-        private var beganFrame = CGRect.zero
-        
-        /// 记录pan手势开始时，手势位置
-        private var beganTouch = CGPoint.zero
-        
-        //
-        // MARK: - Life Cycle
-        //
-        
-        /// 初始化
-        public override init(frame: CGRect) {
-            super.init(frame: frame)
-            contentView.addSubview(imageContainer)
-            imageContainer.maximumZoomScale = imageMaximumZoomScale
-            imageContainer.delegate = self
-            imageContainer.showsVerticalScrollIndicator = false
-            imageContainer.showsHorizontalScrollIndicator = false
-            if #available(iOS 11.0, *) {
-                imageContainer.contentInsetAdjustmentBehavior = .never
-            }
-            
-            imageContainer.addSubview(imageView)
-            imageView.clipsToBounds = true
-            
-            // 长按手势
-            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
-            contentView.addGestureRecognizer(longPress)
-            
-            // 双击手势
-            let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleClick(_:)))
-            doubleTap.numberOfTapsRequired = 2
-            contentView.addGestureRecognizer(doubleTap)
-            
-            // 单击手势
-            let singleTap = UITapGestureRecognizer(target: self, action: #selector(onClick(_:)))
-            contentView.addGestureRecognizer(singleTap)
-            singleTap.require(toFail: doubleTap)
-            
-            // 拖动手势
-            let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
-            pan.delegate = self
-            // 必须加在图片容器上。不能加在contentView上，否则长图下拉不能触发
-            imageContainer.addGestureRecognizer(pan)
-            // 子类在此添加自己的视图
-            setupViews()
+open class JXPhotoBrowserBaseCell: UICollectionViewCell {
+    /// ImageView
+    public let imageView = UIImageView()
+    
+    /// 图片缩放容器
+    public let imageContainer = UIScrollView()
+    
+    /// 图片允许的最大放大倍率
+    public var imageMaximumZoomScale: CGFloat = 2.0
+    
+    /// 单击时回调
+    public var clickCallback: ((UITapGestureRecognizer) -> Void)?
+    
+    /// 长按时回调
+    public var longPressedCallback: ((UILongPressGestureRecognizer) -> Void)?
+    
+    /// 图片拖动时回调
+    public var panChangedCallback: ((_ scale: CGFloat) -> Void)?
+    
+    /// 图片拖动松手回调。isDown: 是否向下
+    public var panReleasedCallback: ((_ isDown: Bool) -> Void)?
+    
+    /// 记录pan手势开始时imageView的位置
+    private var beganFrame = CGRect.zero
+    
+    /// 记录pan手势开始时，手势位置
+    private var beganTouch = CGPoint.zero
+    
+    //
+    // MARK: - Life Cycle
+    //
+    
+    /// 初始化
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        contentView.addSubview(imageContainer)
+        imageContainer.maximumZoomScale = imageMaximumZoomScale
+        imageContainer.delegate = self
+        imageContainer.showsVerticalScrollIndicator = false
+        imageContainer.showsHorizontalScrollIndicator = false
+        if #available(iOS 11.0, *) {
+            imageContainer.contentInsetAdjustmentBehavior = .never
         }
         
-        required public init?(coder aDecoder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
+        imageContainer.addSubview(imageView)
+        imageView.clipsToBounds = true
         
-        open override func layoutSubviews() {
-            super.layoutSubviews()
-            imageContainer.frame = contentView.bounds
-            imageContainer.setZoomScale(1.0, animated: false)
-            imageView.frame = fitFrame
-            imageContainer.setZoomScale(1.0, animated: false)
-        }
+        // 长按手势
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
+        contentView.addGestureRecognizer(longPress)
         
-        /// 给子类重写。在初始化时调用
-        open func setupViews() {}
+        // 双击手势
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleClick(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        contentView.addGestureRecognizer(doubleTap)
+        
+        // 单击手势
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(onClick(_:)))
+        contentView.addGestureRecognizer(singleTap)
+        singleTap.require(toFail: doubleTap)
+        
+        // 拖动手势
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
+        pan.delegate = self
+        // 必须加在图片容器上。不能加在contentView上，否则长图下拉不能触发
+        imageContainer.addGestureRecognizer(pan)
+        // 子类在此添加自己的视图
+        setupViews()
     }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        imageContainer.frame = contentView.bounds
+        imageContainer.setZoomScale(1.0, animated: false)
+        imageView.frame = fitFrame
+        imageContainer.setZoomScale(1.0, animated: false)
+    }
+    
+    /// 给子类重写。在初始化时调用
+    open func setupViews() {}
 }
 
 //
 // MARK: - Private
 //
 
-extension JXPhotoBrowser.BaseCell {
+extension JXPhotoBrowserBaseCell {
     /// 计算图片复位坐标
     private var resettingCenter: CGPoint {
         let deltaWidth = bounds.width - imageContainer.contentSize.width
@@ -148,7 +146,7 @@ extension JXPhotoBrowser.BaseCell {
 // MARK: - Events
 //
 
-extension JXPhotoBrowser.BaseCell {
+extension JXPhotoBrowserBaseCell {
     /// 响应拖动
     @objc private func onPan(_ pan: UIPanGestureRecognizer) {
         guard imageView.image != nil else {
@@ -232,7 +230,7 @@ extension JXPhotoBrowser.BaseCell {
 // MARK: - UIScrollViewDelegate
 //
 
-extension JXPhotoBrowser.BaseCell: UIScrollViewDelegate {
+extension JXPhotoBrowserBaseCell: UIScrollViewDelegate {
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
@@ -247,7 +245,7 @@ extension JXPhotoBrowser.BaseCell: UIScrollViewDelegate {
 // MARK: - UIGestureRecognizerDelegate
 //
 
-extension JXPhotoBrowser.BaseCell: UIGestureRecognizerDelegate {
+extension JXPhotoBrowserBaseCell: UIGestureRecognizerDelegate {
     open override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // 只响应pan手势
         guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {

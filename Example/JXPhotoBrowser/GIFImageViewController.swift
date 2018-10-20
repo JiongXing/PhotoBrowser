@@ -51,9 +51,9 @@ class GIFImageViewController: BaseCollectionViewController {
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         // 网图加载器
-        let loader = JXPhotoBrowser.KingfisherLoader()
+        let loader = JXKingfisherLoader()
         // 数据源
-        let dataSource = JXPhotoBrowser.RawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
+        let dataSource = JXRawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
             return self.dataSource.count
         }, localImage: { index -> UIImage? in
             let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
@@ -64,9 +64,9 @@ class GIFImageViewController: BaseCollectionViewController {
             return self.dataSource[index].thirdLevelUrl
         }
         // 视图代理，实现了光点型页码指示器
-        let delegate = JXPhotoBrowser.DefaultPageControlDelegate()
+        let delegate = JXDefaultPageControlDelegate()
         // 转场动画
-        let trans = JXPhotoBrowser.ZoomTransitioning { (browser, index, view) -> UIView? in
+        let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
             let indexPath = IndexPath(item: index, section: 0)
             return collectionView.cellForItem(at: indexPath)
         }

@@ -17,7 +17,7 @@ class LongPressedViewController: LocalImageViewController {
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         // 数据源
-        let dataSource = JXPhotoBrowser.LocalDataSource(numberOfItems: {
+        let dataSource = JXLocalDataSource(numberOfItems: {
             // 共有多少项
             return self.dataSource.count
         }, localImage: { index -> UIImage? in
@@ -27,7 +27,7 @@ class LongPressedViewController: LocalImageViewController {
             })
         })
         // 视图代理
-        let delegate = JXPhotoBrowser.BaseDelegate()
+        let delegate = JXPhotoBrowserBaseDelegate()
         // 长按事件
         delegate.longPressedCallback = { browser, index, image, gesture in
             self.longPressed(browser: browser, image: image, gesture: gesture)

@@ -64,13 +64,20 @@ open class JXPhotoBrowser: UIViewController {
     // MARK: - Life Cycle
     //
     
+    #if DEBUG
+    /// 销毁
+    deinit {
+        print("deinit:\(self)")
+    }
+    #endif
+    
     /// 初始化
     /// - parameter dataSource: 数据源
     /// - parameter delegate: 视图代理
     /// - parameter transDelegate: 转场动画代理
     public init(dataSource: JXPhotoBrowserDataSource,
-                delegate: JXPhotoBrowserDelegate = BaseDelegate(),
-                transDelegate: JXPhotoBrowserTransitioningDelegate = FadeTransitioning()) {
+                delegate: JXPhotoBrowserDelegate = JXPhotoBrowserBaseDelegate(),
+                transDelegate: JXPhotoBrowserTransitioningDelegate = JXPhotoBrowserFadeTransitioning()) {
         self.dataSource = dataSource
         self.delegate = delegate
         self.transDelegate = transDelegate

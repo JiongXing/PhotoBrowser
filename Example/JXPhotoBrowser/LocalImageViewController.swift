@@ -35,7 +35,7 @@ class LocalImageViewController: BaseCollectionViewController {
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         // 数据源
-        let dataSource = JXPhotoBrowser.LocalDataSource(numberOfItems: {
+        let dataSource = JXLocalDataSource(numberOfItems: {
             // 共有多少项
             return self.dataSource.count
         }, localImage: { index -> UIImage? in

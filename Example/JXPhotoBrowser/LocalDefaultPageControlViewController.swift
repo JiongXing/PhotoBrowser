@@ -35,7 +35,7 @@ class LocalDefaultPageControlViewController: BaseCollectionViewController {
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         // 数据源
-        let dataSource = JXPhotoBrowser.LocalDataSource(numberOfItems: {
+        let dataSource = JXLocalDataSource(numberOfItems: {
             // 共有多少项
             return self.dataSource.count
         }, localImage: { index -> UIImage? in
@@ -45,7 +45,7 @@ class LocalDefaultPageControlViewController: BaseCollectionViewController {
             })
         })
         // 视图代理，实现了光点型页码指示器
-        let delegate = JXPhotoBrowser.DefaultPageControlDelegate()
+        let delegate = JXDefaultPageControlDelegate()
         // 打开浏览器
         JXPhotoBrowser(dataSource: dataSource, delegate: delegate).show(pageIndex: indexPath.item)
     }
