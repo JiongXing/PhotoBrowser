@@ -14,6 +14,9 @@ extension JXPhotoBrowser {
         /// 进度
         open var progress: CGFloat = 0 {
             didSet {
+                if progress < 0.05 {
+                    progress = 0.05
+                }
                 fanshapedLayer.path = makeProgressPath(progress).cgPath
             }
         }
