@@ -235,6 +235,12 @@ let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
 
 # 常见问题
 
+## Archive 打包错误
+如果出现：
+While deserializing SIL vtable for ...
+abort trap 6
+请升级你的工程到Swift4.2，即可解决。
+
 ## Install 错误：Error installing libwebp
 谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源指向了谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
 1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 1.0.0。
