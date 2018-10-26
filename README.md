@@ -237,8 +237,10 @@ let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
 
 ## Archive 打包错误
 如果出现：
+```
 While deserializing SIL vtable for ...
 abort trap 6
+```
 请升级你的工程到Swift4.2，即可解决。
 
 ## Install 错误：Error installing libwebp
