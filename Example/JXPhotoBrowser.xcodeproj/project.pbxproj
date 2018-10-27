@@ -11,6 +11,8 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		879B2B6825D557BCDBA6374B /* Pods_JXPhotoBrowser_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41F931BB40CB27D81471F834 /* Pods_JXPhotoBrowser_Example.framework */; };
+		94065A5E21843A110077377E /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94065A5D21843A110077377E /* CustomCell.swift */; };
+		94065A602184429F0077377E /* CustomCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94065A5F2184429F0077377E /* CustomCellViewController.swift */; };
 		943450872173A1CB00D74F7E /* RawImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943450862173A1CB00D74F7E /* RawImageViewController.swift */; };
 		94458A522175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A512175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift */; };
 		94458A542175D61A00D673A4 /* LocalNumberControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A532175D61A00D673A4 /* LocalNumberControlViewController.swift */; };
@@ -41,6 +43,8 @@
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		825413BD860D8A81D66B2E8C /* Pods-JXPhotoBrowser_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JXPhotoBrowser_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-JXPhotoBrowser_Example/Pods-JXPhotoBrowser_Example.release.xcconfig"; sourceTree = "<group>"; };
 		85A4FD5B446D868C04C386EF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		94065A5D21843A110077377E /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
+		94065A5F2184429F0077377E /* CustomCellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCellViewController.swift; sourceTree = "<group>"; };
 		943450862173A1CB00D74F7E /* RawImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawImageViewController.swift; sourceTree = "<group>"; };
 		94458A512175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDefaultPageControlViewController.swift; sourceTree = "<group>"; };
 		94458A532175D61A00D673A4 /* LocalNumberControlViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNumberControlViewController.swift; sourceTree = "<group>"; };
@@ -117,6 +121,8 @@
 				943450862173A1CB00D74F7E /* RawImageViewController.swift */,
 				94458A5B217608A600D673A4 /* GIFImageViewController.swift */,
 				94458A5D217624D100D673A4 /* WebpImageViewController.swift */,
+				94065A5F2184429F0077377E /* CustomCellViewController.swift */,
+				94065A5D21843A110077377E /* CustomCell.swift */,
 				94B2892421731F220004CAC7 /* ResourceModel.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -282,7 +288,9 @@
 				94458A522175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift in Sources */,
 				94458A542175D61A00D673A4 /* LocalNumberControlViewController.swift in Sources */,
 				94458A5E217624D100D673A4 /* WebpImageViewController.swift in Sources */,
+				94065A602184429F0077377E /* CustomCellViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				94065A5E21843A110077377E /* CustomCell.swift in Sources */,
 				94B2892921731F220004CAC7 /* ResourceModel.swift in Sources */,
 				94B2892B21731F220004CAC7 /* LocalImageViewController.swift in Sources */,
 				94B2892A21731F220004CAC7 /* BaseCollectionViewCell.swift in Sources */,

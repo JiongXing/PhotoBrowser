@@ -32,11 +32,15 @@ open class JXPhotoBrowserRawButtonCell: JXPhotoBrowserNetworkingCell {
     public var photoLoader: JXPhotoLoader?
     
     /// 初始化
-    open override func setupViews() {
-        super.setupViews()
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
         rawButton.addTarget(self, action: #selector(onRawImageButton), for: .touchUpInside)
         rawButton.isHidden = true
         contentView.addSubview(rawButton)
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     /// 布局

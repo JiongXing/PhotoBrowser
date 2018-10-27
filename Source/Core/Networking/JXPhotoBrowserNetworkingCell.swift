@@ -11,12 +11,18 @@ import UIKit
 /// 可展示两级资源。比如首先展示模糊的图片，然后展示清晰的图片
 open class JXPhotoBrowserNetworkingCell: JXPhotoBrowserBaseCell {
     
+    /// 进度环
     public let progressView = JXPhotoBrowserProgressView()
     
     /// 初始化
-    open override func setupViews() {
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
         progressView.isHidden = true
         contentView.addSubview(progressView)
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     /// 布局

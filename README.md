@@ -36,22 +36,27 @@
 
 # Version History
 
+## Version 2.1.0
+**2018/10/27**
+- 可选择不添加长按手势
+- 删除`JXPhotoBrowserBaseCell`的`setupViews`方法，子类应重写`init(frame: CGRect)`方法，然后作进一步初始化。
+
 ## Version 2.0.x
 **2018/10/18**
 - 重新设计了接口，使用起来更简单易懂。
 - 进行了大规模重构，代码更优雅，更易扩展，更易维护。
-- 注意如果是从1.x版本升级上来的，遇到无法编译情况，请清除Xcode的`Derived Data`
+- 注意如果是从1.x版本升级上来的，遇到无法编译情况，请清除Xcode的`Derived Data`。
 
 ## Version 1.6.1
-1.x版本不再更新功能，若要使用，可参考：[Version_1.x](Version_1.x.md)
+1.x版本不再更新功能，若要使用，可参考：[Version_1.x](Version_1.x.md)。
 
 ## 更多
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 
 # Requirements
 - iOS 9.0
-- Xcode 10
 - Swift 4.2
+- Xcode 10
 
 # Installation
 
@@ -232,6 +237,20 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 let loader = JXKingfisherWebPLoader()
 let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
 ```
+
+## 自定义Cell
+
+### 禁用长按手势
+可通过重写`isNeededLongPressGesture`属性以禁止：
+```swift
+class CustomCell: JXPhotoBrowserBaseCell {
+    /// 是否需要添加长按手势。返回`false`即可避免添加长按手势
+    override var isNeededLongPressGesture: Bool {
+        return false
+    }
+}
+```
+
 
 # 常见问题
 
