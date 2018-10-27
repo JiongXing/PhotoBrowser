@@ -12,7 +12,7 @@ import JXPhotoBrowser
 class BaseCollectionViewController: UICollectionViewController {
 
     /// 数据源
-    var dataSource: [ResourceModel] = []
+    var modelArray: [ResourceModel] = []
     
     /// 名称
     var name: String {
@@ -39,7 +39,7 @@ class BaseCollectionViewController: UICollectionViewController {
         navigationItem.title = name
         collectionView?.backgroundColor = .white
         collectionView?.jx.registerCell(BaseCollectionViewCell.self)
-        dataSource = makeDataSource()
+        modelArray = makeDataSource()
     }
     
     override func viewDidLayoutSubviews() {
@@ -70,7 +70,7 @@ class BaseCollectionViewController: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.count
+        return modelArray.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

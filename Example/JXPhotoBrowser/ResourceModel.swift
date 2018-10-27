@@ -18,4 +18,6 @@ class ResourceModel {
     var thirdLevelUrl: String?
     /// 本地资源，资源名
     var localName: String?
+    /// 备注配文
+    var remark: String?
 }

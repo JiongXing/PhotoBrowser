@@ -8,39 +8,54 @@
 import Foundation
 import UIKit
 
-public class JXLocalDataSource: NSObject, JXPhotoBrowserDataSource {
+open class JXLocalDataSource<T: JXPhotoBrowserBaseCell>: NSObject, JXPhotoBrowserDataSource {
     
     /// 弱引用 PhotoBrowser
-    public weak var browser: JXPhotoBrowser?
+    open weak var browser: JXPhotoBrowser?
+    
+    /// CellType
+    open var cellType: T.Type?
     
     /// 共有多少项
-    public var numberOfItemsCallback: () -> Int
+    open var numberOfItemsCallback: () -> Int
+    
+    /// Cell重用时回调
+    public var reuseCallback: ((T, Int) -> Void)?
     
     /// 每一项的图片对象
-    public var localImageCallback: (Int) -> UIImage?
+    open var localImageCallback: (Int) -> UIImage?
     
+    /// 初始化
     public init(numberOfItems: @escaping () -> Int,
                 localImage: @escaping (Int) -> UIImage?) {
         self.numberOfItemsCallback = numberOfItems
         self.localImageCallback = localImage
     }
     
+    /// 配置重用Cell，回调(Cell, Index)
+    public func configReusableCell(reuse: ((_ cell: T, _ index: Int) -> Void)?) {
+        reuseCallback = reuse
+    }
+    
+    /// 注册Cell
     public func registerCell(for collectionView: UICollectionView) {
-        collectionView.jx.registerCell(JXPhotoBrowserBaseCell.self)
+        collectionView.jx.registerCell(T.self)
     }
     
     //
     // MARK: - UICollectionViewDataSource
     //
     
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return numberOfItemsCallback()
     }
     
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.jx.dequeueReusableCell(JXPhotoBrowserBaseCell.self, for: indexPath)
+    /// Cell复用
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.jx.dequeueReusableCell(T.self, for: indexPath)
         cell.imageView.image = localImageCallback(indexPath.item)
         cell.setNeedsLayout()
+        reuseCallback?(cell, indexPath.item)
         return cell
     }
 }

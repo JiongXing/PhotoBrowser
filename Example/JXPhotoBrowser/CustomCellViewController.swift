@@ -30,6 +30,7 @@ class CustomCellViewController: BaseCollectionViewController {
             let model = ResourceModel()
             model.firstLevelUrl = item[0]
             model.secondLevelUrl = item[1]
+            model.remark = item[2]
             result.append(model)
         }
         result[0].thirdLevelUrl = "http://seopic.699pic.com/photo/00040/8565.jpg_wh1200.jpg"
@@ -39,7 +40,7 @@ class CustomCellViewController: BaseCollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
         // 加载一级资源
-        if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
+        if let firstLevel = self.modelArray[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
             cell.imageView.kf.setImage(with: url)
         } else {
@@ -51,19 +52,21 @@ class CustomCellViewController: BaseCollectionViewController {
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         // 网图加载器
         let loader = JXKingfisherLoader()
-        // 数据源
-        let dataSource = JXRawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
-            return self.dataSource.count
+        // 数据源，通过泛型指定使用的<Cell>
+        let dataSource = JXNetworkingDataSource<CustomCell>(photoLoader: loader, numberOfItems: { () -> Int in
+            return self.modelArray.count
         }, placeholder: { index -> UIImage? in
             let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
             return cell?.imageView.image
-        }, autoloadURLString: { index -> String? in
-            return self.dataSource[index].secondLevelUrl
         }) { index -> String? in
-            return self.dataSource[index].thirdLevelUrl
+            return self.modelArray[index].secondLevelUrl
         }
-        // 视图代理，实现了数字型页码指示器
-        let delegate = JXNumberPageControlDelegate()
+        // Cell复用回调
+        dataSource.configReusableCell { [weak self] (cell, index) in
+            cell.remarkLabel.text = self?.modelArray[index].remark
+        }
+        // 视图代理，实现了光点型页码指示器
+        let delegate = JXDefaultPageControlDelegate()
         // 转场动画
         let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
             let indexPath = IndexPath(item: index, section: 0)

@@ -27,7 +27,7 @@ class LocalDefaultPageControlViewController: BaseCollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
-        cell.imageView.image = self.dataSource[indexPath.item].localName.flatMap({ name -> UIImage? in
+        cell.imageView.image = self.modelArray[indexPath.item].localName.flatMap({ name -> UIImage? in
             return UIImage(named: name)
         })
         return cell
@@ -37,10 +37,10 @@ class LocalDefaultPageControlViewController: BaseCollectionViewController {
         // 数据源
         let dataSource = JXLocalDataSource(numberOfItems: {
             // 共有多少项
-            return self.dataSource.count
+            return self.modelArray.count
         }, localImage: { index -> UIImage? in
             // 每一项的图片对象
-            return self.dataSource[index].localName.flatMap({ name -> UIImage? in
+            return self.modelArray[index].localName.flatMap({ name -> UIImage? in
                 return UIImage(named: name)
             })
         })

@@ -33,20 +33,20 @@ open class JXPhotoBrowserNetworkingCell: JXPhotoBrowserBaseCell {
     
     /// 刷新数据
     open func reloadData(photoLoader: JXPhotoLoader,
-                         localImage: UIImage?,
+                         placeholder: UIImage?,
                          autoloadURLString: String?) {
         // 重置环境
         progressView.isHidden = true
         progressView.progress = 0
         // url是否有效
         guard let urlString = autoloadURLString,let url = URL(string: urlString) else {
-            imageView.image = localImage
+            imageView.image = placeholder
             setNeedsLayout()
             return
         }
         // 取缓存
         let image = photoLoader.imageCached(on: imageView, url: url)
-        let placeholder = image ?? localImage
+        let placeholder = image ?? placeholder
         // 加载
         photoLoader.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { receivedSize, totalSize in
             if totalSize > 0 {

@@ -37,7 +37,8 @@ final class HomeViewController: UITableViewController {
             NetworkingImageViewController(),
             RawImageViewController(),
             GIFImageViewController(),
-            WebpImageViewController()
+            WebpImageViewController(),
+            CustomCellViewController()
         ]
     }
 }

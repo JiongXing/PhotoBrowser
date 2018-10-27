@@ -40,7 +40,7 @@ class GIFImageViewController: BaseCollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
         // 加载一级资源
-        if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
+        if let firstLevel = self.modelArray[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
             cell.imageView.kf.setImage(with: url)
         } else {
@@ -54,14 +54,14 @@ class GIFImageViewController: BaseCollectionViewController {
         let loader = JXKingfisherLoader()
         // 数据源
         let dataSource = JXRawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
-            return self.dataSource.count
+            return self.modelArray.count
         }, placeholder: { index -> UIImage? in
             let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
             return cell?.imageView.image
         }, autoloadURLString: { index -> String? in
-            return self.dataSource[index].secondLevelUrl
+            return self.modelArray[index].secondLevelUrl
         }) { index -> String? in
-            return self.dataSource[index].thirdLevelUrl
+            return self.modelArray[index].thirdLevelUrl
         }
         // 视图代理，实现了光点型页码指示器
         let delegate = JXDefaultPageControlDelegate()

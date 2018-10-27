@@ -15,8 +15,7 @@
 - [x] 支持单击、双击、放大缩小、长按
 - [x] 支持屏幕旋转
 - [x] 支持继承图片浏览器
-- [x] 支持继承页视图Cell
-- [x] 支持自定义Cell注册到浏览器
+- [x] 支持自定义页视图Cell
 - [x] 支持自定义图片加载器
 - [x] 提供了基于`Kingfisher`的图片加载器实现
 - [x] 提供了基于`KingfisherWebP`的WebP图片加载器实现
@@ -24,6 +23,7 @@
 - [x] 提供了数字型的页码指示器的实现
 - [x] 提供了图片加载进度指示器的实现
 - [x] 提供了查看原图按钮的实现
+- [x] 提供了多种数据源代理、视图代理和转场动画代理的实现，自由搭配选用
 - [ ] 理论上支持浏览视频，需自己实现播放功能（待补充示例）
 - [ ] 理论上支持修改数据源（待补充示例）
 
@@ -38,9 +38,10 @@
 
 ## Version 2.1.0
 **2018/10/27**
+- 现可通过泛型的方式向三种默认的数据源指定要使用的Cell，并增加一个泛型方法在复用时直接返回所设置的Cell。
 - 对传入的`pageIndex`保护，越界时自动修正为安全值。
+- 可禁止添加长按手势。
 - `JXNetworkingDataSource`和`JXRawImageDataSource`的初始化方法中，`localImage`重命名为`placeholder`，表意更清晰。
-- 可选择不添加长按手势。
 - 删除`JXPhotoBrowserBaseCell`的`setupViews`方法，子类应重写`init(frame: CGRect)`方法，然后作进一步初始化。
 
 ## Version 2.0.x
@@ -241,9 +242,20 @@ let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
 ```
 
 ## 自定义Cell
+如果需要对页视图作更多自定义，可继承`JXPhotoBrowserBaseCell`创建你的Cell。
+然后在创建数据源代理时，通过泛型的方式设置你的Cell：
+```swift
+// 数据源，通过泛型指定使用的<Cell>
+let dataSource = JXNetworkingDataSource<CustomCell>(...)
+// Cell复用回调
+dataSource.configReusableCell { (cell, index) in
+    // 给复用Cell刷新数据
+}
+```
 
-### 禁用长按手势
-可通过重写`isNeededLongPressGesture`属性以禁止：
+
+## 禁用长按手势
+可通过自定义Cell重写`isNeededLongPressGesture`属性以禁止：
 ```swift
 class CustomCell: JXPhotoBrowserBaseCell {
     /// 是否需要添加长按手势。返回`false`即可避免添加长按手势
