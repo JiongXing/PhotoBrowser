@@ -16,10 +16,10 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
     /// 字颜色
     open var textColor = UIColor.white
     
-    /// 可指定中心点Y坐标。默认值：iPhoneX为40，非iPhoneX为20
-    open var centerY: CGFloat = {
-        if #available(iOS 11.0, *) {
-            return 40
+    /// 指定Y轴从顶部往下偏移值
+    open lazy var offsetY: CGFloat = {
+        if #available(iOS 11.0, *), let window = UIApplication.shared.keyWindow {
+            return window.safeAreaInsets.top
         }
         return 20
     }()
@@ -68,8 +68,8 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
         let totalPages = browser.itemsCount
         pageControl.text = "\(browser.pageIndex + 1) / \(totalPages)"
         pageControl.sizeToFit()
-        pageControl.center = CGPoint(x: superView.bounds.width / 2,
-                                     y: centerY)
+        pageControl.center.x = superView.bounds.width / 2
+        pageControl.frame.origin.y = offsetY
         pageControl.isHidden = totalPages <= 1
     }
 }

@@ -10,12 +10,13 @@ import Foundation
 /// 实现了以 UIPageControl 为页码指示器的 Delegate.
 open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
     
-    /// 可指定中心点Y坐标，距离底部值。默认值：iPhoneX为30，非iPhoneX为20
-    open lazy var centerBottomY: CGFloat = {
-        if #available(iOS 11.0, *) {
-            return 30
+    /// 指定Y轴从底部往上偏移值
+    open lazy var offsetY: CGFloat = {
+        if #available(iOS 11.0, *), let window = UIApplication.shared.keyWindow,
+            window.safeAreaInsets.bottom > 0 {
+            return 25
         }
-        return 20
+        return 15
     }()
     
     /// 页码指示器
@@ -62,8 +63,10 @@ open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
         pageControl.numberOfPages = totalPages
         pageControl.currentPage = browser.pageIndex
         pageControl.sizeToFit()
-        pageControl.center = CGPoint(x: superView.bounds.width / 2,
-                                     y: superView.bounds.maxY - centerBottomY)
+        pageControl.center.x = superView.bounds.width / 2
+        let originY: CGFloat = superView.bounds.maxY
+        pageControl.frame.origin.y = originY - offsetY - pageControl.bounds.height
+        print(pageControl.frame)
         pageControl.isHidden = totalPages <= 1
     }
 }

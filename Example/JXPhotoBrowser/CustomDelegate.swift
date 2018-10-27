@@ -9,7 +9,7 @@
 import Foundation
 import JXPhotoBrowser
 
-class CustomDelegate: JXDefaultPageControlDelegate {
+class CustomDelegate: JXNumberPageControlDelegate {
 
     /// 点下一张
     var clickBackCallback: ((CustomDelegate) -> Void)?
@@ -48,20 +48,15 @@ class CustomDelegate: JXDefaultPageControlDelegate {
     
     override func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
         super.photoBrowserViewDidLayoutSubviews(browser)
-        do {
-            let width: CGFloat = 50
-            let height: CGFloat = 30
-            let x: CGFloat = 20
-            let y: CGFloat = 40
-            backButton.frame = CGRect(x: x, y: y, width: width, height: height)
+        let width: CGFloat = 50
+        let height: CGFloat = 30
+        var y: CGFloat = 20
+        if #available(iOS 11.0, *), let window = UIApplication.shared.keyWindow {
+            y = window.safeAreaInsets.top
         }
-        do {
-            let width: CGFloat = 50
-            let height: CGFloat = 30
-            let x = browser.view.bounds.width - 20 - width
-            let y: CGFloat = 40
-            forwardButton.frame = CGRect(x: x, y: y, width: width, height: height)
-        }
+        backButton.frame = CGRect(x: 20, y: y, width: width, height: height)
+        let x = browser.view.bounds.width - 20 - width
+        forwardButton.frame = CGRect(x: x, y: y, width: width, height: height)
     }
     
     @objc private func onBackButton() {

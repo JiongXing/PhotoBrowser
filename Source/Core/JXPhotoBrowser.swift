@@ -103,6 +103,8 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
+        self.extendedLayoutIncludesOpaqueBars = true
+        self.automaticallyAdjustsScrollViewInsets = false
         view.addSubview(collectionView)
         if #available(iOS 11.0, *) {
             collectionView.contentInsetAdjustmentBehavior = .never
