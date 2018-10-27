@@ -20,18 +20,18 @@ public class JXNetworkingDataSource: NSObject, JXPhotoBrowserDataSource {
     public var numberOfItemsCallback: () -> Int
     
     /// 一级资源，本地图片
-    public var localImageCallback: (Int) -> UIImage?
+    public var placeholderCallback: (Int) -> UIImage?
     
     /// 二级资源，自动加载的网络图片
     public var autoloadURLStringCallback: (Int) -> String?
     
     public init(photoLoader: JXPhotoLoader,
                 numberOfItems: @escaping () -> Int,
-                localImage: @escaping (Int) -> UIImage?,
+                placeholder: @escaping (Int) -> UIImage?,
                 autoloadURLString: @escaping (Int) -> String?) {
         self.photoLoader = photoLoader
         self.numberOfItemsCallback = numberOfItems
-        self.localImageCallback = localImage
+        self.placeholderCallback = placeholder
         self.autoloadURLStringCallback = autoloadURLString
     }
     
@@ -50,7 +50,7 @@ public class JXNetworkingDataSource: NSObject, JXPhotoBrowserDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(JXPhotoBrowserNetworkingCell.self, for: indexPath)
         // 一级资源
-        let localImage = localImageCallback(indexPath.item)
+        let localImage = placeholderCallback(indexPath.item)
         // 二级资源
         let autoloadURLString = autoloadURLStringCallback(indexPath.item)
         // 刷新数据

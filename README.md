@@ -39,6 +39,7 @@
 ## Version 2.1.0
 **2018/10/27**
 - 对传入的`pageIndex`保护，越界时自动修正为安全值。
+- `JXNetworkingDataSource`和`JXRawImageDataSource`的初始化方法中，`localImage`重命名为`placeholder`，表意更清晰。
 - 可选择不添加长按手势。
 - 删除`JXPhotoBrowserBaseCell`的`setupViews`方法，子类应重写`init(frame: CGRect)`方法，然后作进一步初始化。
 
