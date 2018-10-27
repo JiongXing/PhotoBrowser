@@ -39,10 +39,14 @@ open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
         super.photoBrowser(browser, viewDidAppear: animated)
         // 页面出来后，再显示页码指示器
         // 多于一张图才添加到视图
-        let totalPages = browser.dataSource.collectionView(browser.collectionView, numberOfItemsInSection: 0)
+        let totalPages = browser.itemsCount
         if totalPages > 1 {
             browser.view.addSubview(pageControl)
         }
+    }
+    
+    public override func photoBrowserDidReloadData(_ browser: JXPhotoBrowser) {
+        layout()
     }
     
     //
@@ -54,7 +58,7 @@ open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
             return
         }
         guard let superView = pageControl.superview else { return }
-        let totalPages = browser.dataSource.collectionView(browser.collectionView, numberOfItemsInSection: 0)
+        let totalPages = browser.itemsCount
         pageControl.numberOfPages = totalPages
         pageControl.currentPage = browser.pageIndex
         pageControl.sizeToFit()

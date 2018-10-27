@@ -42,14 +42,14 @@ open class JXPhotoBrowser: UIViewController {
     open var isPreviewing = false
     
     /// 流型布局
-    public lazy var flowLayout: UICollectionViewFlowLayout = {
+    open lazy var flowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         return layout
     }()
     
     /// 容器
-    public lazy var collectionView: UICollectionView = {
+    open lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
         collectionView.backgroundColor = UIColor.clear
         collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
@@ -182,19 +182,36 @@ open class JXPhotoBrowser: UIViewController {
     /// - parameter index: 图片序号，从0开始
     open func scrollToItem(_ index: Int, at position: UICollectionView.ScrollPosition, animated: Bool) {
         var safeIndex = max(0, index)
-        safeIndex = min(collectionView.numberOfItems(inSection: 0) - 1, safeIndex)
+        safeIndex = min(itemsCount - 1, safeIndex)
         pageIndex = safeIndex
         let indexPath = IndexPath(item: safeIndex, section: 0)
         collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
     }
     
     /// 取当前显示页的内容视图。比如是 ImageView.
-    public var displayingContentView: UIView? {
+    open var displayingContentView: UIView? {
         return delegate.displayingContentView(self, pageIndex: pageIndex)
     }
     
     /// 取转场动画视图
-    public var transitionZoomView: UIView? {
+    open var transitionZoomView: UIView? {
         return delegate.transitionZoomView(self, pageIndex: pageIndex)
+    }
+    
+    /// 取项数
+    open var itemsCount: Int {
+        return dataSource.collectionView(collectionView, numberOfItemsInSection: 0)
+    }
+    
+    /// 刷新数据
+    open func reloadData() {
+        let numberOfItems = itemsCount
+        guard numberOfItems > 0 else {
+            delegate.dismissPhotoBrowser(self)
+            return
+        }
+        pageIndex = min(pageIndex, numberOfItems - 1)
+        collectionView.reloadData()
+        delegate.photoBrowserDidReloadData(self)
     }
 }

@@ -14,6 +14,8 @@ class CustomCellViewController: BaseCollectionViewController {
         return "自定义Cell"
     }
     
+    weak var browser: JXPhotoBrowser?
+    
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
         guard let url = Bundle.main.url(forResource: "Photos", withExtension: "plist") else {
@@ -64,6 +66,11 @@ class CustomCellViewController: BaseCollectionViewController {
         // Cell复用回调
         dataSource.configReusableCell { [weak self] (cell, index) in
             cell.remarkLabel.text = self?.modelArray[index].remark
+            cell.clickDeleteCallback = { _ in
+                print("移除第\(index)项")
+                self?.modelArray.remove(at: index)
+                self?.browser?.reloadData()
+            }
         }
         // 视图代理，实现了光点型页码指示器
         let delegate = JXDefaultPageControlDelegate()
@@ -72,8 +79,10 @@ class CustomCellViewController: BaseCollectionViewController {
             let indexPath = IndexPath(item: index, section: 0)
             return collectionView.cellForItem(at: indexPath)
         }
-        // 打开浏览器
-        JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-            .show(pageIndex: indexPath.item)
+        // 浏览器
+        let browser = JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
+        self.browser = browser
+        // 打开
+        browser.show(pageIndex: indexPath.item)
     }
 }

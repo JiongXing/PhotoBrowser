@@ -43,4 +43,10 @@ public protocol JXPhotoBrowserDelegate: UICollectionViewDelegate {
     
     /// viewDidDisappear 即将结束时调用
     func photoBrowser(_ browser: JXPhotoBrowser, viewDidDisappear animated: Bool)
+    
+    /// 关闭
+    func dismissPhotoBrowser(_ browser: JXPhotoBrowser)
+    
+    /// 数据源已刷新
+    func photoBrowserDidReloadData(_ browser: JXPhotoBrowser)
 }

@@ -13,9 +13,6 @@ open class JXLocalDataSource<T: JXPhotoBrowserBaseCell>: NSObject, JXPhotoBrowse
     /// 弱引用 PhotoBrowser
     open weak var browser: JXPhotoBrowser?
     
-    /// CellType
-    open var cellType: T.Type?
-    
     /// 共有多少项
     open var numberOfItemsCallback: () -> Int
     

@@ -59,7 +59,7 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
         // 绑定 Cell 回调事件
         // 单击
         cell.clickCallback = { _ in
-            self.browser?.dismiss(animated: true, completion: nil)
+            self.dismiss()
         }
         // 拖
         cell.panChangedCallback = { scale in
@@ -72,7 +72,7 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
         // 拖完松手
         cell.panReleasedCallback = { isDown in
             if isDown {
-                self.browser?.dismiss(animated: true, completion: nil)
+                self.dismiss()
             } else {
                 self.browser?.transDelegate.maskAlpha = 1.0
                 self.coverStatusBar(true)
@@ -85,6 +85,11 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
                 self.longPressedCallback?(browser, indexPath.item, weakCell?.imageView.image, gesture)
             }
         }
+    }
+    
+    /// 关闭
+    private func dismiss() {
+        self.browser?.dismiss(animated: true, completion: nil)
     }
     
     /// scrollView滑动
@@ -137,6 +142,14 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     }
     
     public func photoBrowser(_ browser: JXPhotoBrowser, viewDidDisappear animated: Bool) {
+        // Empty.
+    }
+    
+    public func dismissPhotoBrowser(_ browser: JXPhotoBrowser) {
+        self.dismiss()
+    }
+    
+    public func photoBrowserDidReloadData(_ browser: JXPhotoBrowser) {
         // Empty.
     }
 }
