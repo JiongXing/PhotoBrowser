@@ -11,13 +11,13 @@ import UIKit
 open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     
     /// 弱引用 PhotoBrowser
-    public weak var browser: JXPhotoBrowser?
+    open weak var browser: JXPhotoBrowser?
     
     /// 图片内容缩张模式
-    public var contentMode: UIView.ContentMode = .scaleAspectFill
+    open var contentMode: UIView.ContentMode = .scaleAspectFill
     
     /// 长按回调。回传参数分别是：浏览器，图片序号，图片对象，手势对象
-    public var longPressedCallback: ((JXPhotoBrowser, Int, UIImage?, UILongPressGestureRecognizer) -> Void)?
+    open var longPressedCallback: ((JXPhotoBrowser, Int, UIImage?, UILongPressGestureRecognizer) -> Void)?
     
     //
     // MARK: - 处理状态栏
@@ -27,7 +27,7 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     open var isNeedCoverStatusBar = true
     
     /// 保存原windowLevel
-    public var originWindowLevel: UIWindow.Level?
+    open var originWindowLevel: UIWindow.Level?
     
     /// 遮盖状态栏。以改变windowLevel的方式遮盖
     /// - parameter cover: true-遮盖；false-不遮盖
@@ -93,63 +93,63 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     }
     
     /// scrollView滑动
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
     }
     
     /// 取当前显示页的内容视图。比如是 ImageView.
-    public func displayingContentView(_ browser: JXPhotoBrowser, pageIndex: Int) -> UIView? {
+    open func displayingContentView(_ browser: JXPhotoBrowser, pageIndex: Int) -> UIView? {
         let indexPath = IndexPath.init(item: pageIndex, section: 0)
         let cell = browser.collectionView.cellForItem(at: indexPath) as? JXPhotoBrowserBaseCell
         return cell?.imageView
     }
     
     /// 取转场动画视图
-    public func transitionZoomView(_ browser: JXPhotoBrowser, pageIndex: Int) -> UIView? {
+    open func transitionZoomView(_ browser: JXPhotoBrowser, pageIndex: Int) -> UIView? {
         let indexPath = IndexPath.init(item: pageIndex, section: 0)
         let cell = browser.collectionView.cellForItem(at: indexPath) as? JXPhotoBrowserBaseCell
         return UIImageView(image: cell?.imageView.image)
     }
     
-    public func photoBrowser(_ browser: JXPhotoBrowser, pageIndexDidChanged pageIndex: Int) {
+    open func photoBrowser(_ browser: JXPhotoBrowser, pageIndexDidChanged pageIndex: Int) {
         // Empty.
     }
     
-    public func photoBrowserViewDidLoad(_ browser: JXPhotoBrowser) {
+    open func photoBrowserViewDidLoad(_ browser: JXPhotoBrowser) {
         // Empty.
     }
     
-    public func photoBrowser(_ browser: JXPhotoBrowser, viewWillAppear animated: Bool) {
+    open func photoBrowser(_ browser: JXPhotoBrowser, viewWillAppear animated: Bool) {
         // 遮盖状态栏
         coverStatusBar(true)
     }
     
-    public func photoBrowserViewWillLayoutSubviews(_ browser: JXPhotoBrowser) {
+    open func photoBrowserViewWillLayoutSubviews(_ browser: JXPhotoBrowser) {
         // Empty.
     }
     
-    public func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
+    open func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
         // Empty.
     }
     
-    public func photoBrowser(_ browser: JXPhotoBrowser, viewDidAppear animated: Bool) {
+    open func photoBrowser(_ browser: JXPhotoBrowser, viewDidAppear animated: Bool) {
         // Empty.
     }
     
-    public func photoBrowser(_ browser: JXPhotoBrowser, viewWillDisappear animated: Bool) {
+    open func photoBrowser(_ browser: JXPhotoBrowser, viewWillDisappear animated: Bool) {
         // 还原状态栏
         coverStatusBar(false)
     }
     
-    public func photoBrowser(_ browser: JXPhotoBrowser, viewDidDisappear animated: Bool) {
+    open func photoBrowser(_ browser: JXPhotoBrowser, viewDidDisappear animated: Bool) {
         // Empty.
     }
     
-    public func dismissPhotoBrowser(_ browser: JXPhotoBrowser) {
+    open func dismissPhotoBrowser(_ browser: JXPhotoBrowser) {
         self.dismiss()
     }
     
-    public func photoBrowserDidReloadData(_ browser: JXPhotoBrowser) {
+    open func photoBrowserDidReloadData(_ browser: JXPhotoBrowser) {
         // Empty.
     }
 }

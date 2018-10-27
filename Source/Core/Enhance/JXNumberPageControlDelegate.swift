@@ -32,17 +32,17 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
         return view
     }()
     
-    public override func photoBrowser(_ browser: JXPhotoBrowser, pageIndexDidChanged pageIndex: Int) {
+    open override func photoBrowser(_ browser: JXPhotoBrowser, pageIndexDidChanged pageIndex: Int) {
         super.photoBrowser(browser, pageIndexDidChanged: pageIndex)
         layout()
     }
     
-    public override func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
+    open override func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
         super.photoBrowserViewDidLayoutSubviews(browser)
         layout()
     }
     
-    public override func photoBrowser(_ browser: JXPhotoBrowser, viewDidAppear animated: Bool) {
+    open override func photoBrowser(_ browser: JXPhotoBrowser, viewDidAppear animated: Bool) {
         super.photoBrowser(browser, viewDidAppear: animated)
         // 页面出来后，再显示页码指示器
         // 多于一张图才添加到视图
@@ -52,7 +52,7 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
         }
     }
     
-    public override func photoBrowserDidReloadData(_ browser: JXPhotoBrowser) {
+    open override func photoBrowserDidReloadData(_ browser: JXPhotoBrowser) {
         layout()
     }
     

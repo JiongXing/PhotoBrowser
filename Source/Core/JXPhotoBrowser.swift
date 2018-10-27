@@ -183,7 +183,6 @@ open class JXPhotoBrowser: UIViewController {
     open func scrollToItem(_ index: Int, at position: UICollectionView.ScrollPosition, animated: Bool) {
         var safeIndex = max(0, index)
         safeIndex = min(itemsCount - 1, safeIndex)
-        pageIndex = safeIndex
         let indexPath = IndexPath(item: safeIndex, section: 0)
         collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
     }

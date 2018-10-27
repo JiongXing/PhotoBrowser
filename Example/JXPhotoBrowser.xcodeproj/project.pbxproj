@@ -13,6 +13,7 @@
 		879B2B6825D557BCDBA6374B /* Pods_JXPhotoBrowser_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41F931BB40CB27D81471F834 /* Pods_JXPhotoBrowser_Example.framework */; };
 		94065A5E21843A110077377E /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94065A5D21843A110077377E /* CustomCell.swift */; };
 		94065A602184429F0077377E /* CustomCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94065A5F2184429F0077377E /* CustomCellViewController.swift */; };
+		94065A62218489D90077377E /* CustomDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94065A61218489D90077377E /* CustomDelegate.swift */; };
 		943450872173A1CB00D74F7E /* RawImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943450862173A1CB00D74F7E /* RawImageViewController.swift */; };
 		94458A522175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A512175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift */; };
 		94458A542175D61A00D673A4 /* LocalNumberControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A532175D61A00D673A4 /* LocalNumberControlViewController.swift */; };
@@ -45,6 +46,7 @@
 		85A4FD5B446D868C04C386EF /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		94065A5D21843A110077377E /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		94065A5F2184429F0077377E /* CustomCellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCellViewController.swift; sourceTree = "<group>"; };
+		94065A61218489D90077377E /* CustomDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDelegate.swift; sourceTree = "<group>"; };
 		943450862173A1CB00D74F7E /* RawImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawImageViewController.swift; sourceTree = "<group>"; };
 		94458A512175D4EB00D673A4 /* LocalDefaultPageControlViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDefaultPageControlViewController.swift; sourceTree = "<group>"; };
 		94458A532175D61A00D673A4 /* LocalNumberControlViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNumberControlViewController.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				94458A5D217624D100D673A4 /* WebpImageViewController.swift */,
 				94065A5F2184429F0077377E /* CustomCellViewController.swift */,
 				94065A5D21843A110077377E /* CustomCell.swift */,
+				94065A61218489D90077377E /* CustomDelegate.swift */,
 				94B2892421731F220004CAC7 /* ResourceModel.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
@@ -300,6 +303,7 @@
 				94B2894321734FBC0004CAC7 /* LongPressedViewController.swift in Sources */,
 				94B2892D21731F220004CAC7 /* HomeViewController.swift in Sources */,
 				94458A582175D7FD00D673A4 /* ZoomFrameViewController.swift in Sources */,
+				94065A62218489D90077377E /* CustomDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

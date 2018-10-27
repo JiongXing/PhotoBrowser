@@ -66,14 +66,27 @@ class CustomCellViewController: BaseCollectionViewController {
         // Cell复用回调
         dataSource.configReusableCell { [weak self] (cell, index) in
             cell.remarkLabel.text = self?.modelArray[index].remark
+            // 删除
             cell.clickDeleteCallback = { _ in
                 print("移除第\(index)项")
                 self?.modelArray.remove(at: index)
                 self?.browser?.reloadData()
             }
         }
-        // 视图代理，实现了光点型页码指示器
-        let delegate = JXDefaultPageControlDelegate()
+        // 自定义视图代理
+        let delegate = CustomDelegate()
+        // 上一张
+        delegate.clickBackCallback = { [weak self] _ in
+            if let browser = self?.browser {
+                browser.scrollToItem(browser.pageIndex - 1, at: .centeredHorizontally, animated: true)
+            }
+        }
+        // 下一张
+        delegate.clickForwardCallback = { [weak self] _ in
+            if let browser = self?.browser {
+                browser.scrollToItem(browser.pageIndex + 1, at: .centeredHorizontally, animated: true)
+            }
+        }
         // 转场动画
         let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
             let indexPath = IndexPath(item: index, section: 0)
