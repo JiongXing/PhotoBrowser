@@ -30,9 +30,9 @@
 
 
 <div>
-	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_1.png" width = "30%" div/>
-	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_2.png" width = "30%" div/>
-	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Snip20181017_3.png" width = "30%" div/>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Home.png" width = "30%" div/>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Transition.png" width = "30%" div/>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Browser.png" width = "30%" div/>
 </div>
 
 # Version History
@@ -41,6 +41,7 @@
 **2018/10/27**
 - 现可通过泛型的方式向三种默认的数据源指定要使用的Cell，并增加一个泛型方法在复用时直接返回所设置的Cell。
 - 支持修改数据源，重载数据
+- 支持代码调用图片切换
 - 对传入的`pageIndex`保护，越界时自动修正为安全值。
 - 可禁止添加长按手势。
 - `JXNetworkingDataSource`和`JXRawImageDataSource`的初始化方法中，`localImage`重命名为`placeholder`，表意更清晰。
