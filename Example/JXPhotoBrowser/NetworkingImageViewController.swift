@@ -68,7 +68,9 @@ class NetworkingImageViewController: BaseCollectionViewController {
             return collectionView.cellForItem(at: indexPath)
         }
         // 打开浏览器
+//        JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
+//            .show(pageIndex: indexPath.item)
         JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-            .show(pageIndex: indexPath.item)
+            .show(pageIndex: 99)
     }
 }

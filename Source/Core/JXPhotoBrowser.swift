@@ -8,7 +8,7 @@
 import UIKit
 
 open class JXPhotoBrowser: UIViewController {
-
+    
     //
     // MARK: - Public Properties
     //
@@ -58,7 +58,7 @@ open class JXPhotoBrowser: UIViewController {
         collectionView.isPagingEnabled = true
         collectionView.alwaysBounceVertical = false
         return collectionView
-        }()
+    }()
     
     //
     // MARK: - Life Cycle
@@ -85,7 +85,7 @@ open class JXPhotoBrowser: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.modalPresentationStyle = .custom
         self.transitioningDelegate = transDelegate
-
+        
         dataSource.browser = self
         delegate.browser = self
         transDelegate.browser = self
@@ -98,7 +98,7 @@ open class JXPhotoBrowser: UIViewController {
     /// 打开浏览器
     open func show(pageIndex: Int) {
         self.pageIndex = pageIndex
-         UIViewController.jx.topMost?.present(self, animated: true, completion: nil)
+        UIViewController.jx.topMost?.present(self, animated: true, completion: nil)
     }
     
     open override func viewDidLoad() {
@@ -181,8 +181,10 @@ open class JXPhotoBrowser: UIViewController {
     /// 滑到哪张图片
     /// - parameter index: 图片序号，从0开始
     open func scrollToItem(_ index: Int, at position: UICollectionView.ScrollPosition, animated: Bool) {
-        pageIndex = index
-        let indexPath = IndexPath(item: index, section: 0)
+        var safeIndex = max(0, index)
+        safeIndex = min(collectionView.numberOfItems(inSection: 0) - 1, safeIndex)
+        pageIndex = safeIndex
+        let indexPath = IndexPath(item: safeIndex, section: 0)
         collectionView.scrollToItem(at: indexPath, at: position, animated: animated)
     }
     
