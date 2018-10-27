@@ -192,7 +192,7 @@ let loader = JXPhotoBrowser.KingfisherLoader()
 // 数据源
 let dataSource = JXNetworkingDataSource(photoLoader: loader, numberOfItems: { () -> Int in
     return self.dataSource.count
-}, localImage: { index -> UIImage? in
+}, placeholder: { index -> UIImage? in
     let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
     return cell?.imageView.image
 }) { index -> String? in
@@ -211,7 +211,7 @@ let loader = JXPhotoBrowser.KingfisherLoader()
 // 数据源
 let dataSource = JXRawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
     return self.dataSource.count
-}, localImage: { index -> UIImage? in
+}, placeholder: { index -> UIImage? in
     let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
     return cell?.imageView.image
 }, autoloadURLString: { index -> String? in
