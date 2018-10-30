@@ -84,8 +84,8 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 
 ## 手动导入
 1. 请把`Source/Core`下的所有文件拷贝到你的项目。
-2. 如果需要使用`Kingfisher`来加载网络图片，就把`Source/Kingfisher`下的文件也拷贝到你的项目。
-3. 如果需要加载`WebP`图片，就把`Source/KingfisherWebP`下的文件也拷贝到你的项目。
+2. 如果需要使用`Kingfisher`来加载网络图片，就把`Source/Kingfisher`下的文件也拷贝到你的项目，并导入`Kingfisher`库。
+3. 如果需要加载`WebP`图片，就把`Source/KingfisherWebP`下的文件也拷贝到你的项目，并导入`KingfisherWebP`库。
 
 # Usage
 
