@@ -63,8 +63,8 @@
 - iOS 9.0
 - Swift 4.2
 - Xcode 10
-> 如果需要用在Swift4.2之下的项目中，请通过手动导入的方式拷贝文件到你的项目，自行修改为相应Swift版本的语法。
-> 改为Swift4.0或4.1的语法，修改的地方只有几处，工作量不大。
+> - 如果需要用在Swift4.2之下的项目中，请通过手动导入的方式拷贝文件到你的项目，自行修改为相应Swift版本的语法。
+> - 改为Swift4.0或4.1的语法，修改的地方只有几处，工作量不大。
 
 # Installation
 
@@ -83,9 +83,9 @@ pod 'JXPhotoBrowser/KingfisherWebP'
 ```
 
 ## 手动导入
-请把`Source/Core`下的所有文件拷贝到你的项目。
-如果需要使用`Kingfisher`来加载网络图片，就把`Source/Kingfisher`下的文件也拷贝到你的项目。
-如果需要加载`WebP`图片，就把`Source/KingfisherWebP`下的文件也拷贝到你的项目。
+1. 请把`Source/Core`下的所有文件拷贝到你的项目。
+2. 如果需要使用`Kingfisher`来加载网络图片，就把`Source/Kingfisher`下的文件也拷贝到你的项目。
+3. 如果需要加载`WebP`图片，就把`Source/KingfisherWebP`下的文件也拷贝到你的项目。
 
 # Usage
 
