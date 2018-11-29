@@ -37,8 +37,8 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
         layout()
     }
     
-    open override func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
-        super.photoBrowserViewDidLayoutSubviews(browser)
+    open override func photoBrowserViewWillLayoutSubviews(_ browser: JXPhotoBrowser) {
+        super.photoBrowserViewWillLayoutSubviews(browser)
         layout()
     }
     

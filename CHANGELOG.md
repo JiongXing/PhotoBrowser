@@ -1,4 +1,8 @@
-# Version History
+# Change Log
+
+## Version 2.1.1
+**2018/11/29**
+- 优化横屏模式的显示效果，横屏时显示全图
 
 ## Version 2.1.0
 **2018/10/27**

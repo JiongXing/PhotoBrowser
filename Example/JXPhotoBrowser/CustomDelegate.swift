@@ -46,8 +46,8 @@ class CustomDelegate: JXNumberPageControlDelegate {
         forwardButton.addTarget(self, action: #selector(onForwardButton), for: .touchUpInside)
     }
     
-    override func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
-        super.photoBrowserViewDidLayoutSubviews(browser)
+    override func photoBrowserViewWillLayoutSubviews(_ browser: JXPhotoBrowser) {
+        super.photoBrowserViewWillLayoutSubviews(browser)
         let width: CGFloat = 50
         let height: CGFloat = 30
         var y: CGFloat = 20

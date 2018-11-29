@@ -21,6 +21,7 @@
 		94458A582175D7FD00D673A4 /* ZoomFrameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A572175D7FD00D673A4 /* ZoomFrameViewController.swift */; };
 		94458A5C217608A600D673A4 /* GIFImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A5B217608A600D673A4 /* GIFImageViewController.swift */; };
 		94458A5E217624D100D673A4 /* WebpImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94458A5D217624D100D673A4 /* WebpImageViewController.swift */; };
+		94623EDA21AFCB0B001D5EB0 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 94623ED921AFCB0B001D5EB0 /* CHANGELOG.md */; };
 		94B2892921731F220004CAC7 /* ResourceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B2892421731F220004CAC7 /* ResourceModel.swift */; };
 		94B2892A21731F220004CAC7 /* BaseCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B2892521731F220004CAC7 /* BaseCollectionViewCell.swift */; };
 		94B2892B21731F220004CAC7 /* LocalImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B2892621731F220004CAC7 /* LocalImageViewController.swift */; };
@@ -54,6 +55,7 @@
 		94458A572175D7FD00D673A4 /* ZoomFrameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomFrameViewController.swift; sourceTree = "<group>"; };
 		94458A5B217608A600D673A4 /* GIFImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFImageViewController.swift; sourceTree = "<group>"; };
 		94458A5D217624D100D673A4 /* WebpImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebpImageViewController.swift; sourceTree = "<group>"; };
+		94623ED921AFCB0B001D5EB0 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		94B2892421731F220004CAC7 /* ResourceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceModel.swift; sourceTree = "<group>"; };
 		94B2892521731F220004CAC7 /* BaseCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCollectionViewCell.swift; sourceTree = "<group>"; };
 		94B2892621731F220004CAC7 /* LocalImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalImageViewController.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				C0774FC1B291D40E4F0C4FA0 /* JXPhotoBrowser.podspec */,
 				85A4FD5B446D868C04C386EF /* README.md */,
 				5816A5604882A6E330772A08 /* LICENSE */,
+				94623ED921AFCB0B001D5EB0 /* CHANGELOG.md */,
 			);
 			name = "Podspec Metadata";
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 				94B28958217387E90004CAC7 /* Photos.plist in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
+				94623EDA21AFCB0B001D5EB0 /* CHANGELOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,7 +439,7 @@
 				INFOPLIST_FILE = JXPhotoBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.demo.JXPhotoBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -454,7 +458,7 @@
 				INFOPLIST_FILE = JXPhotoBrowser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.demo.JXPhotoBrowser;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;

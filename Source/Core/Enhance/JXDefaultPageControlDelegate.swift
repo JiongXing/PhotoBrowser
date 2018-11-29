@@ -31,8 +31,8 @@ open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
         pageControl.currentPage = pageIndex
     }
     
-    open override func photoBrowserViewDidLayoutSubviews(_ browser: JXPhotoBrowser) {
-        super.photoBrowserViewDidLayoutSubviews(browser)
+    open override func photoBrowserViewWillLayoutSubviews(_ browser: JXPhotoBrowser) {
+        super.photoBrowserViewWillLayoutSubviews(browser)
         layout()
     }
     
@@ -66,7 +66,6 @@ open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
         pageControl.center.x = superView.bounds.width / 2
         let originY: CGFloat = superView.bounds.maxY
         pageControl.frame.origin.y = originY - offsetY - pageControl.bounds.height
-        print(pageControl.frame)
         pageControl.isHidden = totalPages <= 1
     }
 }

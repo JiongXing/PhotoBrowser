@@ -136,12 +136,12 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
+        layout()
         delegate.photoBrowserViewWillLayoutSubviews(self)
     }
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        layout()
         delegate.photoBrowserViewDidLayoutSubviews(self)
     }
     

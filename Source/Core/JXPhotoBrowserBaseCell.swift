@@ -97,8 +97,8 @@ open class JXPhotoBrowserBaseCell: UICollectionViewCell {
         super.layoutSubviews()
         imageContainer.frame = contentView.bounds
         imageContainer.setZoomScale(1.0, animated: false)
-        imageView.frame = fitFrame
-        imageContainer.setZoomScale(1.0, animated: false)
+        imageView.frame.size = fitSize
+        imageView.center = CGPoint(x: imageContainer.bounds.width / 2, y: imageContainer.bounds.height / 2)
     }
 }
 
@@ -122,18 +122,22 @@ extension JXPhotoBrowserBaseCell {
         guard let image = imageView.image else {
             return CGSize.zero
         }
-        let width = imageContainer.bounds.width
-        let scale = image.size.height / image.size.width
-        return CGSize(width: width, height: scale * width)
-    }
-    
-    /// 计算图片适合的frame
-    private var fitFrame: CGRect {
-        let size = fitSize
-        let y = (imageContainer.bounds.height - size.height) > 0
-            ? (imageContainer.bounds.height - size.height) * 0.5
-            : 0
-        return CGRect(x: 0, y: y, width: size.width, height: size.height)
+        var width: CGFloat
+        var height: CGFloat
+        if imageContainer.bounds.width < imageContainer.bounds.height {
+            // 竖屏
+            width = imageContainer.bounds.width
+            height = (image.size.height / image.size.width) * width
+        } else {
+            // 横屏
+            height = imageContainer.bounds.height
+            width = (image.size.width / image.size.height) * height
+            if width > imageContainer.bounds.width {
+                width = imageContainer.bounds.width
+                height = (image.size.height / image.size.width) * width
+            }
+        }
+        return CGSize(width: width, height: height)
     }
     
     /// 复位ImageView
@@ -143,10 +147,10 @@ extension JXPhotoBrowserBaseCell {
         let needResetSize = imageView.bounds.size.width < size.width
             || imageView.bounds.size.height < size.height
         UIView.animate(withDuration: 0.25) {
-            self.imageView.center = self.resettingCenter
             if needResetSize {
                 self.imageView.bounds.size = size
             }
+            self.imageView.center = self.resettingCenter
         }
     }
 }
