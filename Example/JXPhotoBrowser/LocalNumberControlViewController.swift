@@ -17,7 +17,7 @@ class LocalNumberControlViewController: BaseCollectionViewController {
     
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
-        (0..<6).forEach { index in
+        (0..<7).forEach { index in
             let model = ResourceModel()
             model.localName = "local_\(index)"
             result.append(model)

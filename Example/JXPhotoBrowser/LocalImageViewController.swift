@@ -17,7 +17,7 @@ class LocalImageViewController: BaseCollectionViewController {
     
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
-        (0..<6).forEach { index in
+        (0..<7).forEach { index in
             let model = ResourceModel()
             model.localName = "local_\(index)"
             result.append(model)
@@ -45,26 +45,6 @@ class LocalImageViewController: BaseCollectionViewController {
             })
         })
         // 打开浏览器
-//        JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
-        
-        // MARK: -  缩放长图
-        // 视图代理，实现了光点型页码指示器
-        let delegate = JXDefaultPageControlDelegate()
-        ///frame  缩放
-        let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> CGRect? in
-            let indexPath = IndexPath(item: index, section: 0)
-            if let cell = collectionView.cellForItem(at: indexPath) {
-                let height = (cell as! BaseCollectionViewCell).imageView.image?.size.height ?? 0.0
-                let width = (cell as! BaseCollectionViewCell).imageView.image?.size.width ?? 0.0
-                let proportion = width / height
-                let rect = cell.convert(cell.bounds, to: view)
-                return CGRect(x: rect.origin.x, y: rect.origin.y, width: rect.size.width, height: rect.size.width / proportion )
-            }
-            return nil
-        }
-        
-        // 打开浏览器
-        JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-            .show(pageIndex: indexPath.item)
+        JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
     }
 }

@@ -17,7 +17,7 @@ class ZoomViewController: BaseCollectionViewController {
     
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
-        (0..<6).forEach { index in
+        (0..<7).forEach { index in
             let model = ResourceModel()
             model.localName = "local_\(index)"
             result.append(model)
@@ -49,7 +49,8 @@ class ZoomViewController: BaseCollectionViewController {
         // 转场动画
         let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
             let indexPath = IndexPath(item: index, section: 0)
-            return collectionView.cellForItem(at: indexPath)
+            let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
+            return cell?.imageView
         }
         // 打开浏览器
         JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
