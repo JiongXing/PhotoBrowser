@@ -37,6 +37,10 @@
 
 # Change Log
 
+## Version 2.1.3
+**2019/01/06**
+- 优化长图转场动画，视觉更流畅
+
 ## Version 2.1.2
 **2018/12/07**
 - 修复显示长图时可能发生的交互BUG
@@ -71,8 +75,6 @@
 - iOS 9.0
 - Swift 4.2
 - Xcode 10
-> - 如需要用在Swift4.2之下的项目使用，请自行修改为相应Swift版本的语法。
-> - 改为Swift4.0或4.1的语法，修改的地方只有几处，工作量不大。
 
 # Installation
 
@@ -109,7 +111,7 @@ open class JXPhotoBrowser: UIViewController {
 ```
 
 ## 打开图片浏览器
-打开图片浏览器之前，需要指定所浏览图片的序号：
+打开图片浏览器之前，可以指定显示图片组中的哪张图片，计数从0开始：
 ```swift
 photoBrowser.pageIndex = selectedIndex
 ```
@@ -170,13 +172,15 @@ JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexP
 ```
 
 ## 转场动画
-打开`JXPhotoBrowser`时，默认使用的转场动画是`Fade`渐变型的，如果想要`Zoom`缩张型，需要返回动画起始/结束位置给`Zoom`动画代理。
-本框架提供了两种方案，你可选择返回起始/结束视图，或选择返回起始/结束坐标。
+打开`JXPhotoBrowser`时，默认使用的转场动画是`Fade`渐变型的，如果想要`Zoom`缩张型，需要返回动画"起始/结束"的前置视图位置给`Zoom`动画代理。
+本框架提供了两种方案，你可选择返回起始/结束视图，或选择返回起始/结束视图的Frame。
 ```swift
-// 返回起始/结束 视图
+// 返回"起始/结束"的前置视图
 let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
     let indexPath = IndexPath(item: index, section: 0)
-    return collectionView.cellForItem(at: indexPath)
+    // 获取前置视图
+    let cell = collectionView.cellForItem(at: indexPath) as? CustomCell
+    return cell?.imageView
 }
 // 打开浏览器
 JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
@@ -184,12 +188,15 @@ JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
 ```
 
 ```swift
-// 返回起始/结束 位置
+// 返回"起始/结束"的前置视图位置
 let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> CGRect? in
     let indexPath = IndexPath(item: index, section: 0)
-    if let cell = collectionView.cellForItem(at: indexPath) {
-        return cell.convert(cell.bounds, to: view)
+    guard let cell = collectionView.cellForItem(at: indexPath) as? CustomCell else {
+        return nil
     }
+    // 这里提供了一个方法，用于获取前置视图在转场容器中的Frame。
+    // 你也可以自己实现需要的Frame。
+    return JXPhotoBrowserZoomTransitioning.resRect(oriRes: cell.imageView, to: view)
     return nil
 }
 // 打开浏览器
