@@ -32,6 +32,7 @@
 #import "mips_macro.h"
 #import "msa_macro.h"
 #import "neon.h"
+#import "quant.h"
 #import "yuv.h"
 #import "backward_references_enc.h"
 #import "cost_enc.h"

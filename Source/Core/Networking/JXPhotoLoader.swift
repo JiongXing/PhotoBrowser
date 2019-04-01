@@ -10,7 +10,7 @@ import Foundation
 /// PhotoLoader 实现者必须是 NSObject 子类
 public protocol JXPhotoLoader {
     /// 取缓存的图片对象
-    func imageCached(on imageView: UIImageView, url: URL?) -> UIImage?
+    func hasCached(with url: URL?) -> Bool
     
     /// 加载图片并设置给 imageView
     /// 加载本地图片时，url 为空，placeholder 为本地图片

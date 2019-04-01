@@ -20,7 +20,7 @@ CG_EXTERN const CFStringRef kWebPAnimatedImageDuration;
 CG_EXTERN const CFStringRef kWebPAnimatedImageLoopCount;
 CG_EXTERN const CFStringRef kWebPAnimatedImageFrames; // CFArrayRef of CGImageRef
 
-NSUInteger WebPImageFrameCountGetFromData(CFDataRef webpData);
+uint32_t WebPImageFrameCountGetFromData(CFDataRef webpData);
 CFDictionaryRef __nullable WebPAnimatedImageInfoCreateWithData(CFDataRef webpData);
 CFDataRef __nullable WebPDataCreateWithAnimatedImageInfo(CFDictionaryRef imageInfo);
 

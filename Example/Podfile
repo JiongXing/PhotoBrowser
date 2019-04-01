@@ -1,12 +1,12 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-platform :ios, '9.0'
+platform :ios, '10.0'
 use_frameworks!
 
 target 'JXPhotoBrowser_Example' do
     pod 'Kingfisher'
     pod 'JXPhotoBrowser', :path => '../'
-    pod 'libwebp', '1.0.0'
+    pod 'libwebp'
     pod 'JXPhotoBrowser/KingfisherWebP', :path => '../'
 
 end

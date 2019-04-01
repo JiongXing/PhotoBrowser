@@ -40,8 +40,6 @@ class WebpImageViewController: BaseCollectionViewController {
         if let firstLevel = self.modelArray[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
             cell.imageView.kf.setImage(with: url)
-        } else {
-            cell.imageView.kf.setImage(with: nil)
         }
         return cell
     }

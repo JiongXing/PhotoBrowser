@@ -44,9 +44,6 @@ open class JXPhotoBrowserNetworkingCell: JXPhotoBrowserBaseCell {
             setNeedsLayout()
             return
         }
-        // 取缓存
-        let image = photoLoader.imageCached(on: imageView, url: url)
-        let placeholder = image ?? placeholder
         // 加载
         photoLoader.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { receivedSize, totalSize in
             if totalSize > 0 {

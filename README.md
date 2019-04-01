@@ -37,12 +37,21 @@
 
 # Change Log
 
+## Version 2.2.0
+**2019/04/01**
+
+- 支持Kingfisher 5.x，同时最低支持iOS 10.0
+- `JXPhotoLoader`协议替换`imageCached(on:, url:)`为`hasCached(with url:)`
+
+
 ## Version 2.1.3
+
 **2019/01/06**
 - 优化长图转场动画，视觉更流畅
 
 ## Version 2.1.2
 **2018/12/07**
+
 - 修复显示长图时可能发生的交互BUG
 
 ## Version 2.1.1
@@ -72,8 +81,10 @@
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 
 # Requirements
-- iOS 9.0
-- Swift 4.2
+- iOS 9.0 (v2.1及以下)
+- iOS 10.0 (v2.2及以上)
+- Swift 4.2 (v2.x)
+- Swift 5.0 (v3.x)
 - Xcode 10
 
 # Installation

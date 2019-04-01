@@ -14,7 +14,7 @@ open class JXDefaultPageControlDelegate: JXPhotoBrowserBaseDelegate {
     open lazy var offsetY: CGFloat = {
         if #available(iOS 11.0, *), let window = UIApplication.shared.keyWindow,
             window.safeAreaInsets.bottom > 0 {
-            return 25
+            return 20
         }
         return 15
     }()

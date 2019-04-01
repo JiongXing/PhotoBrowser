@@ -49,7 +49,7 @@ open class JXPhotoBrowserRawButtonCell: JXPhotoBrowserNetworkingCell {
         rawButton.sizeToFit()
         rawButton.bounds.size.width += 14
         rawButton.center = CGPoint(x: contentView.bounds.width / 2,
-                                   y: contentView.bounds.height - 25 - rawButton.bounds.height)
+                                   y: contentView.bounds.height - 35 - rawButton.bounds.height)
     }
     
     /// 刷新数据
@@ -71,8 +71,8 @@ open class JXPhotoBrowserRawButtonCell: JXPhotoBrowserNetworkingCell {
             return
         }
         // 如果有原图缓存，则显示原图
-        if let image = photoLoader.imageCached(on: imageView, url: url) {
-            photoLoader.setImage(on: imageView, url: url, placeholder: image, progressBlock: { (_, _) in
+        if photoLoader.hasCached(with: url) {
+            photoLoader.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { (_, _) in
                 // Empty.
             }) {
                 self.setNeedsLayout()

@@ -1,47 +1,47 @@
 PODS:
-  - JXPhotoBrowser (2.1.0):
-    - JXPhotoBrowser/Kingfisher (= 2.1.0)
-  - JXPhotoBrowser/Core (2.1.0)
-  - JXPhotoBrowser/Kingfisher (2.1.0):
+  - JXPhotoBrowser (2.2.0):
+    - JXPhotoBrowser/Kingfisher (= 2.2.0)
+  - JXPhotoBrowser/Core (2.2.0)
+  - JXPhotoBrowser/Kingfisher (2.2.0):
     - JXPhotoBrowser/Core
     - Kingfisher
-  - JXPhotoBrowser/KingfisherWebP (2.1.0):
+  - JXPhotoBrowser/KingfisherWebP (2.2.0):
     - JXPhotoBrowser/Core
     - KingfisherWebP
-  - Kingfisher (4.10.0)
-  - KingfisherWebP (0.4.2):
-    - Kingfisher (~> 4.0)
+  - Kingfisher (5.3.1)
+  - KingfisherWebP (0.5.0):
+    - Kingfisher (~> 5.0)
     - libwebp (>= 0.5.0)
-  - libwebp (1.0.0):
-    - libwebp/core (= 1.0.0)
-    - libwebp/dec (= 1.0.0)
-    - libwebp/demux (= 1.0.0)
-    - libwebp/dsp (= 1.0.0)
-    - libwebp/enc (= 1.0.0)
-    - libwebp/mux (= 1.0.0)
-    - libwebp/utils (= 1.0.0)
-    - libwebp/webp (= 1.0.0)
-  - libwebp/core (1.0.0):
+  - libwebp (1.0.2):
+    - libwebp/core (= 1.0.2)
+    - libwebp/dec (= 1.0.2)
+    - libwebp/demux (= 1.0.2)
+    - libwebp/dsp (= 1.0.2)
+    - libwebp/enc (= 1.0.2)
+    - libwebp/mux (= 1.0.2)
+    - libwebp/utils (= 1.0.2)
+    - libwebp/webp (= 1.0.2)
+  - libwebp/core (1.0.2):
     - libwebp/webp
-  - libwebp/dec (1.0.0):
+  - libwebp/dec (1.0.2):
     - libwebp/core
-  - libwebp/demux (1.0.0):
+  - libwebp/demux (1.0.2):
     - libwebp/core
-  - libwebp/dsp (1.0.0):
+  - libwebp/dsp (1.0.2):
     - libwebp/core
-  - libwebp/enc (1.0.0):
+  - libwebp/enc (1.0.2):
     - libwebp/core
-  - libwebp/mux (1.0.0):
+  - libwebp/mux (1.0.2):
     - libwebp/core
-  - libwebp/utils (1.0.0):
+  - libwebp/utils (1.0.2):
     - libwebp/core
-  - libwebp/webp (1.0.0)
+  - libwebp/webp (1.0.2)
 
 DEPENDENCIES:
   - JXPhotoBrowser (from `../`)
   - JXPhotoBrowser/KingfisherWebP (from `../`)
   - Kingfisher
-  - libwebp (= 1.0.0)
+  - libwebp
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -54,11 +54,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: 537fd8398a0325b6c6662bf3252fa5dceceba4ec
-  Kingfisher: 43c4b802d8b5256cf1f4379e9cd10b329be6d3e2
-  KingfisherWebP: 53632f3da248ccabd4999d775903d6ae0aaa7768
-  libwebp: 1ad7cec76ed0a6db76a1ee4fbb08a15fbbdb8776
+  JXPhotoBrowser: b2b60039e14fd4612c90418754e070ee1ac63b81
+  Kingfisher: d9e7e0b209b59b8f9873aa2f37654e81a7beea51
+  KingfisherWebP: 310f69a932151c526a7649de965f57e56918c8d0
+  libwebp: 00eb2a159eb1b5ec02a44b573523a3ae92b077f7
 
-PODFILE CHECKSUM: b9c4832e8631fbb2f2f819cde4d1d8598960ed0e
+PODFILE CHECKSUM: 16150422a6d013d9fa0ad7f982aae2f6806fc218
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.6.1
