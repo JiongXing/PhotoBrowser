@@ -42,8 +42,8 @@ open class JXPhotoBrowser: UIViewController {
     open var isPreviewing = false
     
     /// 流型布局
-    open lazy var flowLayout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
+    open lazy var flowLayout: JXCollectionViewFlowLayout = {
+        let layout = JXCollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         return layout
     }()
@@ -173,11 +173,8 @@ open class JXPhotoBrowser: UIViewController {
     /// 屏幕即将旋转回调
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        // 记录旋转前index
-        let index = pageIndex
-        DispatchQueue.main.asyncAfter(deadline: .now() + coordinator.transitionDuration, execute: {
-            self.scrollToItem(index, at: .left, animated: false)
-        })
+
+        flowLayout.indexPathForFocusItem = IndexPath(item: pageIndex, section: 0)
     }
     
     /// 滑到哪张图片
