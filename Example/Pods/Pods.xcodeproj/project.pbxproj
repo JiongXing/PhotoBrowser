@@ -19,7 +19,6 @@
 		07F8D2E0020FF43B7235529A9E57C986 /* predictor_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = D4BCE13DAF548467459C7E1A912D04AC /* predictor_enc.c */; settings = {COMPILER_FLAGS = "-D_THREAD_SAFE -fno-objc-arc"; }; };
 		0D458564AC4E183A76C7C008C43ADD8A /* cost_neon.c in Sources */ = {isa = PBXBuildFile; fileRef = C9DD5CFC3FF91A149DD4CAF940798939 /* cost_neon.c */; settings = {COMPILER_FLAGS = "-D_THREAD_SAFE -fno-objc-arc"; }; };
 		0EF2E1076354DBD0C1F0785AA3E4F850 /* CallbackQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C88B22364B0C4B89DA609C028B9CC04D /* CallbackQueue.swift */; };
-		11A5E8612258A7CD005AE237 /* JXCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A5E8602258A7CD005AE237 /* JXCollectionViewFlowLayout.swift */; };
 		148852AA9C62F715560978F838EE12AB /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 837FBA70F874BA5E207E512A36718724 /* Kingfisher.framework */; };
 		16B371A8A2CA96D8B03F48F7596838E8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBBDD8095C2118BE2273D8F1B642BA4 /* Foundation.framework */; };
 		19F94CDD5FD5CA2114387514957690CD /* alpha_processing_neon.c in Sources */ = {isa = PBXBuildFile; fileRef = 00BB12116AFF28FFCCD6DE39ED934626 /* alpha_processing_neon.c */; settings = {COMPILER_FLAGS = "-D_THREAD_SAFE -fno-objc-arc"; }; };
@@ -151,6 +150,7 @@
 		92931FEE0AF5D01CB1FBBEB53DA57F8E /* enc_neon.c in Sources */ = {isa = PBXBuildFile; fileRef = AFB3D2C60CC4890B093ED678FFB7F3AC /* enc_neon.c */; settings = {COMPILER_FLAGS = "-D_THREAD_SAFE -fno-objc-arc"; }; };
 		94147267364228403FE13AD9CB1C8CF4 /* String+MD5.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF254DBA890B27C04F980553A5FBED1 /* String+MD5.swift */; };
 		94B5A9DA91DF851F6A461AB0D7A0AE3B /* JXPhotoBrowserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3096E578C922CADC352E5F8B56342C2 /* JXPhotoBrowserDelegate.swift */; };
+		94B7F10B225B1E2D0024FC47 /* JXCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94B7F10A225B1E2D0024FC47 /* JXCollectionViewFlowLayout.swift */; };
 		96568985B1DE693102D18FC79797AF5F /* Runtime.swift in Sources */ = {isa = PBXBuildFile; fileRef = D499CCD9CB53507FDEEDD303966CAE9B /* Runtime.swift */; };
 		967CF4A18261E0EE8FFE28D26DAE3CE7 /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94D18AE215334F1FB8760CC813AF745B /* Resource.swift */; };
 		98F8AD70FBF2B10F1F71790894D46CED /* vp8i_enc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C2313E0617F24FC4D7ECB48FF563258 /* vp8i_enc.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -350,7 +350,6 @@
 		0CE4503C366B5F6ECD182BACCB4B7B54 /* JXPhotoBrowser-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "JXPhotoBrowser-dummy.m"; sourceTree = "<group>"; };
 		0E412461BC68E38A98C4857AC633130D /* filters_sse2.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = filters_sse2.c; path = src/dsp/filters_sse2.c; sourceTree = "<group>"; };
 		0FEF9A96C952F2ACD0B8D31BD6D47BAB /* JXKingfisherWebPLoader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JXKingfisherWebPLoader.swift; path = Source/KingfisherWebP/JXKingfisherWebPLoader.swift; sourceTree = "<group>"; };
-		11A5E8602258A7CD005AE237 /* JXCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		13AEC5EE53C268E139CE302FDD15C5E4 /* quant_levels_dec_utils.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = quant_levels_dec_utils.c; path = src/utils/quant_levels_dec_utils.c; sourceTree = "<group>"; };
 		14F297E821BF34C3FB8CEDCED6F8F107 /* Box.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Box.swift; path = Sources/Utility/Box.swift; sourceTree = "<group>"; };
 		15816870F0780F22E1B45D2F9B76F4C9 /* ImageFormat.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageFormat.swift; path = Sources/Image/ImageFormat.swift; sourceTree = "<group>"; };
@@ -495,6 +494,7 @@
 		9138DD6B1903DAE7308FA2EFA8E5CE62 /* lossless_enc_neon.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = lossless_enc_neon.c; path = src/dsp/lossless_enc_neon.c; sourceTree = "<group>"; };
 		92517E226D6BD4F6E4F400F74A05A552 /* JXPhotoBrowser-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "JXPhotoBrowser-umbrella.h"; sourceTree = "<group>"; };
 		938D69476EED476602FA85648D47481D /* rescaler_msa.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = rescaler_msa.c; path = src/dsp/rescaler_msa.c; sourceTree = "<group>"; };
+		94B7F10A225B1E2D0024FC47 /* JXCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JXCollectionViewFlowLayout.swift; path = Source/Core/JXCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
 		94D18AE215334F1FB8760CC813AF745B /* Resource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Resource.swift; path = Sources/General/ImageSource/Resource.swift; sourceTree = "<group>"; };
 		951C7BC72F6860441745488CB38F5BB5 /* enc_sse41.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = enc_sse41.c; path = src/dsp/enc_sse41.c; sourceTree = "<group>"; };
 		96354F08E2FA6554C3A044625EF68732 /* KingfisherWebP.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = KingfisherWebP.xcconfig; sourceTree = "<group>"; };
@@ -669,11 +669,11 @@
 		1293ABC08EFC4FAB39E310ECAD2AF03F /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				11A5E8602258A7CD005AE237 /* JXCollectionViewFlowLayout.swift */,
 				432057E1C6EB83A323C270AE58689648 /* JXLocalDataSource.swift */,
 				58D936845F2877A2BB288857CC77CEC1 /* JXPhotoBrowser.swift */,
 				C8E96824FDFD76B126AD6E18EFA576F6 /* JXPhotoBrowserBaseCell.swift */,
 				DAF51E7250E6F799557D1DD56CD08295 /* JXPhotoBrowserBaseDelegate.swift */,
+				94B7F10A225B1E2D0024FC47 /* JXCollectionViewFlowLayout.swift */,
 				BB6AAD0C98D2DF97A9A5E00A7FDB98AE /* Animator */,
 				29F49F7613CF4D7B74E1731DC71F649E /* Enhance */,
 				B36113BF83AE7FECA61C5D88CF64D27F /* Networking */,
@@ -1534,7 +1534,7 @@
 				E792E305A25BA284637952562F860802 /* JXKingfisherLoader.swift in Sources */,
 				70E4C9BD84E402975D1626D421B70663 /* JXKingfisherWebPLoader.swift in Sources */,
 				FB0B6D70C8E3D00FEA93241E880EE224 /* JXLocalDataSource.swift in Sources */,
-				11A5E8612258A7CD005AE237 /* JXCollectionViewFlowLayout.swift in Sources */,
+				94B7F10B225B1E2D0024FC47 /* JXCollectionViewFlowLayout.swift in Sources */,
 				3369C8244D33776A1A7105B17AD47DB8 /* JXNamespace.swift in Sources */,
 				6146C463682BD7291F9F49DF86B2F8EE /* JXNetworkingDataSource.swift in Sources */,
 				D1CD46E1ECC5AF7F445135D9BB87011A /* JXNumberPageControlDelegate.swift in Sources */,
