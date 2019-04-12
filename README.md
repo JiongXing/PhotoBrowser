@@ -37,12 +37,16 @@
 
 # Change Log
 
+## Version 2.2.1
+**2019/04/12**
+
+- 优化屏幕旋转时的闪烁问题
+
 ## Version 2.2.0
 **2019/04/01**
 
 - 支持Kingfisher 5.x，同时最低支持iOS 10.0
 - `JXPhotoLoader`协议替换`imageCached(on:, url:)`为`hasCached(with url:)`
-
 
 ## Version 2.1.3
 
