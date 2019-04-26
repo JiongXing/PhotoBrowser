@@ -66,6 +66,7 @@
 		94B28957217387E90004CAC7 /* Photos.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Photos.plist; sourceTree = "<group>"; };
 		BA3915EE6D7877DE993671DC /* Pods-JXPhotoBrowser_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-JXPhotoBrowser_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-JXPhotoBrowser_Tests/Pods-JXPhotoBrowser_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		C0774FC1B291D40E4F0C4FA0 /* JXPhotoBrowser.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = JXPhotoBrowser.podspec; path = ../JXPhotoBrowser.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		E39BF295227346BF00588A38 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,8 +214,10 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
+				ar,
 			);
 			mainGroup = 607FACC71AFB9204008FA782;
 			productRefGroup = 607FACD11AFB9204008FA782 /* Products */;
@@ -318,6 +321,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				607FACDF1AFB9204008FA782 /* Base */,
+				E39BF295227346BF00588A38 /* ar */,
 			);
 			name = LaunchScreen.xib;
 			sourceTree = "<group>";

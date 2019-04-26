@@ -236,6 +236,7 @@
 		E2B80B90E156D40F7CF0E2414FDA2D71 /* JXPhotoBrowserTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C542D1D122D4E2AF867C67387D36257D /* JXPhotoBrowserTransitioningDelegate.swift */; };
 		E2BA0A141AE91FD6CE124C077EBB3F77 /* Image+WebP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8037812FA099F7CAD4D53A7B8E402400 /* Image+WebP.swift */; };
 		E37AB01986F095E0633AA0153096ADBF /* lossless_enc_msa.c in Sources */ = {isa = PBXBuildFile; fileRef = D21B79C6E974B90811477BA9DF862D20 /* lossless_enc_msa.c */; settings = {COMPILER_FLAGS = "-D_THREAD_SAFE -fno-objc-arc"; }; };
+		E39BF297227358F100588A38 /* LayoutUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E39BF296227358F100588A38 /* LayoutUtil.swift */; };
 		E4BBA7D72737F8E43AD7109D36BF1308 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0C6CECC6172A4019CDF87729A934D02 /* Filter.swift */; };
 		E5163184EDA95CCF95AF1F91C96CC009 /* SessionDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B81D151AF54CEAADA30F12DC726BF4 /* SessionDataTask.swift */; };
 		E5377F4067E192E462E0EB31C2FE796B /* enc.c in Sources */ = {isa = PBXBuildFile; fileRef = 0AD1A1022132A361A39CDDE41E3598B0 /* enc.c */; settings = {COMPILER_FLAGS = "-D_THREAD_SAFE -fno-objc-arc"; }; };
@@ -588,6 +589,7 @@
 		E13AC0C855E35AF59D02398336ECD742 /* cpu.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = cpu.c; path = src/dsp/cpu.c; sourceTree = "<group>"; };
 		E3096E578C922CADC352E5F8B56342C2 /* JXPhotoBrowserDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserDelegate.swift; sourceTree = "<group>"; };
 		E351E0FED3DEDE2F545C4638CBDC6DAC /* KingfisherWebP-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "KingfisherWebP-Info.plist"; sourceTree = "<group>"; };
+		E39BF296227358F100588A38 /* LayoutUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutUtil.swift; sourceTree = "<group>"; };
 		E42B3B20F6504EA592485509329C956C /* ExtensionHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExtensionHelpers.swift; path = Sources/Utility/ExtensionHelpers.swift; sourceTree = "<group>"; };
 		E44E3D105CCD6987F92871632045CB75 /* syntax_enc.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = syntax_enc.c; path = src/enc/syntax_enc.c; sourceTree = "<group>"; };
 		E641436AC4DEB35902E92A731BB7A0E2 /* WebPProcessor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WebPProcessor.swift; path = KingfisherWebP/Classes/WebPProcessor.swift; sourceTree = "<group>"; };
@@ -1102,6 +1104,7 @@
 				370BB8B0ECFAF19B02D60473A0F20269 /* JXNamespace.swift */,
 				080E450889437B0DCDB48F7697004B27 /* UICollectionView+JX.swift */,
 				F39C46C20CFE66A9D4486135CA801072 /* UIViewController+JX.swift */,
+				E39BF296227358F100588A38 /* LayoutUtil.swift */,
 			);
 			name = Utils;
 			path = Source/Core/Utils;
@@ -1537,6 +1540,7 @@
 				94B7F10B225B1E2D0024FC47 /* JXCollectionViewFlowLayout.swift in Sources */,
 				3369C8244D33776A1A7105B17AD47DB8 /* JXNamespace.swift in Sources */,
 				6146C463682BD7291F9F49DF86B2F8EE /* JXNetworkingDataSource.swift in Sources */,
+				E39BF297227358F100588A38 /* LayoutUtil.swift in Sources */,
 				D1CD46E1ECC5AF7F445135D9BB87011A /* JXNumberPageControlDelegate.swift in Sources */,
 				41C16BBCECCD7B9836ACCA6FD7422A27 /* JXPhotoBrowser-dummy.m in Sources */,
 				784DB13E9201FF55FD877E83462EEE53 /* JXPhotoBrowser.swift in Sources */,

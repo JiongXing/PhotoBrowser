@@ -113,15 +113,16 @@ open class JXPhotoBrowser: UIViewController {
         collectionView.delegate = delegate
         collectionView.dataSource = dataSource
         dataSource.registerCell(for: collectionView)
-        
-        layout()
+        let index = pageIndex
+        setLayout()
         collectionView.reloadData()
-        scrollToItem(pageIndex, at: .left, animated: false)
+        collectionView.layoutIfNeeded()
+        self.scrollToItem(index, at: .left, animated: false)
         collectionView.layoutIfNeeded()
         delegate.photoBrowserViewDidLoad(self)
     }
     
-    private func layout() {
+    private func setLayout() {
         flowLayout.minimumLineSpacing = photoSpacing
         flowLayout.itemSize = view.bounds.size
         collectionView.frame = view.bounds
@@ -136,7 +137,7 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        layout()
+        setLayout()
         delegate.photoBrowserViewWillLayoutSubviews(self)
     }
     
