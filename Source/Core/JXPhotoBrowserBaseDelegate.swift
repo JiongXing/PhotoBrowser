@@ -94,7 +94,11 @@ open class JXPhotoBrowserBaseDelegate: NSObject, JXPhotoBrowserDelegate {
     
     /// scrollView滑动
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        browser?.pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
+        if LayoutUtil.isRTLLayout {
+            browser?.pageIndex = abs(Int((scrollView.contentSize.width - scrollView.contentOffset.x - scrollView.bounds.width/2) / scrollView.bounds.width))
+        }else{
+            browser?.pageIndex = abs(Int((scrollView.contentOffset.x + scrollView.bounds.width/2) / scrollView.bounds.width))
+        }
     }
     
     /// 取当前显示页的内容视图。比如是 ImageView.
