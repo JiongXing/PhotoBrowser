@@ -1,9 +1,8 @@
 //
-//  Kingfisher.h
+//  Box.swift
 //  Kingfisher
 //
-//  Created by Wei Wang on 15/4/6.
-//
+//  Created by Wei Wang on 2018/3/17.
 //  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,14 +23,12 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Kingfisher.
-FOUNDATION_EXPORT double KingfisherVersionNumber;
-
-//! Project version string for Kingfisher.
-FOUNDATION_EXPORT const unsigned char KingfisherVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Kingfisher/PublicHeader.h>
-
-
+class Box<T> {
+    let value: T
+    
+    init(_ value: T) {
+        self.value = value
+    }
+}

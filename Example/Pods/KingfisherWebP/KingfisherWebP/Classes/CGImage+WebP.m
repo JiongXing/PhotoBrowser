@@ -306,7 +306,7 @@ const CFStringRef kWebPAnimatedImageDuration = CFSTR("kWebPAnimatedImageDuration
 const CFStringRef kWebPAnimatedImageLoopCount = CFSTR("kWebPAnimatedImageLoopCount");
 const CFStringRef kWebPAnimatedImageFrames = CFSTR("kWebPAnimatedImageFrames");
 
-uint32_t WebPImageFrameCountGetFromData(CFDataRef webpData) {
+NSUInteger WebPImageFrameCountGetFromData(CFDataRef webpData) {
     WebPData webp_data;
     WebPDataInit(&webp_data);
     webp_data.bytes = CFDataGetBytePtr(webpData);
@@ -317,7 +317,7 @@ uint32_t WebPImageFrameCountGetFromData(CFDataRef webpData) {
         return 0;
     }
     
-    uint32_t frameCount = WebPDemuxGetI(dmux, WEBP_FF_FRAME_COUNT);
+    NSUInteger frameCount = WebPDemuxGetI(dmux, WEBP_FF_FRAME_COUNT);
     WebPDemuxDelete(dmux);
     
     return frameCount;

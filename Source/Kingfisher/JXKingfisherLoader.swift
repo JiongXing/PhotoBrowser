@@ -21,10 +21,9 @@ public class JXKingfisherLoader: JXPhotoLoader {
     }
     
     public func setImage(on imageView: UIImageView, url: URL?, placeholder: UIImage?, progressBlock: @escaping (Int64, Int64) -> Void, completionHandler: @escaping () -> Void) {
-        
         imageView.kf.setImage(with: url, placeholder: placeholder, progressBlock: { receivedSize, totalSize in
             progressBlock(receivedSize, totalSize)
-        }, completionHandler: { _ in
+        }, completionHandler: { _, _, _, _ in
             completionHandler()
         })
     }

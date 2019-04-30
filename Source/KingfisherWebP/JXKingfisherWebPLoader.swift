@@ -30,7 +30,7 @@ public class JXKingfisherWebPLoader: JXPhotoLoader {
         
         imageView.kf.setImage(with: url, placeholder: placeholder, options: options, progressBlock: { receivedSize, totalSize in
             progressBlock(receivedSize, totalSize)
-        }, completionHandler: { _ in
+        }, completionHandler: { _, _, _, _ in
             completionHandler()
         })
     }

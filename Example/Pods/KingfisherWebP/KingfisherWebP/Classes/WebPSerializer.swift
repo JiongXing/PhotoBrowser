@@ -9,6 +9,7 @@
 import Kingfisher
 
 public struct WebPSerializer: CacheSerializer {
+
     public static let `default` = WebPSerializer()
     private init() {}
 
@@ -20,7 +21,7 @@ public struct WebPSerializer: CacheSerializer {
         }
     }
 
-    public func image(with data: Data, options: KingfisherParsedOptionsInfo) -> Image? {
-        return WebPProcessor.default.process(item: .data(data), options: options)
+    public func image(with data: Data, options: KingfisherOptionsInfo?) -> Image? {
+        return WebPProcessor.default.process(item: .data(data), options: options ?? [])
     }
 }

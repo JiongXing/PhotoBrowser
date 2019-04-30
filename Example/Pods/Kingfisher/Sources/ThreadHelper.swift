@@ -1,8 +1,8 @@
 //
-//  Kingfisher.h
+//  ThreadHelper.swift
 //  Kingfisher
 //
-//  Created by Wei Wang on 15/4/6.
+//  Created by Wei Wang on 15/10/9.
 //
 //  Copyright (c) 2018 Wei Wang <onevcat@gmail.com>
 //
@@ -24,14 +24,17 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-//! Project version number for Kingfisher.
-FOUNDATION_EXPORT double KingfisherVersionNumber;
-
-//! Project version string for Kingfisher.
-FOUNDATION_EXPORT const unsigned char KingfisherVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <Kingfisher/PublicHeader.h>
-
-
+extension DispatchQueue {
+    // This method will dispatch the `block` to self.
+    // If `self` is the main queue, and current thread is main thread, the block
+    // will be invoked immediately instead of being dispatched.
+    func safeAsync(_ block: @escaping ()->()) {
+        if self === DispatchQueue.main && Thread.isMainThread {
+            block()
+        } else {
+            async { block() }
+        }
+    }
+}
