@@ -45,14 +45,10 @@ open class JXPhotoBrowserNetworkingCell: JXPhotoBrowserBaseCell {
             return
         }
         // 加载
+        self.progressView.isHidden = false
         photoLoader.setImage(on: imageView, url: url, placeholder: placeholder, progressBlock: { receivedSize, totalSize in
             if totalSize > 0 {
                 self.progressView.progress = CGFloat(receivedSize) / CGFloat(totalSize)
-                if receivedSize < totalSize {
-                    self.progressView.isHidden = false
-                }
-            } else {
-                self.progressView.progress = 0
             }
         }) {
             self.progressView.isHidden = true
