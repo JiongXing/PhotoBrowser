@@ -29,6 +29,9 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
         let view = UILabel()
         view.font = font
         view.textColor = textColor
+        view.textAlignment = NSTextAlignment.center
+        view.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.4)
+        view.layer.masksToBounds = true
         return view
     }()
     
@@ -68,6 +71,9 @@ open class JXNumberPageControlDelegate: JXPhotoBrowserBaseDelegate {
         let totalPages = browser.itemsCount
         pageControl.text = "\(browser.pageIndex + 1) / \(totalPages)"
         pageControl.sizeToFit()
+        pageControl.frame.size.width += pageControl.frame.height
+        pageControl.layer.cornerRadius = pageControl.frame.height / 2
+//        pageControl.frame.size.width = CGFloat((pageControl.text!.count-2) * 16)
         pageControl.center.x = superView.bounds.width / 2
         pageControl.frame.origin.y = offsetY
         pageControl.isHidden = totalPages <= 1
