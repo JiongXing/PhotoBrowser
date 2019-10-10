@@ -32,8 +32,8 @@ class GIFImageViewController: BaseCollectionViewController {
             model.secondLevelUrl = item[1]
             result.append(model)
         }
-        result[0].secondLevelUrl = "http://www.qqpaopao.com/q/UploadPic/2016-7/2016720224249353.gif"
-        result[1].thirdLevelUrl = "http://img3.3lian.com/2006/013/08/20051103121023912.gif"
+        result[0].secondLevelUrl = "http://pic37.nipic.com/20140206/17516072_002337888107_2.gif"
+        result[1].thirdLevelUrl = "http://images.shejidaren.com/wp-content/uploads/2015/11/dribbble-gif-8.gif"
         return result
     }
     

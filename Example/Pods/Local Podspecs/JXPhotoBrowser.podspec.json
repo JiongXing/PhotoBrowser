@@ -19,7 +19,10 @@
   "platforms": {
     "ios": "9.0"
   },
-  "swift_version": "4.2",
+  "swift_versions": [
+    "4.2",
+    "5.0"
+  ],
   "default_subspecs": "Kingfisher",
   "subspecs": [
     {
@@ -53,5 +56,6 @@
         ]
       }
     }
-  ]
+  ],
+  "swift_version": "5.0"
 }
