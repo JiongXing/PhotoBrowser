@@ -20,10 +20,29 @@ For convenience, you may set it as a global default option to all `KingfisherMan
 
 ```swift
 // somewhere after your application launches...
-KingfisherManager.shared.defaultOptions = [.processor(WebPProcessor.default), .cacheSerializer(WebPSerializer.default)]
+
+KingfisherManager.shared.defaultOptions += [
+  .processor(WebPProcessor.default),
+  .cacheSerializer(WebPSerializer.default)
+]
 
 // You can now use webp in Kingfisher like any other format
 imageView.kf.setImage(with: url)
+```
+
+Some image servers may expect the `"Accept"` header to include `"image/webp"`.
+You can include this header to all Kingfisher requests by doing:
+```swift
+let modifier = AnyModifier { request in
+    var req = request
+    req.addValue("image/webp */*", forHTTPHeaderField: "Accept")
+    return req
+}
+
+KingfisherManager.shared.defaultOptions += [
+    .requestModifier(modifier),
+    // ... other options
+]
 ```
 
 If the image data is not in webp format, the default processor and serializer in `Kingfisher` will be used.

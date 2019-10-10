@@ -9,11 +9,10 @@
 import Kingfisher
 
 public struct WebPSerializer: CacheSerializer {
-
     public static let `default` = WebPSerializer()
     private init() {}
 
-    public func data(with image: Image, original: Data?) -> Data? {
+    public func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
         if let original = original, !original.isWebPFormat {
             return DefaultCacheSerializer.default.data(with: image, original: original)
         } else {
@@ -21,7 +20,7 @@ public struct WebPSerializer: CacheSerializer {
         }
     }
 
-    public func image(with data: Data, options: KingfisherOptionsInfo?) -> Image? {
-        return WebPProcessor.default.process(item: .data(data), options: options ?? [])
+    public func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
+        return WebPProcessor.default.process(item: .data(data), options: options)
     }
 }

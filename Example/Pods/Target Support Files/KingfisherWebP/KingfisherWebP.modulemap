@@ -3,8 +3,4 @@ framework module KingfisherWebP {
 
   export *
   module * { export * }
-
-  explicit module Private {
-    header "CGImage+WebP.h"
-  }
 }

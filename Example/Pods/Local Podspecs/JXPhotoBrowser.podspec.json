@@ -1,6 +1,6 @@
 {
   "name": "JXPhotoBrowser",
-  "version": "2.1.4",
+  "version": "2.2.5",
   "summary": "Elegant photo browser in Swift.",
   "description": "Elegant photo browser in Swift. Inspired by WeChat.",
   "homepage": "https://github.com/JiongXing/PhotoBrowser",
@@ -14,10 +14,10 @@
   },
   "source": {
     "git": "https://github.com/JiongXing/PhotoBrowser.git",
-    "tag": "2.1.4"
+    "tag": "2.2.5"
   },
   "platforms": {
-    "ios": "9.0"
+    "ios": "10.0"
   },
   "swift_versions": [
     "4.2",
