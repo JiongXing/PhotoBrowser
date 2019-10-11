@@ -37,6 +37,20 @@
 
 # Change Log
 
+## Version 2.2.5/2.1.5
+
+** 2019/10/11 **
+
+> v2.1.5支持到iOS9，使用Kingfisher 4.x版本。v2.2.5因为使用了 Kingfisher 5.x，最低只能支持到iOS10。
+> Kingfisher 5.x 的图片缓存与先前版本不太一样，可能在这里有问题。
+> 未来版本增加SDWebImage支持示例，对网络图片的加载会进一步解耦，甚至加载视频。
+
+> 未来版本增加SDWebImage支持示例，对网络图片的加载会进一步解耦，甚至加载视频。
+
+- 现在`imageMaximumZoomScale`属性已启用。
+- 数字页码添加半透背景，解决预览白图时数字消失问题。
+- 现在自动支持`Swift 5`编译。
+
 ## Version 2.2.3（iOS9: 2.1.4）
 
 **2019/04/30**
@@ -77,10 +91,9 @@
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 
 # Requirements
-- iOS 9.0 (v2.1及以下)
-- iOS 10.0 (v2.2及以上)
-- Swift 4.2 (v2.x)
-- Swift 5.0 (v3.x)
+- iOS 9.0 (JXPhotoBrowser v2.1 +)
+- iOS 10.0 (JXPhotoBrowser v2.2 +)
+- Swift 4.2 +
 - Xcode 10
 
 # Installation
