@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name             = 'JXPhotoBrowser'
-    s.version          = '2.1.5'
+    s.version          = '2.1.6'
     s.summary          = 'Elegant photo browser in Swift.'
     s.description      = 'Elegant photo browser in Swift. Inspired by WeChat.'
     
