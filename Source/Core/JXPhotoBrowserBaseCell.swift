@@ -128,7 +128,7 @@ extension JXPhotoBrowserBaseCell {
     
     /// 计算图片适合的size
     private var fitSize: CGSize {
-        guard let image = imageView.image else {
+        guard let image = imageView.image, image.size.width > 0, image.size.height > 0 else {
             return CGSize.zero
         }
         var width: CGFloat
