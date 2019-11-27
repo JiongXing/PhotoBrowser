@@ -16,23 +16,22 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     /// 询问当前数据总量
     open lazy var numberOfItems: () -> Int = { 0 }
     
-    /// 生成单项视图，将会被调用3次以生成3块视图
-    open lazy var createCell: (JXPhotoBrowser) -> UIView = { _ in UIView() }
+    /// 返回可复用的Cell类。用户可根据index返回不同的类。本闭包将在每次复用Cell时实时调用。
+    open lazy var cellClassAtIndex: (_ index: Int) -> JXPhotoBrowserCell.Type = { _ in
+        JXPhotoBrowserImageCell.self
+    }
     
-    /// Cell刷新数据时调用。pageIndex从0计起
-    open lazy var reloadItem: (_ cell: UIView, _ pageIndex: Int) -> Void = { _, _ in }
+    /// 刷新Cell数据。本闭包将在Cell完成位置布局后调用。
+    open lazy var reloadCell: (_ cell: JXPhotoBrowserCell, _ pageIndex: Int) -> Void = { _, _ in }
     
-    open lazy var didChangedPageIndex: (Int) -> Void = { _ in}
+    /// 页码已改变
+    open lazy var didChangedPageIndex: (Int) -> Void = { _ in }
     
     /// 滑动方向
     open var scrollDirection: JXPhotoBrowser.ScrollDirection = .horizontal
     
     /// 项间距
     open var itemSpacing: CGFloat = 30
-    
-    open var visibleCells: [Int: UIView] = [:]
-    
-    open var reusableCells: Set<UIView> = []
     
     /// 当前页码
     open var pageIndex = 0 {
@@ -128,12 +127,51 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         }
     }
     
-    /// 重置所有复用Cell位置。更新 visibleCells 和 reusableCells
+    //
+    // MARK: - 复用Cell
+    //
+    
+    /// 显示中的Cell
+    open var visibleCells = [Int: JXPhotoBrowserCell]()
+    
+    /// 缓存中的Cell
+    open var reusableCells = [String: [JXPhotoBrowserCell]]()
+    
+    /// 入队
+    private func enqueue(cell: JXPhotoBrowserCell) {
+        let name = String(describing: cell.classForCoder)
+        if var array = reusableCells[name] {
+            array.append(cell)
+            reusableCells[name] = array
+        } else {
+            reusableCells[name] = [cell]
+        }
+    }
+    
+    /// 出队，没缓存则新建
+    private func dequeue(cellType: JXPhotoBrowserCell.Type, browser: JXPhotoBrowser) -> JXPhotoBrowserCell {
+        var cell: JXPhotoBrowserCell
+        let name = String(describing: cellType.classForCoder())
+        if var array = reusableCells[name], array.count > 0 {
+            JXPhotoBrowserLog.middle("命中缓存！\(name)")
+            cell = array.removeFirst()
+            reusableCells[name] = array
+        } else {
+            JXPhotoBrowserLog.middle("新建Cell! \(name)")
+            cell = cellType.generate(with: browser)
+        }
+        return cell
+    }
+    
+    /// 重置所有Cell的位置。更新 visibleCells 和 reusableCells
     open func resetCells() {
-        JXPhotoBrowserLog.low("\(self.classForCoder) resetCells!")
-        let itemsTotalCount = numberOfItems()
-        // 移除不显示的cell
+        JXPhotoBrowserLog.middle("\(self.classForCoder) resetCells!")
+        guard let browser = photoBrowser else {
+            return
+        }
+        // 移除不在显示范围内的cell
         var removingKeys: Set<Int> = []
+        let itemsTotalCount = numberOfItems()
         // 异常数值处理
         if itemsTotalCount <= 0 {
             visibleCells.forEach { key, _ in
@@ -147,34 +185,32 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         removingKeys.forEach { key in
             if let cell = visibleCells.removeValue(forKey: key) {
                 cell.removeFromSuperview()
-                reusableCells.insert(cell)
+                JXPhotoBrowserLog.middle("移除 index:\(key)，并入列")
+                enqueue(cell: cell)
             }
-        }
-        guard let browser = photoBrowser else {
-            return
         }
         // 添加要显示的cell
         for index in (pageIndex - 1)...(pageIndex + 1) {
             if index < 0 || index > itemsTotalCount - 1 {
                 continue
             }
-            if visibleCells[index] != nil {
+            let clazz = cellClassAtIndex(index)
+            JXPhotoBrowserLog.middle("Required class name: \(String(describing: clazz))")
+            if let cell = visibleCells[index],
+                String(describing: cell.classForCoder) == String(describing: clazz) {
+                JXPhotoBrowserLog.middle("index:\(index)显示中")
                 continue
             }
-            var cell: UIView
-            if reusableCells.count > 0 {
-                cell = reusableCells.removeFirst()
-            } else {
-                cell = createCell(browser)
-            }
-            scrollView.addSubview(cell)
+            JXPhotoBrowserLog.middle("index:\(index) 出列!")
+            let cell = dequeue(cellType: clazz, browser: browser)
             visibleCells[index] = cell
+            scrollView.addSubview(cell)
         }
     }
     
     /// 刷新所有显示中的Cell位置
     open func layoutCells() {
-        JXPhotoBrowserLog.low("\(self.classForCoder) layoutCells!")
+        JXPhotoBrowserLog.middle("\(self.classForCoder) layoutCells!")
         let cellWidth = bounds.width
         let cellHeight = bounds.height
         var sizeWidth: CGFloat = 0
@@ -197,7 +233,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     open func reloadItems() {
         JXPhotoBrowserLog.low("\(self.classForCoder) reloadItems!")
         visibleCells.forEach { index, cell in
-            reloadItem(cell, index)
+            reloadCell(cell, index)
         }
     }
 }

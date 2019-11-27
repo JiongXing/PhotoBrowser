@@ -52,16 +52,16 @@ open class JXPhotoBrowser: UIViewController {
         get { browserView.numberOfItems }
     }
     
-    /// 生成单项视图，将会被调用3次以生成3块视图
-    open var createCell: (JXPhotoBrowser) -> UIView {
-        set { browserView.createCell = newValue }
-        get { browserView.createCell }
+    /// 返回可复用的Cell类。用户可根据index返回不同的类。本闭包将在每次复用Cell时实时调用。
+    open var cellClassAtIndex: (_ index: Int) -> JXPhotoBrowserCell.Type {
+        set { browserView.cellClassAtIndex = newValue }
+        get { browserView.cellClassAtIndex }
     }
     
-    /// Cell刷新数据时调用。pageIndex从0计起
-    open var reloadItem: (_ cell: UIView, _ pageIndex: Int) -> Void {
-        set { browserView.reloadItem = newValue }
-        get { browserView.reloadItem }
+    /// 刷新Cell数据。本闭包将在Cell完成位置布局后调用。
+    open var reloadCell: (_ cell: JXPhotoBrowserCell, _ pageIndex: Int) -> Void {
+        set { browserView.reloadCell = newValue }
+        get { browserView.reloadCell }
     }
     
     /// 主视图
@@ -91,7 +91,7 @@ open class JXPhotoBrowser: UIViewController {
     }
     
     /// 显示图片浏览器
-    open func show(method: ShowMethod) {
+    open func show(method: ShowMethod = .present(fromVC: nil, embed: nil)) {
         switch method {
         case .push(let inNC):
             let nav = inNC ?? JXPhotoBrowser.topMost?.navigationController

@@ -50,15 +50,13 @@ class NetworkImageViewController: BaseCollectionViewController {
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         let browser = JXPhotoBrowser()
-        browser.createCell = { photoBrowser in
-            let cell = JXPhotoBrowserImageCell()
-            cell.photoBrowser = photoBrowser
-            return cell
+        browser.cellClassAtIndex = { _ in
+            JXPhotoBrowserImageCell.self
         }
         browser.numberOfItems = { [weak self] in
             self?.dataSource.count ?? 0
         }
-        browser.reloadItem = { [weak self] cell, index in
+        browser.reloadCell = { [weak self] cell, index in
             guard let cell = cell as? JXPhotoBrowserImageCell else { return }
             guard let model = self?.dataSource[index] else { return }
             guard let urlString = model.secondLevelUrl, let url = URL(string: urlString) else {

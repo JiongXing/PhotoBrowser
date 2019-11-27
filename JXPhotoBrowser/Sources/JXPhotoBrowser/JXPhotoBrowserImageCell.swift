@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate, JXPhotoBrowserZoomSupportedCell {
+open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecognizerDelegate, JXPhotoBrowserCell, JXPhotoBrowserZoomSupportedCell {
     
     /// 弱引用PhotoBrowser
     open weak var photoBrowser: JXPhotoBrowser?
@@ -47,7 +47,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
     }
     
-    public override init(frame: CGRect) {
+    public required override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
@@ -55,6 +55,12 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
+    }
+    
+    public static func generate(with browser: JXPhotoBrowser) -> Self {
+        let cell =  Self.init(frame: .zero)
+        cell.photoBrowser = browser
+        return cell
     }
     
     open func setup() {

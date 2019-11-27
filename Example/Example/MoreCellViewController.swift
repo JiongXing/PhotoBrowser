@@ -1,19 +1,19 @@
 //
-//  LocalImageViewController.swift
-//  JXPhotoBrwoser_Example
+//  MoreCellViewController.swift
+//  Example
 //
-//  Created by JiongXing on 2018/10/14.
-//  Copyright © 2018年 CocoaPods. All rights reserved.
+//  Created by JiongXing on 2019/11/26.
+//  Copyright © 2019 JiongXing. All rights reserved.
 //
 
 import UIKit
 import JXPhotoBrowser
 
-class LocalImageViewController: BaseCollectionViewController {
+class MoreCellViewController: BaseCollectionViewController {
     
-    override var name: String { "本地图片" }
+    override var name: String { "最后一个视图显示更多" }
     
-    override var remark: String { "最简单的场景，展示本地图片" }
+    override var remark: String { "示范如何在最后一个视图结束后追加一个'更多'" }
     
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
@@ -47,6 +47,7 @@ class LocalImageViewController: BaseCollectionViewController {
             cell.imageView.image = UIImage(named: "local_\(index)")
         }
         browser.pageIndex = indexPath.item
-        browser.show()
+        browser.show(method: .present(fromVC: nil, embed: nil))
     }
 }
+
