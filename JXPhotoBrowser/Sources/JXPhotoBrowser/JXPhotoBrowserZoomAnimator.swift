@@ -16,9 +16,9 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
     /// 转场动画的前向视图
     open var previousViewClosure: PreviousViewAtIndexClosure = { _ in nil }
     
-    open var showDuration: TimeInterval = 1
+    open var showDuration: TimeInterval = 0.25
     
-    open var dismissDuration: TimeInterval = 1
+    open var dismissDuration: TimeInterval = 0.25
     
     /// 替补的动画方案
     open lazy var substituteAnimator: JXPhotoBrowserTransitionAnimator = JXPhotoBrowserFadeAnimator()

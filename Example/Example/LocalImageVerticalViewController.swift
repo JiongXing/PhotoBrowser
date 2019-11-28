@@ -16,13 +16,7 @@ class LocalImageVerticalViewController: BaseCollectionViewController {
     override var remark: String { "支持竖向的滑动" }
     
     override func makeDataSource() -> [ResourceModel] {
-        var result: [ResourceModel] = []
-        (0..<6).forEach { index in
-            let model = ResourceModel()
-            model.localName = "local_\(index)"
-            result.append(model)
-        }
-        return result
+        makeLocalDataSource()
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -41,9 +35,10 @@ class LocalImageVerticalViewController: BaseCollectionViewController {
             self.dataSource.count
         }
         browser.reloadCell = { cell, index in
-            if let cell = cell as? JXPhotoBrowserImageCell {
-                cell.imageView.image = UIImage(named: "local_\(index)")
-            }
+            let browserCell = cell as? JXPhotoBrowserImageCell
+            let collectionPath = IndexPath(item: index, section: indexPath.section)
+            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
+            browserCell?.imageView.image = collectionCell?.imageView.image
         }
         browser.pageIndex = indexPath.item
         browser.show()

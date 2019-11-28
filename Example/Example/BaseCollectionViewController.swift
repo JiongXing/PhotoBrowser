@@ -72,6 +72,37 @@ class BaseCollectionViewController: UICollectionViewController {
     func makeDataSource() -> [ResourceModel] {
         return []
     }
+    
+    func makeLocalDataSource() -> [ResourceModel] {
+        var result: [ResourceModel] = []
+        (0..<6).forEach { index in
+            let model = ResourceModel()
+            model.localName = "local_\(index)"
+            result.append(model)
+        }
+        return result
+    }
+    
+    func makeNetworkDataSource() -> [ResourceModel] {
+        var result: [ResourceModel] = []
+        guard let url = Bundle.main.url(forResource: "Photos", withExtension: "plist") else {
+            return result
+        }
+        guard let data = try? Data.init(contentsOf: url) else {
+            return result
+        }
+        let decoder = PropertyListDecoder()
+        guard let array = try? decoder.decode([[String]].self, from: data) else {
+            return result
+        }
+        array.forEach { item in
+            let model = ResourceModel()
+            model.firstLevelUrl = item[0]
+            model.secondLevelUrl = item[1]
+            result.append(model)
+        }
+        return result
+    }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.count

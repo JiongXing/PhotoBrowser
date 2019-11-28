@@ -1,5 +1,5 @@
 //
-//  LocalImageZoomViewController.swift
+//  SDWebImageViewController.swift
 //  Example
 //
 //  Created by JiongXing on 2019/11/28.
@@ -8,22 +8,24 @@
 
 import UIKit
 import JXPhotoBrowser
+import SDWebImage
 
-class LocalImageZoomViewController: BaseCollectionViewController {
+class SDWebImageViewController: BaseCollectionViewController {
     
-    override var name: String { "Zoom转场动画" }
+    override var name: String { "网络图片-SDWebImage" }
     
-    override var remark: String { "简单易用的缩放式转场动画，兼容缩略图与放大图存在差异" }
+    override var remark: String { "示范如何用SDWebImage加载网络图片" }
     
     override func makeDataSource() -> [ResourceModel] {
-        makeLocalDataSource()
+        makeNetworkDataSource()
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
-        cell.imageView.image = self.dataSource[indexPath.item].localName.flatMap({ name -> UIImage? in
-            UIImage(named: name)
-        })
+        if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
+            let url = URL(string: firstLevel)
+            cell.imageView.kf.setImage(with: url)
+        }
         return cell
     }
     
@@ -33,12 +35,21 @@ class LocalImageZoomViewController: BaseCollectionViewController {
             self.dataSource.count
         }
         browser.reloadCell = { cell, index in
+            var url: URL?
+            guard let urlString = self.dataSource[index].secondLevelUrl else {
+                return
+            }
+            url = URL(string: urlString)
             let browserCell = cell as? JXPhotoBrowserImageCell
             let collectionPath = IndexPath(item: index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
-            browserCell?.imageView.image = collectionCell?.imageView.image
+            let placeholder = collectionCell?.imageView.image
+            // 用SDWebImage加载
+            let options: SDWebImageOptions = [.queryDiskDataSync, .scaleDownLargeImages]
+            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: options, completed: { (_, _, _, _) in
+                browserCell?.setNeedsLayout()
+            })
         }
-        // 使用Zoom动画
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)
             let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell

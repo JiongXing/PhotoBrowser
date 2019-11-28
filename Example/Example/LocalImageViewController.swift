@@ -16,13 +16,7 @@ class LocalImageViewController: BaseCollectionViewController {
     override var remark: String { "最简单的场景，展示本地图片" }
     
     override func makeDataSource() -> [ResourceModel] {
-        var result: [ResourceModel] = []
-        (0..<6).forEach { index in
-            let model = ResourceModel()
-            model.localName = "local_\(index)"
-            result.append(model)
-        }
-        return result
+        makeLocalDataSource()
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -42,9 +36,10 @@ class LocalImageViewController: BaseCollectionViewController {
         }
         // 刷新Cell数据。本闭包将在Cell完成位置布局后调用。
         browser.reloadCell = { cell, index in
-            if let cell = cell as? JXPhotoBrowserImageCell {
-                cell.imageView.image = UIImage(named: "local_\(index)")
-            }
+            let browserCell = cell as? JXPhotoBrowserImageCell
+            let collectionPath = IndexPath(item: index, section: indexPath.section)
+            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
+            browserCell?.imageView.image = collectionCell?.imageView.image
         }
         // 可指定打开时定位到哪一页
         browser.pageIndex = indexPath.item

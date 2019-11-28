@@ -38,7 +38,8 @@ class HomeViewController: UITableViewController {
             LocalImageVerticalViewController(),
             LocalImageZoomViewController(),
             LocalImageSmoothZoomViewController(),
-            NetworkImageViewController()
+            KingfisherImageViewController(),
+            SDWebImageViewController(),
         ]
     }
     

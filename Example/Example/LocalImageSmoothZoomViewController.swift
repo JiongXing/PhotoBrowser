@@ -16,13 +16,7 @@ class LocalImageSmoothZoomViewController: BaseCollectionViewController {
     override var remark: String { "需要用户自己创建并提供转场视图，以及缩略图位置" }
     
     override func makeDataSource() -> [ResourceModel] {
-        var result: [ResourceModel] = []
-        (0..<6).forEach { index in
-            let model = ResourceModel()
-            model.localName = "local_\(index)"
-            result.append(model)
-        }
-        return result
+        makeLocalDataSource()
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -41,9 +35,10 @@ class LocalImageSmoothZoomViewController: BaseCollectionViewController {
             self.dataSource.count
         }
         browser.reloadCell = { cell, index in
-            if let cell = cell as? JXPhotoBrowserImageCell {
-                cell.imageView.image = UIImage(named: "local_\(index)")
-            }
+            let browserCell = cell as? JXPhotoBrowserImageCell
+            let collectionPath = IndexPath(item: index, section: indexPath.section)
+            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
+            browserCell?.imageView.image = collectionCell?.imageView.image
         }
         // 更丝滑的Zoom动画
         browser.transitionAnimator = JXPhotoBrowserSmoothZoomAnimator(transitionContext: { (index, destinationView) -> JXPhotoBrowserSmoothZoomAnimator.TransitionContext? in
