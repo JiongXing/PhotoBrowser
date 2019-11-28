@@ -62,7 +62,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     }()
     
     deinit {
-        JXPhotoBrowserLog.low("deinit - \(self)")
+        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
     }
     
     public convenience init() {

@@ -35,6 +35,8 @@ class HomeViewController: UITableViewController {
         super.viewWillAppear(animated)
         dataSource = [
             LocalImageViewController(),
+            LocalImageVerticalViewController(),
+            LocalImageZoomViewController(),
             NetworkImageViewController()
         ]
     }
@@ -48,6 +50,7 @@ class HomeViewController: UITableViewController {
         let vc = dataSource[indexPath.row]
         cell.textLabel?.text = vc.name
         cell.detailTextLabel?.text = vc.remark
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
     

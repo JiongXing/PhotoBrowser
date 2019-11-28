@@ -15,6 +15,10 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
     /// 转场动画的前向视图
     open var previousViewClosure: PreviousViewAtIndexClosure = { _ in nil }
     
+    open var showDuration: TimeInterval = 0.25
+    
+    open var dismissDuration: TimeInterval = 0.25
+    
     public init(previousView: @escaping PreviousViewAtIndexClosure) {
         previousViewClosure = previousView
     }
@@ -28,7 +32,7 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
         snap2.alpha = 0
         browser.view.addSubview(snap2)
         browser.view.addSubview(snap1)
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: showDuration, animations: {
             browser.maskView.alpha = 1.0
             snap1.frame = bigFrame
             snap2.frame = bigFrame
@@ -51,7 +55,7 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
         browser.view.addSubview(snap2)
         browser.view.addSubview(snap1)
         browser.browserView.alpha = 0
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: dismissDuration, animations: {
             browser.maskView.alpha = 0
             snap1.frame = preFrame
             snap2.frame = preFrame

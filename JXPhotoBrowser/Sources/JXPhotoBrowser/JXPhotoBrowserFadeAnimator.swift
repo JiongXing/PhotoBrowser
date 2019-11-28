@@ -10,8 +10,12 @@ import UIKit
 
 open class JXPhotoBrowserFadeAnimator: JXPhotoBrowserTransitionAnimator {
     
+    open var showDuration: TimeInterval = 0.25
+    
+    open var dismissDuration: TimeInterval = 0.25
+    
     open func show(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: showDuration, animations: {
             browser.maskView.alpha = 1.0
             browser.browserView.alpha = 1.0
         }) { _ in
@@ -20,7 +24,7 @@ open class JXPhotoBrowserFadeAnimator: JXPhotoBrowserTransitionAnimator {
     }
     
     open func dismiss(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
-        UIView.animate(withDuration: 0.25, animations: {
+        UIView.animate(withDuration: dismissDuration, animations: {
             browser.maskView.alpha = 0
             browser.browserView.alpha = 0
         }) { _ in

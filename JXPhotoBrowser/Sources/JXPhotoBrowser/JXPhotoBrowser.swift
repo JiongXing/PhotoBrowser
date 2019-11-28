@@ -46,7 +46,7 @@ open class JXPhotoBrowser: UIViewController {
         get { browserView.pageIndex }
     }
     
-    /// 询问当前数据总量
+    /// 浏览过程中实时获取数据总量
     open var numberOfItems: () -> Int {
         set { browserView.numberOfItems = newValue }
         get { browserView.numberOfItems }

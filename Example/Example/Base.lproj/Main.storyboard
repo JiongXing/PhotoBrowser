@@ -24,7 +24,7 @@
             </objects>
             <point key="canvasLocation" x="100.00000000000001" y="90.401785714285708"/>
         </scene>
-        <!--首页-->
+        <!--示例-->
         <scene sceneID="cke-rJ-MSq">
             <objects>
                 <tableViewController id="nNS-8g-8Fa" customClass="HomeViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
@@ -37,7 +37,7 @@
                             <outlet property="delegate" destination="nNS-8g-8Fa" id="9JX-yM-RFs"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="首页" id="2f0-CQ-a37"/>
+                    <navigationItem key="navigationItem" title="示例" id="2f0-CQ-a37"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zpn-xU-Mzb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

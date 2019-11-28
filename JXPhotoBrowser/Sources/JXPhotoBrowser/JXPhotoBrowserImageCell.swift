@@ -20,7 +20,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
             if scrollDirection == .horizontal {
                 addPanGesture()
             } else if let existed = existedPan {
-                JXPhotoBrowserLog.low("移除Pan!")
+                JXPhotoBrowserLog.low("移除Pan手势!")
                 scrollView.removeGestureRecognizer(existed)
             }
         }
@@ -58,8 +58,9 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     }
     
     public static func generate(with browser: JXPhotoBrowser) -> Self {
-        let cell =  Self.init(frame: .zero)
+        let cell = Self.init(frame: .zero)
         cell.photoBrowser = browser
+        cell.scrollDirection = browser.scrollDirection
         return cell
     }
     
