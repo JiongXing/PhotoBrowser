@@ -37,6 +37,7 @@ class HomeViewController: UITableViewController {
             LocalImageViewController(),
             LocalImageVerticalViewController(),
             LocalImageZoomViewController(),
+            LocalImageSmoothZoomViewController(),
             NetworkImageViewController()
         ]
     }
@@ -55,7 +56,6 @@ class HomeViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         tableView.deselectRow(at: indexPath, animated: false)
         navigationController?.pushViewController(dataSource[indexPath.row], animated: true)
     }

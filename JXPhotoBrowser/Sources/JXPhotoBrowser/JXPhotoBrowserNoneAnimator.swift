@@ -1,5 +1,5 @@
 //
-//  JXPhotoBrowserNoAnimator.swift
+//  JXPhotoBrowserNoneAnimator.swift
 //  JXPhotoBrowser
 //
 //  Created by JiongXing on 2019/11/26.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-open class JXPhotoBrowserNoAnimator: JXPhotoBrowserTransitionAnimator {
+open class JXPhotoBrowserNoneAnimator: JXPhotoBrowserTransitionAnimator {
     
     open func show(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
         completion()
