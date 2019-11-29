@@ -1,19 +1,19 @@
 //
-//  LocalImageZoomViewController.swift
+//  DataSourceAppendViewController.swift
 //  Example
 //
-//  Created by JiongXing on 2019/11/28.
+//  Created by JiongXing on 2019/11/29.
 //  Copyright © 2019 JiongXing. All rights reserved.
 //
 
 import UIKit
 import JXPhotoBrowser
 
-class LocalImageZoomViewController: BaseCollectionViewController {
+class DataSourceAppendViewController: BaseCollectionViewController {
+
+    override var name: String { "无限新增图片" }
     
-    override var name: String { "Zoom转场动画" }
-    
-    override var remark: String { "简单易用的缩放式转场动画，兼容缩略图与放大图存在差异" }
+    override var remark: String { "浏览过程中不断新增图片，变更数据源，刷新UI" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()
@@ -35,13 +35,24 @@ class LocalImageZoomViewController: BaseCollectionViewController {
             let indexPath = IndexPath(item: context.index, section: indexPath.section)
             browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         }
-        // 使用Zoom动画
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)
             let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
             return cell?.imageView
         })
+        // 监听页码变化
+        browser.didChangedPageIndex = { index in
+            if index == self.dataSource.count - 1 {
+                // 滑到最后一张
+                self.appendMoreData()
+            }
+        }
         browser.pageIndex = indexPath.item
         browser.show()
     }
+    
+    private func appendMoreData() {
+        
+    }
 }
+

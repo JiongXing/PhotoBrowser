@@ -58,10 +58,19 @@ open class JXPhotoBrowser: UIViewController {
         get { browserView.cellClassAtIndex }
     }
     
+    /// Cell刷新时用的上下文。index: 刷新的Cell对应的index；currentIndex: 当前显示的页
+    public typealias ReloadCellContext = (cell: JXPhotoBrowserCell, index: Int, currentIndex: Int)
+    
     /// 刷新Cell数据。本闭包将在Cell完成位置布局后调用。
-    open var reloadCell: (_ cell: JXPhotoBrowserCell, _ pageIndex: Int) -> Void {
-        set { browserView.reloadCell = newValue }
-        get { browserView.reloadCell }
+    open var reloadCellAtIndex: (ReloadCellContext) -> Void {
+        set { browserView.reloadCellAtIndex = newValue }
+        get { browserView.reloadCellAtIndex }
+    }
+    
+    /// 自然滑动引起的页码改变时回调
+    open var didChangedPageIndex: (_ idnex: Int) -> Void {
+        set { browserView.didChangedPageIndex = newValue }
+        get { browserView.didChangedPageIndex }
     }
     
     /// 主视图

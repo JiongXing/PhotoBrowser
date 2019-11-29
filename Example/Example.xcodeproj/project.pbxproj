@@ -34,6 +34,14 @@
 		940B2980238FB3F000DC5F6F /* KingfisherImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */; };
 		940B2982238FBAC200DC5F6F /* SDWebImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */; };
 		940B2984238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2983238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift */; };
+		949C25D42390FB4C00CD654B /* DataSourceAppendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25D32390FB4C00CD654B /* DataSourceAppendViewController.swift */; };
+		949C25D62390FB7B00CD654B /* HideThumbnailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25D52390FB7B00CD654B /* HideThumbnailViewController.swift */; };
+		949C25D82390FB9E00CD654B /* PushNextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25D72390FB9E00CD654B /* PushNextViewController.swift */; };
+		949C25DA2390FC8900CD654B /* RawImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25D92390FC8900CD654B /* RawImageViewController.swift */; };
+		949C25DC2390FC9F00CD654B /* LoadingProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25DB2390FC9F00CD654B /* LoadingProgressViewController.swift */; };
+		949C25DE2390FCC000CD654B /* GIFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25DD2390FCC000CD654B /* GIFViewController.swift */; };
+		949C25E02390FCCF00CD654B /* WebPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25DF2390FCCF00CD654B /* WebPViewController.swift */; };
+		949C25E22390FCF900CD654B /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25E12390FCF900CD654B /* VideoViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +72,14 @@
 		940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingfisherImageViewController.swift; sourceTree = "<group>"; };
 		940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageViewController.swift; sourceTree = "<group>"; };
 		940B2983238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceDeleteViewController.swift; sourceTree = "<group>"; };
+		949C25D32390FB4C00CD654B /* DataSourceAppendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceAppendViewController.swift; sourceTree = "<group>"; };
+		949C25D52390FB7B00CD654B /* HideThumbnailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HideThumbnailViewController.swift; sourceTree = "<group>"; };
+		949C25D72390FB9E00CD654B /* PushNextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNextViewController.swift; sourceTree = "<group>"; };
+		949C25D92390FC8900CD654B /* RawImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawImageViewController.swift; sourceTree = "<group>"; };
+		949C25DB2390FC9F00CD654B /* LoadingProgressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingProgressViewController.swift; sourceTree = "<group>"; };
+		949C25DD2390FCC000CD654B /* GIFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFViewController.swift; sourceTree = "<group>"; };
+		949C25DF2390FCCF00CD654B /* WebPViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPViewController.swift; sourceTree = "<group>"; };
+		949C25E12390FCF900CD654B /* VideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,11 +128,19 @@
 				940B297D238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift */,
 				940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */,
 				940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */,
+				949C25DB2390FC9F00CD654B /* LoadingProgressViewController.swift */,
+				949C25D92390FC8900CD654B /* RawImageViewController.swift */,
+				949C25DD2390FCC000CD654B /* GIFViewController.swift */,
+				949C25DF2390FCCF00CD654B /* WebPViewController.swift */,
 				940B2983238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift */,
+				949C25D32390FB4C00CD654B /* DataSourceAppendViewController.swift */,
+				949C25D52390FB7B00CD654B /* HideThumbnailViewController.swift */,
+				949C25D72390FB9E00CD654B /* PushNextViewController.swift */,
 				940B296B238D1C7800DC5F6F /* MultipleCellViewController.swift */,
 				940B296D238D1E9800DC5F6F /* MoreCellViewController.swift */,
 				940B296F238D1FAC00DC5F6F /* MoreCell.swift */,
 				940B2971238D20A800DC5F6F /* MoreDetailViewController.swift */,
+				949C25E12390FCF900CD654B /* VideoViewController.swift */,
 				940B2960238D128200DC5F6F /* ResourceModel.swift */,
 				940B295F238D128200DC5F6F /* UICollectionView+JX.swift */,
 				940B295D238D128200DC5F6F /* UITableView+JX.swift */,
@@ -221,8 +245,13 @@
 				940B2970238D1FAC00DC5F6F /* MoreCell.swift in Sources */,
 				940B296C238D1C7800DC5F6F /* MultipleCellViewController.swift in Sources */,
 				940B2982238FBAC200DC5F6F /* SDWebImageViewController.swift in Sources */,
+				949C25DA2390FC8900CD654B /* RawImageViewController.swift in Sources */,
+				949C25DC2390FC9F00CD654B /* LoadingProgressViewController.swift in Sources */,
+				949C25E02390FCCF00CD654B /* WebPViewController.swift in Sources */,
 				940B2965238D128200DC5F6F /* JXNamespace.swift in Sources */,
 				940B2969238D128200DC5F6F /* ResourceModel.swift in Sources */,
+				949C25D62390FB7B00CD654B /* HideThumbnailViewController.swift in Sources */,
+				949C25D82390FB9E00CD654B /* PushNextViewController.swift in Sources */,
 				940B28B0238CD68900DC5F6F /* AppDelegate.swift in Sources */,
 				940B2967238D128200DC5F6F /* LocalImageViewController.swift in Sources */,
 				940B28B2238CD68900DC5F6F /* SceneDelegate.swift in Sources */,
@@ -231,12 +260,15 @@
 				940B297A238F70D900DC5F6F /* LocalImageZoomViewController.swift in Sources */,
 				940B2978238F6BA900DC5F6F /* LocalImageVerticalViewController.swift in Sources */,
 				940B296E238D1E9800DC5F6F /* MoreCellViewController.swift in Sources */,
+				949C25DE2390FCC000CD654B /* GIFViewController.swift in Sources */,
 				940B2980238FB3F000DC5F6F /* KingfisherImageViewController.swift in Sources */,
 				940B2968238D128200DC5F6F /* UICollectionView+JX.swift in Sources */,
 				940B2966238D128200DC5F6F /* UITableView+JX.swift in Sources */,
+				949C25E22390FCF900CD654B /* VideoViewController.swift in Sources */,
 				940B2962238D128200DC5F6F /* BaseCollectionViewController.swift in Sources */,
 				940B2972238D20A800DC5F6F /* MoreDetailViewController.swift in Sources */,
 				940B2963238D128200DC5F6F /* BaseCollectionViewCell.swift in Sources */,
+				949C25D42390FB4C00CD654B /* DataSourceAppendViewController.swift in Sources */,
 				940B297E238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

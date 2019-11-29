@@ -11,9 +11,9 @@ import JXPhotoBrowser
 
 class DataSourceDeleteViewController: BaseCollectionViewController {
 
-    override var name: String { "删除图片" }
+    override var name: String { "删除图片-长按事件" }
     
-    override var remark: String { "浏览过程中删除图片，变更数据源，刷新UI" }
+    override var remark: String { "浏览过程中删除图片，变更数据源，刷新UI。长按删除。" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()
@@ -30,13 +30,13 @@ class DataSourceDeleteViewController: BaseCollectionViewController {
         browser.numberOfItems = {
             self.dataSource.count
         }
-        browser.reloadCell = { cell, index in
-            guard let browserCell = cell as? JXPhotoBrowserImageCell else {
+        browser.reloadCellAtIndex = { context in
+            guard let browserCell = context.cell as? JXPhotoBrowserImageCell else {
                 return
             }
-            let indexPath = IndexPath(item: index, section: indexPath.section)
+            let indexPath = IndexPath(item: context.index, section: indexPath.section)
             browserCell.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
-            browserCell.index = index
+            browserCell.index = context.index
             // 添加长按事件
             browserCell.longPressedAction = { cell, _ in
                 self.longPress(cell: cell)

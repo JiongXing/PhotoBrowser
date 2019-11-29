@@ -34,14 +34,14 @@ class SDWebImageViewController: BaseCollectionViewController {
         browser.numberOfItems = {
             self.dataSource.count
         }
-        browser.reloadCell = { cell, index in
+        browser.reloadCellAtIndex = { context in
             var url: URL?
-            guard let urlString = self.dataSource[index].secondLevelUrl else {
+            guard let urlString = self.dataSource[context.index].secondLevelUrl else {
                 return
             }
             url = URL(string: urlString)
-            let browserCell = cell as? JXPhotoBrowserImageCell
-            let collectionPath = IndexPath(item: index, section: indexPath.section)
+            let browserCell = context.cell as? JXPhotoBrowserImageCell
+            let collectionPath = IndexPath(item: context.index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
             // 用SDWebImage加载

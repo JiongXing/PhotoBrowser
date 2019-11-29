@@ -34,19 +34,6 @@ class MultipleCellViewController: BaseCollectionViewController {
     }
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
-        let browser = JXPhotoBrowser()
-        browser.cellClassAtIndex = { _ in
-            JXPhotoBrowserImageCell.self
-        }
-        browser.numberOfItems = { [weak self] in
-            self?.dataSource.count ?? 0
-        }
-        browser.reloadCell = { cell, index in
-            guard let cell = cell as? JXPhotoBrowserImageCell else { return }
-            cell.index = index
-            cell.imageView.image = UIImage(named: "local_\(index)")
-        }
-        browser.pageIndex = indexPath.item
-        browser.show(method: .present(fromVC: nil, embed: nil))
+        
     }
 }

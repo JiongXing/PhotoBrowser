@@ -32,9 +32,9 @@ class LocalImageVerticalViewController: BaseCollectionViewController {
         browser.numberOfItems = {
             self.dataSource.count
         }
-        browser.reloadCell = { cell, index in
-            let browserCell = cell as? JXPhotoBrowserImageCell
-            let indexPath = IndexPath(item: index, section: indexPath.section)
+        browser.reloadCellAtIndex = { context in
+            let browserCell = context.cell as? JXPhotoBrowserImageCell
+            let indexPath = IndexPath(item: context.index, section: indexPath.section)
             browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         }
         browser.pageIndex = indexPath.item
