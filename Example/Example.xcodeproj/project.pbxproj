@@ -471,16 +471,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:SDWebImage/SDWebImage.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.3.2;
+				kind = exactVersion;
+				version = 5.3.2;
 			};
 		};
 		940B2950238D06DC00DC5F6F /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "git@github.com:onevcat/Kingfisher.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.1;
+				kind = exactVersion;
+				version = 5.10.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

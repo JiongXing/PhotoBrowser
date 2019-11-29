@@ -40,7 +40,8 @@ class HomeViewController: UITableViewController {
             LocalImageSmoothZoomViewController(),
             KingfisherImageViewController(),
             SDWebImageViewController(),
-            DataSourceDeleteViewController()
+            DataSourceDeleteViewController(),
+            DataSourceAppendViewController()
         ]
     }
     

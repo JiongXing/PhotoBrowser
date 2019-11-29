@@ -41,18 +41,27 @@ class DataSourceAppendViewController: BaseCollectionViewController {
             return cell?.imageView
         })
         // 监听页码变化
-        browser.didChangedPageIndex = { index in
+        browser.didChangedPageIndex = { browser, index in
+            // 滑到最后一张
             if index == self.dataSource.count - 1 {
-                // 滑到最后一张
-                self.appendMoreData()
+                self.appendMoreData(currentIndex: index, browser: browser)
             }
         }
+        browser.scrollDirection = .vertical
         browser.pageIndex = indexPath.item
         browser.show()
     }
     
-    private func appendMoreData() {
-        
+    private func appendMoreData(currentIndex: Int, browser: JXPhotoBrowser) {
+        var randomIndexes = (0..<6).map { $0 }
+        randomIndexes.shuffle()
+        randomIndexes.forEach { index in
+            let model = ResourceModel()
+            model.localName = "local_\(index)"
+            dataSource.append(model)
+        }
+        collectionView.reloadData()
+        browser.reloadData()
     }
 }
 
