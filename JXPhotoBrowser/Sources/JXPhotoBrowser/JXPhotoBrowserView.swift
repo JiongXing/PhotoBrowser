@@ -84,14 +84,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         addSubview(scrollView)
     }
     
-    /// 刷新数据，同时刷新Cell布局
-    open func reloadData() {
-        resetCells()
-        layoutCells()
-        reloadItems()
-        refreshContentOffset()
-    }
-    
     open override func layoutSubviews() {
         super.layoutSubviews()
         JXPhotoBrowserLog.low("\(self.classForCoder) layoutSubviews!")
@@ -101,6 +93,18 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             scrollView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height + itemSpacing)
         }
         reloadData()
+    }
+    
+    /// 刷新数据，同时刷新Cell布局
+    open func reloadData() {
+        // 修正pageIndex，同步数据源的变更
+        pageIndex = max(0, pageIndex)
+        pageIndex = min(pageIndex, numberOfItems())
+        JXPhotoBrowserLog.low("当前页：\(pageIndex)")
+        resetCells()
+        layoutCells()
+        reloadItems()
+        refreshContentOffset()
     }
     
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -169,6 +173,34 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         guard let browser = photoBrowser else {
             return
         }
+        visibleCells.forEach { _, cell in
+            cell.removeFromSuperview()
+            enqueue(cell: cell)
+        }
+        visibleCells.removeAll()
+        
+        // 添加要显示的cell
+        let itemsTotalCount = numberOfItems()
+        for index in (pageIndex - 1)...(pageIndex + 1) {
+            if index < 0 || index > itemsTotalCount - 1 {
+                continue
+            }
+            let clazz = cellClassAtIndex(index)
+            JXPhotoBrowserLog.middle("Required class name: \(String(describing: clazz))")
+            JXPhotoBrowserLog.middle("index:\(index) 出列!")
+            let cell = dequeue(cellType: clazz, browser: browser)
+            visibleCells[index] = cell
+            scrollView.addSubview(cell)
+        }
+    }
+    
+    /*
+    /// 重置所有Cell的位置。更新 visibleCells 和 reusableCells
+    open func resetCells() {
+        JXPhotoBrowserLog.middle("\(self.classForCoder) resetCells!")
+        guard let browser = photoBrowser else {
+            return
+        }
         // 移除不在显示范围内的cell
         var removingKeys: Set<Int> = []
         let itemsTotalCount = numberOfItems()
@@ -206,7 +238,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             visibleCells[index] = cell
             scrollView.addSubview(cell)
         }
-    }
+    }*/
     
     /// 刷新所有显示中的Cell位置
     open func layoutCells() {
@@ -233,7 +265,9 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     open func reloadItems() {
         JXPhotoBrowserLog.low("\(self.classForCoder) reloadItems!")
         visibleCells.forEach { index, cell in
+            JXPhotoBrowserLog.low("刷新index:\(index)")
             reloadCell(cell, index)
+            cell.setNeedsLayout()
         }
     }
 }

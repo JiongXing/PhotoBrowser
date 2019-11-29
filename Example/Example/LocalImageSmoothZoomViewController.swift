@@ -21,9 +21,7 @@ class LocalImageSmoothZoomViewController: BaseCollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
-        cell.imageView.image = self.dataSource[indexPath.item].localName.flatMap({ name -> UIImage? in
-            UIImage(named: name)
-        })
+        cell.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         // 等比拉伸，填满视图
         cell.imageView.contentMode = .scaleAspectFill
         return cell
@@ -36,9 +34,8 @@ class LocalImageSmoothZoomViewController: BaseCollectionViewController {
         }
         browser.reloadCell = { cell, index in
             let browserCell = cell as? JXPhotoBrowserImageCell
-            let collectionPath = IndexPath(item: index, section: indexPath.section)
-            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
-            browserCell?.imageView.image = collectionCell?.imageView.image
+            let indexPath = IndexPath(item: index, section: indexPath.section)
+            browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         }
         // 更丝滑的Zoom动画
         browser.transitionAnimator = JXPhotoBrowserSmoothZoomAnimator(transitionContext: { (index, destinationView) -> JXPhotoBrowserSmoothZoomAnimator.TransitionContext? in

@@ -33,6 +33,7 @@
 		940B297E238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B297D238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift */; };
 		940B2980238FB3F000DC5F6F /* KingfisherImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */; };
 		940B2982238FBAC200DC5F6F /* SDWebImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */; };
+		940B2984238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2983238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 		940B297D238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalImageSmoothZoomViewController.swift; sourceTree = "<group>"; };
 		940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingfisherImageViewController.swift; sourceTree = "<group>"; };
 		940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDWebImageViewController.swift; sourceTree = "<group>"; };
+		940B2983238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceDeleteViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 				940B297D238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift */,
 				940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */,
 				940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */,
+				940B2983238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift */,
 				940B296B238D1C7800DC5F6F /* MultipleCellViewController.swift */,
 				940B296D238D1E9800DC5F6F /* MoreCellViewController.swift */,
 				940B296F238D1FAC00DC5F6F /* MoreCell.swift */,
@@ -223,6 +226,7 @@
 				940B28B0238CD68900DC5F6F /* AppDelegate.swift in Sources */,
 				940B2967238D128200DC5F6F /* LocalImageViewController.swift in Sources */,
 				940B28B2238CD68900DC5F6F /* SceneDelegate.swift in Sources */,
+				940B2984238FC4FD00DC5F6F /* DataSourceDeleteViewController.swift in Sources */,
 				940B2958238D125C00DC5F6F /* HomeViewController.swift in Sources */,
 				940B297A238F70D900DC5F6F /* LocalImageZoomViewController.swift in Sources */,
 				940B2978238F6BA900DC5F6F /* LocalImageVerticalViewController.swift in Sources */,

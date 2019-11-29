@@ -84,28 +84,30 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         addGestureRecognizer(singleTap)
     }
     
-    // 长按时回调
+    // 长按事件
     public typealias LongPressAction = (JXPhotoBrowserImageCell, UILongPressGestureRecognizer) -> Void
-    private var longPressedAction: LongPressAction?
     
-    private weak var existedLongPress: UILongPressGestureRecognizer?
-    
-    /// 添加长按手势
-    open func addLongPress(action: @escaping LongPressAction) {
-        longPressedAction = action
-        if existedLongPress != nil {
-            return
+    /// 长按时回调。赋值时自动添加手势，赋值为nil时移除手势
+    open var longPressedAction: LongPressAction? {
+        didSet {
+            if oldValue != nil && longPressedAction == nil {
+                removeGestureRecognizer(longPress)
+            } else if oldValue == nil && longPressedAction != nil {
+                addGestureRecognizer(longPress)
+            }
         }
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
-        addGestureRecognizer(longPress)
-        existedLongPress = longPress
     }
+    
+    /// 已添加的长按手势
+    private lazy var longPress: UILongPressGestureRecognizer = {
+        UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
+    }()
     
     private weak var existedPan: UIPanGestureRecognizer?
     
     /// 添加拖动手势
     open func addPanGesture() {
-        if existedPan != nil {
+        guard existedPan == nil else {
             return
         }
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onPan(_:)))
@@ -216,7 +218,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     /// 长按
     @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
         if press.state == .began {
-            JXPhotoBrowserLog.low("ImageCell longPress!")
+            JXPhotoBrowserLog.low("长按!!! index:\(index)")
             longPressedAction?(self, press)
         }
     }

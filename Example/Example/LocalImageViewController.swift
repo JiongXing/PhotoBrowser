@@ -21,9 +21,7 @@ class LocalImageViewController: BaseCollectionViewController {
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
-        cell.imageView.image = self.dataSource[indexPath.item].localName.flatMap({ name -> UIImage? in
-            UIImage(named: name)
-        })
+        cell.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         return cell
     }
     
@@ -37,9 +35,8 @@ class LocalImageViewController: BaseCollectionViewController {
         // 刷新Cell数据。本闭包将在Cell完成位置布局后调用。
         browser.reloadCell = { cell, index in
             let browserCell = cell as? JXPhotoBrowserImageCell
-            let collectionPath = IndexPath(item: index, section: indexPath.section)
-            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
-            browserCell?.imageView.image = collectionCell?.imageView.image
+            let indexPath = IndexPath(item: index, section: indexPath.section)
+            browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         }
         // 可指定打开时定位到哪一页
         browser.pageIndex = indexPath.item

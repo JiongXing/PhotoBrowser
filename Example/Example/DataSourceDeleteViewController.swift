@@ -1,5 +1,5 @@
 //
-//  LocalImageZoomViewController.swift
+//  DataSourceDeleteViewController.swift
 //  Example
 //
 //  Created by JiongXing on 2019/11/28.
@@ -9,11 +9,11 @@
 import UIKit
 import JXPhotoBrowser
 
-class LocalImageZoomViewController: BaseCollectionViewController {
+class DataSourceDeleteViewController: BaseCollectionViewController {
+
+    override var name: String { "删除图片" }
     
-    override var name: String { "Zoom转场动画" }
-    
-    override var remark: String { "简单易用的缩放式转场动画，兼容缩略图与放大图存在差异" }
+    override var remark: String { "浏览过程中删除图片，变更数据源，刷新UI" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()
@@ -31,11 +31,17 @@ class LocalImageZoomViewController: BaseCollectionViewController {
             self.dataSource.count
         }
         browser.reloadCell = { cell, index in
-            let browserCell = cell as? JXPhotoBrowserImageCell
+            guard let browserCell = cell as? JXPhotoBrowserImageCell else {
+                return
+            }
             let indexPath = IndexPath(item: index, section: indexPath.section)
-            browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
+            browserCell.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
+            browserCell.index = index
+            // 添加长按事件
+            browserCell.longPressedAction = { cell, _ in
+                self.longPress(cell: cell)
+            }
         }
-        // 使用Zoom动画
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)
             let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
@@ -44,4 +50,16 @@ class LocalImageZoomViewController: BaseCollectionViewController {
         browser.pageIndex = indexPath.item
         browser.show()
     }
+    
+    private func longPress(cell: JXPhotoBrowserImageCell) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "删除", style: .destructive, handler: { _ in
+            self.dataSource.remove(at: cell.index)
+            self.collectionView.reloadData()
+            cell.photoBrowser?.reloadData()
+        }))
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+        cell.photoBrowser?.present(alert, animated: true, completion: nil)
+    }
 }
+
