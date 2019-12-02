@@ -41,7 +41,8 @@ class HomeViewController: UITableViewController {
             KingfisherImageViewController(),
             SDWebImageViewController(),
             DataSourceDeleteViewController(),
-            DataSourceAppendViewController()
+            DataSourceAppendViewController(),
+            PushNextViewController()
         ]
     }
     
@@ -62,7 +63,6 @@ class HomeViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: false)
         navigationController?.pushViewController(dataSource[indexPath.row], animated: true)
     }
-
 }
 
 class HomeTableViewCell: UITableViewCell {

@@ -106,6 +106,15 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         refreshContentOffset()
     }
     
+    /// 根据页码更新滑动位置
+    open func refreshContentOffset() {
+        if scrollDirection == .horizontal {
+            scrollView.contentOffset = CGPoint(x: CGFloat(pageIndex) * scrollView.bounds.width, y: 0)
+        } else {
+            scrollView.contentOffset = CGPoint(x: 0, y: CGFloat(pageIndex) * scrollView.bounds.height)
+        }
+    }
+    
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollDirection == .horizontal && scrollView.bounds.width > 0  {
             pageIndex = Int(round(scrollView.contentOffset.x / (scrollView.bounds.width)))
@@ -119,15 +128,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             layoutCells()
             reloadItems()
             didChangedPageIndex(pageIndex)
-        }
-    }
-    
-    /// 根据页码更新滑动位置
-    open func refreshContentOffset() {
-        if scrollDirection == .horizontal {
-            scrollView.contentOffset = CGPoint(x: CGFloat(pageIndex) * scrollView.bounds.width, y: 0)
-        } else {
-            scrollView.contentOffset = CGPoint(x: 0, y: CGFloat(pageIndex) * scrollView.bounds.height)
         }
     }
     
@@ -213,6 +213,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             }
         }
         scrollView.contentSize = CGSize(width: sizeWidth, height: sizeHeight)
+        JXPhotoBrowserLog.middle("更新contentSize: \(scrollView.contentSize)")
     }
     
     /// 刷新所有Cell的数据

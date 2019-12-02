@@ -35,6 +35,8 @@ class DataSourceDeleteViewController: BaseCollectionViewController {
                 return
             }
             let indexPath = IndexPath(item: context.index, section: indexPath.section)
+            // 必须从数据源取数据，不能取collectionCell的imageView里的图片，
+            // 在更改数据源后即使reloadData，也可能取不到，因为UIImageView的图片需要一个更新周期。
             browserCell.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
             browserCell.index = context.index
             // 添加长按事件

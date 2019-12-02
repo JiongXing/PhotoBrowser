@@ -80,7 +80,14 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
         let browserView = browser.browserView
         let view = browser.view
         let closure = previousViewClosure
-        guard let previousView = closure(browserView.pageIndex), let cell = browserView.visibleCells[browserView.pageIndex] as? JXPhotoBrowserZoomSupportedCell else {
+        guard let previousView = closure(browserView.pageIndex) else {
+            JXPhotoBrowserLog.high("取不到前视图！")
+            return nil
+        }
+        JXPhotoBrowserLog.high("browserView.pageIndex:\(browserView.pageIndex)")
+        JXPhotoBrowserLog.high("visibleCells:\(browserView.visibleCells)")
+        guard let cell = browserView.visibleCells[browserView.pageIndex] as? JXPhotoBrowserZoomSupportedCell else {
+            JXPhotoBrowserLog.high("取不到后视图！")
             return nil
         }
         let thumbnailFrame = previousView.convert(previousView.bounds, to: view)
@@ -90,6 +97,7 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
         let destinationFrame = cell.convert(intersection, to: view)
         guard let snap1 = previousView.resizableSnapshotView(from: previousView.bounds, afterScreenUpdates: false, withCapInsets: .zero),
             let snap2 = cell.resizableSnapshotView(from: destinationFrame, afterScreenUpdates: true, withCapInsets: .zero) else {
+                JXPhotoBrowserLog.high("取不到前后截图！")
                 return nil
         }
         return (snap1, snap2, thumbnailFrame, destinationFrame)

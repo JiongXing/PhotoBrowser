@@ -101,6 +101,7 @@ open class JXPhotoBrowser: UIViewController {
         switch method {
         case .push(let inNC):
             let nav = inNC ?? JXPhotoBrowser.topMost?.navigationController
+            nav?.delegate = self
             nav?.pushViewController(self, animated: false)
         case .present(let fromVC, let embed):
             let toVC = embed?(self) ?? self
@@ -148,6 +149,9 @@ open class JXPhotoBrowser: UIViewController {
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         JXPhotoBrowserLog.low("Browser viewDidLayoutSubviews! frame:\(view.frame) bounds:\(view.bounds)")
+        if presentingViewController == nil {
+            showAnimationIfNeeded()
+        }
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -157,7 +161,10 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        showAnimationIfNeeded()
+        JXPhotoBrowserLog.low("viewDidAppear!")
+        if presentingViewController != nil {
+            showAnimationIfNeeded()
+        }
     }
     
     open override func viewDidDisappear(_ animated: Bool) {
