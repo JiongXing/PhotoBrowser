@@ -26,7 +26,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     }
     
     /// 自实现转场动画
-    open lazy var transitionAnimator: JXPhotoBrowserTransitionAnimator = JXPhotoBrowserFadeAnimator()
+    open lazy var transitionAnimator: JXPhotoBrowserAnimatedTransitioning = JXPhotoBrowserFadeAnimator()
     
     /// 滑动方向
     open var scrollDirection: JXPhotoBrowser.ScrollDirection {
@@ -83,6 +83,8 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         return view
     }()
     
+    open weak var previousNavigationControllerDelegate: UINavigationControllerDelegate?
+    
     deinit {
         JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
     }
@@ -101,7 +103,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         switch method {
         case .push(let inNC):
             let nav = inNC ?? JXPhotoBrowser.topMost?.navigationController
-            // TODO: 处理
+            previousNavigationControllerDelegate = nav?.delegate
             nav?.delegate = self
             nav?.pushViewController(self, animated: true)
         case .present(let fromVC, let embed):
@@ -164,15 +166,18 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-//        JXPhotoBrowserLog.low("viewDidAppear!")
-//        if presentingViewController != nil {
-//            showAnimationIfNeeded()
-//        }
+        JXPhotoBrowserLog.low("viewDidAppear!")
+        navigationController?.delegate = previousNavigationControllerDelegate
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        hideNavigationBar(false)
     }
     
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        hideNavigationBar(false)
+        
     }
     
     //
@@ -217,36 +222,18 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         JXPhotoBrowserLog.high("动画代理animationControllerFor!")
         transitionAnimator.isForShow = (operation == .push)
         transitionAnimator.photoBrowser = self
+        transitionAnimator.isNavigationAnimation = true
         return transitionAnimator
-    }
-    
-    private var isShowDone = false
-    
-    private func showAnimationIfNeeded() {
-        if isShowDone {
-            return
-        }
-        isShowDone = true
-        transitionAnimator.show(browser: self) { [weak self] in
-            guard let `self` = self else { return }
-            self.setStatusBar(hidden: true)
-            self.browserView.alpha = 1
-            self.maskView.alpha = 1
-            if let indicator = self.pageIndicator {
-                self.view.addSubview(indicator)
-                indicator.setup(with: self)
-                indicator.reloadData(numberOfItems: self.numberOfItems(), pageIndex: self.pageIndex)
-            }
-        }
     }
     
     /// 销毁PhotoBrowser
     open func dismiss() {
         setStatusBar(hidden: false)
-        if self.presentingViewController != nil {
-            self.dismiss(animated: true, completion: nil)
+        if presentingViewController != nil {
+            dismiss(animated: true, completion: nil)
         } else {
-            self.navigationController?.popViewController(animated: true)
+            navigationController?.delegate = self
+            navigationController?.popViewController(animated: true)
         }
     }
     

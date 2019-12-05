@@ -42,7 +42,6 @@ class PushNextViewController: BaseCollectionViewController {
             }
         }
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
-            JXPhotoBrowserLog.high("获取前视图, index:\(index)")
             let path = IndexPath(item: index, section: indexPath.section)
             let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
             return cell?.imageView

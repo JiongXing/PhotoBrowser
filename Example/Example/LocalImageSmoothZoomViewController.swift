@@ -51,6 +51,6 @@ class LocalImageSmoothZoomViewController: BaseCollectionViewController {
             return (transitionView, thumbnailFrame)
         })
         browser.pageIndex = indexPath.item
-        browser.show()
+        browser.show(method: .push(inNC: nil))
     }
 }

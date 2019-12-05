@@ -9,46 +9,13 @@
 import UIKit
 
 /// 更丝滑的Zoom动画
-open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserTransitionAnimator {
+open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitioning {
     
     open var showDuration: TimeInterval = 0.25
     
     open var dismissDuration: TimeInterval = 0.25
     
-    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return isForShow ? showDuration : dismissDuration
-    }
-    
-    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let browser = photoBrowser else {
-            transitionContext.completeTransition(false)
-            return
-        }
-        guard let (transitionView, thumbnailFrame, destinationFrame) = transitionViewAndFrames(with: browser) else {
-            JXPhotoBrowserLog.high("取不到Frames!")
-            substituteAnimator.isForShow = isForShow
-            substituteAnimator.photoBrowser = photoBrowser
-            substituteAnimator.animateTransition(using: transitionContext)
-            return
-        }
-        browser.browserView.isHidden = true
-        if isForShow {
-            browser.maskView.alpha = 0
-            if let toView = transitionContext.view(forKey: .to) {
-                transitionContext.containerView.addSubview(toView)
-            }
-        }
-        transitionView.frame = isForShow ? thumbnailFrame : destinationFrame
-        transitionContext.containerView.addSubview(transitionView)
-        UIView.animate(withDuration: showDuration, animations: {
-            browser.maskView.alpha = self.isForShow ? 1.0 : 0
-            transitionView.frame = self.isForShow ? destinationFrame : thumbnailFrame
-        }) { _ in
-            browser.browserView.isHidden = false
-            transitionView.removeFromSuperview()
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-        }
-    }
+    open var isNavigationAnimation = false
     
     public typealias TransitionViewAndFrame = (transitionView: UIView, thumbnailFrame: CGRect)
     public typealias TransitionViewAndFrameProvider = (_ index: Int, _ destinationView: UIView) -> TransitionViewAndFrame?
@@ -57,10 +24,79 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserTransitionA
     open var transitionViewAndFrameProvider: TransitionViewAndFrameProvider = { _, _ in nil }
     
     /// 替补的动画方案
-    open lazy var substituteAnimator: JXPhotoBrowserTransitionAnimator = JXPhotoBrowserFadeAnimator()
+    open lazy var substituteAnimator: JXPhotoBrowserAnimatedTransitioning = JXPhotoBrowserFadeAnimator()
     
     public init(transitionViewAndFrame: @escaping TransitionViewAndFrameProvider) {
         transitionViewAndFrameProvider = transitionViewAndFrame
+    }
+    
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return isForShow ? showDuration : dismissDuration
+    }
+    
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        if isForShow {
+            playShowAnimation(context: transitionContext)
+        } else {
+            playDismissAnimation(context: transitionContext)
+        }
+    }
+    
+    private func playShowAnimation(context: UIViewControllerContextTransitioning) {
+        guard let browser = photoBrowser, let toView = context.view(forKey: .to) else {
+            return
+        }
+        if isNavigationAnimation, let fromView = context.view(forKey: .from), let fromViewSnapshot = snapshot(with: fromView) {
+            toView.insertSubview(fromViewSnapshot, at: 0)
+        }
+        context.containerView.addSubview(toView)
+        
+        guard let (transitionView, thumbnailFrame, destinationFrame) = transitionViewAndFrames(with: browser) else {
+            // 转为执行替补动画
+            substituteAnimator.isForShow = isForShow
+            substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.animateTransition(using: context)
+            return
+        }
+        browser.maskView.alpha = 0
+        browser.browserView.isHidden = true
+        transitionView.frame = thumbnailFrame
+        context.containerView.addSubview(transitionView)
+        UIView.animate(withDuration: showDuration, animations: {
+            browser.maskView.alpha = 1.0
+            transitionView.frame = destinationFrame
+        }) { _ in
+            browser.browserView.isHidden = false
+            toView.insertSubview(browser.maskView, belowSubview: browser.browserView)
+            transitionView.removeFromSuperview()
+            context.completeTransition(!context.transitionWasCancelled)
+        }
+    }
+    
+    private func playDismissAnimation(context: UIViewControllerContextTransitioning) {
+        guard let browser = photoBrowser else {
+            return
+        }
+        guard let (transitionView, thumbnailFrame, destinationFrame) = transitionViewAndFrames(with: browser) else {
+            // 转为执行替补动画
+            substituteAnimator.isForShow = isForShow
+            substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.animateTransition(using: context)
+            return
+        }
+        browser.browserView.isHidden = true
+        transitionView.frame = destinationFrame
+        context.containerView.addSubview(transitionView)
+        UIView.animate(withDuration: showDuration, animations: {
+            browser.maskView.alpha = 0
+            transitionView.frame = thumbnailFrame
+        }) { _ in
+            if let toView = context.view(forKey: .to) {
+                context.containerView.addSubview(toView)
+            }
+            transitionView.removeFromSuperview()
+            context.completeTransition(!context.transitionWasCancelled)
+        }
     }
     
     private func transitionViewAndFrames(with browser: JXPhotoBrowser) -> (UIView, CGRect, CGRect)? {
@@ -75,38 +111,5 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserTransitionA
         let showContentView = cell.showContentView
         let destinationFrame = showContentView.convert(showContentView.bounds, to: destinationView)
         return (transitionContext.transitionView, transitionContext.thumbnailFrame, destinationFrame)
-    }
-    
-    open func show(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
-        guard let (transitionView, thumbnailFrame, destinationFrame) = transitionViewAndFrames(with: browser) else {
-            substituteAnimator.show(browser: browser, completion: completion)
-            return
-        }
-        transitionView.frame = thumbnailFrame
-        browser.view.addSubview(transitionView)
-        UIView.animate(withDuration: showDuration, animations: {
-            browser.maskView.alpha = 1.0
-            transitionView.frame = destinationFrame
-        }) { _ in
-            transitionView.removeFromSuperview()
-            completion()
-        }
-    }
-    
-    open func dismiss(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
-        guard let (transitionView, thumbnailFrame, destinationFrame) = transitionViewAndFrames(with: browser) else {
-            substituteAnimator.dismiss(browser: browser, completion: completion)
-            return
-        }
-        transitionView.frame = destinationFrame
-        browser.view.addSubview(transitionView)
-        browser.browserView.alpha = 0
-        UIView.animate(withDuration: dismissDuration, animations: {
-            browser.maskView.alpha = 0
-            transitionView.frame = thumbnailFrame
-        }) { _ in
-            transitionView.removeFromSuperview()
-            completion()
-        }
     }
 }
