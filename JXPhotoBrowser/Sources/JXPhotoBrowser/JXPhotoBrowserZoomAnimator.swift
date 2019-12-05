@@ -9,22 +9,78 @@
 import UIKit
 
 /// Zoom动画
-open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
+open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserTransitionAnimator {
+    
+    open var showDuration: TimeInterval = 1.25
+    
+    open var dismissDuration: TimeInterval = 1.25
+    
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return isForShow ? showDuration : dismissDuration
+    }
+    
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        guard let browser = photoBrowser else {
+            transitionContext.completeTransition(false)
+            return
+        }
+        guard let (snap1, snap2, thumbnailFrame, destinationFrame) = snapshotsAndFrames(browser: browser) else {
+            JXPhotoBrowserLog.high("取不到Frames!")
+            substituteAnimator.isForShow = isForShow
+            substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.animateTransition(using: transitionContext)
+            return
+        }
+        browser.browserView.isHidden = true
+        if isForShow {
+            snap1.frame = thumbnailFrame
+            snap2.frame = thumbnailFrame
+            snap2.alpha = 0
+            browser.maskView.alpha = 0
+            if let toView = transitionContext.view(forKey: .to) {
+                transitionContext.containerView.addSubview(toView)
+            }
+        } else {
+            snap1.frame = destinationFrame
+            snap1.alpha = 0
+            snap2.frame = destinationFrame
+        }
+        transitionContext.containerView.addSubview(snap1)
+        transitionContext.containerView.addSubview(snap2)
+        UIView.animate(withDuration: showDuration, animations: {
+            if self.isForShow {
+                browser.maskView.alpha = 1.0
+                snap1.frame = destinationFrame
+                snap1.alpha = 0
+                snap2.frame = destinationFrame
+                snap2.alpha = 1.0
+            } else {
+                browser.maskView.alpha = 0
+                snap1.frame = thumbnailFrame
+                snap1.alpha = 0
+                snap2.frame = thumbnailFrame
+                snap2.alpha = 1.0
+            }
+        }) { _ in
+            browser.browserView.isHidden = false
+            snap1.removeFromSuperview()
+            snap2.removeFromSuperview()
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
+        }
+    }
+    
     
     public typealias PreviousViewAtIndexClosure = (_ index: Int) -> UIView?
     
     /// 转场动画的前向视图
-    open var previousViewClosure: PreviousViewAtIndexClosure = { _ in nil }
+    open var previousViewProvider: PreviousViewAtIndexClosure = { _ in nil }
     
-    open var showDuration: TimeInterval = 0.25
-    
-    open var dismissDuration: TimeInterval = 0.25
     
     /// 替补的动画方案
     open lazy var substituteAnimator: JXPhotoBrowserTransitionAnimator = JXPhotoBrowserFadeAnimator()
     
     public init(previousView: @escaping PreviousViewAtIndexClosure) {
-        previousViewClosure = previousView
+        previousViewProvider = previousView
     }
     
     open func show(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
@@ -79,13 +135,11 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
     private func snapshotsAndFrames(browser: JXPhotoBrowser) -> (UIView, UIView, CGRect, CGRect)? {
         let browserView = browser.browserView
         let view = browser.view
-        let closure = previousViewClosure
+        let closure = previousViewProvider
         guard let previousView = closure(browserView.pageIndex) else {
             JXPhotoBrowserLog.high("取不到前视图！")
             return nil
         }
-        JXPhotoBrowserLog.high("browserView.pageIndex:\(browserView.pageIndex)")
-        JXPhotoBrowserLog.high("visibleCells:\(browserView.visibleCells)")
         guard let cell = browserView.visibleCells[browserView.pageIndex] as? JXPhotoBrowserZoomSupportedCell else {
             JXPhotoBrowserLog.high("取不到后视图！")
             return nil
@@ -93,12 +147,15 @@ open class JXPhotoBrowserZoomAnimator: JXPhotoBrowserTransitionAnimator {
         let thumbnailFrame = previousView.convert(previousView.bounds, to: view)
         let showContentView = cell.showContentView
         // 两Rect求交集，得出显示中的区域
-        let intersection = cell.bounds.intersection(showContentView.frame)
-        let destinationFrame = cell.convert(intersection, to: view)
-        guard let snap1 = previousView.resizableSnapshotView(from: previousView.bounds, afterScreenUpdates: false, withCapInsets: .zero),
-            let snap2 = cell.resizableSnapshotView(from: destinationFrame, afterScreenUpdates: true, withCapInsets: .zero) else {
-                JXPhotoBrowserLog.high("取不到前后截图！")
-                return nil
+        let destinationFrame = cell.convert(cell.bounds.intersection(showContentView.frame), to: view)
+        JXPhotoBrowserLog.high("动画 destinationFrame:\(destinationFrame)")
+        guard let snap1 = previousView.snapshotView(afterScreenUpdates: false) else {
+            JXPhotoBrowserLog.high("取不到前截图！")
+            return nil
+        }
+        guard let snap2 = cell.resizableSnapshotView(from: destinationFrame, afterScreenUpdates: false, withCapInsets: .zero) else {
+            JXPhotoBrowserLog.high("取不到后截图！")
+            return nil
         }
         return (snap1, snap2, thumbnailFrame, destinationFrame)
     }

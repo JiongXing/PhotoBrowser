@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class JXPhotoBrowser: UIViewController {
+open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate {
     
     /// 通过本回调，把图片浏览器嵌套在导航控制器里
     public typealias PresentEmbedClosure = (JXPhotoBrowser) -> UINavigationController
@@ -101,14 +101,16 @@ open class JXPhotoBrowser: UIViewController {
         switch method {
         case .push(let inNC):
             let nav = inNC ?? JXPhotoBrowser.topMost?.navigationController
+            // TODO: 处理
             nav?.delegate = self
-            nav?.pushViewController(self, animated: false)
+            nav?.pushViewController(self, animated: true)
         case .present(let fromVC, let embed):
             let toVC = embed?(self) ?? self
             toVC.modalPresentationStyle = .custom
             toVC.modalPresentationCapturesStatusBarAppearance = true
+            toVC.transitioningDelegate = self
             let from = fromVC ?? JXPhotoBrowser.topMost
-            from?.present(toVC, animated: false, completion: nil)
+            from?.present(toVC, animated: true, completion: nil)
         }
     }
     
@@ -125,17 +127,21 @@ open class JXPhotoBrowser: UIViewController {
         automaticallyAdjustsScrollViewInsets = false
         hideNavigationBar(true)
         
+        transitionAnimator.photoBrowser = self
+        
         view.backgroundColor = .clear
         view.addSubview(maskView)
         view.addSubview(browserView)
-        maskView.alpha = 0
-        browserView.alpha = 0
         
         browserView.didChangedPageIndex = { [weak self] index in
             guard let `self` = self else { return }
             self.pageIndicator?.didChanged(pageIndex: index)
             self.didChangedPageIndex(self, index)
         }
+        
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        JXPhotoBrowserLog.high("viewDidLoad layout finish!")
     }
     
     open override func viewWillLayoutSubviews() {
@@ -148,10 +154,7 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        JXPhotoBrowserLog.low("Browser viewDidLayoutSubviews! frame:\(view.frame) bounds:\(view.bounds)")
-        if presentingViewController == nil {
-            showAnimationIfNeeded()
-        }
+//        JXPhotoBrowserLog.low("Browser viewDidLayoutSubviews! frame:\(view.frame) bounds:\(view.bounds)")
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -161,10 +164,10 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        JXPhotoBrowserLog.low("viewDidAppear!")
-        if presentingViewController != nil {
-            showAnimationIfNeeded()
-        }
+//        JXPhotoBrowserLog.low("viewDidAppear!")
+//        if presentingViewController != nil {
+//            showAnimationIfNeeded()
+//        }
     }
     
     open override func viewDidDisappear(_ animated: Bool) {
@@ -196,6 +199,27 @@ open class JXPhotoBrowser: UIViewController {
     // MARK: - 转场
     //
     
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        JXPhotoBrowserLog.low("动画代理forPresented!")
+        transitionAnimator.isForShow = true
+        transitionAnimator.photoBrowser = self
+        return transitionAnimator
+    }
+    
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        JXPhotoBrowserLog.low("动画代理forDismissed!")
+        transitionAnimator.isForShow = false
+        transitionAnimator.photoBrowser = self
+        return transitionAnimator
+    }
+    
+    public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        JXPhotoBrowserLog.high("动画代理animationControllerFor!")
+        transitionAnimator.isForShow = (operation == .push)
+        transitionAnimator.photoBrowser = self
+        return transitionAnimator
+    }
+    
     private var isShowDone = false
     
     private func showAnimationIfNeeded() {
@@ -219,13 +243,10 @@ open class JXPhotoBrowser: UIViewController {
     /// 销毁PhotoBrowser
     open func dismiss() {
         setStatusBar(hidden: false)
-        transitionAnimator.dismiss(browser: self) { [weak self] in
-            guard let `self` = self else { return }
-            if self.presentingViewController != nil {
-                self.dismiss(animated: false, completion: nil)
-            } else {
-                self.navigationController?.popViewController(animated: false)
-            }
+        if self.presentingViewController != nil {
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            self.navigationController?.popViewController(animated: true)
         }
     }
     

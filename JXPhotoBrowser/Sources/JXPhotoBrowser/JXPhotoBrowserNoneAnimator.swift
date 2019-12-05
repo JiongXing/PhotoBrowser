@@ -6,9 +6,18 @@
 //  Copyright © 2019 JiongXing. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-open class JXPhotoBrowserNoneAnimator: JXPhotoBrowserTransitionAnimator {
+open class JXPhotoBrowserNoneAnimator: NSObject, JXPhotoBrowserTransitionAnimator {
+    
+    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+        0
+    }
+    
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        transitionContext.completeTransition(transitionContext.transitionWasCancelled)
+    }
+    
     
     open func show(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
         completion()

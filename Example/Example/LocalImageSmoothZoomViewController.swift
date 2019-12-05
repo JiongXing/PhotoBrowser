@@ -38,7 +38,7 @@ class LocalImageSmoothZoomViewController: BaseCollectionViewController {
             browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
         }
         // 更丝滑的Zoom动画
-        browser.transitionAnimator = JXPhotoBrowserSmoothZoomAnimator(transitionContext: { (index, destinationView) -> JXPhotoBrowserSmoothZoomAnimator.TransitionContext? in
+        browser.transitionAnimator = JXPhotoBrowserSmoothZoomAnimator(transitionViewAndFrame: { (index, destinationView) -> JXPhotoBrowserSmoothZoomAnimator.TransitionViewAndFrame? in
             let path = IndexPath(item: index, section: indexPath.section)
             guard let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell else {
                 return nil

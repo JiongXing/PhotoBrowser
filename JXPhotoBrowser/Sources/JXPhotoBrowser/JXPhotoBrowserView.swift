@@ -108,6 +108,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     /// 根据页码更新滑动位置
     open func refreshContentOffset() {
+        JXPhotoBrowserLog.low("JXPhotoBrowserView refreshContentOffset!")
         if scrollDirection == .horizontal {
             scrollView.contentOffset = CGPoint(x: CGFloat(pageIndex) * scrollView.bounds.width, y: 0)
         } else {

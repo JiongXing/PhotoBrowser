@@ -41,6 +41,8 @@ class LocalImageViewController: BaseCollectionViewController {
         // 可指定打开时定位到哪一页
         browser.pageIndex = indexPath.item
         // 展示
-        browser.show()
+        browser.show(method: .present(fromVC: self, embed: { browser -> UINavigationController in
+            UINavigationController(rootViewController: browser)
+        }))
     }
 }

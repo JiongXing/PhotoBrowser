@@ -42,13 +42,14 @@ class PushNextViewController: BaseCollectionViewController {
             }
         }
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
+            JXPhotoBrowserLog.high("获取前视图, index:\(index)")
             let path = IndexPath(item: index, section: indexPath.section)
             let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
             return cell?.imageView
         })
         browser.pageIndex = indexPath.item
         // 让PhotoBrowser嵌入当前的导航控制器里
-        browser.show(method: .push(inNC: self.navigationController))
+        browser.show(method: .push(inNC: nil))
     }
     
     private func longPress(cell: JXPhotoBrowserImageCell) {
