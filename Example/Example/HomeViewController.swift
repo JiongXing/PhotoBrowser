@@ -42,7 +42,8 @@ class HomeViewController: UITableViewController {
             SDWebImageViewController(),
             DataSourceDeleteViewController(),
             DataSourceAppendViewController(),
-            PushNextViewController()
+            PushNextViewController(),
+            LoadingProgressViewController()
         ]
     }
     

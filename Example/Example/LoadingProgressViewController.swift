@@ -7,83 +7,81 @@
 //
 
 import UIKit
-
-private let reuseIdentifier = "Cell"
+import JXPhotoBrowser
+import SDWebImage
 
 class LoadingProgressViewController: BaseCollectionViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Register cell classes
-        self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-
-        // Do any additional setup after loading the view.
+    
+    override var name: String { "网络图片显示加载进度" }
+    
+    override var remark: String { "举例如何通过自定义UI显示图片的加载进度" }
+    
+    override func makeDataSource() -> [ResourceModel] {
+        makeNetworkDataSource()
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-    // MARK: UICollectionViewDataSource
-
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
-
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
-        return 0
-    }
-
+    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-    
-        // Configure the cell
-    
+        let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
+        if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
+            let url = URL(string: firstLevel)
+            cell.imageView.kf.setImage(with: url)
+        }
         return cell
     }
-
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
     
+    override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
+        let browser = JXPhotoBrowser()
+        browser.numberOfItems = {
+            self.dataSource.count
+        }
+        // 使用自定义的Cell
+        browser.cellClassAtIndex = { _ in
+            LoadingImageCell.self
+        }
+        browser.reloadCellAtIndex = { context in
+            let browserCell = context.cell as? LoadingImageCell
+            let collectionPath = IndexPath(item: context.index, section: indexPath.section)
+            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
+            let placeholder = collectionCell?.imageView.image
+            browserCell?.reloadData(urlString: self.dataSource[context.index].secondLevelUrl, placeholder: placeholder)
+        }
+        browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
+            let path = IndexPath(item: index, section: indexPath.section)
+            let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
+            return cell?.imageView
+        })
+        browser.pageIndex = indexPath.item
+        browser.show()
     }
-    */
+}
 
+/// 加上进度环的Cell
+class LoadingImageCell: JXPhotoBrowserImageCell {
+    /// 进度环
+    let progressView = JXPhotoBrowserProgressView()
+    
+    override func setup() {
+        super.setup()
+        addSubview(progressView)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        progressView.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
+    }
+    
+    func reloadData(urlString: String?, placeholder: UIImage?) {
+        progressView.progress = 0
+        let url = urlString.flatMap { URL(string: $0) }
+        let options: SDWebImageOptions = [.refreshCached, .lowPriority]
+        imageView.sd_setImage(with: url, placeholderImage: placeholder, options: options, progress: { [weak self] (received, total, _) in
+            if total > 0 {
+                JXPhotoBrowserLog.low("loading: \(received) / \(total)")
+                self?.progressView.progress = CGFloat(received) / CGFloat(total)
+            }
+        }) { [weak self] (_, _, _, _) in
+            self?.progressView.progress = 1.0
+            self?.setNeedsLayout()
+        }
+    }
 }

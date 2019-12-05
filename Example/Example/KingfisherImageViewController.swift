@@ -14,7 +14,7 @@ class KingfisherImageViewController: BaseCollectionViewController {
     
     override var name: String { "网络图片-Kingfisher" }
     
-    override var remark: String { "示范如何用Kingfisher加载网络图片" }
+    override var remark: String { "举例如何用Kingfisher加载网络图片" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeNetworkDataSource()
@@ -35,11 +35,7 @@ class KingfisherImageViewController: BaseCollectionViewController {
             self.dataSource.count
         }
         browser.reloadCellAtIndex = { context in
-            var url: URL?
-            guard let urlString = self.dataSource[context.index].secondLevelUrl else {
-                return
-            }
-            url = URL(string: urlString)
+            let url = self.dataSource[context.index].secondLevelUrl.flatMap { URL(string: $0) }
             let browserCell = context.cell as? JXPhotoBrowserImageCell
             let collectionPath = IndexPath(item: context.index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell

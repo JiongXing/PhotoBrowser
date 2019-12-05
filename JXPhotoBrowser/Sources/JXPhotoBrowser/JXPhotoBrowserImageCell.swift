@@ -57,6 +57,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         setup()
     }
     
+    /// 生成实例
     public static func generate(with browser: JXPhotoBrowser) -> Self {
         let cell = Self.init(frame: .zero)
         cell.photoBrowser = browser

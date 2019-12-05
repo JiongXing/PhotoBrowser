@@ -41,6 +41,7 @@
 		949C25DE2390FCC000CD654B /* GIFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25DD2390FCC000CD654B /* GIFViewController.swift */; };
 		949C25E02390FCCF00CD654B /* WebPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25DF2390FCCF00CD654B /* WebPViewController.swift */; };
 		949C25E22390FCF900CD654B /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25E12390FCF900CD654B /* VideoViewController.swift */; };
+		94A02D4023992669007E5DCE /* JXPhotoBrowserProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A02D3F23992668007E5DCE /* JXPhotoBrowserProgressView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,7 @@
 		949C25DD2390FCC000CD654B /* GIFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFViewController.swift; sourceTree = "<group>"; };
 		949C25DF2390FCCF00CD654B /* WebPViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPViewController.swift; sourceTree = "<group>"; };
 		949C25E12390FCF900CD654B /* VideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
+		94A02D3F23992668007E5DCE /* JXPhotoBrowserProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserProgressView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				940B297F238FB3F000DC5F6F /* KingfisherImageViewController.swift */,
 				940B2981238FBAC200DC5F6F /* SDWebImageViewController.swift */,
 				949C25DB2390FC9F00CD654B /* LoadingProgressViewController.swift */,
+				94A02D3F23992668007E5DCE /* JXPhotoBrowserProgressView.swift */,
 				949C25D92390FC8900CD654B /* RawImageViewController.swift */,
 				949C25DD2390FCC000CD654B /* GIFViewController.swift */,
 				949C25DF2390FCCF00CD654B /* WebPViewController.swift */,
@@ -265,6 +268,7 @@
 				940B2972238D20A800DC5F6F /* MoreDetailViewController.swift in Sources */,
 				940B2963238D128200DC5F6F /* BaseCollectionViewCell.swift in Sources */,
 				949C25D42390FB4C00CD654B /* DataSourceAppendViewController.swift in Sources */,
+				94A02D4023992669007E5DCE /* JXPhotoBrowserProgressView.swift in Sources */,
 				940B297E238FA9C800DC5F6F /* LocalImageSmoothZoomViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
