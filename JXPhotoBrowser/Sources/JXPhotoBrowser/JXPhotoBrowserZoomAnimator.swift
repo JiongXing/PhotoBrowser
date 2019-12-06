@@ -11,9 +11,9 @@ import UIKit
 /// Zoom动画
 open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitioning {
     
-    open var showDuration: TimeInterval = 0.25
+    open var showDuration: TimeInterval = 1.25
     
-    open var dismissDuration: TimeInterval = 0.25
+    open var dismissDuration: TimeInterval = 1.25
     
     open var isNavigationAnimation = false
     
@@ -42,6 +42,7 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     }
     
     private func playShowAnimation(context: UIViewControllerContextTransitioning) {
+        JXPhotoBrowserLog.high("执行Show动画！")
         guard let browser = photoBrowser, let toView = context.view(forKey: .to) else {
             return
         }
@@ -120,6 +121,7 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
             JXPhotoBrowserLog.high("取不到前视图！")
             return nil
         }
+        JXPhotoBrowserLog.high("取后视图。index:\(browserView.pageIndex), cell:\(browserView.visibleCells[browserView.pageIndex])")
         guard let cell = browserView.visibleCells[browserView.pageIndex] as? JXPhotoBrowserZoomSupportedCell else {
             JXPhotoBrowserLog.high("取不到后视图！")
             return nil

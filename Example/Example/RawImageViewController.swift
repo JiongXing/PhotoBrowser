@@ -26,7 +26,7 @@ class RawImageViewController: BaseCollectionViewController {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
         if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
-            cell.imageView.kf.setImage(with: url)
+            cell.imageView.sd_setImage(with: url, completed: nil)
         }
         return cell
     }
@@ -110,7 +110,7 @@ class RawImageCell: JXPhotoBrowserImageCell {
                 self?.setNeedsLayout()
             }
             // 原图如果有缓存就加载
-            self?.loadRawImageIfCached(placeholder: placeholder, rawURLString: rawURLString)
+            self?.loadRawImageIfCached(placeholder: self?.imageView.image, rawURLString: rawURLString)
         }
     }
     

@@ -7,83 +7,53 @@
 //
 
 import UIKit
-
-private let reuseIdentifier = "Cell"
+import JXPhotoBrowser
+import SDWebImage
 
 class GIFViewController: BaseCollectionViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Register cell classes
-        self.collectionView!.register(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
-
-        // Do any additional setup after loading the view.
+    
+    override var name: String { "加载GIF图片" }
+    
+    override var remark: String { "举例如何用SDWebImage加载GIF网络图片" }
+    
+    override func makeDataSource() -> [ResourceModel] {
+        let models = makeNetworkDataSource()
+        models[3].secondLevelUrl = "https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/gifImage.gif"
+        return models
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-    // MARK: UICollectionViewDataSource
-
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
-
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of items
-        return 0
-    }
-
+    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-    
-        // Configure the cell
-    
+        let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
+        if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
+            let url = URL(string: firstLevel)
+            cell.imageView.sd_setImage(with: url, completed: nil)
+        }
         return cell
     }
-
-    // MARK: UICollectionViewDelegate
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
     
+    override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
+        let browser = JXPhotoBrowser()
+        browser.numberOfItems = {
+            self.dataSource.count
+        }
+        browser.reloadCellAtIndex = { context in
+            let url = self.dataSource[context.index].secondLevelUrl.flatMap { URL(string: $0) }
+            let browserCell = context.cell as? JXPhotoBrowserImageCell
+            let collectionPath = IndexPath(item: context.index, section: indexPath.section)
+            let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
+            let placeholder = collectionCell?.imageView.image
+            // 用SDWebImage加载
+            let options: SDWebImageOptions = [.queryDiskDataSync, .scaleDownLargeImages]
+            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: options, completed: { (_, _, _, _) in
+                browserCell?.setNeedsLayout()
+            })
+        }
+        browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
+            let path = IndexPath(item: index, section: indexPath.section)
+            let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
+            return cell?.imageView
+        })
+        browser.pageIndex = indexPath.item
+        browser.show()
     }
-    */
-
 }

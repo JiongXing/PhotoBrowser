@@ -154,11 +154,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: pageIndex)
     }
     
-    open override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-//        JXPhotoBrowserLog.low("Browser viewDidLayoutSubviews! frame:\(view.frame) bounds:\(view.bounds)")
-    }
-    
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         hideNavigationBar(true)

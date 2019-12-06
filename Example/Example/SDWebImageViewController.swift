@@ -24,7 +24,7 @@ class SDWebImageViewController: BaseCollectionViewController {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
         if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
-            cell.imageView.kf.setImage(with: url)
+            cell.imageView.sd_setImage(with: url, completed: nil)
         }
         return cell
     }
@@ -37,12 +37,15 @@ class SDWebImageViewController: BaseCollectionViewController {
         browser.reloadCellAtIndex = { context in
             let url = self.dataSource[context.index].secondLevelUrl.flatMap { URL(string: $0) }
             let browserCell = context.cell as? JXPhotoBrowserImageCell
+            browserCell?.index = context.index
+            JXPhotoBrowserLog.high("reload index:\(context.index) cell:\(browserCell)")
             let collectionPath = IndexPath(item: context.index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
             // 用SDWebImage加载
-            let options: SDWebImageOptions = [.queryDiskDataSync, .scaleDownLargeImages]
-            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: options, completed: { (_, _, _, _) in
+//            let options: SDWebImageOptions = [.queryDiskDataSync, .scaleDownLargeImages]
+//            browserCell?.imageView.image = nil
+            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], completed: { (_, _, _, _) in
                 browserCell?.setNeedsLayout()
             })
         }

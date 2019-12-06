@@ -44,7 +44,9 @@ class HomeViewController: UITableViewController {
             DataSourceAppendViewController(),
             PushNextViewController(),
             LoadingProgressViewController(),
-            RawImageViewController()
+            RawImageViewController(),
+            GIFViewController(),
+            MultipleCellViewController()
         ]
     }
     

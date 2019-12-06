@@ -24,7 +24,7 @@ class LoadingProgressViewController: BaseCollectionViewController {
         let cell = collectionView.jx.dequeueReusableCell(BaseCollectionViewCell.self, for: indexPath)
         if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
-            cell.imageView.kf.setImage(with: url)
+            cell.imageView.sd_setImage(with: url, completed: nil)
         }
         return cell
     }
