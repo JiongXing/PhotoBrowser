@@ -43,7 +43,8 @@ class HomeViewController: UITableViewController {
             DataSourceDeleteViewController(),
             DataSourceAppendViewController(),
             PushNextViewController(),
-            LoadingProgressViewController()
+            LoadingProgressViewController(),
+            RawImageViewController()
         ]
     }
     

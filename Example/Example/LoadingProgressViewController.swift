@@ -43,7 +43,7 @@ class LoadingProgressViewController: BaseCollectionViewController {
             let collectionPath = IndexPath(item: context.index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
-            browserCell?.reloadData(urlString: self.dataSource[context.index].secondLevelUrl, placeholder: placeholder)
+            browserCell?.reloadData(placeholder: placeholder, urlString: self.dataSource[context.index].secondLevelUrl)
         }
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)
@@ -70,7 +70,7 @@ class LoadingImageCell: JXPhotoBrowserImageCell {
         progressView.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
     }
     
-    func reloadData(urlString: String?, placeholder: UIImage?) {
+    func reloadData(placeholder: UIImage?, urlString: String?) {
         progressView.progress = 0
         let url = urlString.flatMap { URL(string: $0) }
         let options: SDWebImageOptions = [.refreshCached, .lowPriority]
@@ -79,8 +79,8 @@ class LoadingImageCell: JXPhotoBrowserImageCell {
                 JXPhotoBrowserLog.low("loading: \(received) / \(total)")
                 self?.progressView.progress = CGFloat(received) / CGFloat(total)
             }
-        }) { [weak self] (_, _, _, _) in
-            self?.progressView.progress = 1.0
+        }) { [weak self] (_, error, _, _) in
+            self?.progressView.progress = error == nil ? 1.0 : 0
             self?.setNeedsLayout()
         }
     }
