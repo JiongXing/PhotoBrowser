@@ -7,8 +7,6 @@
 # Features
 - [x] 支持本地图片
 - [x] 支持初始图、高清图和原图三个级别
-- [x] 支持`GIF`格式
-- [x] 支持`WebP`格式
 - [x] 支持Fade渐变转场动画
 - [x] 支持Zoom缩放转场动画
 - [x] 支持下滑手势关闭浏览器
@@ -25,8 +23,7 @@
 - [x] 提供了数字型的页码指示器的实现
 - [x] 提供了图片加载进度指示器的实现
 - [x] 提供了查看原图按钮的实现
-- [x] 提供了多种数据源代理、视图代理和转场动画代理的实现，自由搭配选用
-- [ ] 纯视频、视频与图片混合（待开发）
+- [x] 视频与图片混合展示
 
 
 <div>
@@ -36,6 +33,15 @@
 </div>
 
 # Change Log
+
+## Version 3.0.0
+
+**2019/12/06**
+
+- 项目重构完成，更灵活，易扩展，适应性更强，无第三方库依赖。
+
+> 各种需求场景的使用方法均有举例，请下载Example查看。
+> 3.0版本说明文档正在完善，敬请期待。
 
 ## Version 2.1.6 (iOS9 +) & Version 2.2.6 (iOS 10 +)
 
@@ -97,10 +103,8 @@
 查看更多日志：[CHANGELOG](CHANGELOG.md)
 
 # Requirements
-- iOS 9.0 (JXPhotoBrowser v2.1 +)
-- iOS 10.0 (JXPhotoBrowser v2.2 +)
+- iOS 9.0 +
 - Swift 4.2 +
-- Xcode 10
 
 # Installation
 
@@ -113,17 +117,16 @@ pod repo update
 ```
 pod 'JXPhotoBrowser'
 ```
-如果需要加载WebP图片，则引入subspec
-```
-pod 'JXPhotoBrowser/KingfisherWebP'
-```
 
 ## 手动导入
+
 1. 请把`Source/Core`下的所有文件拷贝到你的项目。
 2. 如果需要使用`Kingfisher`来加载网络图片，就把`Source/Kingfisher`下的文件也拷贝到你的项目，并导入`Kingfisher`库。
 3. 如果需要加载`WebP`图片，就把`Source/KingfisherWebP`下的文件也拷贝到你的项目，并导入`KingfisherWebP`库。
 
 # Usage
+
+> 3.0版本说明文档正在完善，敬请期待。
 
 ## 初始化 
 创建图片浏览器需要三个参数，分别是数据源、视图代理、转场代理。
