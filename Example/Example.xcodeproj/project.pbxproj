@@ -25,7 +25,6 @@
 		940B2968238D128200DC5F6F /* UICollectionView+JX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B295F238D128200DC5F6F /* UICollectionView+JX.swift */; };
 		940B2969238D128200DC5F6F /* ResourceModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2960238D128200DC5F6F /* ResourceModel.swift */; };
 		940B296C238D1C7800DC5F6F /* MultipleCellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B296B238D1C7800DC5F6F /* MultipleCellViewController.swift */; };
-		940B2970238D1FAC00DC5F6F /* MoreCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B296F238D1FAC00DC5F6F /* MoreCell.swift */; };
 		940B2972238D20A800DC5F6F /* MoreDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2971238D20A800DC5F6F /* MoreDetailViewController.swift */; };
 		940B2978238F6BA900DC5F6F /* LocalImageVerticalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2977238F6BA900DC5F6F /* LocalImageVerticalViewController.swift */; };
 		940B297A238F70D900DC5F6F /* LocalImageZoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2979238F70D900DC5F6F /* LocalImageZoomViewController.swift */; };
@@ -40,6 +39,7 @@
 		949C25DE2390FCC000CD654B /* GIFViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25DD2390FCC000CD654B /* GIFViewController.swift */; };
 		949C25E22390FCF900CD654B /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949C25E12390FCF900CD654B /* VideoViewController.swift */; };
 		94A02D4023992669007E5DCE /* JXPhotoBrowserProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A02D3F23992668007E5DCE /* JXPhotoBrowserProgressView.swift */; };
+		94BB36AE239A7D3B00B70F6A /* MultipleSectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94BB36AD239A7D3B00B70F6A /* MultipleSectionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,7 +61,6 @@
 		940B295F238D128200DC5F6F /* UICollectionView+JX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UICollectionView+JX.swift"; sourceTree = "<group>"; };
 		940B2960238D128200DC5F6F /* ResourceModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResourceModel.swift; sourceTree = "<group>"; };
 		940B296B238D1C7800DC5F6F /* MultipleCellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipleCellViewController.swift; sourceTree = "<group>"; };
-		940B296F238D1FAC00DC5F6F /* MoreCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreCell.swift; sourceTree = "<group>"; };
 		940B2971238D20A800DC5F6F /* MoreDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDetailViewController.swift; sourceTree = "<group>"; };
 		940B2977238F6BA900DC5F6F /* LocalImageVerticalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalImageVerticalViewController.swift; sourceTree = "<group>"; };
 		940B2979238F70D900DC5F6F /* LocalImageZoomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalImageZoomViewController.swift; sourceTree = "<group>"; };
@@ -76,6 +75,7 @@
 		949C25DD2390FCC000CD654B /* GIFViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GIFViewController.swift; sourceTree = "<group>"; };
 		949C25E12390FCF900CD654B /* VideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
 		94A02D3F23992668007E5DCE /* JXPhotoBrowserProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserProgressView.swift; sourceTree = "<group>"; };
+		94BB36AD239A7D3B00B70F6A /* MultipleSectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipleSectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,8 +132,8 @@
 				949C25D32390FB4C00CD654B /* DataSourceAppendViewController.swift */,
 				949C25D72390FB9E00CD654B /* PushNextViewController.swift */,
 				940B296B238D1C7800DC5F6F /* MultipleCellViewController.swift */,
-				940B296F238D1FAC00DC5F6F /* MoreCell.swift */,
 				940B2971238D20A800DC5F6F /* MoreDetailViewController.swift */,
+				94BB36AD239A7D3B00B70F6A /* MultipleSectionViewController.swift */,
 				949C25E12390FCF900CD654B /* VideoViewController.swift */,
 				940B2960238D128200DC5F6F /* ResourceModel.swift */,
 				940B295F238D128200DC5F6F /* UICollectionView+JX.swift */,
@@ -236,11 +236,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				940B2970238D1FAC00DC5F6F /* MoreCell.swift in Sources */,
 				940B296C238D1C7800DC5F6F /* MultipleCellViewController.swift in Sources */,
 				940B2982238FBAC200DC5F6F /* SDWebImageViewController.swift in Sources */,
 				949C25DA2390FC8900CD654B /* RawImageViewController.swift in Sources */,
 				949C25DC2390FC9F00CD654B /* LoadingProgressViewController.swift in Sources */,
+				94BB36AE239A7D3B00B70F6A /* MultipleSectionViewController.swift in Sources */,
 				940B2965238D128200DC5F6F /* JXNamespace.swift in Sources */,
 				940B2969238D128200DC5F6F /* ResourceModel.swift in Sources */,
 				949C25D82390FB9E00CD654B /* PushNextViewController.swift in Sources */,

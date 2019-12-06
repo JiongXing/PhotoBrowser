@@ -121,11 +121,9 @@ class RawImageCell: JXPhotoBrowserImageCell {
         }
         SDImageCache.shared.containsImage(forKey: rawString, cacheType: .all) { [weak self] cacheType in
             if cacheType == .none {
-                JXPhotoBrowserLog.low("没有原图缓存！")
                 self?.rawButton.isHidden = false
                 return
             }
-            JXPhotoBrowserLog.low("查询到原图缓存！type:\(cacheType.rawValue)")
             self?.imageView.sd_setImage(with: URL(string: rawString), placeholderImage: placeholder, options: []) { (_, error, _, _) in
                 if error == nil {
                     self?.setNeedsLayout()
@@ -147,7 +145,6 @@ class RawImageCell: JXPhotoBrowserImageCell {
         }
         imageView.sd_setImage(with: url, placeholderImage: imageView.image, options: [], progress: { [weak self] (received, total, _) in
             if total > 0 {
-                JXPhotoBrowserLog.low("loading: \(received) / \(total)")
                 self?.progressView.progress = CGFloat(received) / CGFloat(total)
             }
         }) { [weak self] (_, error, _, _) in

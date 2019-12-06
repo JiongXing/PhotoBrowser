@@ -43,8 +43,7 @@ class GIFViewController: BaseCollectionViewController {
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
             // 用SDWebImage加载
-            let options: SDWebImageOptions = [.queryDiskDataSync, .scaleDownLargeImages]
-            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: options, completed: { (_, _, _, _) in
+            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], completed: { (_, _, _, _) in
                 browserCell?.setNeedsLayout()
             })
         }

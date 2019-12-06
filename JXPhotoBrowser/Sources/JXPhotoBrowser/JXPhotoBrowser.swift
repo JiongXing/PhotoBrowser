@@ -86,7 +86,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     open weak var previousNavigationControllerDelegate: UINavigationControllerDelegate?
     
     deinit {
-        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
+        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
     }
     
     public init() {
@@ -124,7 +124,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        JXPhotoBrowserLog.low("Browser viewDidLoad! frame:\(view.frame) bounds:\(view.bounds)")
         
         automaticallyAdjustsScrollViewInsets = false
         hideNavigationBar(true)
@@ -143,12 +142,10 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         
         view.setNeedsLayout()
         view.layoutIfNeeded()
-        JXPhotoBrowserLog.high("viewDidLoad layout finish!")
     }
     
     open override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        JXPhotoBrowserLog.low("Browser viewWillLayoutSubviews! frame:\(view.frame) bounds:\(view.bounds)")
         maskView.frame = view.bounds
         browserView.frame = view.bounds
         pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: pageIndex)
@@ -161,7 +158,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        JXPhotoBrowserLog.low("viewDidAppear!")
         navigationController?.delegate = previousNavigationControllerDelegate
     }
     
@@ -200,21 +196,18 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     //
     
     public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        JXPhotoBrowserLog.low("动画代理forPresented!")
         transitionAnimator.isForShow = true
         transitionAnimator.photoBrowser = self
         return transitionAnimator
     }
     
     public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        JXPhotoBrowserLog.low("动画代理forDismissed!")
         transitionAnimator.isForShow = false
         transitionAnimator.photoBrowser = self
         return transitionAnimator
     }
     
     public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        JXPhotoBrowserLog.high("动画代理animationControllerFor!")
         transitionAnimator.isForShow = (operation == .push)
         transitionAnimator.photoBrowser = self
         transitionAnimator.isNavigationAnimation = true

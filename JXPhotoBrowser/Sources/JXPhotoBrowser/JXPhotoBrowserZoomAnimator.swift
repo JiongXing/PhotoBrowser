@@ -11,9 +11,9 @@ import UIKit
 /// Zoom动画
 open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitioning {
     
-    open var showDuration: TimeInterval = 1.25
+    open var showDuration: TimeInterval = 0.25
     
-    open var dismissDuration: TimeInterval = 1.25
+    open var dismissDuration: TimeInterval = 0.25
     
     open var isNavigationAnimation = false
     
@@ -42,7 +42,6 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     }
     
     private func playShowAnimation(context: UIViewControllerContextTransitioning) {
-        JXPhotoBrowserLog.high("执行Show动画！")
         guard let browser = photoBrowser, let toView = context.view(forKey: .to) else {
             return
         }
@@ -118,20 +117,15 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
         let view = browser.view
         let closure = previousViewProvider
         guard let previousView = closure(browserView.pageIndex) else {
-            JXPhotoBrowserLog.high("取不到前视图！")
             return nil
         }
-        JXPhotoBrowserLog.high("取后视图。index:\(browserView.pageIndex), cell:\(browserView.visibleCells[browserView.pageIndex])")
         guard let cell = browserView.visibleCells[browserView.pageIndex] as? JXPhotoBrowserZoomSupportedCell else {
-            JXPhotoBrowserLog.high("取不到后视图！")
             return nil
         }
         let thumbnailFrame = previousView.convert(previousView.bounds, to: view)
         let showContentView = cell.showContentView
         // 两Rect求交集，得出显示中的区域
         let destinationFrame = cell.convert(cell.bounds.intersection(showContentView.frame), to: view)
-        JXPhotoBrowserLog.high("动画 destinationFrame:\(destinationFrame)")
-        
         guard let snap1 = fastSnapshot(with: previousView) else {
             JXPhotoBrowserLog.high("取不到前截图！")
             return nil

@@ -20,7 +20,6 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
             if scrollDirection == .horizontal {
                 addPanGesture()
             } else if let existed = existedPan {
-                JXPhotoBrowserLog.low("移除Pan手势!")
                 scrollView.removeGestureRecognizer(existed)
             }
         }
@@ -44,7 +43,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     }()
     
     deinit {
-        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
+        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
     }
     
     public required override init(frame: CGRect) {
@@ -126,7 +125,6 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         let origin = computeImageLayoutOrigin(for: size, in: scrollView)
         imageView.frame = CGRect(origin: origin, size: size)
         scrollView.setZoomScale(1.0, animated: false)
-        JXPhotoBrowserLog.low("ImageCell layoutSubviews index:\(index) imageView.frame:\(imageView.frame)")
     }
     
     open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -135,14 +133,12 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     
     open func scrollViewDidZoom(_ scrollView: UIScrollView) {
         imageView.center = computeImageLayoutCenter(in: scrollView)
-//        JXPhotoBrowserLog.low("scrollView.contentSize:\(scrollView.contentSize)")
     }
     
     open func computeImageLayoutSize(for image: UIImage?, in scrollView: UIScrollView) -> CGSize {
         guard let imageSize = image?.size, imageSize.width > 0 && imageSize.height > 0 else {
             return .zero
         }
-        JXPhotoBrowserLog.low("image size: \(imageSize)")
         var width: CGFloat
         var height: CGFloat
         let containerSize = scrollView.bounds.size
@@ -196,7 +192,6 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     
     /// 单击
     @objc open func onSingleTap(_ tap: UITapGestureRecognizer) {
-        JXPhotoBrowserLog.low("\(self.classForCoder) onSingleTap!")
         photoBrowser?.dismiss()
     }
     
@@ -219,7 +214,6 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     /// 长按
     @objc open func onLongPress(_ press: UILongPressGestureRecognizer) {
         if press.state == .began {
-            JXPhotoBrowserLog.low("长按!!! index:\(index)")
             longPressedAction?(self, press)
         }
     }

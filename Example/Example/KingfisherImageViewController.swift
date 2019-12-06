@@ -41,7 +41,7 @@ class KingfisherImageViewController: BaseCollectionViewController {
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
             // 用Kingfisher加载
-            browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options: [.loadDiskFileSynchronously], completionHandler: { _ in
+            browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options: [], completionHandler: { _ in
                 browserCell?.setNeedsLayout()
             })
         }

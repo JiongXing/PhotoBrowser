@@ -61,7 +61,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     }()
     
     deinit {
-        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
+        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
     }
     
     public convenience init() {
@@ -85,7 +85,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        JXPhotoBrowserLog.low("\(self.classForCoder) layoutSubviews!")
         if scrollDirection == .horizontal {
             scrollView.frame = CGRect(x: 0, y: 0, width: bounds.width + itemSpacing, height: bounds.height)
         } else {
@@ -99,7 +98,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         // 修正pageIndex，同步数据源的变更
         pageIndex = max(0, pageIndex)
         pageIndex = min(pageIndex, numberOfItems())
-        JXPhotoBrowserLog.low("当前页：\(pageIndex)")
         resetCells()
         layoutCells()
         reloadItems()
@@ -108,7 +106,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     /// 根据页码更新滑动位置
     open func refreshContentOffset() {
-        JXPhotoBrowserLog.low("JXPhotoBrowserView refreshContentOffset!")
         if scrollDirection == .horizontal {
             scrollView.contentOffset = CGPoint(x: CGFloat(pageIndex) * scrollView.bounds.width, y: 0)
         } else {
@@ -123,7 +120,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             pageIndex = Int(round(scrollView.contentOffset.y / (scrollView.bounds.height)))
         }
         if isPageIndexChanged {
-            JXPhotoBrowserLog.low("PageIndexChanged -> \(pageIndex)")
             isPageIndexChanged = false
             resetCells()
             layoutCells()
@@ -170,7 +166,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     /// 重置所有Cell的位置。更新 visibleCells 和 reusableCells
     open func resetCells() {
-        JXPhotoBrowserLog.middle("\(self.classForCoder) resetCells!")
         guard let browser = photoBrowser else {
             return
         }
@@ -197,7 +192,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     /// 刷新所有显示中的Cell位置
     open func layoutCells() {
-        JXPhotoBrowserLog.middle("\(self.classForCoder) layoutCells!")
         let cellWidth = bounds.width
         let cellHeight = bounds.height
         var sizeWidth: CGFloat = 0
@@ -214,14 +208,11 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             }
         }
         scrollView.contentSize = CGSize(width: sizeWidth, height: sizeHeight)
-        JXPhotoBrowserLog.middle("更新contentSize: \(scrollView.contentSize)")
     }
     
     /// 刷新所有Cell的数据
     open func reloadItems() {
-        JXPhotoBrowserLog.low("\(self.classForCoder) reloadItems!")
         visibleCells.forEach { index, cell in
-            JXPhotoBrowserLog.low("刷新index:\(index)")
             reloadCellAtIndex((cell, index, pageIndex))
             cell.setNeedsLayout()
         }

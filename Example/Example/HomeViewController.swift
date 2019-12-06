@@ -46,7 +46,8 @@ class HomeViewController: UITableViewController {
             LoadingProgressViewController(),
             RawImageViewController(),
             GIFViewController(),
-            MultipleCellViewController()
+            MultipleCellViewController(),
+            MultipleSectionViewController()
         ]
     }
     

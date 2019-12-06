@@ -19,7 +19,6 @@ open class JXPhotoBrowserFadeAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        JXPhotoBrowserLog.high("执行动画!")
         guard let browser = photoBrowser else {
             transitionContext.completeTransition(false)
             return

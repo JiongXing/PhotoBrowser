@@ -13,7 +13,7 @@ class MultipleCellViewController: BaseCollectionViewController {
     
     override var name: String { "多种类视图" }
     
-    override var remark: String { "支持不同的类作为项视图" }
+    override var remark: String { "支持不同的类作为项视图，如在最后一页显示更多推荐" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()
@@ -53,5 +53,46 @@ class MultipleCellViewController: BaseCollectionViewController {
         })
         browser.pageIndex = indexPath.item
         browser.show()
+    }
+}
+
+class MoreCell: UIView, JXPhotoBrowserCell {
+    
+    weak var photoBrowser: JXPhotoBrowser?
+    
+    static func generate(with browser: JXPhotoBrowser) -> Self {
+        let instance = Self.init(frame: .zero)
+        instance.photoBrowser = browser
+        return instance
+    }
+    
+    var onClick: (() -> Void)?
+    
+    lazy var button: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.setTitle("  更多 +  ", for: .normal)
+        btn.setTitleColor(UIColor.darkText, for: .normal)
+        return btn
+    }()
+    
+    required override init(frame: CGRect) {
+        super.init(frame: .zero)
+        backgroundColor = .white
+        addSubview(button)
+        button.addTarget(self, action: #selector(click), for: .touchUpInside)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        button.sizeToFit()
+        button.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
+    }
+    
+    @objc private func click() {
+        photoBrowser?.dismiss()
     }
 }

@@ -19,7 +19,7 @@ public struct JXPhotoBrowserLog {
     }
     
     /// 允许输出日志的最低等级。`forbidden`为禁止所有日志
-    public static var minimumLevel: Level = .low
+    public static var minimumLevel: Level = .high
     
     public static func low(_ item: @autoclosure () -> Any) {
         if minimumLevel.rawValue <= Level.low.rawValue {

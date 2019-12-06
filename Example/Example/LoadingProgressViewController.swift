@@ -73,10 +73,8 @@ class LoadingImageCell: JXPhotoBrowserImageCell {
     func reloadData(placeholder: UIImage?, urlString: String?) {
         progressView.progress = 0
         let url = urlString.flatMap { URL(string: $0) }
-        let options: SDWebImageOptions = [.refreshCached, .lowPriority]
-        imageView.sd_setImage(with: url, placeholderImage: placeholder, options: options, progress: { [weak self] (received, total, _) in
+        imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], progress: { [weak self] (received, total, _) in
             if total > 0 {
-                JXPhotoBrowserLog.low("loading: \(received) / \(total)")
                 self?.progressView.progress = CGFloat(received) / CGFloat(total)
             }
         }) { [weak self] (_, error, _, _) in
