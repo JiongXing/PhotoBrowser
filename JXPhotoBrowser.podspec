@@ -15,6 +15,4 @@ Pod::Spec.new do |s|
     s.swift_version = '4.2', '5.0'
     s.source_files = 'JXPhotoBrowser/Sources/JXPhotoBrowser/*'
     
-    s.default_subspec = 'Kingfisher'
-    
 end
