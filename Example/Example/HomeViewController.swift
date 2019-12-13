@@ -35,7 +35,8 @@ class HomeViewController: UITableViewController {
         super.viewWillAppear(animated)
         dataSource = [
             LocalImageViewController(),
-            LocalImageVerticalViewController(),
+            VerticalBrowseViewController(),
+            VideoPhotoViewController(),
             LocalImageZoomViewController(),
             LocalImageSmoothZoomViewController(),
             KingfisherImageViewController(),
@@ -45,7 +46,6 @@ class HomeViewController: UITableViewController {
             PushNextViewController(),
             LoadingProgressViewController(),
             RawImageViewController(),
-            GIFViewController(),
             MultipleCellViewController(),
             MultipleSectionViewController()
         ]

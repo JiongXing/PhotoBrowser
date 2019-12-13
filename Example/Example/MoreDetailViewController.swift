@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class MoreDetailViewController: UIViewController {
     
@@ -18,11 +19,26 @@ class MoreDetailViewController: UIViewController {
         return lab
     }()
     
+    var player: AVPlayer?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         
-        view.addSubview(label)
+//        view.addSubview(label)
+        
+        let mp4Path = Bundle.main.url(forResource: "novel", withExtension: "MP4")!
+        
+        let item = AVPlayerItem(asset: AVAsset(url: mp4Path))
+        player = AVPlayer(playerItem: item)
+        let layer = AVPlayerLayer(player: player)
+        layer.frame = view.bounds
+        view.layer.addSublayer(layer)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        player?.play()
     }
     
     override func viewWillLayoutSubviews() {

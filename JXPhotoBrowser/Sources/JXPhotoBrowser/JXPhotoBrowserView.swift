@@ -27,6 +27,12 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     /// 自然滑动引起的页码改变时回调
     open lazy var didChangedPageIndex: (_ index: Int) -> Void = { _ in }
     
+    /// Cell将显示
+    open lazy var cellWillAppear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
+    
+    /// Cell将不显示
+    open lazy var cellWillDisappear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
+    
     /// 滑动方向
     open var scrollDirection: JXPhotoBrowser.ScrollDirection = .horizontal
     
@@ -169,16 +175,25 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         guard let browser = photoBrowser else {
             return
         }
-        visibleCells.forEach { _, cell in
+        var removeFromVisibles = [Int]()
+        for (index, cell) in visibleCells {
+            if index == pageIndex {
+                continue
+            }
+            cellWillDisappear(cell, index)
             cell.removeFromSuperview()
             enqueue(cell: cell)
+            removeFromVisibles.append(index)
         }
-        visibleCells.removeAll()
+        removeFromVisibles.forEach { visibleCells.removeValue(forKey: $0) }
         
         // 添加要显示的cell
         let itemsTotalCount = numberOfItems()
         for index in (pageIndex - 1)...(pageIndex + 1) {
             if index < 0 || index > itemsTotalCount - 1 {
+                continue
+            }
+            if index == pageIndex && visibleCells[index] != nil {
                 continue
             }
             let clazz = cellClassAtIndex(index)
@@ -212,9 +227,12 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     /// 刷新所有Cell的数据
     open func reloadItems() {
-        visibleCells.forEach { index, cell in
+        visibleCells.forEach { [weak self] index, cell in
             reloadCellAtIndex((cell, index, pageIndex))
             cell.setNeedsLayout()
+            if index == pageIndex {
+                self?.cellWillAppear(cell, index)
+            }
         }
     }
 }

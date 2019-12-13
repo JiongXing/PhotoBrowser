@@ -41,7 +41,7 @@ class DataSourceAppendViewController: BaseCollectionViewController {
             return cell?.imageView
         })
         // 监听页码变化
-        browser.didChangedPageIndex = { browser, index in
+        browser.didChangedPageIndex = { index in
             // 滑到最后一张
             if index == self.dataSource.count - 1 {
                 self.appendMoreData(currentIndex: index, browser: browser)

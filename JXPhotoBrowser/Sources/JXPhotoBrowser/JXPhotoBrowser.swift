@@ -68,7 +68,19 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     }
     
     /// 自然滑动引起的页码改变时回调
-    open lazy var didChangedPageIndex: (_ browser: JXPhotoBrowser, _ index: Int) -> Void = { _, _ in }
+    open lazy var didChangedPageIndex: (_ index: Int) -> Void = { _ in }
+    
+    /// Cell将显示
+    open var cellWillAppear: (JXPhotoBrowserCell, Int) -> Void {
+        set { browserView.cellWillAppear = newValue }
+        get { browserView.cellWillAppear }
+    }
+    
+    /// Cell将不显示
+    open var cellWillDisappear: (JXPhotoBrowserCell, Int) -> Void {
+        set { browserView.cellWillDisappear = newValue }
+        get { browserView.cellWillDisappear }
+    }
     
     /// 主视图
     open lazy var browserView = JXPhotoBrowserView()
@@ -137,7 +149,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         browserView.didChangedPageIndex = { [weak self] index in
             guard let `self` = self else { return }
             self.pageIndicator?.didChanged(pageIndex: index)
-            self.didChangedPageIndex(self, index)
+            self.didChangedPageIndex(index)
         }
         
         view.setNeedsLayout()
