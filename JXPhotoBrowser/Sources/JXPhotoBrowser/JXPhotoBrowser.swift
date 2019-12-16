@@ -171,6 +171,10 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.delegate = previousNavigationControllerDelegate
+        if let indicator = pageIndicator {
+            view.addSubview(indicator)
+            indicator.setup(with: self)
+        }
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
@@ -260,6 +264,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     /// 关闭PhotoBrowser
     open func dismiss() {
         setStatusBar(hidden: false)
+        pageIndicator?.removeFromSuperview()
         if presentingViewController != nil {
             dismiss(animated: true, completion: nil)
         } else {

@@ -42,9 +42,9 @@ class DataSourceAppendViewController: BaseCollectionViewController {
         })
         // 监听页码变化
         browser.didChangedPageIndex = { index in
-            // 滑到最后一张
+            // 已到最后一张
             if index == self.dataSource.count - 1 {
-                self.appendMoreData(currentIndex: index, browser: browser)
+                self.appendMoreData(browser: browser)
             }
         }
         browser.scrollDirection = .vertical
@@ -52,7 +52,7 @@ class DataSourceAppendViewController: BaseCollectionViewController {
         browser.show()
     }
     
-    private func appendMoreData(currentIndex: Int, browser: JXPhotoBrowser) {
+    private func appendMoreData(browser: JXPhotoBrowser) {
         var randomIndexes = (0..<6).map { $0 }
         randomIndexes.shuffle()
         randomIndexes.forEach { index in
@@ -61,6 +61,7 @@ class DataSourceAppendViewController: BaseCollectionViewController {
             dataSource.append(model)
         }
         collectionView.reloadData()
+        // TODO: UIScrollView的pageEnable特性原因，不能很好衔接，效果上有点问题，还未解决
         browser.reloadData()
     }
 }

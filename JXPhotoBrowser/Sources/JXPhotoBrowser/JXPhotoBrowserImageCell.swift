@@ -238,6 +238,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
             imageView.frame = result.frame
             photoBrowser?.maskView.alpha = result.scale * result.scale
             photoBrowser?.setStatusBar(hidden: result.scale > 0.99)
+            photoBrowser?.pageIndicator?.isHidden = result.scale < 0.99
         case .ended, .cancelled:
             imageView.frame = panResult(pan).frame
             let isDown = pan.velocity(in: self).y > 0
@@ -246,6 +247,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
             } else {
                 photoBrowser?.maskView.alpha = 1.0
                 photoBrowser?.setStatusBar(hidden: true)
+                photoBrowser?.pageIndicator?.isHidden = false
                 resetImageViewPosition()
             }
         default:
