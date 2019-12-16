@@ -178,9 +178,9 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         hideNavigationBar(false)
     }
     
-    open override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        browserView.isRotating = true
     }
     
     //
@@ -200,40 +200,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
             if let barHidden = isPreviousNavigationBarHidden {
                 navigationController?.setNavigationBarHidden(barHidden, animated: false)
             }
-        }
-    }
-    
-    //
-    // MARK: - 转场
-    //
-    
-    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transitionAnimator.isForShow = true
-        transitionAnimator.photoBrowser = self
-        return transitionAnimator
-    }
-    
-    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transitionAnimator.isForShow = false
-        transitionAnimator.photoBrowser = self
-        return transitionAnimator
-    }
-    
-    public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        transitionAnimator.isForShow = (operation == .push)
-        transitionAnimator.photoBrowser = self
-        transitionAnimator.isNavigationAnimation = true
-        return transitionAnimator
-    }
-    
-    /// 销毁PhotoBrowser
-    open func dismiss() {
-        setStatusBar(hidden: false)
-        if presentingViewController != nil {
-            dismiss(animated: true, completion: nil)
-        } else {
-            navigationController?.delegate = self
-            navigationController?.popViewController(animated: true)
         }
     }
     
@@ -266,6 +232,40 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
             isStatusBarHidden = isPreviousStatusBarHidden
         }
         setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    //
+    // MARK: - 转场
+    //
+    
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transitionAnimator.isForShow = true
+        transitionAnimator.photoBrowser = self
+        return transitionAnimator
+    }
+    
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transitionAnimator.isForShow = false
+        transitionAnimator.photoBrowser = self
+        return transitionAnimator
+    }
+    
+    public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationController.Operation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transitionAnimator.isForShow = (operation == .push)
+        transitionAnimator.photoBrowser = self
+        transitionAnimator.isNavigationAnimation = true
+        return transitionAnimator
+    }
+    
+    /// 关闭PhotoBrowser
+    open func dismiss() {
+        setStatusBar(hidden: false)
+        if presentingViewController != nil {
+            dismiss(animated: true, completion: nil)
+        } else {
+            navigationController?.delegate = self
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     //

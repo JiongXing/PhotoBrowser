@@ -66,6 +66,8 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         return sv
     }()
     
+    var isRotating = false
+    
     deinit {
         JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
     }
@@ -99,11 +101,23 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         reloadData()
     }
     
+    open func resetContentSize() {
+        let maxIndex = CGFloat(numberOfItems())
+        if scrollDirection == .horizontal {
+            scrollView.contentSize = CGSize(width: scrollView.frame.width * maxIndex,
+                                            height: scrollView.frame.height)
+        } else {
+            scrollView.contentSize = CGSize(width: scrollView.frame.width,
+                                            height: scrollView.frame.height * maxIndex)
+        }
+    }
+    
     /// 刷新数据，同时刷新Cell布局
     open func reloadData() {
         // 修正pageIndex，同步数据源的变更
         pageIndex = max(0, pageIndex)
         pageIndex = min(pageIndex, numberOfItems())
+        resetContentSize()
         resetCells()
         layoutCells()
         reloadItems()
@@ -120,6 +134,12 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     }
     
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // 屏幕旋转时会触发本方法。此时不可更改pageIndex
+        if isRotating {
+            return
+        }
+        isRotating = false
+        
         if scrollDirection == .horizontal && scrollView.bounds.width > 0  {
             pageIndex = Int(round(scrollView.contentOffset.x / (scrollView.bounds.width)))
         } else if scrollDirection == .vertical && scrollView.bounds.height > 0 {
@@ -209,20 +229,13 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     open func layoutCells() {
         let cellWidth = bounds.width
         let cellHeight = bounds.height
-        var sizeWidth: CGFloat = 0
-        var sizeHeight: CGFloat = 0
         for (index, cell) in visibleCells {
             if scrollDirection == .horizontal {
                 cell.frame = CGRect(x: CGFloat(index) * (cellWidth + itemSpacing), y: 0, width: cellWidth, height: cellHeight)
-                sizeWidth = max(sizeWidth, cell.frame.maxX + itemSpacing)
-                sizeHeight = cellHeight
             } else {
                 cell.frame = CGRect(x: 0, y: CGFloat(index) * (cellHeight + itemSpacing), width: cellWidth, height: cellHeight)
-                sizeHeight = max(sizeHeight, cell.frame.maxY + itemSpacing)
-                sizeWidth = cellWidth
             }
         }
-        scrollView.contentSize = CGSize(width: sizeWidth, height: sizeHeight)
     }
     
     /// 刷新所有Cell的数据
