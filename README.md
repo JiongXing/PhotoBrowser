@@ -45,7 +45,7 @@ pod 'JXPhotoBrowser', '~> 3.0'
 
 ### 基本用法
 
-1.先实例化一个图片浏览器对象。
+#### 1.先实例化一个图片浏览器对象。
 
 注意每次打开图片浏览，都应该重新实例化（重新实例化的开销很小，不必担心）。
 
@@ -53,7 +53,7 @@ pod 'JXPhotoBrowser', '~> 3.0'
 let browser = JXPhotoBrowser()
 ```
 
-2.实时提供图片总量。
+#### 2.实时提供图片总量。
 
 因考虑到数据源有可能是在浏览过程中变化的，所以JXPhotoBrowser框架（以下简称'框架'）将会在适当时机调用闭包动态获取当前用户的数据源数量，类似`UITableView`的机制。
 
@@ -63,7 +63,7 @@ browser.numberOfItems = {
 }
 ```
 
-3.刷新项视图。
+#### 3.刷新项视图。
 
 框架的项视图(展示单张图片的View)是复用的，由最多3个视图重复使用来实现无限数量的图片浏览。
 
@@ -81,7 +81,7 @@ browser.reloadCellAtIndex = { context in
 }
 ```
 
-4.指定打开图片浏览器时定位到哪一页。
+#### 4.指定打开图片浏览器时定位到哪一页。
 
 所赋的值应当在用户数据源的范围内，如数据源共有10项，则`pageIndex`允许范围是`0~9`。
 
@@ -89,7 +89,7 @@ browser.reloadCellAtIndex = { context in
 browser.pageIndex = indexPath.item
 ```
 
-5.显示图片浏览器
+#### 5.显示图片浏览器
 
 浏览器主类`JXPhotoBrowser`是一个`UIViewController`，支持导航栏`push`，也支持模态`present`。
 框架提供的`show()`方法封装实现了常见的打开方式。
@@ -322,8 +322,8 @@ public protocol JXPhotoBrowserCell: UIView {
 
 ```swift
 browser.cellClassAtIndex = { index in
-		// 视频与图片交替展示
-    index % 2 == 0 ? VideoCell.self : JXPhotoBrowserImageCell.self
+	// 视频与图片交替展示
+	index % 2 == 0 ? VideoCell.self : JXPhotoBrowserImageCell.self
 }
 ```
 
@@ -339,7 +339,7 @@ browser.cellClassAtIndex = { index in
 
 ```
 /// 通过本回调，把图片浏览器嵌套在导航控制器里
-    public typealias PresentEmbedClosure = (JXPhotoBrowser) -> UINavigationController
+public typealias PresentEmbedClosure = (JXPhotoBrowser) -> UINavigationController
     
 /// 打开方式类型
 public enum ShowMethod {
@@ -349,7 +349,7 @@ public enum ShowMethod {
 
 ```
 
-**push**
+#### push
 考虑到实际应用场景中，图片浏览器可能需要被嵌入在一个导航控制器里，而且要求使用已有的导航控制器，此时`.push`枚举能满足这中需求。
 
 ```swift
@@ -364,7 +364,7 @@ inNC 可以传`nil`，此时框架将会尝试自己获取当前顶层的导航�
 browser.show(method: .push(inNC: nil))
 ```
 
-**present**
+#### present
 如果没有嵌入当前导航控制器里的需要，那么可以使用`present`。
 
 `fromVC`是`present`的发起者，允许传`nil`值，此时框架将会尝试自己获取当前顶层控制器。
