@@ -29,10 +29,9 @@ pod 'JXPhotoBrowser', '~> 3.0'
 
 ### Swift Package Manager (Xcode 11+)
 
-在Xcode的包管理器添加本仓库URL。
+使用Xcode的包管理器添加本仓库URL。
 `File -> Swift Packages -> Add Package Dependency`
-添加URL：``(待更新)
-
+添加URL：`https://github.com/JiongXing/PhotoBrowser`
 
 ### Manual
 
@@ -58,7 +57,7 @@ let browser = JXPhotoBrowser()
 
 ```swift
 browser.numberOfItems = {
-		self.dataSource.count
+	self.dataSource.count
 }
 ```
 
@@ -201,9 +200,8 @@ browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options:
 要给项视图(Cell)添加UI，最好是自定义自己的Cell。例子工程示范了如何通过自定义Cell，添加一个图片加载指示器。
 
 ```swift
-/// 加上进度环的Cell
 class LoadingImageCell: JXPhotoBrowserImageCell {
-    /// 进度环
+
     let progressView = JXPhotoBrowserProgressView()
     
     override func setup() {
@@ -333,13 +331,53 @@ browser.cellClassAtIndex = { index in
 
 某些业务场景需要在最后一页浏览结束后，展示"更多推荐"视图，也是可以的，查看例子[MultipleCellViewController](Example/Example/MultipleCellViewController.swift)
 
+### 打开方式
+
+框架支持`present`和`push`。通过PhotoBrowser的`show(method:)`方法打开时，可以传入框架定义的枚举类型。
+
+```
+/// 通过本回调，把图片浏览器嵌套在导航控制器里
+    public typealias PresentEmbedClosure = (JXPhotoBrowser) -> UINavigationController
+    
+/// 打开方式类型
+public enum ShowMethod {
+    case push(inNC: UINavigationController?)
+    case present(fromVC: UIViewController?, embed: PresentEmbedClosure?)
+}
+
+```
+
+**push**
+考虑到实际应用场景中，图片浏览器可能需要被嵌入在一个导航控制器里，而且要求使用已有的导航控制器，此时`.push`枚举能满足这中需求。
+
+```swift
+// 获取当前导航控制器
+let nav = topVC.navigationController 
+browser.show(method: .push(inNC: nav))
+```
+
+inNC 可以传`nil`，此时框架将会尝试自己获取当前顶层的导航控制器，方便用户。
+
+```swift
+browser.show(method: .push(inNC: nil))
+```
+
+**present**
+如果没有嵌入当前导航控制器里的需要，那么可以使用`present`。
+
+`fromVC`是`present`的发起者，允许传`nil`值，此时框架将会尝试自己获取当前顶层控制器。
+`embed`允许传入一个新建的导航控制器，也允许`nil`值，空值时PhotoBrowser将不会嵌入任何导航控制器里。
+
+`show(method:)`的默认传参是参数皆为`nil`的`present`枚举。
+
+
 ## 历史版本
 
 2.0版本请参考：[Version2.x](Version2.x.md)
 
 1.0版本请参考：[Version1.x](Version1.x.md)
 
-初稿文章：[初稿](初稿文章.md)
+初稿文章：[ARTICLE](ARTICLE.md)
 
 ## 感谢
 
