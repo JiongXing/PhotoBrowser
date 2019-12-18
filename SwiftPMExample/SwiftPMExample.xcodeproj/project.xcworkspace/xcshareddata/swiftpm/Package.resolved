@@ -5,9 +5,9 @@
         "package": "JXPhotoBrowser",
         "repositoryURL": "https://github.com/JiongXing/PhotoBrowser",
         "state": {
-          "branch": "master",
-          "revision": "dc5bdb5e59d13ff316b2e0af4fc95d7f2f36bba8",
-          "version": null
+          "branch": null,
+          "revision": "c7e0ef8559f304699c12bb4c0b668e3a43fe061d",
+          "version": "3.0.5"
         }
       }
     ]

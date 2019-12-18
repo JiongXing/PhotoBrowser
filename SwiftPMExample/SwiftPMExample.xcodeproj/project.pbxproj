@@ -350,8 +350,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/JiongXing/PhotoBrowser";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
