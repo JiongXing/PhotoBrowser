@@ -10,18 +10,14 @@
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Transition.png" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Browser.png" width = "30%" div/>
 </div>
+(截图待更新)
+
 ## 环境要求
 
 - iOS 8.0 以上
 - Swift 4.2 以上
 
 ## 安装方法
-
-### Swift Package Manager (Xcode 11+)
-
-在Xcode的包管理器添加本仓库URL。
-`File -> Swift Packages -> Add Package Dependency`
-添加URL：`https://github.com/JiongXing/PhotoBrowser`
 
 ### Cocoapods
 
@@ -30,6 +26,13 @@
 ```
 pod 'JXPhotoBrowser', '~> 3.0'
 ```
+
+### Swift Package Manager (Xcode 11+)
+
+在Xcode的包管理器添加本仓库URL。
+`File -> Swift Packages -> Add Package Dependency`
+添加URL：``(待更新)
+
 
 ### Manual
 
@@ -42,6 +45,7 @@ pod 'JXPhotoBrowser', '~> 3.0'
 ### 基本用法
 
 1.先实例化一个图片浏览器对象。
+
 注意每次打开图片浏览，都应该重新实例化（重新实例化的开销很小，不必担心）。
 
 ```swift
@@ -49,6 +53,7 @@ let browser = JXPhotoBrowser()
 ```
 
 2.实时提供图片总量。
+
 因考虑到数据源有可能是在浏览过程中变化的，所以JXPhotoBrowser框架（以下简称'框架'）将会在适当时机调用闭包动态获取当前用户的数据源数量，类似`UITableView`的机制。
 
 ```swift
@@ -58,9 +63,13 @@ browser.numberOfItems = {
 ```
 
 3.刷新项视图。
+
 框架的项视图(展示单张图片的View)是复用的，由最多3个视图重复使用来实现无限数量的图片浏览。
+
 在每个项视图需要被刷新时，`reloadCellAtIndex`闭包将会被调用，用户应当在此时更新对应数据源的视图展示。
+
 框架默认实现并使用了`JXPhotoBrowserImageCell`作为项视图，用户也可以自由定制项视图，更多细节在下文介绍。
+
 `JXPhotoBrowserImageCell`有一个`imageView`视图，用户只需要对其加载图片即可正常使用。
 
 ```swift
@@ -72,6 +81,7 @@ browser.reloadCellAtIndex = { context in
 ```
 
 4.指定打开图片浏览器时定位到哪一页。
+
 所赋的值应当在用户数据源的范围内，如数据源共有10项，则`pageIndex`允许范围是`0~9`。
 
 ```swift
@@ -79,8 +89,10 @@ browser.pageIndex = indexPath.item
 ```
 
 5.显示图片浏览器
+
 浏览器主类`JXPhotoBrowser`是一个`UIViewController`，支持导航栏`push`，也支持模态`present`。
 框架提供的`show()`方法封装实现了常见的打开方式。
+
 无参调用`show()`方法的时候，默认使用了`present`模态打开一个不带导航栏的图片浏览器。
 
 ```swift
@@ -141,9 +153,11 @@ protocol JXPhotoBrowserAnimatedTransitioning: UIViewControllerAnimatedTransition
 用户需要自定义转场动画时，关注点仅在实现`UIViewControllerAnimatedTransitioning`上。`isForShow`和`photoBrowser`的值将由JXPhotoBrowser注入，用户可在编写自己的动画实现时获取到它们的值以帮助开发。
 
 Zoom转场动画如果需要百分百过渡顺滑，需要小图和大图的尺寸比例一致，拉伸方式、对齐方式也一致才可以达到视觉上的自然。
+
 具体在代码实现上，需要转场的视图在小尺寸时和缩略图吻合，同时要在放大后和浏览大图吻合。如果缩略图是居中显示的，大图是顶端对齐的，那么转场视图也需要在动画过程中同时调整对齐方式。由于框架无法预实现所有应用场景，同时也为了让用户更灵活地针对自己的应用场景做定制，所以对于这种完美转场效果的需求，`JXPhotoBrowserSmoothZoomAnimator`要求用户自行创建转场动画视图，以及计算出前后两端的`Frame`。
 
 关于`转场动画视图前后两端的Frame`，是指基于PhotoBrowser.view的坐标系的Frame。
+
 对于大图端的Frame，只要图片浏览的的项视图遵循了`JXPhotoBrowserZoomSupportedCell`协议，告诉框架其内容视图对象是哪个，框架即可自动计算出大图端的Frame。
 
 ```swift
@@ -181,7 +195,9 @@ browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options:
 ### 图片加载进度指示器
 
 框架出于业务无关的考虑，对容易受因场景而变更的UI控件都不再集成，但会把示例实现放在例子工程中。
+
 图片加载进度指示器就是这种UI，用户若有需要可自行下载[JXPhotoBrowserProgressView](Example/Example/JXPhotoBrowserProgressView.swift)。
+
 要给项视图(Cell)添加UI，最好是自定义自己的Cell。例子工程示范了如何通过自定义Cell，添加一个图片加载指示器。
 
 ```swift
@@ -253,13 +269,17 @@ browser.reloadData()
 ```
 
 变更数据源的关键在于用户控制好自己的数据一致性，包括要同步缩略图控制器的刷新。
+
 详情查看例子工程的[DataSourceDeleteViewController](Example/Example/DataSourceDeleteViewController.swift)和[DataSourceAppendViewController](Example/Example/DataSourceAppendViewController.swift)
 
 ### 跨Section浏览图片
 
 曾经有同学问我这种场景下怎么做，所以我特地举例示范。
+
 这里的意思是指像微信朋友圈（相册）那样，缩略图所在是UICollectionView，有许多个Section，每个Section里有许多图片，当打开图片浏览器的时候需要把所有Section的图片全部一起浏览。
+
 其实这个与PhotoBrowser本身能力无关，PhotoBrowser都是支持的，难点在于用户自己对数据源的处理，要处理好图片浏览器里图片的索引号与数据源里数据的IndexPath的映射关系。
+
 详情可查看[MultipleSectionViewController](Example/Example/MultipleSectionViewController.swift)
 
 ### 竖向浏览
@@ -273,6 +293,7 @@ open var scrollDirection: JXPhotoBrowser.ScrollDirection = .horizontal
 ### 视频浏览
 
 无论是图片浏览还是视频浏览，于PhotoBrowser来说都是等同的，PhotoBrowser并不知道它的项视图(Cell)承载了什么内容。用户可通过自定义带有播放视频功能的Cell的来达到视频浏览的目的。
+
 框架提供了项视图的生命周期方法，可帮助用户更好地控制视频的播放与停止。
 
 ```swift
@@ -288,6 +309,7 @@ open lazy var cellDidAppear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
 ### 图片与视频混合浏览
 
 框架允许多个不同的Cell同时存在，允许给每一个项配置不同的类。
+
 任何遵循了`JXPhotoBrowserCell`协议的类都可以作为PhotoBrowser的项视图。协议仅有一个方法需要实现，就是要求提供生产实例的类方法，框架将会在适当时机通过此方法实例化Cell。
 
 ```swift
@@ -314,7 +336,9 @@ browser.cellClassAtIndex = { index in
 ## 历史版本
 
 2.0版本请参考：[Version2.x](Version2.x.md)
+
 1.0版本请参考：[Version1.x](Version1.x.md)
+
 初稿文章：[初稿](初稿文章.md)
 
 ## 感谢
