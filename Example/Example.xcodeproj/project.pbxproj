@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2AEB6B8F9BE5491709588A13 /* Pods_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C865A91F7F2253828EA21D5E /* Pods_Example.framework */; };
 		940855D523A372830035DE67 /* video_2.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 940855D223A372820035DE67 /* video_2.MP4 */; };
 		940855D623A372830035DE67 /* video_1.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 940855D323A372830035DE67 /* video_1.MP4 */; };
 		940855D723A372830035DE67 /* video_0.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 940855D423A372830035DE67 /* video_0.MP4 */; };
@@ -17,9 +18,6 @@
 		940B28B7238CD68900DC5F6F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 940B28B5238CD68900DC5F6F /* Main.storyboard */; };
 		940B28B9238CD68A00DC5F6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 940B28B8238CD68A00DC5F6F /* Assets.xcassets */; };
 		940B28BC238CD68A00DC5F6F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 940B28BA238CD68A00DC5F6F /* LaunchScreen.storyboard */; };
-		940B28C5238CE13D00DC5F6F /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 940B28C4238CE13D00DC5F6F /* SDWebImage */; };
-		940B2952238D06DC00DC5F6F /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 940B2951238D06DC00DC5F6F /* Kingfisher */; };
-		940B2956238D0C0500DC5F6F /* JXPhotoBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = 940B2955238D0C0500DC5F6F /* JXPhotoBrowser */; };
 		940B2958238D125C00DC5F6F /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2957238D125C00DC5F6F /* HomeViewController.swift */; };
 		940B2962238D128200DC5F6F /* BaseCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B2959238D128100DC5F6F /* BaseCollectionViewController.swift */; };
 		940B2963238D128200DC5F6F /* BaseCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940B295A238D128200DC5F6F /* BaseCollectionViewCell.swift */; };
@@ -49,6 +47,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		31A88E8341E1D523A23FE516 /* Pods-Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.debug.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.debug.xcconfig"; sourceTree = "<group>"; };
+		8DF36111CE33754436913622 /* Pods-Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Example.release.xcconfig"; path = "Target Support Files/Pods-Example/Pods-Example.release.xcconfig"; sourceTree = "<group>"; };
 		940855D223A372820035DE67 /* video_2.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video_2.MP4; sourceTree = "<group>"; };
 		940855D323A372830035DE67 /* video_1.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video_1.MP4; sourceTree = "<group>"; };
 		940855D423A372830035DE67 /* video_0.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video_0.MP4; sourceTree = "<group>"; };
@@ -61,7 +61,6 @@
 		940B28B8238CD68A00DC5F6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		940B28BB238CD68A00DC5F6F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		940B28BD238CD68A00DC5F6F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		940B2953238D0BAE00DC5F6F /* JXPhotoBrowser */ = {isa = PBXFileReference; lastKnownFileType = folder; name = JXPhotoBrowser; path = ../JXPhotoBrowser; sourceTree = "<group>"; };
 		940B2957238D125C00DC5F6F /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		940B2959238D128100DC5F6F /* BaseCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCollectionViewController.swift; sourceTree = "<group>"; };
 		940B295A238D128200DC5F6F /* BaseCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -88,6 +87,7 @@
 		949C25E12390FCF900CD654B /* VideoPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPhotoViewController.swift; sourceTree = "<group>"; };
 		94A02D3F23992668007E5DCE /* JXPhotoBrowserProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserProgressView.swift; sourceTree = "<group>"; };
 		94BB36AD239A7D3B00B70F6A /* MultipleSectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipleSectionViewController.swift; sourceTree = "<group>"; };
+		C865A91F7F2253828EA21D5E /* Pods_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,9 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				940B2956238D0C0500DC5F6F /* JXPhotoBrowser in Frameworks */,
-				940B2952238D06DC00DC5F6F /* Kingfisher in Frameworks */,
-				940B28C5238CE13D00DC5F6F /* SDWebImage in Frameworks */,
+				2AEB6B8F9BE5491709588A13 /* Pods_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,9 +106,9 @@
 			isa = PBXGroup;
 			children = (
 				940B28AE238CD68900DC5F6F /* Example */,
-				940B2953238D0BAE00DC5F6F /* JXPhotoBrowser */,
 				940B28AD238CD68900DC5F6F /* Products */,
 				940B2954238D0C0500DC5F6F /* Frameworks */,
+				F83A2BD1EA7BC83EE383AE23 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -169,8 +167,19 @@
 		940B2954238D0C0500DC5F6F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C865A91F7F2253828EA21D5E /* Pods_Example.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F83A2BD1EA7BC83EE383AE23 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				31A88E8341E1D523A23FE516 /* Pods-Example.debug.xcconfig */,
+				8DF36111CE33754436913622 /* Pods-Example.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,20 +189,17 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 940B28C0238CD68A00DC5F6F /* Build configuration list for PBXNativeTarget "Example" */;
 			buildPhases = (
+				813170A16440989C0664C239 /* [CP] Check Pods Manifest.lock */,
 				940B28A8238CD68900DC5F6F /* Sources */,
 				940B28A9238CD68900DC5F6F /* Frameworks */,
 				940B28AA238CD68900DC5F6F /* Resources */,
+				ADDBB32874E23C128D80A4C1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Example;
-			packageProductDependencies = (
-				940B28C4238CE13D00DC5F6F /* SDWebImage */,
-				940B2951238D06DC00DC5F6F /* Kingfisher */,
-				940B2955238D0C0500DC5F6F /* JXPhotoBrowser */,
-			);
 			productName = Example;
 			productReference = 940B28AC238CD68900DC5F6F /* Example.app */;
 			productType = "com.apple.product-type.application";
@@ -222,10 +228,6 @@
 				Base,
 			);
 			mainGroup = 940B28A3238CD68900DC5F6F;
-			packageReferences = (
-				940B28C3238CE13D00DC5F6F /* XCRemoteSwiftPackageReference "SDWebImage" */,
-				940B2950238D06DC00DC5F6F /* XCRemoteSwiftPackageReference "Kingfisher" */,
-			);
 			productRefGroup = 940B28AD238CD68900DC5F6F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -251,6 +253,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		813170A16440989C0664C239 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Example-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ADDBB32874E23C128D80A4C1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Example/Pods-Example-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		940B28A8238CD68900DC5F6F /* Sources */ = {
@@ -427,6 +471,7 @@
 		};
 		940B28C1238CD68A00DC5F6F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 31A88E8341E1D523A23FE516 /* Pods-Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -445,6 +490,7 @@
 		};
 		940B28C2238CD68A00DC5F6F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8DF36111CE33754436913622 /* Pods-Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -483,42 +529,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		940B28C3238CE13D00DC5F6F /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:SDWebImage/SDWebImage.git";
-			requirement = {
-				kind = exactVersion;
-				version = 5.3.2;
-			};
-		};
-		940B2950238D06DC00DC5F6F /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:onevcat/Kingfisher.git";
-			requirement = {
-				kind = exactVersion;
-				version = 5.10.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		940B28C4238CE13D00DC5F6F /* SDWebImage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 940B28C3238CE13D00DC5F6F /* XCRemoteSwiftPackageReference "SDWebImage" */;
-			productName = SDWebImage;
-		};
-		940B2951238D06DC00DC5F6F /* Kingfisher */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 940B2950238D06DC00DC5F6F /* XCRemoteSwiftPackageReference "Kingfisher" */;
-			productName = Kingfisher;
-		};
-		940B2955238D0C0500DC5F6F /* JXPhotoBrowser */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = JXPhotoBrowser;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 940B28A4238CD68900DC5F6F /* Project object */;
 }

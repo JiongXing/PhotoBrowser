@@ -1,0 +1,6 @@
+framework module JXPhotoBrowser {
+  umbrella header "JXPhotoBrowser-umbrella.h"
+
+  export *
+  module * { export * }
+}

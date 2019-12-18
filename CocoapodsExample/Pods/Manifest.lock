@@ -1,0 +1,16 @@
+PODS:
+  - JXPhotoBrowser (3.0.3)
+
+DEPENDENCIES:
+  - JXPhotoBrowser (~> 3.0)
+
+SPEC REPOS:
+  trunk:
+    - JXPhotoBrowser
+
+SPEC CHECKSUMS:
+  JXPhotoBrowser: 8ac621d78e4692cb632919cf7c26a67f1d8aae7e
+
+PODFILE CHECKSUM: 20282faf4129d54bc33574a16e47cb11142a1e65
+
+COCOAPODS: 1.8.4
