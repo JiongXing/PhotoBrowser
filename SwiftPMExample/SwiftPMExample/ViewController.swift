@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import JXPhotoBrowser
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        JXPhotoBrowserLog.minimumLevel = .high
+        JXPhotoBrowserLog.high("Hello, world!")
     }
 
 

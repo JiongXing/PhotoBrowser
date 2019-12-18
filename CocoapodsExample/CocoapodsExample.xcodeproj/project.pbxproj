@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -48,7 +48,6 @@
 				C409C779DB5BA4629D6D4D57 /* Pods-CocoapodsExample.debug.xcconfig */,
 				65988DBE36867886B5ED90BF /* Pods-CocoapodsExample.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -360,7 +359,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.cocoapods.CocoapodsExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.CocoapodsExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -378,7 +377,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.cocoapods.CocoapodsExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.CocoapodsExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

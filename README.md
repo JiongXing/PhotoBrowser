@@ -30,7 +30,9 @@ pod 'JXPhotoBrowser', '~> 3.0'
 ### Swift Package Manager (Xcode 11+)
 
 使用Xcode的包管理器添加本仓库URL。
+
 `File -> Swift Packages -> Add Package Dependency`
+
 添加URL：`https://github.com/JiongXing/PhotoBrowser`
 
 ### Manual
@@ -57,7 +59,7 @@ let browser = JXPhotoBrowser()
 
 ```swift
 browser.numberOfItems = {
-	self.dataSource.count
+    self.dataSource.count
 }
 ```
 

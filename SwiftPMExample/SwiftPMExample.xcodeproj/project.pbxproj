@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		941E3D1A23AA3485000E2B8A /* JXPhotoBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = 941E3D1923AA3485000E2B8A /* JXPhotoBrowser */; };
 		94A6772523A9CB1B0060BB2A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A6772423A9CB1B0060BB2A /* AppDelegate.swift */; };
 		94A6772723A9CB1B0060BB2A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A6772623A9CB1B0060BB2A /* SceneDelegate.swift */; };
 		94A6772923A9CB1B0060BB2A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94A6772823A9CB1B0060BB2A /* ViewController.swift */; };
@@ -31,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				941E3D1A23AA3485000E2B8A /* JXPhotoBrowser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,9 @@
 			dependencies = (
 			);
 			name = SwiftPMExample;
+			packageProductDependencies = (
+				941E3D1923AA3485000E2B8A /* JXPhotoBrowser */,
+			);
 			productName = SwiftPMExample;
 			productReference = 94A6772123A9CB1B0060BB2A /* SwiftPMExample.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 94A6771823A9CB1B0060BB2A;
+			packageReferences = (
+				941E3D1823AA3485000E2B8A /* XCRemoteSwiftPackageReference "PhotoBrowser" */,
+			);
 			productRefGroup = 94A6772223A9CB1B0060BB2A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -290,7 +298,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.swiftPM.SwiftPMExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.SwiftPMExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -307,7 +315,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.swiftPM.SwiftPMExample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.JXPhotoBrowser.SwiftPMExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -336,6 +344,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		941E3D1823AA3485000E2B8A /* XCRemoteSwiftPackageReference "PhotoBrowser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JiongXing/PhotoBrowser";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		941E3D1923AA3485000E2B8A /* JXPhotoBrowser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 941E3D1823AA3485000E2B8A /* XCRemoteSwiftPackageReference "PhotoBrowser" */;
+			productName = JXPhotoBrowser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 94A6771923A9CB1B0060BB2A /* Project object */;
 }

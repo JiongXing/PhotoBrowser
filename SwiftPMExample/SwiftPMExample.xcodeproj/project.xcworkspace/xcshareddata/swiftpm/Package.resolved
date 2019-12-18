@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "JXPhotoBrowser",
+        "repositoryURL": "https://github.com/JiongXing/PhotoBrowser",
+        "state": {
+          "branch": "master",
+          "revision": "dc5bdb5e59d13ff316b2e0af4fc95d7f2f36bba8",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
