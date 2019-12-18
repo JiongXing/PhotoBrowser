@@ -50,7 +50,7 @@ class NumberPageIndicatorViewController: BaseCollectionViewController {
             let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
             return cell?.imageView
         })
-        // UIPageIndicator样式的页码指示器
+        // 数字样式的页码指示器
         browser.pageIndicator = JXPhotoBrowserNumberPageIndicator()
         browser.pageIndex = indexPath.item
         browser.show()

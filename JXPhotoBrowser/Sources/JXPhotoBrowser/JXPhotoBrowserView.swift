@@ -33,6 +33,9 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     /// Cell将不显示
     open lazy var cellWillDisappear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
     
+    /// Cell已显示
+    open lazy var cellDidAppear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
+    
     /// 滑动方向
     open var scrollDirection: JXPhotoBrowser.ScrollDirection = .horizontal
     
@@ -154,6 +157,12 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         }
     }
     
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if let cell = visibleCells[pageIndex] {
+            cellDidAppear(cell, pageIndex)
+        }
+    }
+    
     //
     // MARK: - 复用Cell
     //
@@ -241,11 +250,12 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     /// 刷新所有Cell的数据
     open func reloadItems() {
         visibleCells.forEach { [weak self] index, cell in
-            reloadCellAtIndex((cell, index, pageIndex))
+            guard let `self` = self else { return }
+            self.reloadCellAtIndex((cell, index, self.pageIndex))
             cell.setNeedsLayout()
-            if index == pageIndex {
-                self?.cellWillAppear(cell, index)
-            }
+        }
+        if let cell = visibleCells[pageIndex] {
+            cellWillAppear(cell, pageIndex)
         }
     }
 }

@@ -82,6 +82,12 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         get { browserView.cellWillDisappear }
     }
     
+    /// Cell已显示
+    open var cellDidAppear: (JXPhotoBrowserCell, Int) -> Void {
+        set { browserView.cellDidAppear = newValue }
+        get { browserView.cellDidAppear }
+    }
+    
     /// 主视图
     open lazy var browserView = JXPhotoBrowserView()
     
@@ -99,15 +105,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     deinit {
         JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
-    }
-    
-    public init() {
-        super.init(nibName: nil, bundle: nil)
-        browserView.photoBrowser = self
-    }
-    
-    public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     /// 显示图片浏览器
@@ -140,6 +137,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         automaticallyAdjustsScrollViewInsets = false
         hideNavigationBar(true)
         
+        browserView.photoBrowser = self
         transitionAnimator.photoBrowser = self
         
         view.backgroundColor = .clear
