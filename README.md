@@ -4,349 +4,319 @@
 [![License](https://img.shields.io/cocoapods/l/JXPhotoBrowser.svg?style=flat)](https://cocoapods.org/pods/JXPhotoBrowser)
 [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg?style=flat)](https://cocoapods.org/pods/JXPhotoBrowser)
 
-# Features
-- [x] 支持本地图片
-- [x] 支持初始图、高清图和原图三个级别
-- [x] 支持Fade渐变转场动画
-- [x] 支持Zoom缩放转场动画
-- [x] 支持下滑手势关闭浏览器
-- [x] 支持单击、双击、放大缩小、长按
-- [x] 支持屏幕旋转
-- [x] 支持修改数据源，重载数据
-- [x] 支持代码调用图片切换
-- [x] 支持继承图片浏览器
-- [x] 支持自定义页视图Cell
-- [x] 支持自定义图片加载器
-- [x] 提供了基于`Kingfisher`的图片加载器实现
-- [x] 提供了基于`KingfisherWebP`的WebP图片加载器实现
-- [x] 提供了光点型的页码指示器的实现
-- [x] 提供了数字型的页码指示器的实现
-- [x] 提供了图片加载进度指示器的实现
-- [x] 提供了查看原图按钮的实现
-- [x] 视频与图片混合展示
-
 
 <div>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Home.png" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Transition.png" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Browser.png" width = "30%" div/>
 </div>
+## 环境要求
 
-# Change Log
+- iOS 8.0 以上
+- Swift 4.2 以上
 
-## Version 3.0.0
+## 安装方法
 
-**2019/12/06**
+### Swift Package Manager (Xcode 11+)
 
-- 项目重构完成，更灵活，易扩展，适应性更强，无第三方库依赖。
+在Xcode的包管理器添加本仓库URL。
+`File -> Swift Packages -> Add Package Dependency`
+添加URL：`https://github.com/JiongXing/PhotoBrowser`
 
-> 各种需求场景的使用方法均有举例，请下载Example查看。
-> 3.0版本说明文档正在完善，敬请期待。
+### Cocoapods
 
-## Version 2.1.6 (iOS9 +) & Version 2.2.6 (iOS 10 +)
+在`podfile`配置
 
-**2019/11/10**
-
-- 修复图片加载失败可能引发崩溃的问题
-
-## Version 2.1.5/2.2.5
-
-**2019/10/11**
-
-> v2.1.5支持到iOS9，使用Kingfisher 4.x版本。v2.2.5因为使用了 Kingfisher 5.x，最低只能支持到iOS10。
-
-> Kingfisher 5.x 的图片缓存与先前版本不太一样，可能在这里有问题。
-
-> 未来版本增加SDWebImage支持示例，对网络图片的加载会进一步解耦，甚至加载视频。
-
-- 现在`imageMaximumZoomScale`属性已启用。
-- 数字页码添加半透背景，解决预览白图时数字消失问题。
-- 现在自动支持`Swift 5`编译。
-
-## Version 2.2.3（iOS9: 2.1.4）
-
-**2019/04/30**
-
-- 支持RTL语言的布局
-- 优化弱网环境下加载网络图片的进度指示显示
-
-## Version 2.2.1
-
-**2019/04/12**
-
-- 优化屏幕旋转时的闪烁问题
-
-## Version 2.2.0
-**2019/04/01**
-
-- 支持Kingfisher 5.x，同时最低支持iOS 10.0
-- `JXPhotoLoader`协议替换`imageCached(on:, url:)`为`hasCached(with url:)`
-
-## Version 2.1.3
-
-**2019/01/06**
-- 优化长图转场动画，视觉更流畅
-
-## Version 2.1.2
-**2018/12/07**
-
-- 修复显示长图时可能发生的交互BUG
-
-## Version 2.1.1
-**2018/11/29**
-- 优化横屏模式的显示效果，横屏时显示全图
-
-## Version 1.6.1
-1.x版本不再更新功能，若要使用，可参考：[Version_1.x](Version_1.x.md)。
-
-## 更多
-查看更多日志：[CHANGELOG](CHANGELOG.md)
-
-# Requirements
-- iOS 9.0 +
-- Swift 4.2 +
-
-# Installation
-
-## CocoaPods
-更新你的本地仓库以同步最新版本
 ```
-pod repo update
-```
-在你项目的Podfile中配置
-```
-pod 'JXPhotoBrowser'
+pod 'JXPhotoBrowser', '~> 3.0'
 ```
 
-## 手动导入
+### Manual
 
-1. 请把`Source/Core`下的所有文件拷贝到你的项目。
-2. 如果需要使用`Kingfisher`来加载网络图片，就把`Source/Kingfisher`下的文件也拷贝到你的项目，并导入`Kingfisher`库。
-3. 如果需要加载`WebP`图片，就把`Source/KingfisherWebP`下的文件也拷贝到你的项目，并导入`KingfisherWebP`库。
+把本仓库下载到你本地，然后把`Sources`文件夹下的`JXPhotoBrowser`文件夹整个拖入Xcode，勾选拷贝文件选项即可，没有其它第三方依赖。
 
-# Usage
+## 使用方法
 
-> 3.0版本说明文档正在完善，敬请期待。
+> 以下代码取自项目Example例子工程，更详细完整的代码请打开例子工程查看，下文是其关键代码的讲解。
 
-## 初始化 
-创建图片浏览器需要三个参数，分别是数据源、视图代理、转场代理。
-其中数据源是必须自行创建并传入，而视图代理和转场代理是可选的，它们有默认值。
+### 基本用法
+
+1.先实例化一个图片浏览器对象。
+注意每次打开图片浏览，都应该重新实例化（重新实例化的开销很小，不必担心）。
+
 ```swift
-open class JXPhotoBrowser: UIViewController {
-    public init(dataSource: JXPhotoBrowserDataSource,
-                delegate: JXPhotoBrowserDelegate = JXPhotoBrowserBaseDelegate(),
-                transDelegate: JXPhotoBrowserTransitioningDelegate = JXPhotoBrowserFadeTransitioning())
+let browser = JXPhotoBrowser()
+```
+
+2.实时提供图片总量。
+因考虑到数据源有可能是在浏览过程中变化的，所以JXPhotoBrowser框架（以下简称'框架'）将会在适当时机调用闭包动态获取当前用户的数据源数量，类似`UITableView`的机制。
+
+```swift
+browser.numberOfItems = {
+		self.dataSource.count
 }
 ```
 
-## 打开图片浏览器
-打开图片浏览器之前，可以指定显示图片组中的哪张图片，计数从0开始：
-```swift
-photoBrowser.pageIndex = selectedIndex
-```
-然后通过`UIViewController`的`present`方法打开：
-```swift
-viewController.present(photoBrowser, animated: true, completion: nil)
-```
-还有更简洁的代码是这样：
-```swift
-JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
-```
+3.刷新项视图。
+框架的项视图(展示单张图片的View)是复用的，由最多3个视图重复使用来实现无限数量的图片浏览。
+在每个项视图需要被刷新时，`reloadCellAtIndex`闭包将会被调用，用户应当在此时更新对应数据源的视图展示。
+框架默认实现并使用了`JXPhotoBrowserImageCell`作为项视图，用户也可以自由定制项视图，更多细节在下文介绍。
+`JXPhotoBrowserImageCell`有一个`imageView`视图，用户只需要对其加载图片即可正常使用。
 
-## 本地图片
-项目例子展示了如何浏览本地图片：
 ```swift
-// 数据源
-let dataSource = JXLocalDataSource(numberOfItems: {
-    // 共有多少项
-    return self.dataSource.count
-}, localImage: { index -> UIImage? in
-    // 每一项的图片对象
-    return self.dataSource[index].localName.flatMap({ name -> UIImage? in
-        return UIImage(named: name)
-    })
-})
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource).show(pageIndex: indexPath.item)
-```
-
-## 动作事件
-默认实现了单击、双击、拖拽、长按事件。可以给视图代理设置长按事件的回调：
-```swift
-// 视图代理
-let delegate = JXPhotoBrowserBaseDelegate()
-// 长按事件
-delegate.longPressedCallback = { browser, index, image, gesture in
-	// ...
+browser.reloadCellAtIndex = { context in
+    let browserCell = context.cell as? JXPhotoBrowserImageCell
+    let indexPath = IndexPath(item: context.index, section: indexPath.section)
+    browserCell?.imageView.image = self.dataSource[indexPath.item].localName.flatMap { UIImage(named: $0) }
 }
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate: delegate).show(pageIndex: indexPath.item)
 ```
 
-## 光点型页码指示器
-可通过自定义视图代理来增加控件
+4.指定打开图片浏览器时定位到哪一页。
+所赋的值应当在用户数据源的范围内，如数据源共有10项，则`pageIndex`允许范围是`0~9`。
+
 ```swift
-// 视图代理，实现了光点型页码指示器
-let delegate = JXDefaultPageControlDelegate()
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexPath.item)
+browser.pageIndex = indexPath.item
 ```
 
-## 数字型页码指示器
+5.显示图片浏览器
+浏览器主类`JXPhotoBrowser`是一个`UIViewController`，支持导航栏`push`，也支持模态`present`。
+框架提供的`show()`方法封装实现了常见的打开方式。
+无参调用`show()`方法的时候，默认使用了`present`模态打开一个不带导航栏的图片浏览器。
+
 ```swift
-// 视图代理，实现了数字型页码指示器
-let delegate = JXNumberPageControlDelegate()
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate:delegate).show(pageIndex: indexPath.item)
+browser.show()
 ```
 
-## 转场动画
-打开`JXPhotoBrowser`时，默认使用的转场动画是`Fade`渐变型的，如果想要`Zoom`缩张型，需要返回动画"起始/结束"的前置视图位置给`Zoom`动画代理。
-本框架提供了两种方案，你可选择返回起始/结束视图，或选择返回起始/结束视图的Frame。
+### 转场动画
+
+用户可自由编写自己的转场动画，也可以使用框架已实现的三种动画。
+框架的转场动画实现类是一个遵循了`JXPhotoBrowserAnimatedTransitioning`协议的对象。只需要把动画实现类赋值给`PhotoBrowser`的`transitionAnimator`属性，即可生效。
+如果用户不指定动画，`transitionAnimator`属性将会使用默认赋值的`fade`渐变动画。
+
 ```swift
-// 返回"起始/结束"的前置视图
-let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> UIView? in
-    let indexPath = IndexPath(item: index, section: 0)
-    // 获取前置视图
-    let cell = collectionView.cellForItem(at: indexPath) as? CustomCell
+lazy var transitionAnimator: JXPhotoBrowserAnimatedTransitioning = JXPhotoBrowserFadeAnimator()
+```
+
+框架实现了图片打开时从小图位置放大，关闭时缩小回原位置的动画效果（以下简称Zoom动画），有两种实现，分别是：`JXPhotoBrowserZoomAnimator`和`JXPhotoBrowserSmoothZoomAnimator`。
+
+`JXPhotoBrowserZoomAnimator`提供了最简便的方法让用户快速获得Zoom动画，只需要告诉框架，所浏览大图对应的缩略图视图即可。
+
+```swift
+browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
+    let path = IndexPath(item: index, section: indexPath.section)
+    let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
     return cell?.imageView
-}
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-	.show(pageIndex: indexPath.item)
+})
 ```
 
+`JXPhotoBrowserSmoothZoomAnimator`提供了更丝滑流畅的Zoom动画，但是使用上会复杂一点，需要用户自己给出转场视图以及缩略图的位置大小。
+
 ```swift
-// 返回"起始/结束"的前置视图位置
-let trans = JXPhotoBrowserZoomTransitioning { (browser, index, view) -> CGRect? in
-    let indexPath = IndexPath(item: index, section: 0)
-    guard let cell = collectionView.cellForItem(at: indexPath) as? CustomCell else {
+browser.transitionAnimator = JXPhotoBrowserSmoothZoomAnimator(transitionViewAndFrame: { (index, destinationView) -> JXPhotoBrowserSmoothZoomAnimator.TransitionViewAndFrame? in
+    let path = IndexPath(item: index, section: indexPath.section)
+    guard let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell else {
         return nil
     }
-    // 这里提供了一个方法，用于获取前置视图在转场容器中的Frame。
-    // 你也可以自己实现需要的Frame。
-    return JXPhotoBrowserZoomTransitioning.resRect(oriRes: cell.imageView, to: view)
-    return nil
-}
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-	.show(pageIndex: indexPath.item)
+    let image = cell.imageView.image
+    let transitionView = UIImageView(image: image)
+    transitionView.contentMode = cell.imageView.contentMode
+    transitionView.clipsToBounds = true
+    let thumbnailFrame = cell.imageView.convert(cell.imageView.bounds, to: destinationView)
+    return (transitionView, thumbnailFrame)
+})
 ```
 
-## 网络图片-两级：缩略图和高清图
-加载网络图片需要指定网图加载器，本框架以`Kingfisher`为基础实现加载器。
-如果你不想使用`Kingfisher`，可自己实现一个网图加载器。
-要加载网络图片，需要使用网络资源数据源，本框架实现了一个`NetworkingDataSource`：
-```
-// 网图加载器
-let loader = JXPhotoBrowser.KingfisherLoader()
-// 数据源
-let dataSource = JXNetworkingDataSource(photoLoader: loader, numberOfItems: { () -> Int in
-    return self.dataSource.count
-}, placeholder: { index -> UIImage? in
-    let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
-    return cell?.imageView.image
-}) { index -> String? in
-    return self.dataSource[index].secondLevelUrl
-}
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-    .show(pageIndex: indexPath.item)
-```
+现在讲解更详细的用法。
 
-## 网络图片-三级：缩略图、高清图和原图
-如果资源有三个级别，需要有查看原图功能的话，本框架也实现了一个数据源`RawImageDataSource`：
+`JXPhotoBrowserAnimatedTransitioning`协议继承自`UIViewControllerAnimatedTransitioning`，协议声明的3个计算属性都是可选实现。
+
 ```swift
-// 网图加载器
-let loader = JXPhotoBrowser.KingfisherLoader()
-// 数据源
-let dataSource = JXRawImageDataSource(photoLoader: loader, numberOfItems: { () -> Int in
-    return self.dataSource.count
-}, placeholder: { index -> UIImage? in
-    let cell = collectionView.cellForItem(at: indexPath) as? BaseCollectionViewCell
-    return cell?.imageView.image
-}, autoloadURLString: { index -> String? in
-    return self.dataSource[index].secondLevelUrl
-}) { index -> String? in
-    return self.dataSource[index].thirdLevelUrl
-}
-// 打开浏览器
-JXPhotoBrowser(dataSource: dataSource, delegate: delegate, transDelegate: trans)
-    .show(pageIndex: indexPath.item)
-```
-
-## GIF图片
-`Kingfisher`已支持加载`GIF`格式，所以可直接使用`KingfisherLoader`：
-```swift
-// 网图加载器
-let loader = JXKingfisherLoader()
-let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
-```
-
-## WebP图片
-要加载`WebP`图片，本框架实现了一个网图加载器`KingfisherWebPLoader`，需要在`podfile`文件引入subspec：
-```
-pod 'JXPhotoBrowser/KingfisherWebP'
-```
-然后使用它作为网图加载器：
-```swift
-// 网图加载器，WebP加载器
-let loader = JXKingfisherWebPLoader()
-let dataSource = JXPhotoBrowser.NetworkingDataSource(photoLoader: loader, ...)
-```
-
-## 自定义Cell
-如果需要对页视图作更多自定义，可继承`JXPhotoBrowserBaseCell`创建你的Cell。
-然后在创建数据源代理时，通过泛型的方式设置你的Cell：
-```swift
-// 数据源，通过泛型指定使用的<Cell>
-let dataSource = JXNetworkingDataSource<CustomCell>(...)
-// Cell复用回调
-dataSource.configReusableCell { (cell, index) in
-    // 给复用Cell刷新数据
+protocol JXPhotoBrowserAnimatedTransitioning: UIViewControllerAnimatedTransitioning {
+    var isForShow: Bool { get set }
+    var photoBrowser: JXPhotoBrowser? { get set }
+    var isNavigationAnimation: Bool { get set }
 }
 ```
 
+用户需要自定义转场动画时，关注点仅在实现`UIViewControllerAnimatedTransitioning`上。`isForShow`和`photoBrowser`的值将由JXPhotoBrowser注入，用户可在编写自己的动画实现时获取到它们的值以帮助开发。
 
-## 禁用长按手势
-可通过自定义Cell重写`isNeededLongPressGesture`属性以禁止：
+Zoom转场动画如果需要百分百过渡顺滑，需要小图和大图的尺寸比例一致，拉伸方式、对齐方式也一致才可以达到视觉上的自然。
+具体在代码实现上，需要转场的视图在小尺寸时和缩略图吻合，同时要在放大后和浏览大图吻合。如果缩略图是居中显示的，大图是顶端对齐的，那么转场视图也需要在动画过程中同时调整对齐方式。由于框架无法预实现所有应用场景，同时也为了让用户更灵活地针对自己的应用场景做定制，所以对于这种完美转场效果的需求，`JXPhotoBrowserSmoothZoomAnimator`要求用户自行创建转场动画视图，以及计算出前后两端的`Frame`。
+
+关于`转场动画视图前后两端的Frame`，是指基于PhotoBrowser.view的坐标系的Frame。
+对于大图端的Frame，只要图片浏览的的项视图遵循了`JXPhotoBrowserZoomSupportedCell`协议，告诉框架其内容视图对象是哪个，框架即可自动计算出大图端的Frame。
+
 ```swift
-class CustomCell: JXPhotoBrowserBaseCell {
-    /// 是否需要添加长按手势。返回`false`即可避免添加长按手势
-    override var isNeededLongPressGesture: Bool {
-        return false
+/// 支持Zoom转场的Cell
+protocol JXPhotoBrowserZoomSupportedCell: UIView {
+    /// 内容视图
+    var showContentView: UIView { get }
+}
+```
+
+框架提供的作为默认项视图载体的`JXPhotoBrowserImageCell`已经遵循了SupportedCell协议，如果用户需要自定义Cell，同时希望应用ZoomAnimator，那么需要这个自定义Cell遵循`JXPhotoBrowserZoomSupportedCell`协议。
+
+对于小图端的Frame，用户需要自行计算出Frame给SmoothZoomAnimator使用。
+
+而实际应用环境中，有可能图片尺寸过大，缩略图被裁剪，这种情况下转场的前后两端是没办法吻合，框架为此做了一种折中方案，分别取小图和大图两端截图，作为两张转场视图叠加在一起，然后同时渐变加缩放，这就是`JXPhotoBrowserZoomAnimator`，不带`Smooth`。
+
+其实最理想最万能的方案是使用一张图片（视图），让这张图片前期和缩略图重合，随着转场过程逐渐变化，向着大图的形态拟合，结束时和大图重合。遗憾的是我暂时没有高效的实现方案，若有朋友能指点一二，万分感谢~
+
+### 网图加载
+
+框架不再集成网络图片加载功能，而是让用户自由决定使用适合于自己项目的图片加载方案，比如`SDWebImage`和`Kingfisher`，例子工程皆有基本的使用示范。
+
+```swift
+// 用SDWebImage加载
+browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], completed: { (_, _, _, _) in
+    browserCell?.setNeedsLayout()
+})
+
+// 用Kingfisher加载
+browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options: [], completionHandler: { _ in
+    browserCell?.setNeedsLayout()
+})
+```
+
+### 图片加载进度指示器
+
+框架出于业务无关的考虑，对容易受因场景而变更的UI控件都不再集成，但会把示例实现放在例子工程中。
+图片加载进度指示器就是这种UI，用户若有需要可自行下载[JXPhotoBrowserProgressView](Example/Example/JXPhotoBrowserProgressView.swift)。
+要给项视图(Cell)添加UI，最好是自定义自己的Cell。例子工程示范了如何通过自定义Cell，添加一个图片加载指示器。
+
+```swift
+/// 加上进度环的Cell
+class LoadingImageCell: JXPhotoBrowserImageCell {
+    /// 进度环
+    let progressView = JXPhotoBrowserProgressView()
+    
+    override func setup() {
+        super.setup()
+        addSubview(progressView)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        progressView.center = CGPoint(x: bounds.width / 2, y: bounds.height / 2)
+    }
+    
+    func reloadData(placeholder: UIImage?, urlString: String?) {
+        progressView.progress = 0
+        let url = urlString.flatMap { URL(string: $0) }
+        imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], progress: { [weak self] (received, total, _) in
+            if total > 0 {
+                self?.progressView.progress = CGFloat(received) / CGFloat(total)
+            }
+        }) { [weak self] (_, error, _, _) in
+            self?.progressView.progress = error == nil ? 1.0 : 0
+            self?.setNeedsLayout()
+        }
     }
 }
+
 ```
 
+### 查看原图按钮
 
-# 常见问题
+查看原图按钮也像图片加载指示器一样是附加UI，框架本身不继承，但是例子工程有实现，用户可结合自己项目修改使用。难点在于控制按钮的隐藏和显现，以及加载使用原图缓存的问题。
+详情参考[RawImageViewController](Example/Example/RawImageViewController.swift)
 
-## Archive 打包错误
-如果出现：
+### 页码指示器
+
+考虑到页码指示器的样式基本变化不大，所以框架选择把它们的实现集成进来。
+只要是遵循了`JXPhotoBrowserPageIndicator`协议的类都可以成为PhotoBrowser的页面指示器，把实现类的对象赋值给`pageIndicator`属性即可。
+
 ```
-While deserializing SIL vtable for ...
-abort trap 6
+open var pageIndicator: JXPhotoBrowserPageIndicator?
 ```
-请升级你的工程到Swift4.2，即可解决。
 
-## Install 错误：Error installing libwebp
-谷歌家的`libwebp`是放在他家网上的，`pod 'libwebp'`的源指向了谷歌域名的地址，解决办法一是翻墙，二是把本地 repo 源改为放在 Github 上的镜像：
-1. `pod search libwebp` 看看有哪些版本，记住你想 install 的版本号，一般用最新的就行，比如 1.0.0。
-2. `pod repo` 查看 master 的 path，进入目录搜索 libwebp，进入 libwebp -> 1.0.0，找到`libwebp.podspec.json`
-3. 打开`libwebp.podspec.json`，修改 source 地址：
+框架提供了两种页面指示器的实现，当然用户觉得都不满足需求，也可以自己编写，只需要遵循`JXPhotoBrowserPageIndicator`协议即可。
+两种默认实现分别是`JXPhotoBrowserDefaultPageIndicator`和`JXPhotoBrowserNumberPageIndicator`。
+
+```swift
+// UIPageIndicator样式的页码指示器
+browser.pageIndicator = JXPhotoBrowserDefaultPageIndicator()
+// 数字样式的页码指示器
+browser.pageIndicator = JXPhotoBrowserNumberPageIndicator()
 ```
-"source": {
-    "git": "https://github.com/webmproject/libwebp",
-    "tag": "v1.0.0
-  },
+
+### GIF/WebP图片格式
+
+由于框架把图片加载的权力完全交给了用户，所以加载各种各样图片格式的方案都由用户去选择。各大图片加载框架皆有特殊图片格式加载的实现，或是自身有实现，或是第三方的实现，用户都可以找到解决方案。
+
+### 变更数据源
+
+框架支持数据源动态变化，可增加删除数据，然后刷新图片浏览器，就像`UITableView`一样。
+
+```swift
+browser.reloadData()
 ```
-4. 回到你的项目目录，可以愉快地`pod install`了~
 
-# 初版实现思路
+变更数据源的关键在于用户控制好自己的数据一致性，包括要同步缩略图控制器的刷新。
+详情查看例子工程的[DataSourceDeleteViewController](Example/Example/DataSourceDeleteViewController.swift)和[DataSourceAppendViewController](Example/Example/DataSourceAppendViewController.swift)
 
-记录了初版实现思路：[ARTICLE](ARTICLE.md)
+### 跨Section浏览图片
 
-# 感谢
+曾经有同学问我这种场景下怎么做，所以我特地举例示范。
+这里的意思是指像微信朋友圈（相册）那样，缩略图所在是UICollectionView，有许多个Section，每个Section里有许多图片，当打开图片浏览器的时候需要把所有Section的图片全部一起浏览。
+其实这个与PhotoBrowser本身能力无关，PhotoBrowser都是支持的，难点在于用户自己对数据源的处理，要处理好图片浏览器里图片的索引号与数据源里数据的IndexPath的映射关系。
+详情可查看[MultipleSectionViewController](Example/Example/MultipleSectionViewController.swift)
 
-若使用过程中有任何问题，请issues我。 ^_^
+### 竖向浏览
+
+框架除了支持像微信图片那样的横向浏览外，还支持像抖音视频那样的竖向浏览。仅设置一个属性即可改变方向，它的默认值是水平横向。
+
+```swift
+open var scrollDirection: JXPhotoBrowser.ScrollDirection = .horizontal
+```
+
+### 视频浏览
+
+无论是图片浏览还是视频浏览，于PhotoBrowser来说都是等同的，PhotoBrowser并不知道它的项视图(Cell)承载了什么内容。用户可通过自定义带有播放视频功能的Cell的来达到视频浏览的目的。
+框架提供了项视图的生命周期方法，可帮助用户更好地控制视频的播放与停止。
+
+```swift
+open lazy var cellWillAppear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
+
+open lazy var cellWillDisappear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
+
+open lazy var cellDidAppear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
+```
+
+例子工程有简单的本地视频播放实现，详情可参考[VideoPhotoViewController](Example/Example/VideoPhotoViewController.swift)
+
+### 图片与视频混合浏览
+
+框架允许多个不同的Cell同时存在，允许给每一个项配置不同的类。
+任何遵循了`JXPhotoBrowserCell`协议的类都可以作为PhotoBrowser的项视图。协议仅有一个方法需要实现，就是要求提供生产实例的类方法，框架将会在适当时机通过此方法实例化Cell。
+
+```swift
+public protocol JXPhotoBrowserCell: UIView {
+    static func generate(with browser: JXPhotoBrowser) -> Self
+}
+```
+
+对于自定义Cell，遵循了`JXPhotoBrowserCell`协议后，通过以下方法告诉PhotoBrowser每个`index`对应使用的类。
+
+```swift
+browser.cellClassAtIndex = { index in
+		// 视频与图片交替展示
+    index % 2 == 0 ? VideoCell.self : JXPhotoBrowserImageCell.self
+}
+```
+
+框架内部实现了对`JXPhotoBrowserCell`的复用，即便是同时存在多个自定义Cell类，也只会最小量地生成实例。
+
+视频与图片混合的例子[VideoPhotoViewController](Example/Example/VideoPhotoViewController.swift)
+
+某些业务场景需要在最后一页浏览结束后，展示"更多推荐"视图，也是可以的，查看例子[MultipleCellViewController](Example/Example/MultipleCellViewController.swift)
+
+## 历史版本
+
+2.0版本请参考：[Version2.x](Version2.x.md)
+1.0版本请参考：[Version1.x](Version1.x.md)
+初稿文章：[初稿](初稿文章.md)
+
+## 感谢
+
+若使用过程中有任何问题，请issues我。感谢支持 ^_^
