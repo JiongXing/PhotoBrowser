@@ -4,15 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "JXPhotoBrowser",
-    platforms: [
-        .iOS(.v8),
-    ],
+    name: "PhotoBrowser",
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
-            name: "JXPhotoBrowser",
-            targets: ["JXPhotoBrowser"]),
+            name: "PhotoBrowser",
+            targets: ["PhotoBrowser"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -22,10 +19,10 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
-            name: "JXPhotoBrowser",
-            dependencies: [],
-            path: ".",
-            sources: ["Sources/JXPhotoBrowser"],
-        ),
+            name: "PhotoBrowser",
+            dependencies: []),
+        .testTarget(
+            name: "PhotoBrowserTests",
+            dependencies: ["PhotoBrowser"]),
     ]
 )
