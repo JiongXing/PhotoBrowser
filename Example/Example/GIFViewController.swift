@@ -9,6 +9,7 @@
 import UIKit
 import JXPhotoBrowser
 import SDWebImage
+import Kingfisher
 
 class GIFViewController: BaseCollectionViewController {
     
@@ -19,6 +20,7 @@ class GIFViewController: BaseCollectionViewController {
     override func makeDataSource() -> [ResourceModel] {
         let models = makeNetworkDataSource()
         models[3].secondLevelUrl = "https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/gifImage.gif"
+        models[4].secondLevelUrl = "https://gss3.bdstatic.com/7Po3dSag_xI4khGkpoWK1HF6hhy/baike/s%3D500/sign=51eb2484a1af2eddd0f149e9bd120102/48540923dd54564eb5babebbbede9c82d0584f50.jpg"
         return models
     }
     
@@ -27,6 +29,7 @@ class GIFViewController: BaseCollectionViewController {
         if let firstLevel = self.dataSource[indexPath.item].firstLevelUrl {
             let url = URL(string: firstLevel)
             cell.imageView.sd_setImage(with: url, completed: nil)
+            //cell.imageView.kf.setImage(with: url)
         }
         return cell
     }
@@ -46,6 +49,10 @@ class GIFViewController: BaseCollectionViewController {
             browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], completed: { (_, _, _, _) in
                 browserCell?.setNeedsLayout()
             })
+            // Kingfisher
+            /*browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options: [], completionHandler: { _ in
+                browserCell?.setNeedsLayout()
+            })*/
         }
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)

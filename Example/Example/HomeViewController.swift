@@ -49,7 +49,8 @@ class HomeViewController: UITableViewController {
             MultipleCellViewController(),
             MultipleSectionViewController(),
             DefaultPageIndicatorViewController(),
-            NumberPageIndicatorViewController()
+            NumberPageIndicatorViewController(),
+            GIFViewController()
         ]
     }
     
