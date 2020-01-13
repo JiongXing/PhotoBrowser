@@ -11,7 +11,7 @@ import UIKit
 open class JXPhotoBrowserNoneAnimator: NSObject, JXPhotoBrowserAnimatedTransitioning {
     
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        0
+        return 0
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {

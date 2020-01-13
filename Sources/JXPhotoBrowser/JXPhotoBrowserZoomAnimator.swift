@@ -20,7 +20,7 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     public typealias PreviousViewAtIndexClosure = (_ index: Int) -> UIView?
     
     /// 转场动画的前向视图
-    open var previousViewProvider: PreviousViewAtIndexClosure = { _ in nil }
+    open var previousViewProvider: PreviousViewAtIndexClosure = { _ in return nil }
     
     /// 替补的动画方案
     open lazy var substituteAnimator: JXPhotoBrowserAnimatedTransitioning = JXPhotoBrowserFadeAnimator()
@@ -136,6 +136,4 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
         }
         return (snap1, snap2, thumbnailFrame, destinationFrame)
     }
-    
-    
 }

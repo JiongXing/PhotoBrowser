@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name             = 'JXPhotoBrowser'
-    s.version          = '3.0.5'
+    s.version          = '3.0.6'
     s.summary          = 'Elegant photo browser in Swift.'
     s.description      = 'Elegant photo browser in Swift. Inspired by WeChat.'
     
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
     s.source           = { :git => 'https://github.com/JiongXing/PhotoBrowser.git', :tag => s.version.to_s }
     
     s.ios.deployment_target = '8.0'
-    s.swift_version = '4.2', '5.0'
+    s.swift_version = '4.0', '4.2', '5.0'
     s.source_files = 'Sources/JXPhotoBrowser/*'
     
 end

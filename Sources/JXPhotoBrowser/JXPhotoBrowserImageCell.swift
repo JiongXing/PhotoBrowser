@@ -100,7 +100,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     
     /// 已添加的长按手势
     private lazy var longPress: UILongPressGestureRecognizer = {
-        UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
+        return UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
     }()
     
     private weak var existedPan: UIPanGestureRecognizer?
@@ -128,7 +128,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     }
     
     open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        imageView
+        return imageView
     }
     
     open func scrollViewDidZoom(_ scrollView: UIScrollView) {

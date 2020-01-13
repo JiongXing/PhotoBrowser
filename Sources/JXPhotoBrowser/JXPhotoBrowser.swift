@@ -31,31 +31,31 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     /// 滑动方向
     open var scrollDirection: JXPhotoBrowser.ScrollDirection {
         set { browserView.scrollDirection = newValue }
-        get { browserView.scrollDirection }
+        get { return browserView.scrollDirection }
     }
     
     /// 项间距
     open var itemSpacing: CGFloat {
         set { browserView.itemSpacing = newValue }
-        get { browserView.itemSpacing }
+        get { return browserView.itemSpacing }
     }
     
     /// 当前页码
     open var pageIndex: Int {
         set { browserView.pageIndex = newValue }
-        get { browserView.pageIndex }
+        get { return browserView.pageIndex }
     }
     
     /// 浏览过程中实时获取数据总量
     open var numberOfItems: () -> Int {
         set { browserView.numberOfItems = newValue }
-        get { browserView.numberOfItems }
+        get { return browserView.numberOfItems }
     }
     
     /// 返回可复用的Cell类。用户可根据index返回不同的类。本闭包将在每次复用Cell时实时调用。
     open var cellClassAtIndex: (_ index: Int) -> JXPhotoBrowserCell.Type {
         set { browserView.cellClassAtIndex = newValue }
-        get { browserView.cellClassAtIndex }
+        get { return browserView.cellClassAtIndex }
     }
     
     /// Cell刷新时用的上下文。index: 刷新的Cell对应的index；currentIndex: 当前显示的页
@@ -64,7 +64,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     /// 刷新Cell数据。本闭包将在Cell完成位置布局后调用。
     open var reloadCellAtIndex: (ReloadCellContext) -> Void {
         set { browserView.reloadCellAtIndex = newValue }
-        get { browserView.reloadCellAtIndex }
+        get { return browserView.reloadCellAtIndex }
     }
     
     /// 自然滑动引起的页码改变时回调
@@ -73,19 +73,19 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     /// Cell将显示
     open var cellWillAppear: (JXPhotoBrowserCell, Int) -> Void {
         set { browserView.cellWillAppear = newValue }
-        get { browserView.cellWillAppear }
+        get { return browserView.cellWillAppear }
     }
     
     /// Cell将不显示
     open var cellWillDisappear: (JXPhotoBrowserCell, Int) -> Void {
         set { browserView.cellWillDisappear = newValue }
-        get { browserView.cellWillDisappear }
+        get { return browserView.cellWillDisappear }
     }
     
     /// Cell已显示
     open var cellDidAppear: (JXPhotoBrowserCell, Int) -> Void {
         set { browserView.cellDidAppear = newValue }
-        get { browserView.cellDidAppear }
+        get { return browserView.cellDidAppear }
     }
     
     /// 主视图
@@ -105,6 +105,14 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     deinit {
         JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
+    }
+    
+    public init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     /// 显示图片浏览器

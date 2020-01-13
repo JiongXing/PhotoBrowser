@@ -21,7 +21,7 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserAnimatedTra
     public typealias TransitionViewAndFrameProvider = (_ index: Int, _ destinationView: UIView) -> TransitionViewAndFrame?
     
     /// 获取转场缩放的视图与前置Frame
-    open var transitionViewAndFrameProvider: TransitionViewAndFrameProvider = { _, _ in nil }
+    open var transitionViewAndFrameProvider: TransitionViewAndFrameProvider = { _, _ in return nil }
     
     /// 替补的动画方案
     open lazy var substituteAnimator: JXPhotoBrowserAnimatedTransitioning = JXPhotoBrowserFadeAnimator()

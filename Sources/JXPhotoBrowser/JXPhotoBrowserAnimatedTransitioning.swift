@@ -33,7 +33,7 @@ extension JXPhotoBrowserAnimatedTransitioning {
     
     public var photoBrowser: JXPhotoBrowser? {
         get {
-            objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowser
+            return objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowser
         }
         set {
             objc_setAssociatedObject(self, &photoBrowserKey, newValue, .OBJC_ASSOCIATION_ASSIGN)
@@ -41,7 +41,7 @@ extension JXPhotoBrowserAnimatedTransitioning {
     }
     
     public var isNavigationAnimation: Bool {
-        get { false }
+        get { return false }
         set { }
     }
     
