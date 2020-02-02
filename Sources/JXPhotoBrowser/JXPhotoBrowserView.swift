@@ -139,9 +139,9 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // 屏幕旋转时会触发本方法。此时不可更改pageIndex
         if isRotating {
+            isRotating = false
             return
         }
-        isRotating = false
         
         if scrollDirection == .horizontal && scrollView.bounds.width > 0  {
             pageIndex = Int(round(scrollView.contentOffset.x / (scrollView.bounds.width)))
