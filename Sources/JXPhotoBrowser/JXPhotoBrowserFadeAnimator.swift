@@ -19,15 +19,17 @@ open class JXPhotoBrowserFadeAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let browser = photoBrowser else {
+        guard let browser = photoBrowser, let toView = transitionContext.view(forKey: .to) else {
             transitionContext.completeTransition(false)
             return
         }
         if isForShow {
             browser.maskView.alpha = 0
             browser.browserView.alpha = 0
-            if let toView = transitionContext.view(forKey: .to) {
-                transitionContext.containerView.addSubview(toView)
+            transitionContext.containerView.addSubview(toView)
+        } else {
+            if let fromView = transitionContext.view(forKey: .from) {
+                transitionContext.containerView.insertSubview(toView, belowSubview: fromView)
             }
         }
         UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
