@@ -1,5 +1,12 @@
 # Change Log
 
+### Version 3.0.8
+
+> 2020/02/09
+
+- 修复：嵌入导航控制器后的Fade动画显示问题
+- 优化：deinit时还原导航控制器的delegate
+
 ### Version 3.0.7
 
 > 2020/02/04
