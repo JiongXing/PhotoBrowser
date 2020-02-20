@@ -14,21 +14,27 @@ open class JXPhotoBrowserFadeAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     
     open var dismissDuration: TimeInterval = 0.25
     
+    public var isNavigationAnimation: Bool = false
+    
     public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return isForShow ? showDuration : dismissDuration
     }
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let browser = photoBrowser, let toView = transitionContext.view(forKey: .to) else {
+        guard let browser = photoBrowser else {
             transitionContext.completeTransition(false)
             return
         }
         if isForShow {
             browser.maskView.alpha = 0
             browser.browserView.alpha = 0
-            transitionContext.containerView.addSubview(toView)
+            if let toView = transitionContext.view(forKey: .to) {
+                transitionContext.containerView.addSubview(toView)
+            }
         } else {
-            if let fromView = transitionContext.view(forKey: .from) {
+            if isNavigationAnimation,
+                let fromView = transitionContext.view(forKey: .from),
+                let toView = transitionContext.view(forKey: .to) {
                 transitionContext.containerView.insertSubview(toView, belowSubview: fromView)
             }
         }

@@ -103,11 +103,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     open weak var previousNavigationControllerDelegate: UINavigationControllerDelegate?
     
-    deinit {
-        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
-        navigationController?.delegate = previousNavigationControllerDelegate
-    }
-    
     public init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -278,6 +273,11 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
             navigationController?.delegate = self
             navigationController?.popViewController(animated: true)
         }
+    }
+    
+    deinit {
+        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
+        navigationController?.delegate = previousNavigationControllerDelegate
     }
     
     //

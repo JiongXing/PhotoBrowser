@@ -1,5 +1,11 @@
 # Change Log
 
+### Version 3.0.9
+
+> 2020/02/20
+
+- 修复：非嵌入导航栏的Fade动画Dismiss问题
+
 ### Version 3.0.8
 
 > 2020/02/09
