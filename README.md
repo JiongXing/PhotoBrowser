@@ -6,7 +6,7 @@
 
 
 <div>
-	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Home.png" width = "30%" div/>
+	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Home.gif" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Transition.png" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Browser.png" width = "30%" div/>
 </div>
