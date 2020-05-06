@@ -8,6 +8,8 @@
 
 import UIKit
 
+/// 图片浏览器
+/// - 不支持复用，每次使用请新建实例
 open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate {
     
     /// 通过本回调，把图片浏览器嵌套在导航控制器里

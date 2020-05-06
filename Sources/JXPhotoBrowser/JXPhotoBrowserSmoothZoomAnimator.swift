@@ -43,18 +43,19 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserAnimatedTra
     }
     
     private func playShowAnimation(context: UIViewControllerContextTransitioning) {
-        guard let browser = photoBrowser, let toView = context.view(forKey: .to) else {
+        guard let browser = photoBrowser else {
             return
         }
         if isNavigationAnimation, let fromView = context.view(forKey: .from), let fromViewSnapshot = snapshot(with: fromView) {
-            toView.insertSubview(fromViewSnapshot, at: 0)
+            browser.view.insertSubview(fromViewSnapshot, at: 0)
         }
-        context.containerView.addSubview(toView)
+        context.containerView.addSubview(browser.view)
         
         guard let (transitionView, thumbnailFrame, destinationFrame) = transitionViewAndFrames(with: browser) else {
             // 转为执行替补动画
             substituteAnimator.isForShow = isForShow
             substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.isNavigationAnimation = isNavigationAnimation
             substituteAnimator.animateTransition(using: context)
             return
         }
@@ -67,7 +68,7 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserAnimatedTra
             transitionView.frame = destinationFrame
         }) { _ in
             browser.browserView.isHidden = false
-            toView.insertSubview(browser.maskView, belowSubview: browser.browserView)
+            browser.view.insertSubview(browser.maskView, belowSubview: browser.browserView)
             transitionView.removeFromSuperview()
             context.completeTransition(!context.transitionWasCancelled)
         }
@@ -81,6 +82,7 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserAnimatedTra
             // 转为执行替补动画
             substituteAnimator.isForShow = isForShow
             substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.isNavigationAnimation = isNavigationAnimation
             substituteAnimator.animateTransition(using: context)
             return
         }

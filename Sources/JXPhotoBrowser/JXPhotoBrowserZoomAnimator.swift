@@ -42,18 +42,19 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     }
     
     private func playShowAnimation(context: UIViewControllerContextTransitioning) {
-        guard let browser = photoBrowser, let toView = context.view(forKey: .to) else {
+        guard let browser = photoBrowser else {
             return
         }
         if isNavigationAnimation, let fromView = context.view(forKey: .from), let fromViewSnapshot = snapshot(with: fromView) {
-            toView.insertSubview(fromViewSnapshot, at: 0)
+            browser.view.insertSubview(fromViewSnapshot, at: 0)
         }
-        context.containerView.addSubview(toView)
+        context.containerView.addSubview(browser.view)
         
         guard let (snap1, snap2, thumbnailFrame, destinationFrame) = snapshotsAndFrames(browser: browser) else {
             // 转为执行替补动画
             substituteAnimator.isForShow = isForShow
             substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.isNavigationAnimation = isNavigationAnimation
             substituteAnimator.animateTransition(using: context)
             return
         }
@@ -72,7 +73,7 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
             snap2.alpha = 1.0
         }) { _ in
             browser.browserView.isHidden = false
-            toView.insertSubview(browser.maskView, belowSubview: browser.browserView)
+            browser.view.insertSubview(browser.maskView, belowSubview: browser.browserView)
             snap1.removeFromSuperview()
             snap2.removeFromSuperview()
             context.completeTransition(!context.transitionWasCancelled)
@@ -87,6 +88,7 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
             // 转为执行替补动画
             substituteAnimator.isForShow = isForShow
             substituteAnimator.photoBrowser = photoBrowser
+            substituteAnimator.isNavigationAnimation = isNavigationAnimation
             substituteAnimator.animateTransition(using: context)
             return
         }
