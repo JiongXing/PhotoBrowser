@@ -278,7 +278,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     }
     
     deinit {
-        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
+        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
         navigationController?.delegate = previousNavigationControllerDelegate
     }
     

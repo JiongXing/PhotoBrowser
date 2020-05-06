@@ -16,6 +16,9 @@ class HomeViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // JXPhotoBrowser配置日志
+        JXPhotoBrowserLog.level = .low
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         tableView.jx.registerCell(HomeTableViewCell.self)
         

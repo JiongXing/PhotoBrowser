@@ -72,7 +72,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     var isRotating = false
     
     deinit {
-        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
+        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
     }
     
     public convenience init() {
@@ -227,7 +227,7 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             }
             let clazz = cellClassAtIndex(index)
             JXPhotoBrowserLog.middle("Required class name: \(String(describing: clazz))")
-            JXPhotoBrowserLog.middle("index:\(index) 出列!")
+            JXPhotoBrowserLog.middle("index:\(index) 出队!")
             let cell = dequeue(cellType: clazz, browser: browser)
             visibleCells[index] = cell
             scrollView.addSubview(cell)

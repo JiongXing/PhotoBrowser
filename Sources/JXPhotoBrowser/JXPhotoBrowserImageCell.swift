@@ -43,7 +43,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     }()
     
     deinit {
-        JXPhotoBrowserLog.high("deinit - \(self.classForCoder)")
+        JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
     }
     
     public required override init(frame: CGRect) {

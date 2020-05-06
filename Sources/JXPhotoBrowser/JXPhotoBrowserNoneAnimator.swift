@@ -8,6 +8,7 @@
 
 import UIKit
 
+/// 使用本类以实现不出现转场动画的需求
 open class JXPhotoBrowserNoneAnimator: JXPhotoBrowserFadeAnimator {
     
     public override init() {
