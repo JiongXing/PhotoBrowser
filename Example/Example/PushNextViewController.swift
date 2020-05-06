@@ -49,6 +49,14 @@ class PushNextViewController: BaseCollectionViewController {
         browser.pageIndex = indexPath.item
         // 让PhotoBrowser嵌入当前的导航控制器里
         browser.show(method: .push(inNC: nil))
+        
+        /*
+        // 让PhotoBrowser嵌入新创建的导航控制器里，present。
+        // 注：此用法下暂不支持屏幕旋转，若app支持旋转的话，此种使用方式暂未适配
+        browser.show(method: .present(fromVC: self, embed: { browser -> UINavigationController in
+            return UINavigationController.init(rootViewController: browser)
+        }))
+        */
     }
     
     private func longPress(cell: JXPhotoBrowserImageCell) {

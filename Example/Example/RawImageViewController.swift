@@ -49,11 +49,6 @@ class RawImageViewController: BaseCollectionViewController {
             let rawURLString = self.dataSource[context.index].thirdLevelUrl
             browserCell?.reloadData(placeholder: placeholder, urlString: urlString, rawURLString: rawURLString)
         }
-        browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
-            let path = IndexPath(item: index, section: indexPath.section)
-            let cell = collectionView.cellForItem(at: path) as? BaseCollectionViewCell
-            return cell?.imageView
-        })
         browser.pageIndex = indexPath.item
         browser.show()
     }

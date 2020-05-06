@@ -1,5 +1,5 @@
 //
-//  LocalImageZoomViewController.swift
+//  ImageZoomViewController.swift
 //  Example
 //
 //  Created by JiongXing on 2019/11/28.
@@ -9,7 +9,7 @@
 import UIKit
 import JXPhotoBrowser
 
-class LocalImageZoomViewController: BaseCollectionViewController {
+class ImageZoomViewController: BaseCollectionViewController {
     
     override var name: String { "Zoom转场动画" }
     

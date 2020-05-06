@@ -9,7 +9,7 @@
 import UIKit
 import JXPhotoBrowser
 
-class LocalImageSmoothZoomViewController: BaseCollectionViewController {
+class ImageSmoothZoomViewController: BaseCollectionViewController {
     
     override var name: String { "更丝滑的Zoom转场动画" }
     
