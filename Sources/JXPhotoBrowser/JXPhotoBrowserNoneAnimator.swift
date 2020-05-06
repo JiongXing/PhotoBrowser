@@ -8,22 +8,11 @@
 
 import UIKit
 
-open class JXPhotoBrowserNoneAnimator: NSObject, JXPhotoBrowserAnimatedTransitioning {
+open class JXPhotoBrowserNoneAnimator: JXPhotoBrowserFadeAnimator {
     
-    public func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return 0
-    }
-    
-    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        transitionContext.completeTransition(transitionContext.transitionWasCancelled)
-    }
-    
-    
-    open func show(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
-        completion()
-    }
-    
-    open func dismiss(browser: JXPhotoBrowser, completion: @escaping () -> Void) {
-        completion()
+    public override init() {
+        super.init()
+        showDuration = 0
+        dismissDuration = 0
     }
 }
