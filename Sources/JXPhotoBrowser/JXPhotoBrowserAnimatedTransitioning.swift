@@ -31,7 +31,7 @@ extension JXPhotoBrowserAnimatedTransitioning {
         }
     }
     
-    public var photoBrowser: JXPhotoBrowser? {
+    public weak var photoBrowser: JXPhotoBrowser? {
         get {
             return objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowser
         }

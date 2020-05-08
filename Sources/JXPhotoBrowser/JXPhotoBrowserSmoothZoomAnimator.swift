@@ -44,6 +44,7 @@ open class JXPhotoBrowserSmoothZoomAnimator: NSObject, JXPhotoBrowserAnimatedTra
     
     private func playShowAnimation(context: UIViewControllerContextTransitioning) {
         guard let browser = photoBrowser else {
+            context.completeTransition(!context.transitionWasCancelled)
             return
         }
         if isNavigationAnimation,

@@ -22,6 +22,7 @@ open class JXPhotoBrowserFadeAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
     
     public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let browser = photoBrowser else {
+            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
             return
         }
         if isNavigationAnimation, isForShow,
