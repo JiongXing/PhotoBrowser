@@ -45,8 +45,11 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
         guard let browser = photoBrowser else {
             return
         }
-        if isNavigationAnimation, let fromView = context.view(forKey: .from), let fromViewSnapshot = snapshot(with: fromView) {
-            browser.view.insertSubview(fromViewSnapshot, at: 0)
+        if isNavigationAnimation, isForShow,
+            let fromView = context.view(forKey: .from),
+            let fromViewSnapshot = snapshot(with: fromView),
+            let toView = context.view(forKey: .to)  {
+            toView.insertSubview(fromViewSnapshot, at: 0)
         }
         context.containerView.addSubview(browser.view)
         

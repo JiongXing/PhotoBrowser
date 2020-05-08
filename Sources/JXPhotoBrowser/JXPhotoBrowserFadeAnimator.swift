@@ -24,10 +24,11 @@ open class JXPhotoBrowserFadeAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
         guard let browser = photoBrowser else {
             return
         }
-        if isNavigationAnimation, let fromView = transitionContext.view(forKey: .from), let fromViewSnapshot = snapshot(with: fromView) {
-            if let toView = transitionContext.view(forKey: .to)  {
-                toView.insertSubview(fromViewSnapshot, at: 0)
-            }
+        if isNavigationAnimation, isForShow,
+            let fromView = transitionContext.view(forKey: .from),
+            let fromViewSnapshot = snapshot(with: fromView),
+            let toView = transitionContext.view(forKey: .to)  {
+            toView.insertSubview(fromViewSnapshot, at: 0)
         }
         if isForShow {
             browser.maskView.alpha = 0
