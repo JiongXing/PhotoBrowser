@@ -12,10 +12,9 @@ import Kingfisher
 
 class MultipleSectionViewController: BaseCollectionViewController {
     
-    override var name: String { "多Section场景" }
-    
-    override var remark: String { "举例如何做跨Section浏览" }
-    
+    override class func name() -> String { "多Section场景" }
+    override class func remark() -> String { "举例如何做跨Section浏览" }
+     
     var sections = [[ResourceModel]]()
     
     override func viewDidLoad() {

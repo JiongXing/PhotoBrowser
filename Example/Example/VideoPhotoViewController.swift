@@ -11,11 +11,10 @@ import JXPhotoBrowser
 import AVKit
 
 class VideoPhotoViewController: BaseCollectionViewController {
-    
-    override var name: String { "视频与图片混合浏览" }
-    
-    override var remark: String { "微信我的相册浏览方式" }
-    
+
+    override class func name() -> String { "视频与图片混合浏览" }
+    override class func remark() -> String { "微信我的相册浏览方式" }
+
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
         (0..<6).forEach { index in

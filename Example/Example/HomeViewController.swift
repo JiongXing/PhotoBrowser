@@ -11,17 +11,19 @@ import JXPhotoBrowser
 
 class HomeViewController: UITableViewController {
     
-    var dataSource: [BaseCollectionViewController] = []
+    var dataSource: [MakeController] = dataType.map { cls -> MakeController in
+      return ( { cls.init() }, cls.name(), cls.remark())
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // JXPhotoBrowser配置日志
         JXPhotoBrowserLog.level = .low
-        
+
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         tableView.jx.registerCell(HomeTableViewCell.self)
-        
+
         // 授权网络数据访问
         guard let url = URL(string: "http://www.baidu.com") else  {
             return
@@ -33,46 +35,22 @@ class HomeViewController: UITableViewController {
             }
         }.resume()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        dataSource = [
-            LocalImageViewController(),
-            VerticalBrowseViewController(),
-            VideoPhotoViewController(),
-            ImageZoomViewController(),
-            ImageSmoothZoomViewController(),
-            KingfisherImageViewController(),
-            SDWebImageViewController(),
-            DataSourceDeleteViewController(),
-            DataSourceAppendViewController(),
-            PushNextViewController(),
-            LoadingProgressViewController(),
-            RawImageViewController(),
-            MultipleCellViewController(),
-            MultipleSectionViewController(),
-            DefaultPageIndicatorViewController(),
-            NumberPageIndicatorViewController(),
-            GIFViewController()
-        ]
-    }
-    
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSource.count
     }
-    
+
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.jx.dequeueReusableCell(HomeTableViewCell.self)
-        let vc = dataSource[indexPath.row]
-        cell.textLabel?.text = vc.name
-        cell.detailTextLabel?.text = vc.remark
+        let data = dataSource[indexPath.row]
+        cell.textLabel?.text = data.title
+        cell.detailTextLabel?.text = data.subTitle
         cell.accessoryType = .disclosureIndicator
         return cell
     }
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
-        navigationController?.pushViewController(dataSource[indexPath.row], animated: true)
+        navigationController?.pushViewController(dataSource[indexPath.row].makeViewController(), animated: true)
     }
 }
 
@@ -85,4 +63,32 @@ class HomeTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+/*  ViewModel */
+typealias MakeController = (makeViewController: () -> BaseCollectionViewController, title: String, subTitle: String)
+
+// MARK: 数据源
+private extension HomeViewController {
+
+   static let dataType: [BaseCollectionViewController.Type] = [
+      LocalImageViewController.self,
+      VerticalBrowseViewController.self,
+      VideoPhotoViewController.self,
+      ImageZoomViewController.self,
+      ImageZoomViewController.self,
+      ImageSmoothZoomViewController.self,
+      KingfisherImageViewController.self,
+      SDWebImageViewController.self,
+      DataSourceDeleteViewController.self,
+      DataSourceAppendViewController.self,
+      PushNextViewController.self,
+      LoadingProgressViewController.self,
+      RawImageViewController.self,
+      MultipleCellViewController.self,
+      MultipleSectionViewController.self,
+      DefaultPageIndicatorViewController.self,
+      NumberPageIndicatorViewController.self,
+      GIFViewController.self
+    ]
 }

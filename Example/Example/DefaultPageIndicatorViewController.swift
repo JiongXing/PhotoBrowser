@@ -11,11 +11,10 @@ import JXPhotoBrowser
 import SDWebImage
 
 class DefaultPageIndicatorViewController: BaseCollectionViewController {
-    
-    override var name: String { "UIPageControl样式的页码指示器" }
-    
-    override var remark: String { "举例如何使用UIPageControl样式的页码指示器" }
-    
+
+    override class func name() -> String { "UIPageControl样式的页码指示器" }
+    override class func remark() -> String { "举例如何使用UIPageControl样式的页码指示器" }
+
     override func makeDataSource() -> [ResourceModel] {
         makeNetworkDataSource()
     }

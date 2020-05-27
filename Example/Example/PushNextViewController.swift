@@ -11,9 +11,8 @@ import JXPhotoBrowser
 
 class PushNextViewController: BaseCollectionViewController {
 
-    override var name: String { "带导航栏Push" }
-    
-    override var remark: String { "让PhotoBrowser嵌入导航控制器里，Push到下一页" }
+    override class func name() -> String { "带导航栏Push" }
+    override class func remark() -> String { "让PhotoBrowser嵌入导航控制器里，Push到下一页" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()

@@ -12,10 +12,9 @@ import Kingfisher
 
 class KingfisherImageViewController: BaseCollectionViewController {
     
-    override var name: String { "网络图片-Kingfisher" }
-    
-    override var remark: String { "举例如何用Kingfisher加载网络图片" }
-    
+    override class func name() -> String { "网络图片-Kingfisher" }
+    override class func remark() -> String { "举例如何用Kingfisher加载网络图片" }
+
     override func makeDataSource() -> [ResourceModel] {
         makeNetworkDataSource()
     }

@@ -14,33 +14,46 @@ class BaseCollectionViewController: UICollectionViewController {
     var dataSource: [ResourceModel] = []
     
     /// 名称
-    var name: String {
-        return ""
+    class func name() -> String {
+      return ""
     }
     
     /// 说明
-    var remark: String {
-        return ""
+    class func remark() -> String {
+      return ""
     }
     
     let reusedId = "reused"
     
     private var flowLayout: UICollectionViewFlowLayout
     
-    init() {
+    required init() {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .vertical
         self.flowLayout = flowLayout
         super.init(collectionViewLayout: flowLayout)
     }
-    
+    /*
+     // 如果您对不使用 `[weak self]` 会不会造成内存泄漏可以卡开此注释
+     deinit {
+     print("\(Self.self) deinit! ____#")
+     }
+     */
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("使用nib文件初始化时请打开👇注释____#")
+        /*
+         self.dataSource = []
+         self.reusedId = "reused"
+         let flowLayout = UICollectionViewFlowLayout()
+         flowLayout.scrollDirection = .vertical
+         self.flowLayout = flowLayout
+         super.init(coder: aDecoder)
+         */
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = name
+        navigationItem.title = Self.name()
         collectionView?.backgroundColor = .white
         collectionView?.jx.registerCell(BaseCollectionViewCell.self)
         dataSource = makeDataSource()
