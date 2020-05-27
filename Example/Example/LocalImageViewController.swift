@@ -11,9 +11,8 @@ import JXPhotoBrowser
 
 class LocalImageViewController: BaseCollectionViewController {
     
-    override var name: String { "本地图片" }
-    
-    override var remark: String { "最简单的场景，展示本地图片" }
+    override class func name() -> String { "本地图片" }
+    override class func remark() -> String { "最简单的场景，展示本地图片" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()

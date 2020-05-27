@@ -11,9 +11,8 @@ import JXPhotoBrowser
 
 class ImageZoomViewController: BaseCollectionViewController {
     
-    override var name: String { "Zoom转场动画" }
-    
-    override var remark: String { "简单易用的缩放式转场动画，兼容缩略图与放大图存在差异" }
+    override class func name() -> String { "Zoom转场动画" }
+    override class func remark() -> String {  "简单易用的缩放式转场动画，兼容缩略图与放大图存在差异"}
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()

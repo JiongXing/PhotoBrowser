@@ -11,11 +11,10 @@ import JXPhotoBrowser
 import SDWebImage
 
 class RawImageViewController: BaseCollectionViewController {
-    
-    override var name: String { "显示查看原图" }
-    
-    override var remark: String { "举例如何实现查看原图" }
-    
+
+    override class func name() -> String { "显示查看原图" }
+    override class func remark() -> String { "举例如何实现查看原图" }
+
     override func makeDataSource() -> [ResourceModel] {
         let models = makeNetworkDataSource()
         models[3].thirdLevelUrl = "https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/rawImage.jpg"

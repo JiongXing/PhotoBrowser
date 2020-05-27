@@ -11,10 +11,9 @@ import JXPhotoBrowser
 
 class DataSourceDeleteViewController: BaseCollectionViewController {
 
-    override var name: String { "删除图片-长按事件" }
-    
-    override var remark: String { "浏览过程中删除图片，变更数据源，刷新UI。长按删除。" }
-    
+    override class func name() -> String { "删除图片-长按事件" }
+    override class func remark() -> String { "浏览过程中删除图片，变更数据源，刷新UI。长按删除。" }
+
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()
     }

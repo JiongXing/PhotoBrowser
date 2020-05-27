@@ -10,11 +10,10 @@ import UIKit
 import JXPhotoBrowser
 
 class ImageSmoothZoomViewController: BaseCollectionViewController {
-    
-    override var name: String { "更丝滑的Zoom转场动画" }
-    
-    override var remark: String { "需要用户自己创建并提供转场视图，以及缩略图位置" }
-    
+
+    override class func name() -> String { "更丝滑的Zoom转场动画" }
+    override class func remark() -> String { "需要用户自己创建并提供转场视图，以及缩略图位置" }
+
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()
     }

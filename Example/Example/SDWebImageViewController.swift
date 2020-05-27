@@ -12,10 +12,9 @@ import SDWebImage
 
 class SDWebImageViewController: BaseCollectionViewController {
     
-    override var name: String { "网络图片-SDWebImage" }
-    
-    override var remark: String { "举例如何用SDWebImage加载网络图片" }
-    
+    override class func name() -> String { "网络图片-SDWebImage" }
+    override class func remark() -> String { "举例如何用SDWebImage加载网络图片" }
+
     override func makeDataSource() -> [ResourceModel] {
         makeNetworkDataSource()
     }

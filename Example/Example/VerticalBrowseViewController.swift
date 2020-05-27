@@ -12,10 +12,9 @@ import AVKit
 
 class VerticalBrowseViewController: BaseCollectionViewController {
     
-    override var name: String { "竖向浏览视频" }
-    
-    override var remark: String { "抖音的浏览方式" }
-    
+    override class func name() -> String { "竖向浏览视频" }
+    override class func remark() -> String {  "抖音的浏览方式" }
+
     override func makeDataSource() -> [ResourceModel] {
         var result: [ResourceModel] = []
         (0..<6).forEach { index in

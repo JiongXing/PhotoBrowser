@@ -11,11 +11,10 @@ import JXPhotoBrowser
 import SDWebImage
 
 class NumberPageIndicatorViewController: BaseCollectionViewController {
-    
-    override var name: String { "数字样式的页码指示器" }
-    
-    override var remark: String { "举例如何使用数字样式的页码指示器" }
-    
+
+    override class func name() -> String { "数字样式的页码指示器" }
+    override class func remark() -> String {  "举例如何使用数字样式的页码指示器" }
+
     override func makeDataSource() -> [ResourceModel] {
         makeNetworkDataSource()
     }

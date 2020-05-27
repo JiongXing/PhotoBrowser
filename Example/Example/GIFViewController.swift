@@ -13,10 +13,9 @@ import Kingfisher
 
 class GIFViewController: BaseCollectionViewController {
     
-    override var name: String { "加载GIF图片" }
-    
-    override var remark: String { "举例如何用SDWebImage加载GIF网络图片" }
-    
+    override class func name() -> String { return "加载GIF图片" }
+    override class func remark() -> String { "举例如何用SDWebImage加载GIF网络图片" }
+     
     override func makeDataSource() -> [ResourceModel] {
         let models = makeNetworkDataSource()
         models[3].secondLevelUrl = "https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/gifImage.gif"

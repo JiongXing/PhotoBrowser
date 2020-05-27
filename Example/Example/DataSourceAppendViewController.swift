@@ -11,9 +11,8 @@ import JXPhotoBrowser
 
 class DataSourceAppendViewController: BaseCollectionViewController {
 
-    override var name: String { "无限新增图片" }
-    
-    override var remark: String { "浏览过程中不断新增图片，变更数据源，刷新UI" }
+    override class func name() -> String { "无限新增图片" }
+    override class func remark() -> String { "浏览过程中不断新增图片，变更数据源，刷新UI" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()

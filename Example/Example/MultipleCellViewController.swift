@@ -11,9 +11,8 @@ import JXPhotoBrowser
 
 class MultipleCellViewController: BaseCollectionViewController {
     
-    override var name: String { "多种类视图" }
-    
-    override var remark: String { "支持不同的类作为项视图，如在最后一页显示更多推荐" }
+    override class func name() -> String { "多种类视图" }
+    override class func remark() -> String { "支持不同的类作为项视图，如在最后一页显示更多推荐" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeLocalDataSource()

@@ -12,9 +12,8 @@ import SDWebImage
 
 class LoadingProgressViewController: BaseCollectionViewController {
     
-    override var name: String { "网络图片显示加载进度" }
-    
-    override var remark: String { "举例如何通过自定义UI显示图片的加载进度" }
+    override class func name() -> String { "网络图片显示加载进度" }
+    override class func remark() -> String { "举例如何通过自定义UI显示图片的加载进度" }
     
     override func makeDataSource() -> [ResourceModel] {
         makeNetworkDataSource()
