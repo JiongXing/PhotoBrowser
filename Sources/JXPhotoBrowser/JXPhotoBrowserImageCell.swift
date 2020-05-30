@@ -29,7 +29,12 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         let view = UIImageView()
         view.clipsToBounds = true
         return view
-    }()
+    }() {
+        didSet {
+            let containerView = oldValue.superview
+            containerView?.addSubview(imageView)
+        }
+    }
     
     open var scrollView: UIScrollView = {
         let view = UIScrollView()
