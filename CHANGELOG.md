@@ -1,5 +1,11 @@
 # Change Log
 
+### Version 3.1.2
+
+> 2020/05/30
+
+- 优化JXPhotoBrowserImageCell，暴露方法支持子类自定义创建视图
+
 ### Version 3.1.1
 
 > 2020/05/08
