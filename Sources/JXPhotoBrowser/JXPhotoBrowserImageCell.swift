@@ -64,11 +64,16 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         return cell
     }
     
-    open func setup() {
-        backgroundColor = .clear
+    /// 子类可重写，创建子视图。完全自定义时不必调super。
+    open func constructSubviews() {
         scrollView.delegate = self
         addSubview(scrollView)
         scrollView.addSubview(imageView)
+    }
+    
+    open func setup() {
+        backgroundColor = .clear
+        constructSubviews()
         
         /// 拖动手势
         addPanGesture()

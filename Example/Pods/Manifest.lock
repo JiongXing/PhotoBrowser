@@ -1,5 +1,5 @@
 PODS:
-  - JXPhotoBrowser (3.0.4)
+  - JXPhotoBrowser (3.1.2)
   - Kingfisher (5.12.0):
     - Kingfisher/Core (= 5.12.0)
   - Kingfisher/Core (5.12.0)
@@ -22,10 +22,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: 0fe379f3ccbc1b7ced5faa34564deca5d42015f0
+  JXPhotoBrowser: 7f0bc11f02fbc84ae06829f922f32ce822aa9661
   Kingfisher: dc6e0f53bb5b12c3e75bedb0e01bbd7a640eea69
   SDWebImage: 5bf6aec6481ae2a062bdc59f9d6c1d1e552090e0
 
 PODFILE CHECKSUM: e9a664c9797966ecede664d83adb37ef296b9a22
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.1
