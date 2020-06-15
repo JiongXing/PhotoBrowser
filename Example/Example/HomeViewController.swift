@@ -12,7 +12,7 @@ import JXPhotoBrowser
 class HomeViewController: UITableViewController {
     
     var dataSource: [MakeController] = dataType.map { cls -> MakeController in
-      return ( { cls.init() }, cls.name(), cls.remark())
+        return ( { cls.init() }, cls.name(), cls.remark())
     }
 
     override func viewDidLoad() {
@@ -24,7 +24,7 @@ class HomeViewController: UITableViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         tableView.jx.registerCell(HomeTableViewCell.self)
 
-        // 授权网络数据访问
+        // 触发网络数据访问授权
         guard let url = URL(string: "http://www.baidu.com") else  {
             return
         }
@@ -75,7 +75,6 @@ private extension HomeViewController {
       LocalImageViewController.self,
       VerticalBrowseViewController.self,
       VideoPhotoViewController.self,
-      ImageZoomViewController.self,
       ImageZoomViewController.self,
       ImageSmoothZoomViewController.self,
       KingfisherImageViewController.self,

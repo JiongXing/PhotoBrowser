@@ -35,6 +35,10 @@ class GIFViewController: BaseCollectionViewController {
     
     override func openPhotoBrowser(with collectionView: UICollectionView, indexPath: IndexPath) {
         let browser = JXPhotoBrowser()
+        /* 系统UIImageView直接加载GIF内存开销大，最好自定义
+        browser.cellClassAtIndex = { index in
+            return 你自定义的Cell，其中最好使用对GIF优化的ImageView
+        }*/
         browser.numberOfItems = {
             self.dataSource.count
         }
