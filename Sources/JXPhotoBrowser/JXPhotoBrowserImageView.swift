@@ -1,5 +1,5 @@
 //
-//  JXPhotoBrowserZoomSupportedCell.swift
+//  JXPhotoBrowserImageView.swift
 //  JXPhotoBrowser
 //
 //  Created by 梁大红 on 2021/2/19.
