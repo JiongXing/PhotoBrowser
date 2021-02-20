@@ -31,6 +31,12 @@
 
 ## 版本更新记录
 
+### Version 3.1.3
+
+> 2021/02/20
+
+- 优化JXPhotoBrowserImageCell，监听imageView的image赋值，自动layout
+
 ### Version 3.1.2
 
 > 2020/05/30
