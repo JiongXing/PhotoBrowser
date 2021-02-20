@@ -39,10 +39,8 @@ class KingfisherImageViewController: BaseCollectionViewController {
             let collectionPath = IndexPath(item: context.index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
-            // 用Kingfisher加载
-            browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder, options: [], completionHandler: { _ in
-                browserCell?.setNeedsLayout()
-            })
+            // 用 Kingfisher 加载
+            browserCell?.imageView.kf.setImage(with: url, placeholder: placeholder)
         }
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)

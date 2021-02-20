@@ -25,10 +25,13 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         }
     }
     
-    open var imageView: UIImageView = {
-        let view = UIImageView()
-        view.clipsToBounds = true
-        return view
+    open lazy var imageView: JXPhotoBrowserImageView = {
+        let imgView = JXPhotoBrowserImageView()
+        imgView.clipsToBounds = true
+        imgView.imageDidChangedHandler = { [weak self] in
+            self?.setNeedsLayout()
+        }
+        return imgView
     }()
     
     open var scrollView: UIScrollView = {

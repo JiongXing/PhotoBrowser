@@ -40,10 +40,8 @@ class SDWebImageViewController: BaseCollectionViewController {
             let collectionPath = IndexPath(item: context.index, section: indexPath.section)
             let collectionCell = collectionView.cellForItem(at: collectionPath) as? BaseCollectionViewCell
             let placeholder = collectionCell?.imageView.image
-            // 用SDWebImage加载
-            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder, options: [], completed: { (_, _, _, _) in
-                browserCell?.setNeedsLayout()
-            })
+            // 用 SDWebImage 加载
+            browserCell?.imageView.sd_setImage(with: url, placeholderImage: placeholder)
         }
         browser.transitionAnimator = JXPhotoBrowserZoomAnimator(previousView: { index -> UIView? in
             let path = IndexPath(item: index, section: indexPath.section)
