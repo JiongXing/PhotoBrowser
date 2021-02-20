@@ -28,7 +28,9 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     open lazy var imageView: JXPhotoBrowserImageView = {
         let imgView = JXPhotoBrowserImageView()
         imgView.clipsToBounds = true
-        imgView.cell = self
+        imgView.imageDidChangedHandler = { [weak self] in
+            self?.setNeedsLayout()
+        }
         return imgView
     }()
     

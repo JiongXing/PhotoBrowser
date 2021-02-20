@@ -9,12 +9,12 @@
 import UIKit
 
 public class JXPhotoBrowserImageView: UIImageView {
-
-    public weak var cell: JXPhotoBrowserImageCell?
+    
+    public var imageDidChangedHandler: (() -> ())?
     
     public override var image: UIImage? {
         didSet {
-            cell?.setNeedsLayout()
+            imageDidChangedHandler?()
         }
     }
 }
