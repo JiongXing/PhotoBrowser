@@ -25,12 +25,9 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         }
     }
     
-    open lazy var imageView: JXPhotoBrowserImageView = {
-        let imgView = JXPhotoBrowserImageView()
+    open lazy var imageView: UIImageView = {
+        let imgView = UIImageView()
         imgView.clipsToBounds = true
-        imgView.imageDidChangedHandler = { [weak self] in
-            self?.setNeedsLayout()
-        }
         return imgView
     }()
     
@@ -46,6 +43,9 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     }()
     
     deinit {
+        imageView.removeObserver(self,
+                                 forKeyPath: "image",
+                                 context: nil)
         JXPhotoBrowserLog.low("deinit - \(self.classForCoder)")
     }
     
@@ -72,8 +72,13 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         scrollView.delegate = self
         addSubview(scrollView)
         scrollView.addSubview(imageView)
+        // 使用 kvo 监控 imageView 的 image 的变化
+        imageView.addObserver(self,
+                              forKeyPath: "image",
+                              options: [.new],
+                              context: nil)
     }
-    
+
     open func setup() {
         backgroundColor = .clear
         constructSubviews()
@@ -325,5 +330,18 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     
     open var showContentView: UIView {
         return imageView
+    }
+    
+    open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard
+            let imgView = object as? UIImageView,
+            imgView == imageView,
+            keyPath == "image"
+        else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+        // 重新布局
+        setNeedsLayout()
     }
 }

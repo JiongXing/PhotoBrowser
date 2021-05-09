@@ -94,7 +94,6 @@
 		63C2BA763C69F183DDB32456D7201543 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A74964E8B5F2929A33F9EB5995D78D /* Filter.swift */; };
 		649A041C003876A4F759C03C3E3652CF /* SDImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6960EFB2993162319F258881B60DA024 /* SDImageCache.m */; };
 		65BE8A8C0E9B70288AD8CCE147773029 /* UIImage+MultiFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = 2565889371566E10D20975ACF5C40311 /* UIImage+MultiFormat.m */; };
-		65F4046425E01CD80095A9A5 /* JXPhotoBrowserImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F4046325E01CD80095A9A5 /* JXPhotoBrowserImageView.swift */; };
 		674440F26519F0CE1F4FDF820FC3751C /* SDAsyncBlockOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CB8AF4063B3C8EE3E4B785AC862D5AFF /* SDAsyncBlockOperation.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		6762844F87C93CED655A769FE20CCBD2 /* SDWebImage-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 1D11FA4B3C5B80E503AB41DD5A320B6D /* SDWebImage-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6804393EA55473086BC9AC4FE08F33F5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 094F456C4B9E4C448AC3D2B1D4C4FBD6 /* Foundation.framework */; };
@@ -353,7 +352,6 @@
 		60FDFA8C26BA76D40F6655F53B0129BB /* JXPhotoBrowserNoneAnimator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JXPhotoBrowserNoneAnimator.swift; path = Sources/JXPhotoBrowser/JXPhotoBrowserNoneAnimator.swift; sourceTree = "<group>"; };
 		654B995587E00CCC535BCBCE31EADBAC /* SDWebImageDownloaderConfig.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageDownloaderConfig.h; path = SDWebImage/Core/SDWebImageDownloaderConfig.h; sourceTree = "<group>"; };
 		6554B58F8D99D7219F3EF88125971B7D /* ImageCache.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ImageCache.swift; path = Sources/Cache/ImageCache.swift; sourceTree = "<group>"; };
-		65F4046325E01CD80095A9A5 /* JXPhotoBrowserImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = JXPhotoBrowserImageView.swift; path = Sources/JXPhotoBrowser/JXPhotoBrowserImageView.swift; sourceTree = "<group>"; };
 		6628B51F42438535F418FD542A73CFE0 /* SDImageCoderHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDImageCoderHelper.h; path = SDWebImage/Core/SDImageCoderHelper.h; sourceTree = "<group>"; };
 		679ADD8B80067EE9099B2552A111A74B /* SDWebImageDefine.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageDefine.m; path = SDWebImage/Core/SDWebImageDefine.m; sourceTree = "<group>"; };
 		68150FB8B523FCA3F07A9F2512F84C19 /* JXPhotoBrowser-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "JXPhotoBrowser-prefix.pch"; sourceTree = "<group>"; };
@@ -903,7 +901,6 @@
 				0D9ACF5BB466A7FE6E677C17784B1B3A /* JXPhotoBrowserPageIndicator.swift */,
 				BEE1BE659542160A161C80B643854D97 /* JXPhotoBrowserSmoothZoomAnimator.swift */,
 				D7DAB5C464DEE8AA8A0326FE89480A80 /* JXPhotoBrowserView.swift */,
-				65F4046325E01CD80095A9A5 /* JXPhotoBrowserImageView.swift */,
 				C546476430AE7A2D176443E057B642A7 /* JXPhotoBrowserZoomAnimator.swift */,
 				258736388BC74C01CB5697DA90494E78 /* JXPhotoBrowserZoomSupportedCell.swift */,
 				D25B8F557653CC0306BA7FED2D28A8C6 /* Pod */,
@@ -1252,7 +1249,6 @@
 				C8C83E69F2F0669614118ABD1126FE39 /* JXPhotoBrowserCell.swift in Sources */,
 				B76FCA3D7E041DE3DC4FCCFB49E04852 /* JXPhotoBrowserDefaultPageIndicator.swift in Sources */,
 				1773419C7878878E210A43349CF31318 /* JXPhotoBrowserFadeAnimator.swift in Sources */,
-				65F4046425E01CD80095A9A5 /* JXPhotoBrowserImageView.swift in Sources */,
 				7E458FCDA0B9D30C3D61EB01F96D262C /* JXPhotoBrowserImageCell.swift in Sources */,
 				9200B5178DB13D57F136F4382183512E /* JXPhotoBrowserLog.swift in Sources */,
 				3EB2A13C1E2572119586CAB93559F2F2 /* JXPhotoBrowserNoneAnimator.swift in Sources */,
