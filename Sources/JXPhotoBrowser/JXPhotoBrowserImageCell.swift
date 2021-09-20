@@ -33,7 +33,7 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     
     open var scrollView: UIScrollView = {
         let view = UIScrollView()
-        view.maximumZoomScale = 2.0
+        view.maximumZoomScale = JXPhotoBrowser.maximumZoomScale
         view.showsVerticalScrollIndicator = false
         view.showsHorizontalScrollIndicator = false
         if #available(iOS 11.0, *) {
@@ -214,7 +214,8 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
         if scrollView.zoomScale < 1.1 {
             // 以点击的位置为中心，放大
             let pointInView = tap.location(in: imageView)
-            let width = scrollView.bounds.size.width / scrollView.maximumZoomScale
+//            let width = scrollView.bounds.size.width / scrollView.maximumZoomScale
+            let width = scrollView.bounds.size.width / JXPhotoBrowser.doubleScale
             let height = scrollView.bounds.size.height / scrollView.maximumZoomScale
             let x = pointInView.x - (width / 2.0)
             let y = pointInView.y - (height / 2.0)
@@ -239,6 +240,14 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     
     /// 响应拖动
     @objc open func onPan(_ pan: UIPanGestureRecognizer) {
+
+        if let idx = photoBrowser?.browserView.pageIndex,
+           let canPanDismiss = photoBrowser?.canPanDismiss(idx),
+           !canPanDismiss {
+            // 当不可以滑动隐藏时直接返回
+            return
+        }
+
         guard imageView.image != nil else {
             return
         }

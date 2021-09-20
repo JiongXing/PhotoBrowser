@@ -8,6 +8,11 @@
 
 import UIKit
 
+extension JXPhotoBrowser {
+    static var maximumZoomScale: CGFloat = 15.0
+    static var doubleScale: CGFloat = 2.0
+}
+
 /// 图片浏览器
 /// - 不支持复用，每次使用请新建实例
 open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelegate, UINavigationControllerDelegate {
@@ -89,6 +94,12 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         set { browserView.cellDidAppear = newValue }
         get { return browserView.cellDidAppear }
     }
+
+    /// 是否可以滑动隐藏,
+    open var canPanDismiss: (_ index: Int) -> Bool {
+        set { browserView.canPanDismiss = newValue }
+        get { browserView.canPanDismiss }
+    }
     
     /// 主视图
     open lazy var browserView = JXPhotoBrowserView()
@@ -132,15 +143,20 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     }
     
     /// 刷新
-    open func reloadData() {
-        browserView.reloadData()
-        pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: pageIndex)
+    open func reloadData(index: Int? = nil) {
+        if let idx = index, idx < numberOfItems() {
+            browserView.reloadData(index: idx)
+            pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: idx)
+        } else {
+            browserView.reloadData()
+            pageIndicator?.reloadData(numberOfItems: numberOfItems(), pageIndex: pageIndex)
+        }
     }
     
     open override func viewDidLoad() {
         super.viewDidLoad()
         
-        automaticallyAdjustsScrollViewInsets = false
+        //automaticallyAdjustsScrollViewInsets = false
         hideNavigationBar(true)
         
         browserView.photoBrowser = self

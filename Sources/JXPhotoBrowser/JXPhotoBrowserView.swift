@@ -41,6 +41,9 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     
     /// 项间距
     open var itemSpacing: CGFloat = 30
+
+    /// 是否可以滑动隐藏
+    open lazy var canPanDismiss: (_ index: Int) -> Bool = { _ in true }
     
     /// 当前页码。给本属性赋值不会触发`didChangedPageIndex`闭包。
     open var pageIndex = 0 {
@@ -127,12 +130,23 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         refreshContentOffset()
     }
     
+    open func reloadData(index: Int) {
+        // 修正pageIndex，同步数据源的变更
+        pageIndex = max(0, index)
+        pageIndex = min(index, numberOfItems())
+        resetContentSize()
+        resetCells()
+        layoutCells()
+        reloadItems()
+        refreshContentOffset()
+    }
+    
     /// 根据页码更新滑动位置
     open func refreshContentOffset() {
         if scrollDirection == .horizontal {
-            scrollView.contentOffset = CGPoint(x: CGFloat(pageIndex) * scrollView.bounds.width, y: 0)
+            scrollView.setContentOffset(CGPoint(x: CGFloat(pageIndex) * scrollView.bounds.width, y: 0), animated: false)
         } else {
-            scrollView.contentOffset = CGPoint(x: 0, y: CGFloat(pageIndex) * scrollView.bounds.height)
+            scrollView.setContentOffset(CGPoint(x: 0, y: CGFloat(pageIndex) * scrollView.bounds.height), animated: false)
         }
     }
     
