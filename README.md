@@ -10,12 +10,9 @@
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Transition.png" width = "30%" div/>
 	<img src="https://github.com/JiongXing/PhotoBrowser/raw/master/Assets/Browser.png" width = "30%" div/>
 </div>
-(截图待更新)
 
-## 说明
+(更多演示请看Demo)
 
-> 新项目Lantern在本库的基础上优化迭代。Lantern由丰巢团队维护，未来会投入更多的开发资源，问题反馈和解决更及时，推荐大家关注。
-> https://github.com/fcbox/Lantern
 
 ## 特性
 
