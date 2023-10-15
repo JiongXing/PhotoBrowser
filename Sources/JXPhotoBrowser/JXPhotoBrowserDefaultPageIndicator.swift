@@ -12,10 +12,11 @@ open class JXPhotoBrowserDefaultPageIndicator: UIPageControl, JXPhotoBrowserPage
     
     /// 页码与底部的距离
     open lazy var bottomPadding: CGFloat = {
-        if #available(iOS 11.0, *),
-            let window = UIApplication.shared.keyWindow,
-            window.safeAreaInsets.bottom > 0 {
-            return 20
+        if #available(iOS 11.0, *) {
+            let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+            if let window = window, window.safeAreaInsets.bottom > 0 {
+                return 20
+            }
         }
         return 15
     }()

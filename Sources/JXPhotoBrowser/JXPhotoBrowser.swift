@@ -140,7 +140,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     open override func viewDidLoad() {
         super.viewDidLoad()
         
-        automaticallyAdjustsScrollViewInsets = false
         hideNavigationBar(true)
         
         browserView.photoBrowser = self
@@ -288,7 +287,8 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
 
     /// 取最顶层的ViewController
     open class var topMost: UIViewController? {
-        return topMost(of: UIApplication.shared.keyWindow?.rootViewController)
+        let keyWindow = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+        return topMost(of: keyWindow?.rootViewController)
     }
     
     open class func topMost(of viewController: UIViewController?) -> UIViewController? {

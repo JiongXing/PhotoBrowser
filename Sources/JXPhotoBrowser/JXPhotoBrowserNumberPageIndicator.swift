@@ -12,9 +12,11 @@ open class JXPhotoBrowserNumberPageIndicator: UILabel, JXPhotoBrowserPageIndicat
     
     ///  页码与顶部的距离
     open lazy var topPadding: CGFloat = {
-        if #available(iOS 11.0, *),
-            let window = UIApplication.shared.keyWindow {
-            return window.safeAreaInsets.top
+        if #available(iOS 11.0, *) {
+            let window = UIApplication.shared.windows.filter { $0.isKeyWindow }.first
+            if let window = window {
+                return window.safeAreaInsets.top
+            }
         }
         return 20
     }()

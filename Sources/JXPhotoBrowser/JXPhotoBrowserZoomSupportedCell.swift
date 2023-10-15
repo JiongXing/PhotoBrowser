@@ -9,7 +9,7 @@
 import UIKit
 
 /// 在Zoom转场时使用
-protocol JXPhotoBrowserZoomSupportedCell: UIView {
+public protocol JXPhotoBrowserZoomSupportedCell: UIView {
     /// 内容视图
     var showContentView: UIView { get }
 }
