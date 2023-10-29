@@ -1,5 +1,18 @@
 # Change Log
 
+### Version 3.1.4
+
+> 2023/10/15
+
+- 更新 Deprecated 方法，消除 Warnings
+- 变更 JXPhotoBrowserZoomSupportedCell 权限修饰符为 public
+
+### Version 3.1.3
+
+> 2021/02/20
+
+- 优化JXPhotoBrowserImageCell，监听imageView的image赋值，自动layout
+
 ### Version 3.1.2
 
 > 2020/05/30
