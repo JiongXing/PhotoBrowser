@@ -45,20 +45,8 @@ extension JXPhotoBrowserAnimatedTransitioning {
         set { }
     }
     
-    public func fastSnapshot(with view: UIView) -> UIView? {
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, UIScreen.main.scale)
-        view.drawHierarchy(in: view.bounds, afterScreenUpdates: false)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return UIImageView(image: image)
-    }
-    
     public func snapshot(with view: UIView) -> UIView? {
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, UIScreen.main.scale)
-        guard let context = UIGraphicsGetCurrentContext() else { return nil }
-        view.layer.render(in: context)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return UIImageView(image: image)
+        let snapshot = view.snapshotView(afterScreenUpdates: true)
+        return snapshot
     }
 }

@@ -132,7 +132,7 @@ open class JXPhotoBrowserZoomAnimator: NSObject, JXPhotoBrowserAnimatedTransitio
         let showContentView = cell.showContentView
         // 两Rect求交集，得出显示中的区域
         let destinationFrame = cell.convert(cell.bounds.intersection(showContentView.frame), to: view)
-        guard let snap1 = fastSnapshot(with: previousView) else {
+        guard let snap1 = snapshot(with: previousView) else {
             JXPhotoBrowserLog.high("取不到前截图！")
             return nil
         }
