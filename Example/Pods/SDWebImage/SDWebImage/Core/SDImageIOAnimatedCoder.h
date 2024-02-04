@@ -7,12 +7,11 @@
 */
 
 #import <Foundation/Foundation.h>
-#import <ImageIO/ImageIO.h>
 #import "SDImageCoder.h"
 
 /**
  This is the abstract class for all animated coder, which use the Image/IO API. You can not use this directly as real coders. A exception will be raised if you use this class.
- All of the properties need the subclass to implment and works as expceted.
+ All of the properties need the subclass to implement and works as expected.
  For Image/IO, See Apple's documentation: https://developer.apple.com/documentation/imageio
  */
 @interface SDImageIOAnimatedCoder : NSObject <SDProgressiveImageCoder, SDAnimatedImageCoder>
@@ -24,7 +23,7 @@
  */
 @property (class, readonly) SDImageFormat imageFormat;
 /**
- The supported image format UTI Type. Such as `kUTTypeGIF`.
+ The supported image format UTI Type. Such as `kSDUTTypeGIF`.
  This can be used for cases when we can not detect `SDImageFormat. Such as progressive decoding's hint format `kCGImageSourceTypeIdentifierHint`.
  @note Subclass override.
  */
@@ -35,7 +34,7 @@
  */
 @property (class, readonly, nonnull) NSString *dictionaryProperty;
 /**
- The image unclamped deply time property key used in Image/IO  API. Such as `kCGImagePropertyGIFUnclampedDelayTime`
+ The image unclamped delay time property key used in Image/IO  API. Such as `kCGImagePropertyGIFUnclampedDelayTime`
  @note Subclass override.
  */
 @property (class, readonly, nonnull) NSString *unclampedDelayTimeProperty;

@@ -1,11 +1,9 @@
 PODS:
   - JXPhotoBrowser (3.1.4)
-  - Kingfisher (5.12.0):
-    - Kingfisher/Core (= 5.12.0)
-  - Kingfisher/Core (5.12.0)
-  - SDWebImage (5.4.0):
-    - SDWebImage/Core (= 5.4.0)
-  - SDWebImage/Core (5.4.0)
+  - Kingfisher (7.10.2)
+  - SDWebImage (5.18.10):
+    - SDWebImage/Core (= 5.18.10)
+  - SDWebImage/Core (5.18.10)
 
 DEPENDENCIES:
   - JXPhotoBrowser (from `../`)
@@ -13,7 +11,7 @@ DEPENDENCIES:
   - SDWebImage
 
 SPEC REPOS:
-  https://mirrors.tuna.tsinghua.edu.cn/git/CocoaPods/Specs.git:
+  trunk:
     - Kingfisher
     - SDWebImage
 
@@ -22,10 +20,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: b44233dad915babf6bda5eb77e4b080f6c40b3c5
-  Kingfisher: dc6e0f53bb5b12c3e75bedb0e01bbd7a640eea69
-  SDWebImage: 5bf6aec6481ae2a062bdc59f9d6c1d1e552090e0
+  JXPhotoBrowser: 41ffa41252c8d5264f97ab3c1936a5cf935a58d7
+  Kingfisher: 99edc495d3b7607e6425f0d6f6847b2abd6d716d
+  SDWebImage: fc8f2d48bbfd72ef39d70e981bd24a3f3be53fec
 
-PODFILE CHECKSUM: cebe1d098a5de571d15c2e73ec1d433049b4c547
+PODFILE CHECKSUM: 92abaea6b2d28b30ee834a17b1a190e01247e20d
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.14.2
