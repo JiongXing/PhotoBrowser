@@ -41,5 +41,14 @@ class LocalImageViewController: BaseCollectionViewController {
         browser.pageIndex = indexPath.item
         // 展示
         browser.show()
+        
+        // dismis回调
+        browser.willDismiss = { _ in
+            JXPhotoBrowserLog.low("即将dismiss!")
+            return true
+        }
+        browser.didDismiss = { _ in
+            JXPhotoBrowserLog.low("已经dismiss!")
+        }
     }
 }

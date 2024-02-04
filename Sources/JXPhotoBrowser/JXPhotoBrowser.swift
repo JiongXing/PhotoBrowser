@@ -90,6 +90,13 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         get { return browserView.cellDidAppear }
     }
     
+    /// 即将dismiss
+    /// - Returns: 是否执行动画
+    open var willDismiss: ((JXPhotoBrowser) -> Bool)?
+    
+    /// 已经dismiss
+    open var didDismiss: ((JXPhotoBrowser) -> Void)?
+    
     /// 主视图
     open lazy var browserView = JXPhotoBrowserView()
     
@@ -234,12 +241,18 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     /// 关闭PhotoBrowser
     open func dismiss() {
+        let animated = willDismiss?(self) ?? true
         pageIndicator?.removeFromSuperview()
         if presentingViewController != nil {
-            dismiss(animated: true, completion: nil)
+            dismiss(animated: animated) { [weak self] in
+                if let `self` = self {
+                    self.didDismiss?(self)
+                }
+            }
         } else {
             navigationController?.delegate = self
-            navigationController?.popViewController(animated: true)
+            navigationController?.popViewController(animated: animated)
+            didDismiss?(self)
         }
     }
     
