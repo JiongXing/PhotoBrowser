@@ -33,10 +33,14 @@ extension JXPhotoBrowserAnimatedTransitioning {
     
     public weak var photoBrowser: JXPhotoBrowser? {
         get {
-            return objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowser
+            if let wrapper = objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowserWeakAssociationWrapper {
+                return wrapper.target as? JXPhotoBrowser
+            }
+            return nil
         }
         set {
-            objc_setAssociatedObject(self, &photoBrowserKey, newValue, .OBJC_ASSOCIATION_ASSIGN)
+            let wrapper = JXPhotoBrowserWeakAssociationWrapper(target: newValue)
+            objc_setAssociatedObject(self, &photoBrowserKey, wrapper, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
@@ -48,5 +52,14 @@ extension JXPhotoBrowserAnimatedTransitioning {
     public func snapshot(with view: UIView) -> UIView? {
         let snapshot = view.snapshotView(afterScreenUpdates: true)
         return snapshot
+    }
+}
+
+struct JXPhotoBrowserWeakAssociationWrapper {
+    
+    weak var target: AnyObject?
+    
+    init(target: AnyObject? = nil) {
+        self.target = target
     }
 }
