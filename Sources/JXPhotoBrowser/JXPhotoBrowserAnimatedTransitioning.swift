@@ -14,8 +14,8 @@ public protocol JXPhotoBrowserAnimatedTransitioning: UIViewControllerAnimatedTra
     var isNavigationAnimation: Bool { get set }
 }
 
-private var isForShowKey = "isForShowKey"
-private var photoBrowserKey = "photoBrowserKey"
+private var isForShowKey: Void?
+private var photoBrowserKey: Void?
 
 extension JXPhotoBrowserAnimatedTransitioning {
     
