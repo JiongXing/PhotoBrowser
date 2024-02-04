@@ -244,7 +244,7 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         let animated = willDismiss?(self) ?? true
         pageIndicator?.removeFromSuperview()
         if presentingViewController != nil {
-            dismiss(animated: animated) { [weak self] in
+            presentingViewController?.dismiss(animated: animated) { [weak self] in
                 if let `self` = self {
                     self.didDismiss?(self)
                 }

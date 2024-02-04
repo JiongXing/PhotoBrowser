@@ -58,6 +58,8 @@ class DataSourceDeleteViewController: BaseCollectionViewController {
             self.dataSource.remove(at: cell.index)
             self.collectionView.reloadData()
             cell.photoBrowser?.reloadData()
+            // 如果删没了，关闭
+            cell.photoBrowser?.dismiss()
         }))
         alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
         cell.photoBrowser?.present(alert, animated: true, completion: nil)
