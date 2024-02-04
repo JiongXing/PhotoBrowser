@@ -124,7 +124,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
         case .present(let fromVC, let embed):
             let toVC = embed?(self) ?? self
             toVC.modalPresentationStyle = .custom
-            toVC.modalPresentationCapturesStatusBarAppearance = true
             toVC.transitioningDelegate = self
             let from = fromVC ?? JXPhotoBrowser.topMost
             from?.present(toVC, animated: true, completion: nil)
@@ -211,37 +210,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     }
     
     //
-    // MARK: - Status Bar
-    //
-    
-    private lazy var isPreviousStatusBarHidden: Bool = {
-        var previousVC: UIViewController?
-        if let vc = self.presentingViewController {
-            previousVC = vc
-        } else {
-            if let navVCs = self.navigationController?.viewControllers, navVCs.count >= 2 {
-                previousVC = navVCs[navVCs.count - 2]
-            }
-        }
-        return previousVC?.prefersStatusBarHidden ?? false
-    }()
-    
-    private lazy var isStatusBarHidden = self.isPreviousStatusBarHidden
-    
-    open override var prefersStatusBarHidden: Bool {
-        return isStatusBarHidden
-    }
-    
-    open func setStatusBar(hidden: Bool) {
-        if hidden {
-            isStatusBarHidden = true
-        } else {
-            isStatusBarHidden = isPreviousStatusBarHidden
-        }
-        setNeedsStatusBarAppearanceUpdate()
-    }
-    
-    //
     // MARK: - 转场
     //
     
@@ -266,7 +234,6 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     
     /// 关闭PhotoBrowser
     open func dismiss() {
-        setStatusBar(hidden: false)
         pageIndicator?.removeFromSuperview()
         if presentingViewController != nil {
             dismiss(animated: true, completion: nil)
