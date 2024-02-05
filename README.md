@@ -26,36 +26,22 @@
 - [x] 支持网络图片加载、查看原图加载，由用户自由选择其他框架进行图片加载与缓存
 - [x] 支持添加附加控件，框架提供了两种页面指示器的实现，以及在例子工程提供了加载进度环的实现
 
-## 版本更新记录
+## 近期版本更新
 
-### Version 3.1.4
+### Version 3.1.5
 
-> 2023/10/15
+> 2024/02/05
 
-- 更新 Deprecated 方法，消除 Warnings
-- 变更 JXPhotoBrowserZoomSupportedCell 权限修饰符为 public
+- 优化和修复已知问题，包括#213 #216 #217 #221 #224 #225
 
-### Version 3.1.3
-
-> 2021/02/20
-
-- 优化JXPhotoBrowserImageCell，监听imageView的image赋值，自动layout
-
-### Version 3.1.2
-
-> 2020/05/30
-
-- 优化JXPhotoBrowserImageCell，暴露方法支持子类自定义创建视图
-
-### 更多
+### 历史更新记录
 
 - [CHANGELOG](CHANGELOG.md)
 
 
 ## 环境要求
 
-- iOS 8.0 以上
-- Swift 4.2 以上
+- iOS 11.0 及以上
 
 ## 安装方法
 
@@ -64,7 +50,7 @@
 在`podfile`配置
 
 ```
-pod 'JXPhotoBrowser', '~> 3.0'
+pod 'JXPhotoBrowser'
 ```
 
 ### Swift Package Manager (Xcode 11+)

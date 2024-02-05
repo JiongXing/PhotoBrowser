@@ -1,5 +1,5 @@
 PODS:
-  - JXPhotoBrowser (3.1.4)
+  - JXPhotoBrowser (3.1.5)
   - Kingfisher (7.10.2)
   - SDWebImage (5.18.10):
     - SDWebImage/Core (= 5.18.10)
@@ -20,7 +20,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: 41ffa41252c8d5264f97ab3c1936a5cf935a58d7
+  JXPhotoBrowser: e0dad01805e85c317ac8844ce793f7935fa918ed
   Kingfisher: 99edc495d3b7607e6425f0d6f6847b2abd6d716d
   SDWebImage: fc8f2d48bbfd72ef39d70e981bd24a3f3be53fec
 
