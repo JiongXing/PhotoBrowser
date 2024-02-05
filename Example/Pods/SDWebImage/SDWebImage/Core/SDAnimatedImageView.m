@@ -10,24 +10,28 @@
 
 #if SD_UIKIT || SD_MAC
 
-#import "SDAnimatedImagePlayer.h"
 #import "UIImage+Metadata.h"
 #import "NSImage+Compatibility.h"
 #import "SDInternalMacros.h"
 #import "objc/runtime.h"
 
-@interface SDAnimatedImageView () <CALayerDelegate> {
+@interface UIImageView () <CALayerDelegate>
+@end
+
+@interface SDAnimatedImageView () {
     BOOL _initFinished; // Extra flag to mark the `commonInit` is called
     NSRunLoopMode _runLoopMode;
+    NSUInteger _maxBufferSize;
     double _playbackRate;
+    SDAnimatedImagePlaybackMode _playbackMode;
 }
 
+@property (nonatomic, strong, readwrite) SDAnimatedImagePlayer *player;
 @property (nonatomic, strong, readwrite) UIImage *currentFrame;
 @property (nonatomic, assign, readwrite) NSUInteger currentFrameIndex;
 @property (nonatomic, assign, readwrite) NSUInteger currentLoopCount;
 @property (nonatomic, assign) BOOL shouldAnimate;
 @property (nonatomic, assign) BOOL isProgressive;
-@property (nonatomic,strong) SDAnimatedImagePlayer *player; // The animation player.
 @property (nonatomic) CALayer *imageViewLayer; // The actual rendering layer.
 
 @end
@@ -92,6 +96,7 @@
 {
     // Pay attention that UIKit's `initWithImage:` will trigger a `setImage:` during initialization before this `commonInit`.
     // So the properties which rely on this order, should using lazy-evaluation or do extra check in `setImage:`.
+    self.autoPlayAnimatedImage = YES;
     self.shouldCustomLoopCount = NO;
     self.shouldIncrementalLoad = YES;
     self.playbackRate = 1.0;
@@ -133,7 +138,7 @@
             } else {
                 provider = (id<SDAnimatedImage>)image;
             }
-            // Create animted player
+            // Create animated player
             self.player = [SDAnimatedImagePlayer playerWithProvider:provider];
         } else {
             // Update Frame Count
@@ -153,9 +158,15 @@
         // RunLoop Mode
         self.player.runLoopMode = self.runLoopMode;
         
+        // Max Buffer Size
+        self.player.maxBufferSize = self.maxBufferSize;
+        
         // Play Rate
         self.player.playbackRate = self.playbackRate;
         
+        // Play Mode
+        self.player.playbackMode = self.playbackMode;
+
         // Setup handler
         @weakify(self);
         self.player.animationFrameHandler = ^(NSUInteger index, UIImage * frame) {
@@ -166,23 +177,23 @@
         };
         self.player.animationLoopHandler = ^(NSUInteger loopCount) {
             @strongify(self);
-            self.currentLoopCount = loopCount;
             // Progressive image reach the current last frame index. Keep the state and pause animating. Wait for later restart
             if (self.isProgressive) {
-                NSUInteger lastFrameIndex = self.player.totalFrameCount;
+                NSUInteger lastFrameIndex = self.player.totalFrameCount - 1;
                 [self.player seekToFrameAtIndex:lastFrameIndex loopCount:0];
                 [self.player pausePlaying];
+            } else {
+                self.currentLoopCount = loopCount;
             }
         };
         
         // Ensure disabled highlighting; it's not supported (see `-setHighlighted:`).
         super.highlighted = NO;
         
-        // Start animating
-        [self startAnimating];
-
-        [self.imageViewLayer setNeedsDisplay];
+        [self stopAnimating];
+        [self checkPlay];
     }
+    [self.imageViewLayer setNeedsDisplay];
 }
 
 #pragma mark - Configuration
@@ -206,6 +217,16 @@
     return [NSProcessInfo processInfo].activeProcessorCount > 1 ? NSRunLoopCommonModes : NSDefaultRunLoopMode;
 }
 
+- (void)setMaxBufferSize:(NSUInteger)maxBufferSize
+{
+    _maxBufferSize = maxBufferSize;
+    self.player.maxBufferSize = maxBufferSize;
+}
+
+- (NSUInteger)maxBufferSize {
+    return _maxBufferSize; // Defaults to 0
+}
+
 - (void)setPlaybackRate:(double)playbackRate
 {
     _playbackRate = playbackRate;
@@ -219,6 +240,19 @@
     }
     return _playbackRate;
 }
+
+- (void)setPlaybackMode:(SDAnimatedImagePlaybackMode)playbackMode {
+    _playbackMode = playbackMode;
+    self.player.playbackMode = playbackMode;
+}
+
+- (SDAnimatedImagePlaybackMode)playbackMode {
+    if (!_initFinished) {
+        return SDAnimatedImagePlaybackModeNormal; // Default mode is normal
+    }
+    return _playbackMode;
+}
+
 
 - (BOOL)shouldIncrementalLoad
 {
@@ -243,12 +277,7 @@
     [super didMoveToSuperview];
 #endif
     
-    [self updateShouldAnimate];
-    if (self.shouldAnimate) {
-        [self startAnimating];
-    } else {
-        [self stopAnimating];
-    }
+    [self checkPlay];
 }
 
 #if SD_MAC
@@ -263,12 +292,7 @@
     [super didMoveToWindow];
 #endif
     
-    [self updateShouldAnimate];
-    if (self.shouldAnimate) {
-        [self startAnimating];
-    } else {
-        [self stopAnimating];
-    }
+    [self checkPlay];
 }
 
 #if SD_MAC
@@ -283,24 +307,14 @@
     [super setAlpha:alpha];
 #endif
     
-    [self updateShouldAnimate];
-    if (self.shouldAnimate) {
-        [self startAnimating];
-    } else {
-        [self stopAnimating];
-    }
+    [self checkPlay];
 }
 
 - (void)setHidden:(BOOL)hidden
 {
     [super setHidden:hidden];
     
-    [self updateShouldAnimate];
-    if (self.shouldAnimate) {
-        [self startAnimating];
-    } else {
-        [self stopAnimating];
-    }
+    [self checkPlay];
 }
 
 #pragma mark - UIImageView Method Overrides
@@ -329,6 +343,8 @@
     } else {
 #if SD_UIKIT
         [super startAnimating];
+#else
+        [super setAnimates:YES];
 #endif
     }
 }
@@ -347,6 +363,8 @@
     } else {
 #if SD_UIKIT
         [super stopAnimating];
+#else
+        [super setAnimates:NO];
 #endif
     }
 }
@@ -363,9 +381,17 @@
 #endif
 
 #if SD_MAC
+- (BOOL)animates
+{
+    if (self.player) {
+        return self.player.isPlaying;
+    } else {
+        return [super animates];
+    }
+}
+
 - (void)setAnimates:(BOOL)animates
 {
-    [super setAnimates:animates];
     if (animates) {
         [self startAnimating];
     } else {
@@ -387,6 +413,20 @@
 
 #pragma mark - Private Methods
 #pragma mark Animation
+
+/// Check if it should be played
+- (void)checkPlay
+{
+    // Only handle for SDAnimatedImage, leave UIAnimatedImage or animationImages for super implementation control
+    if (self.player && self.autoPlayAnimatedImage) {
+        [self updateShouldAnimate];
+        if (self.shouldAnimate) {
+            [self startAnimating];
+        } else {
+            [self stopAnimating];
+        }
+    }
+}
 
 // Don't repeatedly check our window & superview in `-displayDidRefresh:` for performance reasons.
 // Just update our cached value whenever the animated image or visibility (window, superview, hidden, alpha) is changed.
@@ -431,7 +471,7 @@
 {
     if ([image.class conformsToProtocol:@protocol(SDAnimatedImage)] && image.sd_isIncremental && [image respondsToSelector:@selector(animatedCoder)]) {
         id<SDAnimatedImageCoder> animatedCoder = [(id<SDAnimatedImage>)image animatedCoder];
-        if ([animatedCoder conformsToProtocol:@protocol(SDProgressiveImageCoder)]) {
+        if ([animatedCoder respondsToSelector:@selector(initIncrementalWithOptions:)]) {
             return (id<SDAnimatedImageCoder, SDProgressiveImageCoder>)animatedCoder;
         }
     }
@@ -448,17 +488,38 @@
     if (currentFrame) {
         layer.contentsScale = currentFrame.scale;
         layer.contents = (__bridge id)currentFrame.CGImage;
+    } else {
+        // If we have no animation frames, call super implementation. iOS 14+ UIImageView use this delegate method for rendering.
+        if ([UIImageView instancesRespondToSelector:@selector(displayLayer:)]) {
+            [super displayLayer:layer];
+        } else {
+            // Fallback to implements the static image rendering by ourselves (like macOS or before iOS 14)
+            currentFrame = super.image;
+            layer.contentsScale = currentFrame.scale;
+            layer.contents = (__bridge id)currentFrame.CGImage;
+        }
     }
 }
+
+#if SD_UIKIT
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    // See: #3635
+    // From iOS 17, when UIImageView entering the background, it will receive the trait collection changes, and modify the CALayer.contents by `self.image.CGImage`
+    // However, For animated image, `self.image.CGImge != self.currentFrame.CGImage`, right ?
+    // So this cause the render issue, we need to reset the CALayer.contents again
+    [super traitCollectionDidChange:previousTraitCollection];
+    [self.imageViewLayer setNeedsDisplay];
+}
+#endif
 
 #if SD_MAC
 // NSImageView use a subview. We need this subview's layer for actual rendering.
 // Why using this design may because of properties like `imageAlignment` and `imageScaling`, which it's not available for UIImageView.contentMode (it's impossible to align left and keep aspect ratio at the same time)
 - (NSView *)imageView {
-    NSImageView *imageView = imageView = objc_getAssociatedObject(self, NSSelectorFromString(@"_imageView"));
+    NSImageView *imageView = objc_getAssociatedObject(self, SD_SEL_SPI(imageView));
     if (!imageView) {
         // macOS 10.14
-        imageView = objc_getAssociatedObject(self, NSSelectorFromString(@"_imageSubview"));
+        imageView = objc_getAssociatedObject(self, SD_SEL_SPI(imageSubview));
     }
     return imageView;
 }

@@ -204,9 +204,10 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         guard let browser = photoBrowser else {
             return
         }
+        let n = numberOfItems()
         var removeFromVisibles = [Int]()
         for (index, cell) in visibleCells {
-            if index == pageIndex {
+            if index == pageIndex && n > 0 {
                 continue
             }
             cellWillDisappear(cell, index)

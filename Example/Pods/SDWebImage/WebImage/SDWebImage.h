@@ -9,19 +9,16 @@
 
 #import <SDWebImage/SDWebImageCompat.h>
 
-#if SD_UIKIT
-#import <UIKit/UIKit.h>
-#endif
+//! Project version number for SDWebImage.
+FOUNDATION_EXPORT double SDWebImageVersionNumber;
 
-//! Project version number for WebImage.
-FOUNDATION_EXPORT double WebImageVersionNumber;
+//! Project version string for SDWebImage.
+FOUNDATION_EXPORT const unsigned char SDWebImageVersionString[];
 
-//! Project version string for WebImage.
-FOUNDATION_EXPORT const unsigned char WebImageVersionString[];
-
-// In this header, you should import all the public headers of your framework using statements like #import <WebImage/PublicHeader.h>
+// In this header, you should import all the public headers of your framework using statements like #import <SDWebImage/PublicHeader.h>
 
 #import <SDWebImage/SDWebImageManager.h>
+#import <SDWebImage/SDCallbackQueue.h>
 #import <SDWebImage/SDWebImageCacheKeyFilter.h>
 #import <SDWebImage/SDWebImageCacheSerializer.h>
 #import <SDWebImage/SDImageCacheConfig.h>
@@ -43,6 +40,7 @@ FOUNDATION_EXPORT const unsigned char WebImageVersionString[];
 #import <SDWebImage/UIButton+WebCache.h>
 #import <SDWebImage/SDWebImagePrefetcher.h>
 #import <SDWebImage/UIView+WebCacheOperation.h>
+#import <SDWebImage/UIView+WebCacheState.h>
 #import <SDWebImage/UIImage+Metadata.h>
 #import <SDWebImage/UIImage+MultiFormat.h>
 #import <SDWebImage/UIImage+MemoryCacheCost.h>
@@ -65,6 +63,7 @@ FOUNDATION_EXPORT const unsigned char WebImageVersionString[];
 #import <SDWebImage/SDImageFrame.h>
 #import <SDWebImage/SDImageCoderHelper.h>
 #import <SDWebImage/SDImageGraphics.h>
+#import <SDWebImage/SDGraphicsImageRenderer.h>
 #import <SDWebImage/UIImage+GIF.h>
 #import <SDWebImage/UIImage+ForceDecode.h>
 #import <SDWebImage/NSData+ImageContentType.h>
@@ -73,6 +72,7 @@ FOUNDATION_EXPORT const unsigned char WebImageVersionString[];
 #import <SDWebImage/SDWebImageOptionsProcessor.h>
 #import <SDWebImage/SDImageIOAnimatedCoder.h>
 #import <SDWebImage/SDImageHEICCoder.h>
+#import <SDWebImage/SDImageAWebPCoder.h>
 
 // Mac
 #if __has_include(<SDWebImage/NSImage+Compatibility.h>)

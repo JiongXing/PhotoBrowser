@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class JXPhotoBrowserImageView: UIImageView {
+open class JXPhotoBrowserImageView: UIImageView {
     
     public var imageDidChangedHandler: (() -> ())?
     

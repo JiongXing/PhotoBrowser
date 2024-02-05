@@ -14,8 +14,8 @@ public protocol JXPhotoBrowserAnimatedTransitioning: UIViewControllerAnimatedTra
     var isNavigationAnimation: Bool { get set }
 }
 
-private var isForShowKey = "isForShowKey"
-private var photoBrowserKey = "photoBrowserKey"
+private var isForShowKey: Void?
+private var photoBrowserKey: Void?
 
 extension JXPhotoBrowserAnimatedTransitioning {
     
@@ -33,10 +33,14 @@ extension JXPhotoBrowserAnimatedTransitioning {
     
     public weak var photoBrowser: JXPhotoBrowser? {
         get {
-            return objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowser
+            if let wrapper = objc_getAssociatedObject(self, &photoBrowserKey) as? JXPhotoBrowserWeakAssociationWrapper {
+                return wrapper.target as? JXPhotoBrowser
+            }
+            return nil
         }
         set {
-            objc_setAssociatedObject(self, &photoBrowserKey, newValue, .OBJC_ASSOCIATION_ASSIGN)
+            let wrapper = JXPhotoBrowserWeakAssociationWrapper(target: newValue)
+            objc_setAssociatedObject(self, &photoBrowserKey, wrapper, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
@@ -45,20 +49,17 @@ extension JXPhotoBrowserAnimatedTransitioning {
         set { }
     }
     
-    public func fastSnapshot(with view: UIView) -> UIView? {
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, UIScreen.main.scale)
-        view.drawHierarchy(in: view.bounds, afterScreenUpdates: false)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return UIImageView(image: image)
-    }
-    
     public func snapshot(with view: UIView) -> UIView? {
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, UIScreen.main.scale)
-        guard let context = UIGraphicsGetCurrentContext() else { return nil }
-        view.layer.render(in: context)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return UIImageView(image: image)
+        let snapshot = view.snapshotView(afterScreenUpdates: true)
+        return snapshot
+    }
+}
+
+struct JXPhotoBrowserWeakAssociationWrapper {
+    
+    weak var target: AnyObject?
+    
+    init(target: AnyObject? = nil) {
+        self.target = target
     }
 }
