@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4C0C1A1C2C9B8F3F00C8E7A0 /* JXPhotoBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A0B2C9B8F3F00C8E7A0 /* JXPhotoBrowser.swift */; };
+		4C0C1A1D2C9B8F3F00C8E7A0 /* JXPhotoBrowserAnimatedTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A0C2C9B8F3F00C8E7A0 /* JXPhotoBrowserAnimatedTransitioning.swift */; };
+		4C0C1A1E2C9B8F3F00C8E7A0 /* JXPhotoBrowserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A0D2C9B8F3F00C8E7A0 /* JXPhotoBrowserCell.swift */; };
+		4C0C1A1F2C9B8F3F00C8E7A0 /* JXPhotoBrowserDefaultPageIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A0E2C9B8F3F00C8E7A0 /* JXPhotoBrowserDefaultPageIndicator.swift */; };
+		4C0C1A202C9B8F3F00C8E7A0 /* JXPhotoBrowserFadeAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A0F2C9B8F3F00C8E7A0 /* JXPhotoBrowserFadeAnimator.swift */; };
+		4C0C1A212C9B8F3F00C8E7A0 /* JXPhotoBrowserImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A102C9B8F3F00C8E7A0 /* JXPhotoBrowserImageCell.swift */; };
+		4C0C1A222C9B8F3F00C8E7A0 /* JXPhotoBrowserImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A112C9B8F3F00C8E7A0 /* JXPhotoBrowserImageView.swift */; };
+		4C0C1A232C9B8F3F00C8E7A0 /* JXPhotoBrowserLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A122C9B8F3F00C8E7A0 /* JXPhotoBrowserLog.swift */; };
+		4C0C1A242C9B8F3F00C8E7A0 /* JXPhotoBrowserNoneAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A132C9B8F3F00C8E7A0 /* JXPhotoBrowserNoneAnimator.swift */; };
+		4C0C1A252C9B8F3F00C8E7A0 /* JXPhotoBrowserNumberPageIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A142C9B8F3F00C8E7A0 /* JXPhotoBrowserNumberPageIndicator.swift */; };
+		4C0C1A262C9B8F3F00C8E7A0 /* JXPhotoBrowserPageIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A152C9B8F3F00C8E7A0 /* JXPhotoBrowserPageIndicator.swift */; };
+		4C0C1A272C9B8F3F00C8E7A0 /* JXPhotoBrowserSmoothZoomAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A162C9B8F3F00C8E7A0 /* JXPhotoBrowserSmoothZoomAnimator.swift */; };
+		4C0C1A282C9B8F3F00C8E7A0 /* JXPhotoBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A172C9B8F3F00C8E7A0 /* JXPhotoBrowserView.swift */; };
+		4C0C1A292C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A182C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomAnimator.swift */; };
+		4C0C1A2A2C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomSupportedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0C1A192C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomSupportedCell.swift */; };
+		4C0C1A2B2C9B8F3F00C8E7A0 /* JXPhotoBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C0C1A1A2C9B8F3F00C8E7A0 /* JXPhotoBrowser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4C0C1A002C9B8F3F00C8E7A0 /* JXPhotoBrowser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JXPhotoBrowser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C0C1A0B2C9B8F3F00C8E7A0 /* JXPhotoBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowser.swift; sourceTree = "<group>"; };
+		4C0C1A0C2C9B8F3F00C8E7A0 /* JXPhotoBrowserAnimatedTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserAnimatedTransitioning.swift; sourceTree = "<group>"; };
+		4C0C1A0D2C9B8F3F00C8E7A0 /* JXPhotoBrowserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserCell.swift; sourceTree = "<group>"; };
+		4C0C1A0E2C9B8F3F00C8E7A0 /* JXPhotoBrowserDefaultPageIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserDefaultPageIndicator.swift; sourceTree = "<group>"; };
+		4C0C1A0F2C9B8F3F00C8E7A0 /* JXPhotoBrowserFadeAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserFadeAnimator.swift; sourceTree = "<group>"; };
+		4C0C1A102C9B8F3F00C8E7A0 /* JXPhotoBrowserImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserImageCell.swift; sourceTree = "<group>"; };
+		4C0C1A112C9B8F3F00C8E7A0 /* JXPhotoBrowserImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserImageView.swift; sourceTree = "<group>"; };
+		4C0C1A122C9B8F3F00C8E7A0 /* JXPhotoBrowserLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserLog.swift; sourceTree = "<group>"; };
+		4C0C1A132C9B8F3F00C8E7A0 /* JXPhotoBrowserNoneAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserNoneAnimator.swift; sourceTree = "<group>"; };
+		4C0C1A142C9B8F3F00C8E7A0 /* JXPhotoBrowserNumberPageIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserNumberPageIndicator.swift; sourceTree = "<group>"; };
+		4C0C1A152C9B8F3F00C8E7A0 /* JXPhotoBrowserPageIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserPageIndicator.swift; sourceTree = "<group>"; };
+		4C0C1A162C9B8F3F00C8E7A0 /* JXPhotoBrowserSmoothZoomAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserSmoothZoomAnimator.swift; sourceTree = "<group>"; };
+		4C0C1A172C9B8F3F00C8E7A0 /* JXPhotoBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserView.swift; sourceTree = "<group>"; };
+		4C0C1A182C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserZoomAnimator.swift; sourceTree = "<group>"; };
+		4C0C1A192C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomSupportedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserZoomSupportedCell.swift; sourceTree = "<group>"; };
+		4C0C1A1A2C9B8F3F00C8E7A0 /* JXPhotoBrowser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JXPhotoBrowser.h; sourceTree = "<group>"; };
+		4C0C1A1B2C9B8F3F00C8E7A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4C0C19FD2C9B8F3F00C8E7A0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4C0C19F62C9B8F3F00C8E7A0 = {
+			isa = PBXGroup;
+			children = (
+				4C0C1A022C9B8F3F00C8E7A0 /* JXPhotoBrowser */,
+				4C0C1A012C9B8F3F00C8E7A0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4C0C1A012C9B8F3F00C8E7A0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4C0C1A002C9B8F3F00C8E7A0 /* JXPhotoBrowser.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4C0C1A022C9B8F3F00C8E7A0 /* JXPhotoBrowser */ = {
+			isa = PBXGroup;
+			children = (
+				4C0C1A1A2C9B8F3F00C8E7A0 /* JXPhotoBrowser.h */,
+				4C0C1A1B2C9B8F3F00C8E7A0 /* Info.plist */,
+				4C0C1A0B2C9B8F3F00C8E7A0 /* JXPhotoBrowser.swift */,
+				4C0C1A0C2C9B8F3F00C8E7A0 /* JXPhotoBrowserAnimatedTransitioning.swift */,
+				4C0C1A0D2C9B8F3F00C8E7A0 /* JXPhotoBrowserCell.swift */,
+				4C0C1A0E2C9B8F3F00C8E7A0 /* JXPhotoBrowserDefaultPageIndicator.swift */,
+				4C0C1A0F2C9B8F3F00C8E7A0 /* JXPhotoBrowserFadeAnimator.swift */,
+				4C0C1A102C9B8F3F00C8E7A0 /* JXPhotoBrowserImageCell.swift */,
+				4C0C1A112C9B8F3F00C8E7A0 /* JXPhotoBrowserImageView.swift */,
+				4C0C1A122C9B8F3F00C8E7A0 /* JXPhotoBrowserLog.swift */,
+				4C0C1A132C9B8F3F00C8E7A0 /* JXPhotoBrowserNoneAnimator.swift */,
+				4C0C1A142C9B8F3F00C8E7A0 /* JXPhotoBrowserNumberPageIndicator.swift */,
+				4C0C1A152C9B8F3F00C8E7A0 /* JXPhotoBrowserPageIndicator.swift */,
+				4C0C1A162C9B8F3F00C8E7A0 /* JXPhotoBrowserSmoothZoomAnimator.swift */,
+				4C0C1A172C9B8F3F00C8E7A0 /* JXPhotoBrowserView.swift */,
+				4C0C1A182C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomAnimator.swift */,
+				4C0C1A192C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomSupportedCell.swift */,
+			);
+			path = JXPhotoBrowser;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4C0C19FB2C9B8F3F00C8E7A0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C0C1A2B2C9B8F3F00C8E7A0 /* JXPhotoBrowser.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4C0C19FF2C9B8F3F00C8E7A0 /* JXPhotoBrowser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4C0C1A082C9B8F3F00C8E7A0 /* Build configuration list for PBXNativeTarget "JXPhotoBrowser" */;
+			buildPhases = (
+				4C0C19FB2C9B8F3F00C8E7A0 /* Headers */,
+				4C0C19FC2C9B8F3F00C8E7A0 /* Sources */,
+				4C0C19FD2C9B8F3F00C8E7A0 /* Frameworks */,
+				4C0C19FE2C9B8F3F00C8E7A0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JXPhotoBrowser;
+			productName = JXPhotoBrowser;
+			productReference = 4C0C1A002C9B8F3F00C8E7A0 /* JXPhotoBrowser.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4C0C19F72C9B8F3F00C8E7A0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					4C0C19FF2C9B8F3F00C8E7A0 = {
+						CreatedOnToolsVersion = 15.0;
+						LastSwiftMigration = 1500;
+					};
+				};
+			};
+			buildConfigurationList = 4C0C19FA2C9B8F3F00C8E7A0 /* Build configuration list for PBXProject "JXPhotoBrowser" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4C0C19F62C9B8F3F00C8E7A0;
+			productRefGroup = 4C0C1A012C9B8F3F00C8E7A0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4C0C19FF2C9B8F3F00C8E7A0 /* JXPhotoBrowser */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4C0C19FE2C9B8F3F00C8E7A0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4C0C19FC2C9B8F3F00C8E7A0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4C0C1A1C2C9B8F3F00C8E7A0 /* JXPhotoBrowser.swift in Sources */,
+				4C0C1A1D2C9B8F3F00C8E7A0 /* JXPhotoBrowserAnimatedTransitioning.swift in Sources */,
+				4C0C1A1E2C9B8F3F00C8E7A0 /* JXPhotoBrowserCell.swift in Sources */,
+				4C0C1A1F2C9B8F3F00C8E7A0 /* JXPhotoBrowserDefaultPageIndicator.swift in Sources */,
+				4C0C1A202C9B8F3F00C8E7A0 /* JXPhotoBrowserFadeAnimator.swift in Sources */,
+				4C0C1A212C9B8F3F00C8E7A0 /* JXPhotoBrowserImageCell.swift in Sources */,
+				4C0C1A222C9B8F3F00C8E7A0 /* JXPhotoBrowserImageView.swift in Sources */,
+				4C0C1A232C9B8F3F00C8E7A0 /* JXPhotoBrowserLog.swift in Sources */,
+				4C0C1A242C9B8F3F00C8E7A0 /* JXPhotoBrowserNoneAnimator.swift in Sources */,
+				4C0C1A252C9B8F3F00C8E7A0 /* JXPhotoBrowserNumberPageIndicator.swift in Sources */,
+				4C0C1A262C9B8F3F00C8E7A0 /* JXPhotoBrowserPageIndicator.swift in Sources */,
+				4C0C1A272C9B8F3F00C8E7A0 /* JXPhotoBrowserSmoothZoomAnimator.swift in Sources */,
+				4C0C1A282C9B8F3F00C8E7A0 /* JXPhotoBrowserView.swift in Sources */,
+				4C0C1A292C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomAnimator.swift in Sources */,
+				4C0C1A2A2C9B8F3F00C8E7A0 /* JXPhotoBrowserZoomSupportedCell.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		4C0C1A062C9B8F3F00C8E7A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		4C0C1A072C9B8F3F00C8E7A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		4C0C1A092C9B8F3F00C8E7A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.1.5;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jiongxing.JXPhotoBrowser;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4C0C1A0A2C9B8F3F00C8E7A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 3.1.5;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.jiongxing.JXPhotoBrowser;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4C0C19FA2C9B8F3F00C8E7A0 /* Build configuration list for PBXProject "JXPhotoBrowser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C0C1A062C9B8F3F00C8E7A0 /* Debug */,
+				4C0C1A072C9B8F3F00C8E7A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4C0C1A082C9B8F3F00C8E7A0 /* Build configuration list for PBXNativeTarget "JXPhotoBrowser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4C0C1A092C9B8F3F00C8E7A0 /* Debug */,
+				4C0C1A0A2C9B8F3F00C8E7A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4C0C19F72C9B8F3F00C8E7A0 /* Project object */;
+}

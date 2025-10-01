@@ -1,0 +1,1 @@
+../Sources/JXPhotoBrowser/JXPhotoBrowserSmoothZoomAnimator.swift

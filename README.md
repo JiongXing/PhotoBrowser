@@ -53,6 +53,16 @@
 pod 'JXPhotoBrowser'
 ```
 
+### Carthage
+
+在你项目的`Cartfile`中配置
+
+```
+github "JiongXing/PhotoBrowser"
+```
+
+然后运行`carthage update`，将构建好的`JXPhotoBrowser.framework`拖入你的项目。
+
 ### Swift Package Manager (Xcode 11+)
 
 使用Xcode的包管理器添加本仓库URL。
