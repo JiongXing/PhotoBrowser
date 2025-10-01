@@ -46,4 +46,10 @@ class VideoCell: UIView, JXPhotoBrowserCell {
     @objc private func click() {
         photoBrowser?.dismiss()
     }
+    
+    func prepareForReuse() {
+        // 停止播放并清理播放器状态
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+    }
 }

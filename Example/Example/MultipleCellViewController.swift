@@ -94,4 +94,9 @@ class MoreCell: UIView, JXPhotoBrowserCell {
     @objc private func click() {
         photoBrowser?.dismiss()
     }
+    
+    func prepareForReuse() {
+        // 重置按钮状态
+        onClick = nil
+    }
 }

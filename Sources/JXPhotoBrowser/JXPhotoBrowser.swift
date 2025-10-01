@@ -194,6 +194,11 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         browserView.isRotating = true
+        
+        // 在旋转完成后重置isRotating标志
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.browserView.isRotating = false
+        }
     }
     
     //

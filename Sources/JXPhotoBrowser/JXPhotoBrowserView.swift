@@ -139,7 +139,6 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
     open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         // 屏幕旋转时会触发本方法。此时不可更改pageIndex
         if isRotating {
-            isRotating = false
             return
         }
         
@@ -192,6 +191,8 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
             JXPhotoBrowserLog.middle("命中缓存！\(name)")
             cell = array.removeFirst()
             reusableCells[name] = array
+            // 准备复用，清除旧内容防止闪烁
+            cell.prepareForReuse()
         } else {
             JXPhotoBrowserLog.middle("新建Cell! \(name)")
             cell = cellType.generate(with: browser)

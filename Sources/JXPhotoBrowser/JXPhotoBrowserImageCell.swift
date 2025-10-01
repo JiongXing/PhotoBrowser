@@ -324,4 +324,14 @@ open class JXPhotoBrowserImageCell: UIView, UIScrollViewDelegate, UIGestureRecog
     open var showContentView: UIView {
         return imageView
     }
+    
+    /// 准备复用，清除内容防止闪烁
+    open func prepareForReuse() {
+        // 清除图片内容，防止在屏幕旋转时出现闪烁
+        imageView.image = nil
+        // 重置缩放
+        scrollView.setZoomScale(1.0, animated: false)
+        // 重置滚动位置
+        scrollView.contentOffset = .zero
+    }
 }
