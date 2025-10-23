@@ -94,6 +94,8 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         addSubview(scrollView)
     }
     
+    private var lastLayoutSize: CGSize = .zero
+    
     open override func layoutSubviews() {
         super.layoutSubviews()
         if scrollDirection == .horizontal {
@@ -101,7 +103,15 @@ open class JXPhotoBrowserView: UIView, UIScrollViewDelegate {
         } else {
             scrollView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height + itemSpacing)
         }
-        reloadData()
+        let newSize = bounds.size
+        if newSize != lastLayoutSize || visibleCells.isEmpty {
+            lastLayoutSize = newSize
+            reloadData()
+        } else {
+            // 尺寸未变，仅更新位置与偏移，避免重置/出队/入队导致的布局循环
+            layoutCells()
+            refreshContentOffset()
+        }
     }
     
     open func resetContentSize() {
