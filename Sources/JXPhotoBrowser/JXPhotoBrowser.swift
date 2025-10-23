@@ -189,6 +189,17 @@ open class JXPhotoBrowser: UIViewController, UIViewControllerTransitioningDelega
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         hideNavigationBar(false)
+        // 侧滑返回或关闭时，主动通知当前 Cell 将不显示 -> 暂停视频等
+        if let cell = browserView.visibleCells[pageIndex] {
+            cellWillDisappear(cell, pageIndex)
+        }
+        // 若为交互式返回且最终取消，恢复播放（可选增强）
+        transitionCoordinator?.notifyWhenInteractionChanges { [weak self] context in
+            guard let self = self else { return }
+            if context.isCancelled, let resumedCell = self.browserView.visibleCells[self.pageIndex] {
+                self.cellWillAppear(resumedCell, self.pageIndex)
+            }
+        }
     }
     
     open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {

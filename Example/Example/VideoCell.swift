@@ -46,4 +46,18 @@ class VideoCell: UIView, JXPhotoBrowserCell {
     @objc private func click() {
         photoBrowser?.dismiss()
     }
+    
+    deinit {
+        // 兜底：销毁前停止播放并释放当前条目
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        // 兜底：离开窗口时暂停
+        if window == nil {
+            player.pause()
+        }
+    }
 }
