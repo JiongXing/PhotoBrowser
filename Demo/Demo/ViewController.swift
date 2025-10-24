@@ -81,14 +81,20 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let media = items[indexPath.item]
         switch media.source {
+        case .localImage, .remoteImage:
+            let browser = JXPhotoBrowser()
+            browser.dataSource = self
+            browser.initialIndex = indexPath.item
+            browser.scrollDirection = .horizontal // 可改为 .vertical 支持竖向浏览
+            browser.transitionType = .zoom // 可改为 .fade 或 .none
+            browser.isLoopingEnabled = true // 启用无限循环滑动
+            browser.present(from: self)
         case .localVideo(let fileName, let ext):
             if let url = Bundle.main.url(forResource: fileName, withExtension: ext) {
                 presentPlayer(with: url)
             }
         case .remoteVideo(let url):
             presentPlayer(with: url)
-        default:
-            break
         }
     }
 
@@ -98,6 +104,17 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         present(playerVC, animated: true) {
             playerVC.player?.play()
         }
+    }
+}
+
+
+// MARK: - JXPhotoBrowser DataSource
+extension ViewController: JXPhotoBrowserDataSource {
+    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+        return items.count
+    }
+    func photoBrowser(_ browser: JXPhotoBrowser, mediaSourceAt index: Int) -> MediaSource {
+        return items[index].source
     }
 }
 
