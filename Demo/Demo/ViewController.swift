@@ -88,6 +88,12 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             browser.scrollDirection = .horizontal // 可改为 .vertical 支持竖向浏览
             browser.transitionType = .zoom // 可改为 .fade 或 .none
             browser.isLoopingEnabled = true // 启用无限循环滑动
+            // 为无缝 Zoom 动画提供源缩略图视图
+            browser.originViewProvider = { [weak self] i in
+                let ip = IndexPath(item: i, section: 0)
+                guard let cell = self?.collectionView.cellForItem(at: ip) as? MediaCell else { return nil }
+                return cell.transitionImageView
+            }
             browser.present(from: self)
         case .localVideo(let fileName, let ext):
             if let url = Bundle.main.url(forResource: fileName, withExtension: ext) {

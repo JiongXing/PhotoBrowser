@@ -70,6 +70,9 @@ final class JXPhotoBrowser: UIViewController {
     /// 转场动画类型
     var transitionType: JXPhotoBrowserTransitionType = .fade
     
+    /// 提供源缩略图视图的闭包（用于 Zoom 几何匹配）
+    var originViewProvider: ((Int) -> UIView?)?
+    
     // MARK: - Private Properties
     
     /// 主要的集合视图
@@ -161,6 +164,27 @@ final class JXPhotoBrowser: UIViewController {
     /// 关闭浏览器
     @objc private func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
+    }
+    
+    /// 当前可见的图片视图（用于转场目标）
+    fileprivate func visiblePhotoImageView() -> UIImageView? {
+        let center = CGPoint(
+            x: collectionView.bounds.midX + collectionView.contentOffset.x,
+            y: collectionView.bounds.midY + collectionView.contentOffset.y
+        )
+        guard let idx = collectionView.indexPathForItem(at: center),
+              let cell = collectionView.cellForItem(at: idx) as? PhotoCell else { return nil }
+        return cell.transitionImageView
+    }
+    
+    /// 当前真实索引（虚拟索引映射）
+    fileprivate func currentRealIndex() -> Int? {
+        let center = CGPoint(
+            x: collectionView.bounds.midX + collectionView.contentOffset.x,
+            y: collectionView.bounds.midY + collectionView.contentOffset.y
+        )
+        guard let virtualItem = collectionView.indexPathForItem(at: center)?.item else { return nil }
+        return realIndex(fromVirtual: virtualItem)
     }
     
     // MARK: - Public Methods
@@ -313,6 +337,11 @@ private final class PhotoCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Transition Helper
+    
+    /// 提供转场所需的展示 ImageView（用于几何匹配动画）
+    fileprivate var transitionImageView: UIImageView { imageView }
+    
     // MARK: - Private Methods
     
     private func generateThumbnail(for url: URL) {
@@ -338,7 +367,7 @@ extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? { 
         switch transitionType {
         case .fade: return FadeAnimator(isPresenting: true)
-        case .zoom: return ZoomAnimator(isPresenting: true)
+        case .zoom: return ZoomPresentAnimator()
         case .none: return NoneAnimator(isPresenting: true)
         }
     }
@@ -346,7 +375,7 @@ extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? { 
         switch transitionType {
         case .fade: return FadeAnimator(isPresenting: false)
-        case .zoom: return ZoomAnimator(isPresenting: false)
+        case .zoom: return ZoomDismissAnimator()
         case .none: return NoneAnimator(isPresenting: false)
         }
     }
@@ -401,48 +430,147 @@ extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
         }
     }
     
-    private final class ZoomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-        let isPresenting: Bool
-        
-        init(isPresenting: Bool) { 
-            self.isPresenting = isPresenting 
-        }
-        
-        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.3 }
+    private final class ZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.25 }
         
         func animateTransition(using ctx: UIViewControllerContextTransitioning) {
             let container = ctx.containerView
-            if isPresenting {
-                guard let toView = ctx.view(forKey: .to) else {
-                    ctx.completeTransition(false)
-                    return
-                }
-                container.addSubview(toView)
-                toView.alpha = 0
-                toView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-                UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
+            let duration = transitionDuration(using: ctx)
+            
+            guard
+                let toVC = ctx.viewController(forKey: .to) as? JXPhotoBrowser,
+                let toView = ctx.view(forKey: .to)
+            else {
+                ctx.completeTransition(false)
+                return
+            }
+            
+            container.addSubview(toView)
+            toView.alpha = 0
+            toView.layoutIfNeeded()
+            
+            var originView: UIView?
+            if let provider = toVC.originViewProvider {
+                originView = provider(toVC.initialIndex)
+            }
+            
+            var animImageView: UIImageView?
+            var startFrame: CGRect = .zero
+            var destIV = toVC.visiblePhotoImageView()
+            var endFrame: CGRect = .zero
+            var canZoom = false
+            if let originIV = originView as? UIImageView, let startImg = originIV.image,
+               let targetIV = destIV, let targetImg = targetIV.image, targetImg.size.width > 0 && targetImg.size.height > 0 {
+                // 构造动画起点视图
+                startFrame = originIV.convert(originIV.bounds, to: container)
+                let iv = UIImageView(image: startImg)
+                iv.frame = startFrame
+                iv.contentMode = originIV.contentMode
+                iv.clipsToBounds = true
+                animImageView = iv
+                // 计算目标显示区域（按 scaleAspectFit）
+                let fit = AVMakeRect(aspectRatio: targetImg.size, insideRect: targetIV.bounds)
+                endFrame = targetIV.convert(fit, to: container)
+                // 隐藏真实视图，避免重影
+                originIV.isHidden = true
+                targetIV.isHidden = true
+                canZoom = true
+            }
+            
+            if canZoom, let animIV = animImageView {
+                container.addSubview(animIV)
+                UIView.animate(withDuration: duration, animations: {
+                    animIV.frame = endFrame
                     toView.alpha = 1
-                    toView.transform = .identity
                 }) { finished in
+                    destIV?.isHidden = false
+                    originView?.isHidden = false
+                    animIV.removeFromSuperview()
                     ctx.completeTransition(finished)
                 }
             } else {
-                guard let fromView = ctx.view(forKey: .from) else {
-                    ctx.completeTransition(false)
-                    return
-                }
-                if let toView = ctx.view(forKey: .to) {
-                    container.insertSubview(toView, belowSubview: fromView)
+                // 降级为 fade 动画（不缩放）
+                toView.alpha = 0
+                UIView.animate(withDuration: duration, animations: {
                     toView.alpha = 1
+                }) { finished in
+                    ctx.completeTransition(finished)
                 }
-                UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
+            }
+        }
+    }
+    
+    private final class ZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.25 }
+        
+        func animateTransition(using ctx: UIViewControllerContextTransitioning) {
+            let container = ctx.containerView
+            let duration = transitionDuration(using: ctx)
+            
+            guard
+                let fromVC = ctx.viewController(forKey: .from) as? JXPhotoBrowser,
+                let fromView = ctx.view(forKey: .from)
+            else {
+                ctx.completeTransition(false)
+                return
+            }
+            
+            if let toView = ctx.view(forKey: .to) {
+                container.insertSubview(toView, belowSubview: fromView)
+                toView.alpha = 1
+            }
+            
+            let srcIV = fromVC.visiblePhotoImageView()
+            var animImageView: UIImageView?
+            var startFrame: CGRect = .zero
+            var destView: UIView?
+            var endFrame: CGRect = .zero
+            var canZoom = false
+            if let iv = srcIV, let img = iv.image, img.size.width > 0 && img.size.height > 0 {
+                let fit = AVMakeRect(aspectRatio: img.size, insideRect: iv.bounds)
+                startFrame = iv.convert(fit, to: container)
+                let aiv = UIImageView(image: img)
+                aiv.frame = startFrame
+                aiv.contentMode = iv.contentMode
+                aiv.clipsToBounds = true
+                animImageView = aiv
+                iv.isHidden = true
+                if let currentIndex = fromVC.currentRealIndex(), let origin = fromVC.originViewProvider?(currentIndex) {
+                    destView = origin
+                    endFrame = origin.convert(origin.bounds, to: container)
+                    origin.isHidden = true
+                    canZoom = true
+                }
+            }
+            
+            if canZoom, let animIV = animImageView {
+                container.addSubview(animIV)
+                UIView.animate(withDuration: duration, animations: {
+                    animIV.frame = endFrame
                     fromView.alpha = 0
-                    fromView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+                }) { _ in
+                    let wasCancelled = ctx.transitionWasCancelled
+                    if wasCancelled {
+                        srcIV?.isHidden = false
+                        destView?.isHidden = false
+                        animIV.removeFromSuperview()
+                        fromView.alpha = 1
+                        ctx.completeTransition(false)
+                    } else {
+                        destView?.isHidden = false
+                        animIV.removeFromSuperview()
+                        fromView.removeFromSuperview()
+                        ctx.completeTransition(true)
+                    }
+                }
+            } else {
+                // 降级为 fade 动画（不缩放），保持黑屏修复
+                UIView.animate(withDuration: duration, animations: {
+                    fromView.alpha = 0
                 }) { _ in
                     let wasCancelled = ctx.transitionWasCancelled
                     if wasCancelled {
                         fromView.alpha = 1
-                        fromView.transform = .identity
                         ctx.completeTransition(false)
                     } else {
                         fromView.removeFromSuperview()
