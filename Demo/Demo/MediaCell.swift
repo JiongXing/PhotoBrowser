@@ -11,8 +11,15 @@ import AVFoundation
 import Kingfisher
 
 final class MediaCell: UICollectionViewCell {
+    
+    // MARK: - Static Properties
+    
+    /// 复用标识符
     static let reuseIdentifier = "MediaCell"
-
+    
+    // MARK: - UI Components
+    
+    /// 主要的图片显示视图
     private let imageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -21,7 +28,8 @@ final class MediaCell: UICollectionViewCell {
         iv.backgroundColor = .secondarySystemBackground
         return iv
     }()
-
+    
+    /// 视频播放按钮覆盖层
     private let playOverlay: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "play.circle.fill"))
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -30,17 +38,21 @@ final class MediaCell: UICollectionViewCell {
         iv.isHidden = true
         return iv
     }()
-
+    
+    // MARK: - Initializers
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
-
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setup()
     }
-
+    
+    // MARK: - Setup Methods
+    
     private func setup() {
         contentView.addSubview(imageView)
         contentView.addSubview(playOverlay)
@@ -55,14 +67,18 @@ final class MediaCell: UICollectionViewCell {
             playOverlay.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
-
+    
+    // MARK: - Lifecycle Methods
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.kf.cancelDownloadTask()
         imageView.image = nil
         playOverlay.isHidden = true
     }
-
+    
+    // MARK: - Configuration Methods
+    
     func configure(with media: Media) {
         imageView.image = nil
         playOverlay.isHidden = true
@@ -85,7 +101,9 @@ final class MediaCell: UICollectionViewCell {
             generateThumbnail(for: url)
         }
     }
-
+    
+    // MARK: - Private Methods
+    
     private func generateThumbnail(for url: URL) {
         let asset = AVURLAsset(url: url)
         let generator = AVAssetImageGenerator(asset: asset)

@@ -9,82 +9,147 @@ import UIKit
 import Kingfisher
 import AVFoundation
 
+// MARK: - Data Source Protocol
+
 protocol JXPhotoBrowserDataSource: AnyObject {
     func numberOfItems(in browser: JXPhotoBrowser) -> Int
     func photoBrowser(_ browser: JXPhotoBrowser, mediaSourceAt index: Int) -> MediaSource
 }
 
-enum JXPhotoBrowserTransitionType { case fade, zoom, none }
-enum JXPhotoBrowserScrollDirection {
-    case horizontal, vertical
-    var flowDirection: UICollectionView.ScrollDirection { self == .horizontal ? .horizontal : .vertical }
-    var scrollPosition: UICollectionView.ScrollPosition { self == .horizontal ? .centeredHorizontally : .centeredVertically }
+// MARK: - Enums
+
+enum JXPhotoBrowserTransitionType { 
+    case fade, zoom, none 
 }
 
-final class JXPhotoBrowser: UIViewController {
-    weak var dataSource: JXPhotoBrowserDataSource?
-    var initialIndex: Int = 0
-    var scrollDirection: JXPhotoBrowserScrollDirection = .horizontal
-    var transitionType: JXPhotoBrowserTransitionType = .fade
-
-    private var collectionView: UICollectionView!
+enum JXPhotoBrowserScrollDirection {
+    case horizontal, vertical
     
-    // 无限循环配置
-    private let loopMultiplier: Int = 1000
-    var isLoopingEnabled: Bool = true
-    private var realCount: Int { dataSource?.numberOfItems(in: self) ?? 0 }
-    private var virtualCount: Int { isLoopingEnabled ? realCount * loopMultiplier : realCount }
-    private func realIndex(fromVirtual index: Int) -> Int {
-        let count = realCount
-        guard count > 0 else { return 0 }
-        return index % count
+    var flowDirection: UICollectionView.ScrollDirection { 
+        self == .horizontal ? .horizontal : .vertical 
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .black
+    var scrollPosition: UICollectionView.ScrollPosition { 
+        self == .horizontal ? .centeredHorizontally : .centeredVertically 
+    }
+}
 
+// MARK: - Main Browser Class
+
+final class JXPhotoBrowser: UIViewController {
+    
+    // MARK: - Public Properties
+    
+    /// 数据源代理
+    weak var dataSource: JXPhotoBrowserDataSource?
+    
+    /// 初始显示的图片索引
+    var initialIndex: Int = 0
+    
+    /// 滚动方向（水平或垂直）
+    var scrollDirection: JXPhotoBrowserScrollDirection = .horizontal {
+        didSet {
+            if isViewLoaded {
+                applyCollectionViewConfig()
+            }
+        }
+    }
+    
+    /// 是否启用分页
+    var isPagingEnabled: Bool = true {
+        didSet {
+            if isViewLoaded {
+                collectionView.isPagingEnabled = isPagingEnabled
+            }
+        }
+    }
+    
+    /// 是否启用无限循环滚动
+    var isLoopingEnabled: Bool = true
+    
+    /// 转场动画类型
+    var transitionType: JXPhotoBrowserTransitionType = .fade
+    
+    // MARK: - Private Properties
+    
+    /// 主要的集合视图
+    private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = scrollDirection.flowDirection
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         layout.itemSize = view.bounds.size
-
+    
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.isPagingEnabled = true
         cv.backgroundColor = .black
         cv.dataSource = self
         cv.delegate = self
         cv.showsHorizontalScrollIndicator = false
         cv.showsVerticalScrollIndicator = false
         cv.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.reuseIdentifier)
-        view.addSubview(cv)
-        NSLayoutConstraint.activate([
-            cv.topAnchor.constraint(equalTo: view.topAnchor),
-            cv.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            cv.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            cv.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-        collectionView = cv
+        return cv
+    }()
+    
+    /// 无限循环倍数
+    private let loopMultiplier: Int = 1000
+    
+    /// 真实数据源数量
+    private var realCount: Int { 
+        dataSource?.numberOfItems(in: self) ?? 0 
+    }
+    
+    /// 虚拟数据源数量（用于无限循环）
+    private var virtualCount: Int { 
+        isLoopingEnabled ? realCount * loopMultiplier : realCount 
+    }
+    
+    /// 是否已滚动到初始位置（避免重复滚动）
+    private var didScrollToInitial = false
+    
+    // MARK: - Lifecycle Methods
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .black
+        setupCollectionView()
+        applyCollectionViewConfig()
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissSelf))
         view.addGestureRecognizer(tap)
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        scrollToInitialIndex()
+        if !didScrollToInitial {
+            scrollToInitialIndex()
+            didScrollToInitial = true
+        }
     }
-
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            layout.itemSize = view.bounds.size
-            layout.invalidateLayout()
+            if layout.itemSize != view.bounds.size {
+                layout.itemSize = view.bounds.size
+                layout.invalidateLayout()
+            }
+        }
+        if !didScrollToInitial {
+            scrollToInitialIndex()
+            didScrollToInitial = true
         }
     }
-
+    
+    // MARK: - Private Methods
+    
+    /// 将虚拟索引转换为真实索引
+    private func realIndex(fromVirtual index: Int) -> Int {
+        let count = realCount
+        guard count > 0 else { return 0 }
+        return index % count
+    }
+    
+    /// 滚动到初始索引位置
     private func scrollToInitialIndex() {
         let count = realCount
         guard count > 0 else { return }
@@ -92,22 +157,69 @@ final class JXPhotoBrowser: UIViewController {
         let target = base + max(0, min(initialIndex % count, count - 1))
         collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
     }
-
+    
+    /// 关闭浏览器
     @objc private func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
     }
-
+    
+    // MARK: - Public Methods
+    
+    /// 从指定视图控制器展示浏览器
     func present(from vc: UIViewController) {
         modalPresentationStyle = .fullScreen
         if transitionType != .none { transitioningDelegate = self }
         vc.present(self, animated: transitionType != .none, completion: nil)
     }
+
+    // MARK: - Setup & Configuration
+    
+    /// 添加并约束集合视图
+    private func setupCollectionView() {
+        view.addSubview(collectionView)
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
+    /// 根据当前属性应用集合视图配置（支持运行时切换）
+    private func applyCollectionViewConfig() {
+        // 分页开关
+        collectionView.isPagingEnabled = isPagingEnabled
+        
+        // 更新滚动方向
+        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            let newDirection = scrollDirection.flowDirection
+            if layout.scrollDirection != newDirection {
+                layout.scrollDirection = newDirection
+                layout.invalidateLayout()
+            }
+        }
+        
+        // 保持当前可见项居中（在已滚动到初始项后）
+        if didScrollToInitial {
+            let center = CGPoint(
+                x: collectionView.bounds.midX + collectionView.contentOffset.x,
+                y: collectionView.bounds.midY + collectionView.contentOffset.y
+            )
+            if let indexPath = collectionView.indexPathForItem(at: center) {
+                collectionView.scrollToItem(at: indexPath, at: scrollDirection.scrollPosition, animated: false)
+            }
+        }
+    }
 }
 
+// MARK: - UICollectionView DataSource & Delegate
+
 extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return virtualCount
     }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as! PhotoCell
         if realCount > 0, let src = dataSource?.photoBrowser(self, mediaSourceAt: realIndex(fromVirtual: indexPath.item)) {
@@ -117,8 +229,18 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     }
 }
 
+// MARK: - Photo Cell
+
 private final class PhotoCell: UICollectionViewCell {
+    
+    // MARK: - Static Properties
+    
+    /// 复用标识符
     static let reuseIdentifier = "JXPhotoBrowserPhotoCell"
+    
+    // MARK: - UI Components
+    
+    /// 主要的图片显示视图
     private let imageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -127,6 +249,8 @@ private final class PhotoCell: UICollectionViewCell {
         iv.clipsToBounds = true
         return iv
     }()
+    
+    /// 视频播放按钮覆盖层
     private let playOverlay: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "play.circle.fill"))
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -134,6 +258,9 @@ private final class PhotoCell: UICollectionViewCell {
         iv.isHidden = true
         return iv
     }()
+    
+    // MARK: - Initializers
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(imageView)
@@ -150,23 +277,44 @@ private final class PhotoCell: UICollectionViewCell {
         ])
         backgroundColor = .black
     }
-    required init?(coder: NSCoder) { super.init(coder: coder) }
+    
+    required init?(coder: NSCoder) { 
+        super.init(coder: coder) 
+    }
+    
+    // MARK: - Lifecycle Methods
+    
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageView.kf.cancelDownloadTask(); imageView.image = nil; playOverlay.isHidden = true
+        imageView.kf.cancelDownloadTask()
+        imageView.image = nil
+        playOverlay.isHidden = true
     }
+    
+    // MARK: - Configuration Methods
+    
     func configure(source: MediaSource) {
         switch source {
-        case .localImage(let name): imageView.image = UIImage(named: name)
-        case .remoteImage(let url): imageView.kf.setImage(with: url)
+        case .localImage(let name): 
+            imageView.image = UIImage(named: name)
+            
+        case .remoteImage(let url): 
+            imageView.kf.setImage(with: url)
+            
         case .localVideo(let f, let e):
             playOverlay.isHidden = false
-            if let url = Bundle.main.url(forResource: f, withExtension: e) { generateThumbnail(for: url) }
+            if let url = Bundle.main.url(forResource: f, withExtension: e) { 
+                generateThumbnail(for: url) 
+            }
+            
         case .remoteVideo(let url):
             playOverlay.isHidden = false
             generateThumbnail(for: url)
         }
     }
+    
+    // MARK: - Private Methods
+    
     private func generateThumbnail(for url: URL) {
         let asset = AVURLAsset(url: url)
         let gen = AVAssetImageGenerator(asset: asset)
@@ -174,44 +322,154 @@ private final class PhotoCell: UICollectionViewCell {
         let time = CMTime(seconds: 0.1, preferredTimescale: 600)
         DispatchQueue.global(qos: .userInitiated).async {
             let cg = try? gen.copyCGImage(at: time, actualTime: nil)
-            if let cg = cg { DispatchQueue.main.async { self.imageView.image = UIImage(cgImage: cg) } }
+            if let cg = cg { 
+                DispatchQueue.main.async { 
+                    self.imageView.image = UIImage(cgImage: cg) 
+                } 
+            }
         }
     }
 }
 
-extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? { Animator(type: transitionType, isPresenting: true) }
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? { Animator(type: transitionType, isPresenting: false) }
+// MARK: - Transition Animation
 
-    private final class Animator: NSObject, UIViewControllerAnimatedTransitioning {
-        let type: JXPhotoBrowserTransitionType; let isPresenting: Bool
-        init(type: JXPhotoBrowserTransitionType, isPresenting: Bool) { self.type = type; self.isPresenting = isPresenting }
-        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval {
-            switch type { case .fade: return 0.25; case .zoom: return 0.3; case .none: return 0.0 }
+extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
+    
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? { 
+        switch transitionType {
+        case .fade: return FadeAnimator(isPresenting: true)
+        case .zoom: return ZoomAnimator(isPresenting: true)
+        case .none: return NoneAnimator(isPresenting: true)
         }
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? { 
+        switch transitionType {
+        case .fade: return FadeAnimator(isPresenting: false)
+        case .zoom: return ZoomAnimator(isPresenting: false)
+        case .none: return NoneAnimator(isPresenting: false)
+        }
+    }
+    
+    // MARK: - Animator Classes
+    
+    private final class FadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+        let isPresenting: Bool
+        
+        init(isPresenting: Bool) { 
+            self.isPresenting = isPresenting 
+        }
+        
+        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.25 }
+        
         func animateTransition(using ctx: UIViewControllerContextTransitioning) {
             let container = ctx.containerView
-            guard let toView = ctx.view(forKey: .to) else { ctx.completeTransition(false); return }
-            switch type {
-            case .none:
-                if isPresenting { container.addSubview(toView) }
+            if isPresenting {
+                guard let toView = ctx.view(forKey: .to) else {
+                    ctx.completeTransition(false)
+                    return
+                }
+                container.addSubview(toView)
+                toView.alpha = 0
+                UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
+                    toView.alpha = 1
+                }) { finished in
+                    ctx.completeTransition(finished)
+                }
+            } else {
+                guard let fromView = ctx.view(forKey: .from) else {
+                    ctx.completeTransition(false)
+                    return
+                }
+                if let toView = ctx.view(forKey: .to) {
+                    container.insertSubview(toView, belowSubview: fromView)
+                    toView.alpha = 1
+                }
+                UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
+                    fromView.alpha = 0
+                }) { _ in
+                    let wasCancelled = ctx.transitionWasCancelled
+                    if wasCancelled {
+                        fromView.alpha = 1
+                        ctx.completeTransition(false)
+                    } else {
+                        fromView.removeFromSuperview()
+                        ctx.completeTransition(true)
+                    }
+                }
+            }
+        }
+    }
+    
+    private final class ZoomAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+        let isPresenting: Bool
+        
+        init(isPresenting: Bool) { 
+            self.isPresenting = isPresenting 
+        }
+        
+        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.3 }
+        
+        func animateTransition(using ctx: UIViewControllerContextTransitioning) {
+            let container = ctx.containerView
+            if isPresenting {
+                guard let toView = ctx.view(forKey: .to) else {
+                    ctx.completeTransition(false)
+                    return
+                }
+                container.addSubview(toView)
+                toView.alpha = 0
+                toView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+                UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
+                    toView.alpha = 1
+                    toView.transform = .identity
+                }) { finished in
+                    ctx.completeTransition(finished)
+                }
+            } else {
+                guard let fromView = ctx.view(forKey: .from) else {
+                    ctx.completeTransition(false)
+                    return
+                }
+                if let toView = ctx.view(forKey: .to) {
+                    container.insertSubview(toView, belowSubview: fromView)
+                    toView.alpha = 1
+                }
+                UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
+                    fromView.alpha = 0
+                    fromView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
+                }) { _ in
+                    let wasCancelled = ctx.transitionWasCancelled
+                    if wasCancelled {
+                        fromView.alpha = 1
+                        fromView.transform = .identity
+                        ctx.completeTransition(false)
+                    } else {
+                        fromView.removeFromSuperview()
+                        ctx.completeTransition(true)
+                    }
+                }
+            }
+        }
+    }
+    
+    private final class NoneAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+        let isPresenting: Bool
+        
+        init(isPresenting: Bool) { 
+            self.isPresenting = isPresenting 
+        }
+        
+        func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.0 }
+        
+        func animateTransition(using ctx: UIViewControllerContextTransitioning) {
+            let container = ctx.containerView
+            if isPresenting {
+                if let toView = ctx.view(forKey: .to) { container.addSubview(toView) }
                 ctx.completeTransition(true)
-            case .fade:
-                if isPresenting {
-                    container.addSubview(toView); toView.alpha = 0
-                    UIView.animate(withDuration: transitionDuration(using: ctx), animations: { toView.alpha = 1 }) { ctx.completeTransition($0) }
-                } else {
-                    let fromView = ctx.view(forKey: .from)!
-                    UIView.animate(withDuration: transitionDuration(using: ctx), animations: { fromView.alpha = 0 }) { _ in fromView.removeFromSuperview(); ctx.completeTransition(true) }
-                }
-            case .zoom:
-                if isPresenting {
-                    container.addSubview(toView); toView.alpha = 0; toView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85)
-                    UIView.animate(withDuration: transitionDuration(using: ctx), delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.8, options: .curveEaseInOut, animations: { toView.alpha = 1; toView.transform = .identity }) { ctx.completeTransition($0) }
-                } else {
-                    let fromView = ctx.view(forKey: .from)!
-                    UIView.animate(withDuration: transitionDuration(using: ctx), delay: 0, options: .curveEaseInOut, animations: { fromView.alpha = 0; fromView.transform = CGAffineTransform(scaleX: 0.85, y: 0.85) }) { _ in fromView.removeFromSuperview(); ctx.completeTransition(true) }
-                }
+            } else {
+                if let fromView = ctx.view(forKey: .from) { fromView.removeFromSuperview() }
+                ctx.completeTransition(true)
             }
         }
     }
