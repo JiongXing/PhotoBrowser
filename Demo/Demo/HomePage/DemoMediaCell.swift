@@ -1,5 +1,5 @@
 //
-//  MediaCell.swift
+//  DemoMediaCell.swift
 //  Demo
 //
 //  Created by jxing on 2025/10/24.
@@ -11,7 +11,7 @@ import AVFoundation
 import Kingfisher
 import JXPhotoBrowser
 
-final class MediaCell: UICollectionViewCell {
+final class DemoMediaCell: UICollectionViewCell {
     
     // MARK: - Static Properties
     
@@ -80,25 +80,16 @@ final class MediaCell: UICollectionViewCell {
     
     // MARK: - Configuration Methods
     
-    func configure(with media: Media) {
+    func configure(with media: DemoMedia) {
         imageView.image = nil
         playOverlay.isHidden = true
 
         switch media.source {
-        case .localImage(let name):
-            imageView.image = UIImage(named: name)
-
-        case .remoteImage(let url):
-            if let thumb = media.thumbnailURL {
+        case let .remoteImage(imageURL, thumbnailURL):
+            if let thumb = thumbnailURL {
                 imageView.kf.setImage(with: thumb)
             } else {
-                imageView.kf.setImage(with: url)
-            }
-
-        case let .localVideo(fileName, fileExtension):
-            playOverlay.isHidden = false
-            if let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension) {
-                generateThumbnail(for: url)
+                imageView.kf.setImage(with: imageURL)
             }
 
         case let .remoteVideo(url):

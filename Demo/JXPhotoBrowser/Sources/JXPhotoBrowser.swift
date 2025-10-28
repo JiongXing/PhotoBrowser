@@ -4,14 +4,21 @@
 //
 
 import UIKit
-import Kingfisher
 import AVFoundation
 
 // MARK: - Data Source Protocol
 
 public protocol JXPhotoBrowserDataSource: AnyObject {
+    /// 返回项目总数
     func numberOfItems(in browser: JXPhotoBrowser) -> Int
-    func photoBrowser(_ browser: JXPhotoBrowser, mediaSourceAt index: Int) -> JXMediaSource
+    /// 为指定索引提供用于展示的视图（由调用方负责内容加载）
+    func photoBrowser(_ browser: JXPhotoBrowser, viewForItemAt index: Int) -> UIView
+    /// 可选：为指定索引提供转场使用的视图（通常为 UIImageView）。不提供则默认使用展示视图。
+    func photoBrowser(_ browser: JXPhotoBrowser, transitionViewAt index: Int) -> UIView?
+}
+
+public extension JXPhotoBrowserDataSource {
+    func photoBrowser(_ browser: JXPhotoBrowser, transitionViewAt index: Int) -> UIView? { nil }
 }
 
 // MARK: - Enums
@@ -244,8 +251,13 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
-        if realCount > 0, let src = dataSource?.photoBrowser(self, mediaSourceAt: realIndex(fromVirtual: indexPath.item)) {
-            cell.configure(source: src)
+        if realCount > 0 {
+            let real = realIndex(fromVirtual: indexPath.item)
+            if let contentView = dataSource?.photoBrowser(self, viewForItemAt: real) {
+                cell.setContentView(contentView)
+                let tView = dataSource?.photoBrowser(self, transitionViewAt: real)
+                cell.setTransitionView(tView)
+            }
         }
         return cell
     }

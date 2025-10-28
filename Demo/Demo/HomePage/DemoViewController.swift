@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  DemoViewController.swift
 //  Demo
 //
 //  Created by jxing on 2025/10/24.
@@ -9,25 +9,20 @@ import UIKit
 import AVKit
 import AVFoundation
 import JXPhotoBrowser
-
-struct Media {
-    let id = UUID()
-    let source: JXMediaSource
-    let thumbnailURL: URL?
-}
+import Kingfisher
 
 // MARK: - ViewController
-class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
+class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
 
     private var collectionView: UICollectionView!
 
     // 数据源：改为网络图片（原图 + 缩略图）
-    private let items: [Media] = {
+    private let items: [DemoMedia] = {
         let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
         return (0...8).map { i in
             let original = base.appendingPathComponent("photo_\(i).png")
             let thumbnail = base.appendingPathComponent("photo_\(i)_thumbnail.png")
-            return Media(source: .remoteImage(url: original), thumbnailURL: thumbnail)
+            return DemoMedia(source: .remoteImage(imageURL: original, thumbnailURL: thumbnail))
         }
     }()
 
@@ -49,7 +44,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         collectionView.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(MediaCell.self, forCellWithReuseIdentifier: MediaCell.reuseIdentifier)
+        collectionView.register(DemoMediaCell.self, forCellWithReuseIdentifier: DemoMediaCell.reuseIdentifier)
 
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
@@ -66,7 +61,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaCell.reuseIdentifier, for: indexPath) as! MediaCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DemoMediaCell.reuseIdentifier, for: indexPath) as! DemoMediaCell
         cell.configure(with: items[indexPath.item])
         return cell
     }
@@ -87,7 +82,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let media = items[indexPath.item]
         switch media.source {
-        case .localImage, .remoteImage:
+        case .remoteImage:
             let browser = JXPhotoBrowser()
             browser.dataSource = self
             browser.initialIndex = indexPath.item
@@ -97,14 +92,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             // 为无缝 Zoom 动画提供源缩略图视图
             browser.originViewProvider = { [weak self] i in
                 let ip = IndexPath(item: i, section: 0)
-                guard let cell = self?.collectionView.cellForItem(at: ip) as? MediaCell else { return nil }
+                guard let cell = self?.collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
                 return cell.transitionImageView
             }
             browser.present(from: self)
-        case .localVideo(let fileName, let ext):
-            if let url = Bundle.main.url(forResource: fileName, withExtension: ext) {
-                presentPlayer(with: url)
-            }
         case .remoteVideo(let url):
             presentPlayer(with: url)
         }
@@ -121,14 +112,27 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
 
 // MARK: - JXPhotoBrowser DataSource
-extension ViewController: JXPhotoBrowserDataSource {
-    
+extension DemoViewController: JXPhotoBrowserDataSource {
     func numberOfItems(in browser: JXPhotoBrowser) -> Int {
         return items.count
     }
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, mediaSourceAt index: Int) -> JXMediaSource {
-        return items[index].source
+
+    // 由调用方提供一个用于展示的视图（此处用 UIImageView 加载原图）
+    func photoBrowser(_ browser: JXPhotoBrowser, viewForItemAt index: Int) -> UIView {
+        let iv = UIImageView()
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
+        iv.backgroundColor = .black
+        iv.clipsToBounds = true
+        if case let .remoteImage(imageURL, _) = items[index].source {
+            iv.kf.setImage(with: imageURL)
+        }
+        return iv
+    }
+
+    // 可选：提供转场视图（返回 nil 时，默认使用展示视图）
+    func photoBrowser(_ browser: JXPhotoBrowser, transitionViewAt index: Int) -> UIView? {
+        return nil
     }
 }
 
