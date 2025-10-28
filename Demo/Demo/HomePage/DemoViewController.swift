@@ -89,12 +89,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
             browser.scrollDirection = .horizontal // 可改为 .vertical 支持竖向浏览
             browser.transitionType = .zoom // 可改为 .fade 或 .none
             browser.isLoopingEnabled = true // 启用无限循环滑动
-            // 为无缝 Zoom 动画提供源缩略图视图
-            browser.originViewProvider = { [weak self] i in
-                let ip = IndexPath(item: i, section: 0)
-                guard let cell = self?.collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
-                return cell.transitionImageView
-            }
             browser.present(from: self)
         case .remoteVideo(let url):
             presentPlayer(with: url)
@@ -117,22 +111,54 @@ extension DemoViewController: JXPhotoBrowserDataSource {
         return items.count
     }
 
-    // 由调用方提供一个用于展示的视图（此处用 UIImageView 加载原图）
-    func photoBrowser(_ browser: JXPhotoBrowser, viewForItemAt index: Int) -> UIView {
-        let iv = UIImageView()
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.contentMode = .scaleAspectFit
-        iv.backgroundColor = .black
-        iv.clipsToBounds = true
-        if case let .remoteImage(imageURL, _) = items[index].source {
-            iv.kf.setImage(with: imageURL)
-        }
-        return iv
+    // 生命周期：即将复用（可在此取消下载、清理状态）
+    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int) {
+        cell.imageView.kf.cancelDownloadTask()
     }
 
-    // 可选：提供转场视图（返回 nil 时，默认使用展示视图）
-    func photoBrowser(_ browser: JXPhotoBrowser, transitionViewAt index: Int) -> UIView? {
+    // 生命周期：已复用（为新 index 配置内容）
+    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {
+        cell.imageView.contentMode = .scaleAspectFit
+        cell.imageView.backgroundColor = .black
+        cell.imageView.clipsToBounds = true
+        if case let .remoteImage(imageURL, _) = items[index].source {
+            cell.imageView.kf.setImage(with: imageURL)
+        } else {
+            cell.imageView.image = nil
+        }
+    }
+
+    // 生命周期：将要显示（可做轻量 UI 调整）
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) { }
+
+    // 生命周期：已消失（可回收资源）
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) { }
+
+    // 已移除：框架默认使用展示视图作为转场目标视图
+
+    // 为 Zoom 提供源缩略图视图
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
+        let ip = IndexPath(item: index, section: 0)
+        guard let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
+        return cell.transitionImageView
+    }
+
+    // 提供 Zoom 动画所用的图像数据（优先使用业务方缩略图的当前图像）
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomImageForItemAt index: Int) -> UIImage? {
+        let ip = IndexPath(item: index, section: 0)
+        if let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell {
+            return cell.transitionImageView.image
+        }
+        // 回退：尝试从内存缓存获取原图
+        if case let .remoteImage(imageURL, _) = items[index].source {
+            return Kingfisher.ImageCache.default.retrieveImageInMemoryCache(forKey: imageURL.cacheKey)
+        }
         return nil
+    }
+
+    // 指定 Zoom 视图的 contentMode（由业务方配置）
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomContentModeForItemAt index: Int) -> UIView.ContentMode {
+        return .scaleAspectFit
     }
 }
 

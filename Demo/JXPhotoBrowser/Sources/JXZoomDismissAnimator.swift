@@ -32,20 +32,37 @@ class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             var destView: UIView?
             var endFrame: CGRect = .zero
             var canZoom = false
-            if let iv = srcIV, let img = iv.image, img.size.width > 0 && img.size.height > 0 {
-                let fit = AVMakeRect(aspectRatio: img.size, insideRect: iv.bounds)
-                startFrame = iv.convert(fit, to: container)
-                let aiv = UIImageView(image: img)
-                aiv.frame = startFrame
-                aiv.contentMode = iv.contentMode
-                aiv.clipsToBounds = true
-                animImageView = aiv
-                iv.isHidden = true
-                if let currentIndex = fromVC.currentRealIndex(), let origin = fromVC.originViewProvider?(currentIndex) {
-                    destView = origin
-                    endFrame = origin.convert(origin.bounds, to: container)
-                    origin.isHidden = true
-                    canZoom = true
+            
+            // 从数据源获取 zoom 图像与 contentMode（由业务方定义）
+            let currentIndex = fromVC.currentRealIndex()
+            let zoomImage = currentIndex.flatMap { fromVC.dataSource?.photoBrowser(fromVC, zoomImageForItemAt: $0) }
+            let zoomContentMode = currentIndex.flatMap { fromVC.dataSource?.photoBrowser(fromVC, zoomContentModeForItemAt: $0) } ?? .scaleAspectFit
+            
+            if let iv = srcIV {
+                // 起点：依据浏览器当前显示视图与 contentMode 计算
+                let basisImage = (zoomImage ?? iv.image)
+                if let img = basisImage, img.size.width > 0 && img.size.height > 0 {
+                    let startRect: CGRect
+                    if zoomContentMode == .scaleAspectFit {
+                        startRect = AVMakeRect(aspectRatio: img.size, insideRect: iv.bounds)
+                    } else if zoomContentMode == .scaleAspectFill || zoomContentMode == .scaleToFill {
+                        startRect = iv.bounds
+                    } else {
+                        startRect = AVMakeRect(aspectRatio: img.size, insideRect: iv.bounds)
+                    }
+                    startFrame = iv.convert(startRect, to: container)
+                    let aiv = UIImageView(image: img)
+                    aiv.frame = startFrame
+                    aiv.contentMode = zoomContentMode
+                    aiv.clipsToBounds = true
+                    animImageView = aiv
+                    iv.isHidden = true
+                    if let realIndex = currentIndex, let origin = fromVC.dataSource?.photoBrowser(fromVC, zoomOriginViewAt: realIndex) {
+                        destView = origin
+                        endFrame = origin.convert(origin.bounds, to: container)
+                        origin.isHidden = true
+                        canZoom = true
+                    }
                 }
             }
             

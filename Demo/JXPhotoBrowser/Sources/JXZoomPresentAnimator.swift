@@ -25,37 +25,50 @@ class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             toView.alpha = 0
             toView.layoutIfNeeded()
             
-            var originView: UIView?
-            if let provider = toVC.originViewProvider {
-                originView = provider(toVC.initialIndex)
-            }
+            // 业务方提供的缩略图源视图（用于计算起点几何）
+            let originView: UIView? = toVC.dataSource?.photoBrowser(toVC, zoomOriginViewAt: toVC.initialIndex)
 
+            // 准备动画视图及起止几何
             var animImageView: UIImageView?
             var startFrame: CGRect = .zero
             let destIV = toVC.visiblePhotoImageView()
             var endFrame: CGRect = .zero
             var canZoom = false
-            if let originIV = originView as? UIImageView, let startImg = originIV.image,
+            
+            // 从业务方数据源获取图像与 contentMode（优先使用代理）
+            let zoomImage = toVC.dataSource?.photoBrowser(toVC, zoomImageForItemAt: toVC.initialIndex)
+            let zoomContentMode = toVC.dataSource?.photoBrowser(toVC, zoomContentModeForItemAt: toVC.initialIndex) ?? .scaleAspectFit
+            
+            if let originIV = originView as? UIImageView,
                let targetIV = destIV {
-                // 构造动画起点视图
+                // 起点：使用业务方缩略图视图的几何（不改变其 contentMode）
                 startFrame = originIV.convert(originIV.bounds, to: container)
-                let iv = UIImageView(image: startImg)
-                iv.frame = startFrame
-                iv.contentMode = originIV.contentMode
-                iv.clipsToBounds = true
-                animImageView = iv
-                // 计算目标显示区域（按 scaleAspectFit）；若目标图片未就绪，使用起始图片的尺寸进行拟合
-                let fitRect: CGRect
-                if let targetImg = targetIV.image, targetImg.size.width > 0 && targetImg.size.height > 0 {
-                    fitRect = AVMakeRect(aspectRatio: targetImg.size, insideRect: targetIV.bounds)
-                } else {
-                    fitRect = AVMakeRect(aspectRatio: startImg.size, insideRect: targetIV.bounds)
+                // 动画用的临时 ImageView，图像优先来自数据源；无则回退到缩略图的 image
+                let startImg = zoomImage ?? originIV.image
+                if let startImg = startImg {
+                    let iv = UIImageView(image: startImg)
+                    iv.frame = startFrame
+                    iv.contentMode = zoomContentMode
+                    iv.clipsToBounds = true
+                    animImageView = iv
+                    // 计算目标显示区域：根据业务方指定的 contentMode
+                    let endRect: CGRect
+                    if zoomContentMode == .scaleAspectFit {
+                        let basisImage = targetIV.image ?? startImg
+                        endRect = AVMakeRect(aspectRatio: basisImage.size, insideRect: targetIV.bounds)
+                    } else if zoomContentMode == .scaleAspectFill || zoomContentMode == .scaleToFill {
+                        endRect = targetIV.bounds
+                    } else {
+                        // 其他模式统一退化为按拟合处理
+                        let basisImage = targetIV.image ?? startImg
+                        endRect = AVMakeRect(aspectRatio: basisImage.size, insideRect: targetIV.bounds)
+                    }
+                    endFrame = targetIV.convert(endRect, to: container)
+                    // 隐藏真实视图，避免重影
+                    originIV.isHidden = true
+                    targetIV.isHidden = true
+                    canZoom = true
                 }
-                endFrame = targetIV.convert(fitRect, to: container)
-                // 隐藏真实视图，避免重影
-                originIV.isHidden = true
-                targetIV.isHidden = true
-                canZoom = true
             }
             
             if canZoom, let animIV = animImageView {

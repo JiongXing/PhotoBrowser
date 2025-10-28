@@ -11,14 +11,38 @@ import AVFoundation
 public protocol JXPhotoBrowserDataSource: AnyObject {
     /// 返回项目总数
     func numberOfItems(in browser: JXPhotoBrowser) -> Int
-    /// 为指定索引提供用于展示的视图（由调用方负责内容加载）
-    func photoBrowser(_ browser: JXPhotoBrowser, viewForItemAt index: Int) -> UIView
-    /// 可选：为指定索引提供转场使用的视图（通常为 UIImageView）。不提供则默认使用展示视图。
-    func photoBrowser(_ browser: JXPhotoBrowser, transitionViewAt index: Int) -> UIView?
+
+    /// 生命周期：Cell 即将复用（传入上一次对应的 index）
+    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int)
+    /// 生命周期：Cell 复用完成（已关联到新的 index）
+    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int)
+    /// 生命周期：Cell 即将显示
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int)
+    /// 生命周期：Cell 已消失
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int)
+
+    /// 可选：为 Zoom 转场提供源缩略图视图（用于起点几何计算）。
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
+
+    /// 可选：为指定索引提供用于 Zoom 转场的图片数据。
+    /// 若返回 nil，则动画将回退使用业务方缩略图视图上的 image。
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomImageForItemAt index: Int) -> UIImage?
+    
+    /// 可选：为指定索引提供 Zoom 视图的 contentMode（由业务方设置）。
+    /// 默认使用 .scaleAspectFit。
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomContentModeForItemAt index: Int) -> UIView.ContentMode
 }
 
 public extension JXPhotoBrowserDataSource {
-    func photoBrowser(_ browser: JXPhotoBrowser, transitionViewAt index: Int) -> UIView? { nil }
+    // 默认空实现，便于增量接入
+    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) {}
+
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomImageForItemAt index: Int) -> UIImage? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomContentModeForItemAt index: Int) -> UIView.ContentMode { .scaleAspectFit }
 }
 
 // MARK: - Enums
@@ -75,8 +99,7 @@ public final class JXPhotoBrowser: UIViewController {
     /// 转场动画类型
     public var transitionType: JXPhotoBrowserTransitionType = .fade
     
-    /// 提供源缩略图视图的闭包（用于 Zoom 几何匹配）
-    public var originViewProvider: ((Int) -> UIView?)?
+    // 已弃用：通过数据源方法 `zoomOriginViewAt` 提供源缩略图视图
     
     // MARK: - Private Properties
     
@@ -243,7 +266,7 @@ public final class JXPhotoBrowser: UIViewController {
 
 // MARK: - UICollectionView DataSource & Delegate
 
-extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
+extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, JXPhotoCellLifecycleDelegate {
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return virtualCount
@@ -251,15 +274,35 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+        cell.lifecycleDelegate = self
         if realCount > 0 {
             let real = realIndex(fromVirtual: indexPath.item)
-            if let contentView = dataSource?.photoBrowser(self, viewForItemAt: real) {
-                cell.setContentView(contentView)
-                let tView = dataSource?.photoBrowser(self, transitionViewAt: real)
-                cell.setTransitionView(tView)
-            }
+            cell.currentIndex = real
+            dataSource?.photoBrowser(self, didReuse: cell, at: real)
+        } else {
+            cell.currentIndex = nil
         }
         return cell
+    }
+
+    // 生命周期：Cell 即将显示
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let cell = cell as? JXPhotoCell else { return }
+        let real = realIndex(fromVirtual: indexPath.item)
+        dataSource?.photoBrowser(self, willDisplay: cell, at: real)
+    }
+
+    // 生命周期：Cell 已消失
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let cell = cell as? JXPhotoCell else { return }
+        let real = realIndex(fromVirtual: indexPath.item)
+        dataSource?.photoBrowser(self, didEndDisplaying: cell, at: real)
+    }
+
+    // 来自 Cell 的复用回调
+    func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
+        guard let last = lastIndex else { return }
+        dataSource?.photoBrowser(self, willReuse: cell, at: last)
     }
 }
 

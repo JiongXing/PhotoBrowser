@@ -1,0 +1,203 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -workspace Demo.xcworkspace -scheme Demo -sdk iphonesimulator -configuration Debug build
+
+Build settings from command line:
+    SDKROOT = iphonesimulator26.0
+
+2025-10-28 15:50:55.435 xcodebuild[98794:2511048] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+{ platform:iOS Simulator, arch:arm64, id:40339849-8D54-48C4-B997-714172813312, OS:26.0, name:iPhone 17 }
+{ platform:iOS Simulator, arch:arm64, id:3ED15895-7443-4C1F-9D7F-383B17E206A2, OS:26.0, name:iPhone 17 Pro }
+{ platform:iOS Simulator, arch:arm64, id:56ECFDAA-6DC6-4613-9E19-DB9FC31B1F66, OS:26.0, name:iPhone 17 Pro Max }
+{ platform:iOS Simulator, arch:arm64, id:C86F364C-8528-4EDA-94E1-65317A6A7103, OS:26.0, name:iPhone Air }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008122-000C48DE1180001C, name:My Mac }
+{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+{ platform:iOS, arch:arm64, id:00008030-001A4D1601A1802E, name:梁炯幸的iPhone }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (8 targets)
+    Target 'Demo' in project 'Demo'
+        ➜ Implicit dependency on target 'Pods-Demo' in project 'Pods' via file 'Pods_Demo.framework' in build phase 'Link Binary'
+        ➜ Implicit dependency on target 'JXPhotoBrowser' in project 'Pods' via options '-framework JXPhotoBrowser' in build setting 'OTHER_LDFLAGS'
+        ➜ Implicit dependency on target 'Kingfisher' in project 'Pods' via options '-framework Kingfisher' in build setting 'OTHER_LDFLAGS'
+        ➜ Implicit dependency on target 'LookinServer' in project 'Pods' via options '-framework LookinServer' in build setting 'OTHER_LDFLAGS'
+        ➜ Implicit dependency on target 'SDWebImage' in project 'Pods' via options '-framework SDWebImage' in build setting 'OTHER_LDFLAGS'
+    Target 'Pods-Demo' in project 'Pods'
+        ➜ Explicit dependency on target 'JXPhotoBrowser' in project 'Pods'
+        ➜ Explicit dependency on target 'Kingfisher' in project 'Pods'
+        ➜ Explicit dependency on target 'LookinServer' in project 'Pods'
+        ➜ Explicit dependency on target 'SDWebImage' in project 'Pods'
+    Target 'SDWebImage' in project 'Pods'
+        ➜ Explicit dependency on target 'SDWebImage-SDWebImage' in project 'Pods'
+    Target 'SDWebImage-SDWebImage' in project 'Pods' (no dependencies)
+    Target 'LookinServer' in project 'Pods' (no dependencies)
+    Target 'JXPhotoBrowser' in project 'Pods'
+        ➜ Explicit dependency on target 'Kingfisher' in project 'Pods'
+    Target 'Kingfisher' in project 'Pods'
+        ➜ Explicit dependency on target 'Kingfisher-Kingfisher' in project 'Pods'
+    Target 'Kingfisher-Kingfisher' in project 'Pods' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/Jason/Desktop/ 备份项目/PhotoBrowser/Demo/Demo/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -V
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -x objective-c -c /dev/null
+
+ReadFileContents /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/docc/features.json
+
+Build description signature: 49b69dcdf4ce13337832e06da1938eca
+Build description path: /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/XCBuildData/49b69dcdf4ce13337832e06da1938eca.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk /Users/Jason/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-3885c01c3e6b6a337905948deab2002e26257891a6c027eb51374368541b8346.sdkstatcache
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -o /Users/Jason/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-3885c01c3e6b6a337905948deab2002e26257891a6c027eb51374368541b8346.sdkstatcache
+
+/Users/Jason/Desktop/ 备份项目/PhotoBrowser/Demo/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.0.99. (in target 'LookinServer' from project 'Pods')
+ProcessInfoPlistFile /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/LookinServer/LookinServer.framework/Info.plist /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/LookinServer/LookinServer-Info.plist (in target 'LookinServer' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-infoPlistUtility /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/LookinServer/LookinServer-Info.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/LookinServer/LookinServer.framework/Info.plist
+
+ProcessInfoPlistFile /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/SDWebImage/SDWebImage.bundle/Info.plist /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/SDWebImage/ResourceBundle-SDWebImage-SDWebImage-Info.plist (in target 'SDWebImage-SDWebImage' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-infoPlistUtility /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/SDWebImage/ResourceBundle-SDWebImage-SDWebImage-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/SDWebImage/SDWebImage.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher/Kingfisher.bundle/Info.plist /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/Kingfisher/ResourceBundle-Kingfisher-Kingfisher-Info.plist (in target 'Kingfisher-Kingfisher' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-infoPlistUtility /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/Kingfisher/ResourceBundle-Kingfisher-Kingfisher-Info.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher/Kingfisher.bundle/Info.plist
+
+ProcessProductPackaging "" /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Demo.build/Debug-iphonesimulator/Demo.build/Demo.app-Simulated.xcent (in target 'Demo' from project 'Demo')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "4Z74PJAKUM.com.jxphotobrowser.Demo";
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Demo.build/Debug-iphonesimulator/Demo.build/Demo.app-Simulated.xcent
+
+SwiftDriver JXPhotoBrowser normal arm64 com.apple.xcode.tools.swift.compiler (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name JXPhotoBrowser -Onone -enforce-exclusivity\=checked @/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.SwiftFileList -DDEBUG -D COCOAPODS -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -target arm64-apple-ios13.0-simulator -g -module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser -F /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser -F /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-3885c01c3e6b6a337905948deab2002e26257891a6c027eb51374368541b8346.sdkstatcache -output-file-map /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser_const_extract_protocols.json -Xcc -iquote -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-generated-files.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-own-target-headers.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Pods-8699adb1dd336b26511df848a716bd42-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-project-headers.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser/include -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources-normal/arm64 -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources/arm64 -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources -Xcc -DPOD_CONFIGURATION_DEBUG\=1 -Xcc -DDEBUG\=1 -Xcc -DCOCOAPODS\=1 -emit-objc-header -emit-objc-header-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser-Swift.h -import-underlying-module -Xcc -ivfsoverlay -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/unextended-module-overlay.yaml -working-directory /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods -experimental-emit-module-separately -disable-cmo
+
+SwiftDriver JXPhotoBrowser normal x86_64 com.apple.xcode.tools.swift.compiler (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name JXPhotoBrowser -Onone -enforce-exclusivity\=checked @/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/x86_64/JXPhotoBrowser.SwiftFileList -DDEBUG -D COCOAPODS -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -target x86_64-apple-ios13.0-simulator -g -module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser -F /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser -F /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-3885c01c3e6b6a337905948deab2002e26257891a6c027eb51374368541b8346.sdkstatcache -output-file-map /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/x86_64/JXPhotoBrowser-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/x86_64/JXPhotoBrowser.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/x86_64/JXPhotoBrowser_const_extract_protocols.json -Xcc -iquote -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-generated-files.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-own-target-headers.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Pods-8699adb1dd336b26511df848a716bd42-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-project-headers.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser/include -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources-normal/x86_64 -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources/x86_64 -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources -Xcc -DPOD_CONFIGURATION_DEBUG\=1 -Xcc -DDEBUG\=1 -Xcc -DCOCOAPODS\=1 -emit-objc-header -emit-objc-header-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/x86_64/JXPhotoBrowser-Swift.h -import-underlying-module -Xcc -ivfsoverlay -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/unextended-module-overlay.yaml -working-directory /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/SDWebImage/SDWebImage.framework/Info.plist /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/SDWebImage/SDWebImage-Info.plist (in target 'SDWebImage' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-infoPlistUtility /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/SDWebImage/SDWebImage-Info.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/SDWebImage/SDWebImage.framework/Info.plist
+
+ProcessInfoPlistFile /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher/Kingfisher.framework/Info.plist /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/Kingfisher/Kingfisher-Info.plist (in target 'Kingfisher' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-infoPlistUtility /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/Kingfisher/Kingfisher-Info.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher/Kingfisher.framework/Info.plist
+
+ProcessProductPackagingDER /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Demo.build/Debug-iphonesimulator/Demo.build/Demo.app-Simulated.xcent /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Demo.build/Debug-iphonesimulator/Demo.build/Demo.app-Simulated.xcent.der (in target 'Demo' from project 'Demo')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo
+    /usr/bin/derq query -f xml -i /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Demo.build/Debug-iphonesimulator/Demo.build/Demo.app-Simulated.xcent -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Demo.build/Debug-iphonesimulator/Demo.build/Demo.app-Simulated.xcent.der --raw
+
+ProcessInfoPlistFile /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser/JXPhotoBrowser.framework/Info.plist /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/JXPhotoBrowser/JXPhotoBrowser-Info.plist (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    builtin-infoPlistUtility /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods/Target\ Support\ Files/JXPhotoBrowser/JXPhotoBrowser-Info.plist -producttype com.apple.product-type.framework -expandbuildsettings -format binary -platform iphonesimulator -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser/JXPhotoBrowser.framework/Info.plist
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ JXPhotoBrowser (in target 'JXPhotoBrowser' from project 'Pods')
+
+EmitSwiftModule normal arm64 (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftCompile normal arm64 Compiling\ JXPhotoBrowser.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift (in target 'JXPhotoBrowser' from project 'Pods')
+SwiftCompile normal arm64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+/Users/Jason/Desktop/ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift:280:18: error: cannot assign to property: 'currentIndex' setter is inaccessible
+            cell.currentIndex = real
+            ~~~~~^~~~~~~~~~~~
+/Users/Jason/Desktop/ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift:283:18: error: cannot assign to property: 'currentIndex' setter is inaccessible
+            cell.currentIndex = nil
+            ~~~~~^~~~~~~~~~~~
+
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXFadeAnimator.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXNoneAnimator.swift -primary-file /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoCell.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomDismissAnimator.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomPresentAnimator.swift -emit-dependencies-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.d -emit-const-values-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.swiftconstvalues -emit-reference-dependencies-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.swiftdeps -serialize-diagnostics-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.dia -target arm64-apple-ios13.0-simulator -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.0.sdk -I /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser -F /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser -F /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/Kingfisher -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -import-underlying-module -module-cache-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -D COCOAPODS -serialize-debugging-options -const-gather-protocols-file /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/Jason/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods -enable-anonymous-context-mangled-names -file-compilation-dir /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.0-23A339-3885c01c3e6b6a337905948deab2002e26257891a6c027eb51374368541b8346.sdkstatcache -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-generated-files.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-own-target-headers.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/Pods-8699adb1dd336b26511df848a716bd42-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/JXPhotoBrowser-project-headers.hmap -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Products/Debug-iphonesimulator/JXPhotoBrowser/include -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources-normal/arm64 -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources/arm64 -Xcc -I/Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/DerivedSources -Xcc -DPOD_CONFIGURATION_DEBUG\=1 -Xcc -DDEBUG\=1 -Xcc -DCOCOAPODS\=1 -Xcc -ivfsoverlay -Xcc /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/unextended-module-overlay.yaml -no-auto-bridging-header-chaining -module-name JXPhotoBrowser -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.0 -target-sdk-name iphonesimulator26.0 -clang-target arm64-apple-ios26.0-simulator -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Build/Intermediates.noindex/Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.o -index-unit-output-path /Pods.build/Debug-iphonesimulator/JXPhotoBrowser.build/Objects-normal/arm64/JXPhotoBrowser.o -index-store-path /Users/Jason/Library/Developer/Xcode/DerivedData/Demo-aussvwirgvhmivdbwowsouewhljn/Index.noindex/DataStore -index-system-modules
+SwiftCompile normal arm64 Compiling\ JXZoomDismissAnimator.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomDismissAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+SwiftCompile normal arm64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomDismissAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftEmitModule normal x86_64 Emitting\ module\ for\ JXPhotoBrowser (in target 'JXPhotoBrowser' from project 'Pods')
+
+EmitSwiftModule normal x86_64 (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftCompile normal x86_64 Compiling\ JXPhotoBrowser.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift (in target 'JXPhotoBrowser' from project 'Pods')
+SwiftCompile normal x86_64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftCompile normal x86_64 Compiling\ JXPhotoCell.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoCell.swift (in target 'JXPhotoBrowser' from project 'Pods')
+
+SwiftCompile normal x86_64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoCell.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftCompile normal arm64 Compiling\ JXZoomPresentAnimator.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomPresentAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+
+SwiftCompile normal arm64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomPresentAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftDriverJobDiscovery normal x86_64 Compiling JXPhotoCell.swift (in target 'JXPhotoBrowser' from project 'Pods')
+
+SwiftCompile normal x86_64 Compiling\ JXZoomDismissAnimator.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomDismissAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+
+SwiftCompile normal x86_64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomDismissAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+SwiftCompile normal x86_64 Compiling\ JXZoomPresentAnimator.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomPresentAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+
+SwiftCompile normal x86_64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXZoomPresentAnimator.swift (in target 'JXPhotoBrowser' from project 'Pods')
+    cd /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/Pods
+    
+
+/Users/Jason/Desktop/ 备份项目/PhotoBrowser/Demo/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.0.99. (in target 'SDWebImage-SDWebImage' from project 'Pods')
+/Users/Jason/Desktop/ 备份项目/PhotoBrowser/Demo/Pods/Pods.xcodeproj: warning: The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 9.0, but the range of supported deployment target versions is 12.0 to 26.0.99. (in target 'SDWebImage' from project 'Pods')
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift (in target 'JXPhotoBrowser' from project 'Pods')
+	SwiftCompile normal arm64 Compiling\ JXPhotoBrowser.swift /Users/Jason/Desktop/\ 备份项目/PhotoBrowser/Demo/JXPhotoBrowser/Sources/JXPhotoBrowser.swift (in target 'JXPhotoBrowser' from project 'Pods')
+	Building workspace Demo with scheme Demo and configuration Debug
+(3 failures)

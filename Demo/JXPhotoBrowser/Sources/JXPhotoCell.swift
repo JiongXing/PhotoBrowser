@@ -5,66 +5,57 @@
 
 import UIKit
 
-/// 仅作为容器的 Cell，不参与具体内容加载
-class JXPhotoCell: UICollectionViewCell {
+protocol JXPhotoCellLifecycleDelegate: AnyObject {
+    func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?)
+}
+
+/// 固定图片视图的 Cell，不再动态添加视图
+public final class JXPhotoCell: UICollectionViewCell {
     // MARK: - Static
-    static let reuseIdentifier = "JXPhotoCell"
+    public static let reuseIdentifier = "JXPhotoCell"
 
     // MARK: - UI
-    private let containerView: UIView = {
-        let v = UIView()
-        v.translatesAutoresizingMaskIntoConstraints = false
-        v.backgroundColor = .black
-        return v
+    public let imageView: UIImageView = {
+        let iv = UIImageView()
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
+        iv.clipsToBounds = true
+        iv.backgroundColor = .black
+        return iv
     }()
 
-    private weak var transitionView: UIView?
+    // MARK: - Lifecycle Delegate & State
+    weak var lifecycleDelegate: JXPhotoCellLifecycleDelegate?
+    var currentIndex: Int?
 
     // MARK: - Init
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(containerView)
+        contentView.addSubview(imageView)
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
         backgroundColor = .black
     }
 
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
 
     // MARK: - Lifecycle
-    override func prepareForReuse() {
+    public override func prepareForReuse() {
         super.prepareForReuse()
-        // 移除旧内容视图
-        containerView.subviews.forEach { $0.removeFromSuperview() }
-        transitionView = nil
-    }
-
-    // MARK: - Content Embedding
-    func setContentView(_ view: UIView) {
-        containerView.subviews.forEach { $0.removeFromSuperview() }
-        containerView.addSubview(view)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: containerView.topAnchor),
-            view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
-        ])
-        // 若未设置转场视图，默认使用当前内容视图
-        if transitionView == nil { transitionView = view }
-    }
-
-    func setTransitionView(_ view: UIView?) {
-        transitionView = view
+        // 通知即将复用（携带上一次的 index）
+        lifecycleDelegate?.photoCellWillReuse(self, lastIndex: currentIndex)
+        // 清空旧图像与状态
+        imageView.image = nil
+        currentIndex = nil
     }
 
     // MARK: - Transition Helper
     /// 若调用方提供的是 UIImageView，则可参与几何匹配 Zoom 动画
-    var transitionImageView: UIImageView? { transitionView as? UIImageView }
+    var transitionImageView: UIImageView? { imageView }
 }
