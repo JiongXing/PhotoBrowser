@@ -89,7 +89,11 @@ final class MediaCell: UICollectionViewCell {
             imageView.image = UIImage(named: name)
 
         case .remoteImage(let url):
-            imageView.kf.setImage(with: url)
+            if let thumb = media.thumbnailURL {
+                imageView.kf.setImage(with: thumb)
+            } else {
+                imageView.kf.setImage(with: url)
+            }
 
         case let .localVideo(fileName, fileExtension):
             playOverlay.isHidden = false

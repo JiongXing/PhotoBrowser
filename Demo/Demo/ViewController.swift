@@ -13,23 +13,22 @@ import JXPhotoBrowser
 struct Media {
     let id = UUID()
     let source: JXMediaSource
+    let thumbnailURL: URL?
 }
-
 
 // MARK: - ViewController
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
 
     private var collectionView: UICollectionView!
 
-    // 数据源：默认本地图片 local_0 至 local_8，可混入视频项
+    // 数据源：改为网络图片（原图 + 缩略图）
     private let items: [Media] = {
-        var arr: [Media] = []
-        for i in 0...8 {
-            arr.append(Media(source: .localImage(name: "local_\(i)")))
+        let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
+        return (0...8).map { i in
+            let original = base.appendingPathComponent("photo_\(i).png")
+            let thumbnail = base.appendingPathComponent("photo_\(i)_thumbnail.png")
+            return Media(source: .remoteImage(url: original), thumbnailURL: thumbnail)
         }
-        // 示例：如需添加本地视频（将 sample.mp4 加入工程资源后取消注释）
-        // arr.append(Media(source: .localVideo(fileName: "sample", fileExtension: "mp4")))
-        return arr
     }()
 
     override func viewDidLoad() {
