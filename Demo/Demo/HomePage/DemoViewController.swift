@@ -150,7 +150,6 @@ extension DemoViewController: JXPhotoBrowserDataSource {
         let iv = UIImageView(image: image)
         iv.contentMode = srcIV.contentMode
         iv.clipsToBounds = true
-        iv.backgroundColor = srcIV.backgroundColor
         return iv
     }
 }

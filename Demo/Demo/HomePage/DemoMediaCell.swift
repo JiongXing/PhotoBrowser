@@ -26,7 +26,6 @@ final class DemoMediaCell: UICollectionViewCell {
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.backgroundColor = .secondarySystemBackground
         return iv
     }()
     

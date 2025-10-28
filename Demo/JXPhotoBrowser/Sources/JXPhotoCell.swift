@@ -13,21 +13,20 @@ protocol JXPhotoCellLifecycleDelegate: AnyObject {
 public final class JXPhotoCell: UICollectionViewCell {
     // MARK: - Static
     public static let reuseIdentifier = "JXPhotoCell"
-
+    
     // MARK: - UI
     public let imageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.contentMode = .scaleAspectFit
+        iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.backgroundColor = .black
         return iv
     }()
-
+    
     // MARK: - Lifecycle Delegate & State
     weak var lifecycleDelegate: JXPhotoCellLifecycleDelegate?
     var currentIndex: Int?
-
+    
     // MARK: - Init
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -40,11 +39,11 @@ public final class JXPhotoCell: UICollectionViewCell {
         ])
         backgroundColor = .black
     }
-
+    
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-
+    
     // MARK: - Lifecycle
     public override func prepareForReuse() {
         super.prepareForReuse()
@@ -54,8 +53,13 @@ public final class JXPhotoCell: UICollectionViewCell {
         imageView.image = nil
         currentIndex = nil
     }
-
+    
     // MARK: - Transition Helper
     /// 若调用方提供的是 UIImageView，则可参与几何匹配 Zoom 动画
     var transitionImageView: UIImageView? { imageView }
+
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        print("imageView.frame: \(imageView.frame)")
+    }
 }

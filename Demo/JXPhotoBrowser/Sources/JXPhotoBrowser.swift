@@ -11,7 +11,7 @@ import AVFoundation
 public protocol JXPhotoBrowserDataSource: AnyObject {
     /// 返回项目总数
     func numberOfItems(in browser: JXPhotoBrowser) -> Int
-
+    
     /// 生命周期：Cell 即将复用（传入上一次对应的 index）
     func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int)
     /// 生命周期：Cell 复用完成（已关联到新的 index）
@@ -20,10 +20,10 @@ public protocol JXPhotoBrowserDataSource: AnyObject {
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int)
     /// 生命周期：Cell 已消失
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int)
-
+    
     /// 可选：为 Zoom 转场提供源缩略图视图（用于起点几何计算）。
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
-
+    
     /// 为 Zoom 转场提供一个临时 ZoomView（仅用于动画期间展示，完成后即移除）。
     /// - 参数 isPresenting: true 表示 present 转场，false 表示 dismiss 转场。
     /// - 返回值：需要业务方提前创建并配置内容的视图实例（未添加到任意父视图）。
@@ -37,7 +37,7 @@ public extension JXPhotoBrowserDataSource {
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) {}
-
+    
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
 }
@@ -106,7 +106,7 @@ public final class JXPhotoBrowser: UIViewController {
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         layout.itemSize = view.bounds.size
-    
+        
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .black
@@ -141,7 +141,7 @@ public final class JXPhotoBrowser: UIViewController {
         view.backgroundColor = .black
         setupCollectionView()
         applyCollectionViewConfig()
-
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissSelf))
         view.addGestureRecognizer(tap)
     }
@@ -191,15 +191,56 @@ public final class JXPhotoBrowser: UIViewController {
         dismiss(animated: transitionType != .none, completion: nil)
     }
     
-    /// 当前可见的图片视图（用于转场目标）
+    /// 当前可见的图片视图（用于转场目标，函数内不触发任何滚动）
     func visiblePhotoImageView() -> UIImageView? {
-        let center = CGPoint(
-            x: collectionView.bounds.midX + collectionView.contentOffset.x,
-            y: collectionView.bounds.midY + collectionView.contentOffset.y
-        )
-        guard let idx = collectionView.indexPathForItem(at: center),
-              let cell = collectionView.cellForItem(at: idx) as? JXPhotoCell else { return nil }
-        return cell.transitionImageView
+        // 先确保布局完成，提升获取稳定性
+        view.layoutIfNeeded()
+        collectionView.layoutIfNeeded()
+        
+        func centerPoint() -> CGPoint {
+            CGPoint(
+                x: collectionView.bounds.midX + collectionView.contentOffset.x,
+                y: collectionView.bounds.midY + collectionView.contentOffset.y
+            )
+        }
+        
+        func nearestVisibleCell() -> JXPhotoCell? {
+            if collectionView.visibleCells.isEmpty { return nil }
+            let c = centerPoint()
+            let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
+            return cells.min { lhs, rhs in
+                let dl = hypot(lhs.center.x - c.x, lhs.center.y - c.y)
+                let dr = hypot(rhs.center.x - c.x, rhs.center.y - c.y)
+                return dl < dr
+            }
+        }
+        
+        // 尝试 1：用中心点索引命中 cell（基于 indexPath 直取，不滚动）
+        if let idx = collectionView.indexPathForItem(at: centerPoint()),
+           let cell = collectionView.cellForItem(at: idx) as? JXPhotoCell {
+            return cell.transitionImageView
+        }
+        
+        // 尝试 2：使用当前真实索引，在可见 cells 中查找匹配的 cell
+        if let real = currentRealIndex() {
+            let c = centerPoint()
+            let candidates = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }.filter { $0.currentIndex == real }
+            if let matched = candidates.min(by: { lhs, rhs in
+                let dl = hypot(lhs.center.x - c.x, lhs.center.y - c.y)
+                let dr = hypot(rhs.center.x - c.x, rhs.center.y - c.y)
+                return dl < dr
+            }) {
+                return matched.transitionImageView
+            }
+        }
+        
+        // 尝试 3：从可见 cell 中选择最接近中心的
+        if let cell = nearestVisibleCell() {
+            return cell.transitionImageView
+        }
+        
+        // 兜底：仍无法获取则返回 nil（上层应降级处理）
+        return nil
     }
     
     /// 当前真实索引（虚拟索引映射）
@@ -220,7 +261,21 @@ public final class JXPhotoBrowser: UIViewController {
         if transitionType != .none { transitioningDelegate = self }
         vc.present(self, animated: transitionType != .none, completion: nil)
     }
-
+    
+    /// 供转场动画调用：在展示动画开始前，尽量让初始 Cell 就绪
+    /// - 做法：强制布局、刷新数据并滚动到初始索引，然后再次布局
+    /// - 目的：避免在 Present 阶段无法拿到目标 Cell 导致的 `destIV == nil`
+    func prepareForPresentTransitionIfNeeded() {
+        view.layoutIfNeeded()
+        collectionView.reloadData()
+        collectionView.layoutIfNeeded()
+        if !didScrollToInitial {
+            scrollToInitialIndex()
+            didScrollToInitial = true
+            collectionView.layoutIfNeeded()
+        }
+    }
+    
     // MARK: - Setup & Configuration
     
     /// 添加并约束集合视图
@@ -281,21 +336,21 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
         }
         return cell
     }
-
+    
     // 生命周期：Cell 即将显示
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? JXPhotoCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
         dataSource?.photoBrowser(self, willDisplay: cell, at: real)
     }
-
+    
     // 生命周期：Cell 已消失
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? JXPhotoCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
         dataSource?.photoBrowser(self, didEndDisplaying: cell, at: real)
     }
-
+    
     // 来自 Cell 的复用回调
     func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
         guard let last = lastIndex else { return }
