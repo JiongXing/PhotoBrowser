@@ -62,9 +62,9 @@
 			isa = PBXGroup;
 			children = (
 				96E19AB42EAB636F00B8BA36 /* Demo */,
-				96E19AB32EAB636F00B8BA36 /* Products */,
-				F4179B10EFBA04BAC4462E70 /* Pods */,
 				6892EDB07F1B1D6569656561 /* Frameworks */,
+				F4179B10EFBA04BAC4462E70 /* Pods */,
+				96E19AB32EAB636F00B8BA36 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -185,13 +185,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Demo/Pods-Demo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Demo/Pods-Demo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

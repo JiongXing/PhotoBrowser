@@ -8,6 +8,13 @@
 import UIKit
 import AVKit
 import AVFoundation
+import JXPhotoBrowser
+
+struct Media {
+    let id = UUID()
+    let source: JXMediaSource
+}
+
 
 // MARK: - ViewController
 class ViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
@@ -116,10 +123,12 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
 // MARK: - JXPhotoBrowser DataSource
 extension ViewController: JXPhotoBrowserDataSource {
+    
     func numberOfItems(in browser: JXPhotoBrowser) -> Int {
         return items.count
     }
-    func photoBrowser(_ browser: JXPhotoBrowser, mediaSourceAt index: Int) -> MediaSource {
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, mediaSourceAt index: Int) -> JXMediaSource {
         return items[index].source
     }
 }

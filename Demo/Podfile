@@ -5,6 +5,7 @@ target 'Demo' do
   use_frameworks!
 
   # Pods for Demo
+  pod 'JXPhotoBrowser', :path => './JXPhotoBrowser'
   pod 'SDWebImage'
   pod 'Kingfisher'
   pod 'LookinServer', :configurations => ['Debug']

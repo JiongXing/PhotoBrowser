@@ -9,6 +9,7 @@ import UIKit
 import AVKit
 import AVFoundation
 import Kingfisher
+import JXPhotoBrowser
 
 final class MediaCell: UICollectionViewCell {
     
@@ -90,13 +91,13 @@ final class MediaCell: UICollectionViewCell {
         case .remoteImage(let url):
             imageView.kf.setImage(with: url)
 
-        case .localVideo(let fileName, let ext):
+        case let .localVideo(fileName, fileExtension):
             playOverlay.isHidden = false
-            if let url = Bundle.main.url(forResource: fileName, withExtension: ext) {
+            if let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension) {
                 generateThumbnail(for: url)
             }
 
-        case .remoteVideo(let url):
+        case let .remoteVideo(url):
             playOverlay.isHidden = false
             generateThumbnail(for: url)
         }

@@ -1,4 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-Demo/Pods-Demo-frameworks.sh
+${BUILT_PRODUCTS_DIR}/JXPhotoBrowser/JXPhotoBrowser.framework
 ${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework
 ${BUILT_PRODUCTS_DIR}/LookinServer/LookinServer.framework
 ${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework
