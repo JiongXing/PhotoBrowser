@@ -6,21 +6,58 @@
 import UIKit
 
 protocol JXPhotoCellLifecycleDelegate: AnyObject {
+    /// 即将被复用
     func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?)
+    
+    /// 单击图片（关闭Browser）
+    func photoCellDidSingleTap(_ cell: JXPhotoCell)
 }
 
-/// 固定图片视图的 Cell，不再动态添加视图
-public final class JXPhotoCell: UICollectionViewCell {
+/// 支持图片捏合缩放查看的 Cell
+public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     // MARK: - Static
     public static let reuseIdentifier = "JXPhotoCell"
     
     // MARK: - UI
+    public let scrollView: UIScrollView = {
+        let sv = UIScrollView()
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.minimumZoomScale = 1.0
+        sv.maximumZoomScale = 3.0
+        sv.bouncesZoom = true
+        sv.alwaysBounceVertical = false
+        sv.alwaysBounceHorizontal = false
+        sv.showsVerticalScrollIndicator = false
+        sv.showsHorizontalScrollIndicator = false
+        sv.decelerationRate = .fast
+        sv.backgroundColor = .clear
+        return sv
+    }()
+
     public let imageView: UIImageView = {
         let iv = UIImageView()
-        iv.translatesAutoresizingMaskIntoConstraints = false
+        // 使用非 AutoLayout 的 frame 布局以配合缩放
+        iv.translatesAutoresizingMaskIntoConstraints = true
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         return iv
+    }()
+
+    // 双击手势：小于 1.1 放大到 2x，否则还原
+    private lazy var doubleTapGesture: UITapGestureRecognizer = {
+        let g = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
+        g.numberOfTapsRequired = 2
+        g.numberOfTouchesRequired = 1
+        return g
+    }()
+
+    // 单击手势：用于关闭浏览器（与双击互斥）
+    private lazy var singleTapGesture: UITapGestureRecognizer = {
+        let g = UITapGestureRecognizer(target: self, action: #selector(handleSingleTap(_:)))
+        g.numberOfTapsRequired = 1
+        g.numberOfTouchesRequired = 1
+        g.delaysTouchesBegan = false
+        return g
     }()
     
     // MARK: - Lifecycle Delegate & State
@@ -30,13 +67,25 @@ public final class JXPhotoCell: UICollectionViewCell {
     // MARK: - Init
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.addSubview(imageView)
+        // ScrollView 承载 imageView 以支持捏合缩放
+        contentView.addSubview(scrollView)
         NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            scrollView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
+
+        scrollView.delegate = self
+        scrollView.addSubview(imageView)
+        // 初始采用 frame 等于 scrollView 边界，缩放时由 UIScrollView 管理 contentSize
+        imageView.frame = scrollView.bounds
+        scrollView.contentSize = imageView.frame.size
+        // 添加双击缩放
+        scrollView.addGestureRecognizer(doubleTapGesture)
+        // 添加单击关闭，并与双击冲突处理
+        scrollView.addGestureRecognizer(singleTapGesture)
+        singleTapGesture.require(toFail: doubleTapGesture)
         backgroundColor = .black
     }
     
@@ -52,6 +101,12 @@ public final class JXPhotoCell: UICollectionViewCell {
         // 清空旧图像与状态
         imageView.image = nil
         currentIndex = nil
+        // 重置缩放与偏移
+        scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
+        scrollView.contentOffset = .zero
+        // 恢复初始布局
+        imageView.frame = scrollView.bounds
+        scrollView.contentSize = imageView.frame.size
     }
     
     // MARK: - Transition Helper
@@ -60,6 +115,71 @@ public final class JXPhotoCell: UICollectionViewCell {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        print("imageView.frame: \(imageView.frame)")
+        // 在未缩放状态下自适应新尺寸；缩放中不打扰用户当前位置
+        if scrollView.zoomScale == scrollView.minimumZoomScale {
+            imageView.frame = scrollView.bounds
+            scrollView.contentSize = imageView.frame.size
+            centerImageIfNeeded()
+        } else {
+            // 仅在缩放时维持居中展示
+            centerImageIfNeeded()
+        }
+    }
+
+    // MARK: - UIScrollViewDelegate
+    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imageView
+    }
+
+    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        centerImageIfNeeded()
+    }
+
+    // MARK: - Helpers
+    private func centerImageIfNeeded() {
+        let boundsSize = scrollView.bounds.size
+        var frameToCenter = imageView.frame
+
+        // 计算水平/垂直偏移以在内容小于可视区域时居中
+        if frameToCenter.size.width < boundsSize.width {
+            frameToCenter.origin.x = (boundsSize.width - frameToCenter.size.width) * 0.5
+        } else {
+            frameToCenter.origin.x = 0
+        }
+
+        if frameToCenter.size.height < boundsSize.height {
+            frameToCenter.origin.y = (boundsSize.height - frameToCenter.size.height) * 0.5
+        } else {
+            frameToCenter.origin.y = 0
+        }
+
+        imageView.frame = frameToCenter
+    }
+
+    @objc private func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        let currentScale = scrollView.zoomScale
+        if currentScale < 1.1 {
+            let targetScale = min(2.0, scrollView.maximumZoomScale)
+            let tapPointInScroll = gesture.location(in: scrollView)
+            let tapPointInImage = imageView.convert(tapPointInScroll, from: scrollView)
+            let rect = zoomRect(for: targetScale, centeredAt: tapPointInImage)
+            scrollView.zoom(to: rect, animated: true)
+        } else {
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+        }
+    }
+
+    private func zoomRect(for scale: CGFloat, centeredAt center: CGPoint) -> CGRect {
+        // 以 scrollView 的可视尺寸反推在内容坐标系下应显示的区域尺寸
+        let boundsSize = scrollView.bounds.size
+        let width = boundsSize.width / scale
+        let height = boundsSize.height / scale
+        let originX = center.x - (width * 0.5)
+        let originY = center.y - (height * 0.5)
+        return CGRect(x: originX, y: originY, width: width, height: height)
+    }
+
+    @objc private func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+        lifecycleDelegate?.photoCellDidSingleTap(self)
     }
 }

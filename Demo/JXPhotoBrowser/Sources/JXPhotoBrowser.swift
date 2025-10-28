@@ -141,9 +141,6 @@ public final class JXPhotoBrowser: UIViewController {
         view.backgroundColor = .black
         setupCollectionView()
         applyCollectionViewConfig()
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissSelf))
-        view.addGestureRecognizer(tap)
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -355,6 +352,11 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
         guard let last = lastIndex else { return }
         dataSource?.photoBrowser(self, willReuse: cell, at: last)
+    }
+
+    // 来自 Cell 的单击手势回调：关闭浏览器
+    func photoCellDidSingleTap(_ cell: JXPhotoCell) {
+        dismissSelf()
     }
 }
 

@@ -43,7 +43,6 @@ class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         if let ov = originView, let targetIV = destIV, let zv = zoomView {
             startFrame = ov.convert(ov.bounds, to: container)
             endFrame = targetIV.convert(targetIV.bounds, to: container)
-            print("startFrame: \(startFrame), endFrame: \(endFrame)")
             
             // 隐藏真实视图，避免重影
             ov.isHidden = true
