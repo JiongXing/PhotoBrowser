@@ -24,13 +24,11 @@ public protocol JXPhotoBrowserDataSource: AnyObject {
     /// 可选：为 Zoom 转场提供源缩略图视图（用于起点几何计算）。
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
 
-    /// 可选：为指定索引提供用于 Zoom 转场的图片数据。
-    /// 若返回 nil，则动画将回退使用业务方缩略图视图上的 image。
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomImageForItemAt index: Int) -> UIImage?
-    
-    /// 可选：为指定索引提供 Zoom 视图的 contentMode（由业务方设置）。
-    /// 默认使用 .scaleAspectFit。
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomContentModeForItemAt index: Int) -> UIView.ContentMode
+    /// 为 Zoom 转场提供一个临时 ZoomView（仅用于动画期间展示，完成后即移除）。
+    /// - 参数 isPresenting: true 表示 present 转场，false 表示 dismiss 转场。
+    /// - 返回值：需要业务方提前创建并配置内容的视图实例（未添加到任意父视图）。
+    /// 若返回 nil，则将自动降级为 Fade 动画。
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
 }
 
 public extension JXPhotoBrowserDataSource {
@@ -41,8 +39,7 @@ public extension JXPhotoBrowserDataSource {
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) {}
 
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomImageForItemAt index: Int) -> UIImage? { nil }
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomContentModeForItemAt index: Int) -> UIView.ContentMode { .scaleAspectFit }
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
 }
 
 // MARK: - Enums

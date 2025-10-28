@@ -27,78 +27,58 @@ class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             }
             
             let srcIV = fromVC.visiblePhotoImageView()
-            var animImageView: UIImageView?
             var startFrame: CGRect = .zero
-            var destView: UIView?
             var endFrame: CGRect = .zero
-            var canZoom = false
-            
-            // 从数据源获取 zoom 图像与 contentMode（由业务方定义）
+            var destView: UIView?
+
             let currentIndex = fromVC.currentRealIndex()
-            let zoomImage = currentIndex.flatMap { fromVC.dataSource?.photoBrowser(fromVC, zoomImageForItemAt: $0) }
-            let zoomContentMode = currentIndex.flatMap { fromVC.dataSource?.photoBrowser(fromVC, zoomContentModeForItemAt: $0) } ?? .scaleAspectFit
-            
-            if let iv = srcIV {
-                // 起点：依据浏览器当前显示视图与 contentMode 计算
-                let basisImage = (zoomImage ?? iv.image)
-                if let img = basisImage, img.size.width > 0 && img.size.height > 0 {
-                    let startRect: CGRect
-                    if zoomContentMode == .scaleAspectFit {
-                        startRect = AVMakeRect(aspectRatio: img.size, insideRect: iv.bounds)
-                    } else if zoomContentMode == .scaleAspectFill || zoomContentMode == .scaleToFill {
-                        startRect = iv.bounds
-                    } else {
-                        startRect = AVMakeRect(aspectRatio: img.size, insideRect: iv.bounds)
+            let zoomView = currentIndex.flatMap { fromVC.dataSource?.photoBrowser(fromVC, zoomViewForItemAt: $0, isPresenting: false) }
+
+            if let iv = srcIV, let idx = currentIndex, let zv = zoomView {
+                startFrame = iv.convert(iv.bounds, to: container)
+                iv.isHidden = true
+                if let origin = fromVC.dataSource?.photoBrowser(fromVC, zoomOriginViewAt: idx) {
+                    destView = origin
+                    endFrame = origin.convert(origin.bounds, to: container)
+                    origin.isHidden = true
+
+                    // 使用业务方提供的 ZoomView 作为临时视图
+                    zv.frame = startFrame
+                    container.addSubview(zv)
+
+                    UIView.animate(withDuration: duration, animations: {
+                        zv.frame = endFrame
+                        fromView.alpha = 0
+                    }) { _ in
+                        let wasCancelled = ctx.transitionWasCancelled
+                        if wasCancelled {
+                            iv.isHidden = false
+                            destView?.isHidden = false
+                            zv.removeFromSuperview()
+                            fromView.alpha = 1
+                            ctx.completeTransition(false)
+                        } else {
+                            destView?.isHidden = false
+                            zv.removeFromSuperview()
+                            fromView.removeFromSuperview()
+                            ctx.completeTransition(true)
+                        }
                     }
-                    startFrame = iv.convert(startRect, to: container)
-                    let aiv = UIImageView(image: img)
-                    aiv.frame = startFrame
-                    aiv.contentMode = zoomContentMode
-                    aiv.clipsToBounds = true
-                    animImageView = aiv
-                    iv.isHidden = true
-                    if let realIndex = currentIndex, let origin = fromVC.dataSource?.photoBrowser(fromVC, zoomOriginViewAt: realIndex) {
-                        destView = origin
-                        endFrame = origin.convert(origin.bounds, to: container)
-                        origin.isHidden = true
-                        canZoom = true
-                    }
+                    return
                 }
             }
-            
-            if canZoom, let animIV = animImageView {
-                container.addSubview(animIV)
-                UIView.animate(withDuration: duration, animations: {
-                    animIV.frame = endFrame
-                    fromView.alpha = 0
-                }) { _ in
-                    let wasCancelled = ctx.transitionWasCancelled
-                    if wasCancelled {
-                        srcIV?.isHidden = false
-                        destView?.isHidden = false
-                        animIV.removeFromSuperview()
-                        fromView.alpha = 1
-                        ctx.completeTransition(false)
-                    } else {
-                        destView?.isHidden = false
-                        animIV.removeFromSuperview()
-                        fromView.removeFromSuperview()
-                        ctx.completeTransition(true)
-                    }
-                }
-            } else {
-                // 降级为 fade 动画（不缩放），保持黑屏修复
-                UIView.animate(withDuration: duration, animations: {
-                    fromView.alpha = 0
-                }) { _ in
-                    let wasCancelled = ctx.transitionWasCancelled
-                    if wasCancelled {
-                        fromView.alpha = 1
-                        ctx.completeTransition(false)
-                    } else {
-                        fromView.removeFromSuperview()
-                        ctx.completeTransition(true)
-                    }
+
+            // 降级为 fade 动画（不缩放）
+            UIView.animate(withDuration: duration, animations: {
+                fromView.alpha = 0
+            }) { _ in
+                let wasCancelled = ctx.transitionWasCancelled
+                if wasCancelled {
+                    fromView.alpha = 1
+                    ctx.completeTransition(false)
+                } else {
+                    fromView.removeFromSuperview()
+                    ctx.completeTransition(true)
                 }
             }
         }
