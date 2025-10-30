@@ -115,15 +115,36 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        // 在未缩放状态下自适应新尺寸；缩放中不打扰用户当前位置
+        // 在未缩放状态下，根据图片比例调整 imageView.frame
         if scrollView.zoomScale == scrollView.minimumZoomScale {
+            adjustImageViewFrame()
+        }
+        // 任何时候（包括缩放时），都对图片做居中处理
+        centerImageIfNeeded()
+    }
+
+    // MARK: - Layout Helper
+    /// 根据图片实际尺寸，调整 imageView 的 frame
+    private func adjustImageViewFrame() {
+        guard let image = imageView.image else {
+            // 无图时，重置为容器大小
             imageView.frame = scrollView.bounds
             scrollView.contentSize = imageView.frame.size
-            centerImageIfNeeded()
-        } else {
-            // 仅在缩放时维持居中展示
-            centerImageIfNeeded()
+            return
         }
+        let containerSize = scrollView.bounds.size
+        // 容器或图片尺寸无效时，不做处理
+        guard containerSize.width > 0, containerSize.height > 0, image.size.width > 0 else {
+            return
+        }
+        
+        // 宽度与容器一致，高度等比缩放
+        let imageRatio = image.size.height / image.size.width
+        let newWidth = containerSize.width
+        let newHeight = newWidth * imageRatio
+        
+        imageView.frame = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
+        scrollView.contentSize = imageView.frame.size
     }
 
     // MARK: - UIScrollViewDelegate

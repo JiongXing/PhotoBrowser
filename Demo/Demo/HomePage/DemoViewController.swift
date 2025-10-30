@@ -19,7 +19,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     // 数据源：改为网络图片（原图 + 缩略图）
     private let items: [DemoMedia] = {
         let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
-        return (0...8).map { i in
+        return (0...9).map { i in
             let original = base.appendingPathComponent("photo_\(i).png")
             let thumbnail = base.appendingPathComponent("photo_\(i)_thumbnail.png")
             return DemoMedia(source: .remoteImage(imageURL: original, thumbnailURL: thumbnail))
@@ -121,8 +121,14 @@ extension DemoViewController: JXPhotoBrowserDataSource {
         cell.imageView.contentMode = .scaleAspectFit
         cell.imageView.backgroundColor = .black
         cell.imageView.clipsToBounds = true
-        if case let .remoteImage(imageURL, _) = items[index].source {
-            cell.imageView.kf.setImage(with: imageURL)
+        if case let .remoteImage(imageURL, thumbnailURL) = items[index].source {
+            // 先显示缩略图作为占位图（若存在），再加载原图
+            if let thumbURL = thumbnailURL {
+                cell.imageView.kf.setImage(with: thumbURL)
+                cell.imageView.kf.setImage(with: imageURL, options: [.keepCurrentImageWhileLoading])
+            } else {
+                cell.imageView.kf.setImage(with: imageURL)
+            }
         } else {
             cell.imageView.image = nil
         }
