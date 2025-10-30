@@ -190,54 +190,24 @@ public final class JXPhotoBrowser: UIViewController {
     
     /// 当前可见的图片视图（用于转场目标，函数内不触发任何滚动）
     func visiblePhotoImageView() -> UIImageView? {
-        // 先确保布局完成，提升获取稳定性
         view.layoutIfNeeded()
         collectionView.layoutIfNeeded()
-        
-        func centerPoint() -> CGPoint {
-            CGPoint(
-                x: collectionView.bounds.midX + collectionView.contentOffset.x,
-                y: collectionView.bounds.midY + collectionView.contentOffset.y
-            )
+
+        let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
+        guard !cells.isEmpty else { return nil }
+
+        let center = CGPoint(
+            x: collectionView.bounds.midX + collectionView.contentOffset.x,
+            y: collectionView.bounds.midY + collectionView.contentOffset.y
+        )
+
+        let nearestCell = cells.min { lhs, rhs in
+            let dl = hypot(lhs.center.x - center.x, lhs.center.y - center.y)
+            let dr = hypot(rhs.center.x - center.x, rhs.center.y - center.y)
+            return dl < dr
         }
-        
-        func nearestVisibleCell() -> JXPhotoCell? {
-            if collectionView.visibleCells.isEmpty { return nil }
-            let c = centerPoint()
-            let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
-            return cells.min { lhs, rhs in
-                let dl = hypot(lhs.center.x - c.x, lhs.center.y - c.y)
-                let dr = hypot(rhs.center.x - c.x, rhs.center.y - c.y)
-                return dl < dr
-            }
-        }
-        
-        // 尝试 1：用中心点索引命中 cell（基于 indexPath 直取，不滚动）
-        if let idx = collectionView.indexPathForItem(at: centerPoint()),
-           let cell = collectionView.cellForItem(at: idx) as? JXPhotoCell {
-            return cell.transitionImageView
-        }
-        
-        // 尝试 2：使用当前真实索引，在可见 cells 中查找匹配的 cell
-        if let real = currentRealIndex() {
-            let c = centerPoint()
-            let candidates = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }.filter { $0.currentIndex == real }
-            if let matched = candidates.min(by: { lhs, rhs in
-                let dl = hypot(lhs.center.x - c.x, lhs.center.y - c.y)
-                let dr = hypot(rhs.center.x - c.x, rhs.center.y - c.y)
-                return dl < dr
-            }) {
-                return matched.transitionImageView
-            }
-        }
-        
-        // 尝试 3：从可见 cell 中选择最接近中心的
-        if let cell = nearestVisibleCell() {
-            return cell.transitionImageView
-        }
-        
-        // 兜底：仍无法获取则返回 nil（上层应降级处理）
-        return nil
+
+        return nearestCell?.transitionImageView
     }
     
     /// 当前真实索引（虚拟索引映射）
