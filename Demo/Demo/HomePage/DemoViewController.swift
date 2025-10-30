@@ -10,11 +10,21 @@ import AVKit
 import AVFoundation
 import JXPhotoBrowser
 import Kingfisher
+import Network
 
 // MARK: - ViewController
 class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
 
     private var collectionView: UICollectionView!
+
+    /// 网络监控：是否已允许/可达网络（用于延迟图片加载）
+    private var isNetworkReady: Bool = false
+
+    /// 网络状态监视器（监听网络连通性变化）
+    private let networkMonitor = NWPathMonitor()
+
+    /// 网络监视器队列（后台监控网络状态）
+    private let networkQueue = DispatchQueue(label: "com.demo.network.monitor")
 
     // 数据源：改为网络图片（原图 + 缩略图）
     private let items: [DemoMedia] = {
@@ -28,6 +38,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNetworkMonitoring()
         setupCollectionView()
     }
 
@@ -62,7 +73,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DemoMediaCell.reuseIdentifier, for: indexPath) as! DemoMediaCell
-        cell.configure(with: items[indexPath.item])
+        cell.configure(with: items[indexPath.item], shouldLoad: isNetworkReady)
         return cell
     }
 
@@ -118,9 +129,6 @@ extension DemoViewController: JXPhotoBrowserDataSource {
 
     // 生命周期：已复用（为新 index 配置内容）
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {
-        cell.imageView.contentMode = .scaleAspectFit
-        cell.imageView.backgroundColor = .black
-        cell.imageView.clipsToBounds = true
         if case let .remoteImage(imageURL, thumbnailURL) = items[index].source {
             // 先显示缩略图作为占位图（若存在），再加载原图
             if let thumbURL = thumbnailURL {
@@ -157,6 +165,28 @@ extension DemoViewController: JXPhotoBrowserDataSource {
         iv.contentMode = srcIV.contentMode
         iv.clipsToBounds = true
         return iv
+    }
+}
+
+// MARK: - Network Monitoring
+private extension DemoViewController {
+
+    /// 启动网络权限/连通性监控，连通后刷新列表以触发加载
+    func setupNetworkMonitoring() {
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            guard let self = self else { return }
+            let ready = (path.status == .satisfied)
+            if ready != self.isNetworkReady {
+                self.isNetworkReady = ready
+                if ready {
+                    DispatchQueue.main.async {
+                        self.collectionView.reloadData()
+                    }
+                }
+            }
+        }
+
+        networkMonitor.start(queue: networkQueue)
     }
 }
 

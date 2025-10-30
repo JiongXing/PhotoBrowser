@@ -78,13 +78,16 @@ final class DemoMediaCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration Methods
-    
-    func configure(with media: DemoMedia) {
+
+    /// 配置 Cell 内容
+    /// - 参数 shouldLoad: 是否允许进行网络加载（未连通时仅展示占位）
+    func configure(with media: DemoMedia, shouldLoad: Bool) {
         imageView.image = nil
         playOverlay.isHidden = true
 
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
+            guard shouldLoad else { break }
             if let thumb = thumbnailURL {
                 imageView.kf.setImage(with: thumb)
             } else {
@@ -93,7 +96,9 @@ final class DemoMediaCell: UICollectionViewCell {
 
         case let .remoteVideo(url):
             playOverlay.isHidden = false
-            generateThumbnail(for: url)
+            if shouldLoad {
+                generateThumbnail(for: url)
+            }
         }
     }
     
