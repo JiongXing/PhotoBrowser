@@ -96,7 +96,6 @@ public final class JXPhotoBrowser: UIViewController {
     /// 转场动画类型
     public var transitionType: JXPhotoBrowserTransitionType = .fade
     
-    // 已弃用：通过数据源方法 `zoomOriginViewAt` 提供源缩略图视图
     
     // MARK: - Private Properties
     
@@ -114,6 +113,7 @@ public final class JXPhotoBrowser: UIViewController {
         cv.delegate = self
         cv.showsHorizontalScrollIndicator = false
         cv.showsVerticalScrollIndicator = false
+        cv.isPagingEnabled = true
         cv.register(JXPhotoCell.self, forCellWithReuseIdentifier: JXPhotoCell.reuseIdentifier)
         return cv
     }()
@@ -175,7 +175,7 @@ public final class JXPhotoBrowser: UIViewController {
     }
     
     /// 滚动到初始索引位置
-    fileprivate func scrollToInitialIndex() {
+    private func scrollToInitialIndex() {
         let count = realCount
         guard count > 0 else { return }
         let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
@@ -186,38 +186,6 @@ public final class JXPhotoBrowser: UIViewController {
     /// 关闭浏览器
     @objc private func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
-    }
-    
-    /// 当前可见的图片视图（用于转场目标，函数内不触发任何滚动）
-    func visiblePhotoImageView() -> UIImageView? {
-        view.layoutIfNeeded()
-        collectionView.layoutIfNeeded()
-
-        let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
-        guard !cells.isEmpty else { return nil }
-
-        let center = CGPoint(
-            x: collectionView.bounds.midX + collectionView.contentOffset.x,
-            y: collectionView.bounds.midY + collectionView.contentOffset.y
-        )
-
-        let nearestCell = cells.min { lhs, rhs in
-            let dl = hypot(lhs.center.x - center.x, lhs.center.y - center.y)
-            let dr = hypot(rhs.center.x - center.x, rhs.center.y - center.y)
-            return dl < dr
-        }
-
-        return nearestCell?.transitionImageView
-    }
-    
-    /// 当前真实索引（虚拟索引映射）
-    func currentRealIndex() -> Int? {
-        let center = CGPoint(
-            x: collectionView.bounds.midX + collectionView.contentOffset.x,
-            y: collectionView.bounds.midY + collectionView.contentOffset.y
-        )
-        guard let virtualItem = collectionView.indexPathForItem(at: center)?.item else { return nil }
-        return realIndex(fromVirtual: virtualItem)
     }
     
     // MARK: - Public Methods
@@ -232,7 +200,7 @@ public final class JXPhotoBrowser: UIViewController {
     /// 供转场动画调用：在展示动画开始前，尽量让初始 Cell 就绪
     /// - 做法：强制布局、刷新数据并滚动到初始索引，然后再次布局
     /// - 目的：避免在 Present 阶段无法拿到目标 Cell 导致的 `destIV == nil`
-    func prepareForPresentTransitionIfNeeded() {
+    public func prepareForPresentTransitionIfNeeded() {
         view.layoutIfNeeded()
         collectionView.reloadData()
         collectionView.layoutIfNeeded()
@@ -241,6 +209,25 @@ public final class JXPhotoBrowser: UIViewController {
             didScrollToInitial = true
             collectionView.layoutIfNeeded()
         }
+    }
+    
+    /// 当前展示中的 PhotoCell（用于转场目标等）
+    public func visiblePhotoCell() -> JXPhotoCell? {
+        let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
+        guard !cells.isEmpty else { return nil }
+
+        let center = CGPoint(
+            x: collectionView.bounds.midX + collectionView.contentOffset.x,
+            y: collectionView.bounds.midY + collectionView.contentOffset.y
+        )
+
+        let nearestCell = cells.min { lhs, rhs in
+            let dl = hypot(lhs.center.x - center.x, lhs.center.y - center.y)
+            let dr = hypot(rhs.center.x - center.x, rhs.center.y - center.y)
+            return dl < dr
+        }
+
+        return nearestCell
     }
     
     // MARK: - Setup & Configuration

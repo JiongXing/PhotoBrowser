@@ -7,8 +7,12 @@ import UIKit
 import AVFoundation
 
 class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-    func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.25 }
+    func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval {
+        return 0.25
+    }
     
+    // 获取动画源的当前展示 Cell
+
     func animateTransition(using ctx: UIViewControllerContextTransitioning) {
         let container = ctx.containerView
         let duration = transitionDuration(using: ctx)
@@ -24,25 +28,35 @@ class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         if let toView = ctx.view(forKey: .to) {
             container.insertSubview(toView, belowSubview: fromView)
             toView.alpha = 1
+            toView.layoutIfNeeded()
         }
         
-        let srcIV = fromVC.visiblePhotoImageView()
+        let srcCell = fromVC.visiblePhotoCell()
+        let srcIV = srcCell?.imageView
         var startFrame: CGRect = .zero
         var endFrame: CGRect = .zero
-        var destView: UIView?
+        var originView: UIView?
+
+        // 转场展示用的 ZoomView
+        var zoomIV: UIImageView?
+        if let tmplIV = srcIV {
+            let copy = UIImageView()
+            copy.image = tmplIV.image
+            copy.contentMode = tmplIV.contentMode
+            copy.clipsToBounds = tmplIV.clipsToBounds
+            copy.layer.cornerRadius = tmplIV.layer.cornerRadius
+            copy.backgroundColor = tmplIV.backgroundColor
+            zoomIV = copy
+        }
         
-        let currentIndex = fromVC.currentRealIndex()
-        let zoomView = currentIndex.flatMap { fromVC.dataSource?.photoBrowser(fromVC, zoomViewForItemAt: $0, isPresenting: false) }
-        
-        if let iv = srcIV, let idx = currentIndex, let zv = zoomView {
+        if let iv = srcIV, let idx = srcCell?.currentIndex, let zv = zoomIV {
             startFrame = iv.convert(iv.bounds, to: container)
             iv.isHidden = true
-            if let origin = fromVC.dataSource?.photoBrowser(fromVC, zoomOriginViewAt: idx) {
-                destView = origin
-                endFrame = origin.convert(origin.bounds, to: container)
-                origin.isHidden = true
+            if let ov = fromVC.dataSource?.photoBrowser(fromVC, zoomOriginViewAt: idx) {
+                originView = ov
+                endFrame = ov.convert(ov.bounds, to: container)
+                ov.isHidden = true
                 
-                // 使用业务方提供的 ZoomView 作为临时视图
                 zv.frame = startFrame
                 container.addSubview(zv)
                 
@@ -50,19 +64,10 @@ class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                     zv.frame = endFrame
                     fromView.alpha = 0
                 }) { _ in
-                    let wasCancelled = ctx.transitionWasCancelled
-                    if wasCancelled {
-                        iv.isHidden = false
-                        destView?.isHidden = false
-                        zv.removeFromSuperview()
-                        fromView.alpha = 1
-                        ctx.completeTransition(false)
-                    } else {
-                        destView?.isHidden = false
-                        zv.removeFromSuperview()
-                        fromView.removeFromSuperview()
-                        ctx.completeTransition(true)
-                    }
+                    originView?.isHidden = false
+                    zv.removeFromSuperview()
+                    fromView.removeFromSuperview()
+                    ctx.completeTransition(true)
                 }
                 return
             }

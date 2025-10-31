@@ -8,7 +8,7 @@ import AVFoundation
 
 class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval {
-        0.3
+        return 0.25
     }
     
     func animateTransition(using ctx: UIViewControllerContextTransitioning) {
@@ -37,7 +37,7 @@ class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         
         // 起止几何
         var startFrame: CGRect = .zero
-        let destIV = toVC.visiblePhotoImageView()
+        let destIV = toVC.visiblePhotoCell()?.imageView
         var endFrame: CGRect = .zero
         
         if let ov = originView, let targetIV = destIV, let zv = zoomView {
