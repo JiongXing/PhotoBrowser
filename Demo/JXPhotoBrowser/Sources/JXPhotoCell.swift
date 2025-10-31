@@ -5,7 +5,7 @@
 
 import UIKit
 
-protocol JXPhotoCellLifecycleDelegate: AnyObject {
+public protocol JXPhotoCellLifecycleDelegate: AnyObject {
     /// 即将被复用
     func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?)
     
@@ -14,11 +14,12 @@ protocol JXPhotoCellLifecycleDelegate: AnyObject {
 }
 
 /// 支持图片捏合缩放查看的 Cell
-public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
+open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     // MARK: - Static
     public static let reuseIdentifier = "JXPhotoCell"
     
     // MARK: - UI
+    /// 承载图片并支持捏合缩放的滚动视图
     public let scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -34,6 +35,7 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         return sv
     }()
 
+    /// 展示图片内容的视图（参与缩放与转场）
     public let imageView: UIImageView = {
         let iv = UIImageView()
         // 使用非 AutoLayout 的 frame 布局以配合缩放
@@ -44,7 +46,7 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }()
 
     // 双击手势：小于 1.1 放大到 2x，否则还原
-    private lazy var doubleTapGesture: UITapGestureRecognizer = {
+    public private(set) lazy var doubleTapGesture: UITapGestureRecognizer = {
         let g = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
         g.numberOfTapsRequired = 2
         g.numberOfTouchesRequired = 1
@@ -52,7 +54,7 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }()
 
     // 单击手势：用于关闭浏览器（与双击互斥）
-    private lazy var singleTapGesture: UITapGestureRecognizer = {
+    public private(set) lazy var singleTapGesture: UITapGestureRecognizer = {
         let g = UITapGestureRecognizer(target: self, action: #selector(handleSingleTap(_:)))
         g.numberOfTapsRequired = 1
         g.numberOfTouchesRequired = 1
@@ -61,8 +63,11 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }()
     
     // MARK: - Lifecycle Delegate & State
-    weak var lifecycleDelegate: JXPhotoCellLifecycleDelegate?
-    var currentIndex: Int?
+    /// 生命周期代理（复用/点击等回调）
+    public weak var lifecycleDelegate: JXPhotoCellLifecycleDelegate?
+
+    /// 当前关联的真实索引
+    public var currentIndex: Int?
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -94,7 +99,7 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
     
     // MARK: - Lifecycle
-    public override func prepareForReuse() {
+    open override func prepareForReuse() {
         super.prepareForReuse()
         // 通知即将复用（携带上一次的 index）
         lifecycleDelegate?.photoCellWillReuse(self, lastIndex: currentIndex)
@@ -111,9 +116,9 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     
     // MARK: - Transition Helper
     /// 若调用方提供的是 UIImageView，则可参与几何匹配 Zoom 动画
-    var transitionImageView: UIImageView? { imageView }
+    open var transitionImageView: UIImageView? { imageView }
 
-    public override func layoutSubviews() {
+    open override func layoutSubviews() {
         super.layoutSubviews()
         // 在未缩放状态下，根据图片比例调整 imageView.frame
         if scrollView.zoomScale == scrollView.minimumZoomScale {
@@ -125,7 +130,8 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
 
     // MARK: - Layout Helper
     /// 根据图片实际尺寸，调整 imageView 的 frame
-    private func adjustImageViewFrame() {
+    /// 根据图片实际尺寸，调整 imageView 的 frame（可覆写）
+    open func adjustImageViewFrame() {
         guard let image = imageView.image else {
             // 无图时，重置为容器大小
             imageView.frame = scrollView.bounds
@@ -148,16 +154,17 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     // MARK: - UIScrollViewDelegate
-    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+    open func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
 
-    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+    open func scrollViewDidZoom(_ scrollView: UIScrollView) {
         centerImageIfNeeded()
     }
 
     // MARK: - Helpers
-    private func centerImageIfNeeded() {
+    /// 在内容小于容器时居中展示（可覆写）
+    open func centerImageIfNeeded() {
         let boundsSize = scrollView.bounds.size
         var frameToCenter = imageView.frame
 
@@ -177,7 +184,7 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         imageView.frame = frameToCenter
     }
 
-    @objc private func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+    @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
         let currentScale = scrollView.zoomScale
         if currentScale < 1.1 {
             let targetScale = min(2.0, scrollView.maximumZoomScale)
@@ -190,7 +197,8 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         }
     }
 
-    private func zoomRect(for scale: CGFloat, centeredAt center: CGPoint) -> CGRect {
+    /// 计算目标缩放矩形（可覆写）
+    open func zoomRect(for scale: CGFloat, centeredAt center: CGPoint) -> CGRect {
         // 以 scrollView 的可视尺寸反推在内容坐标系下应显示的区域尺寸
         let boundsSize = scrollView.bounds.size
         let width = boundsSize.width / scale
@@ -200,7 +208,7 @@ public final class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         return CGRect(x: originX, y: originY, width: width, height: height)
     }
 
-    @objc private func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+    @objc open func handleSingleTap(_ gesture: UITapGestureRecognizer) {
         lifecycleDelegate?.photoCellDidSingleTap(self)
     }
 }

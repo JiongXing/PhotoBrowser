@@ -62,7 +62,7 @@ public enum JXPhotoBrowserScrollDirection {
 
 // MARK: - Main Browser Class
 
-public final class JXPhotoBrowser: UIViewController {
+open class JXPhotoBrowser: UIViewController {
     
     // MARK: - Public Properties
     
@@ -81,14 +81,7 @@ public final class JXPhotoBrowser: UIViewController {
         }
     }
     
-    /// 是否启用分页
-    public var isPagingEnabled: Bool = true {
-        didSet {
-            if isViewLoaded {
-                collectionView.isPagingEnabled = isPagingEnabled
-            }
-        }
-    }
+    
     
     /// 是否启用无限循环滚动
     public var isLoopingEnabled: Bool = true
@@ -99,8 +92,8 @@ public final class JXPhotoBrowser: UIViewController {
     
     // MARK: - Private Properties
     
-    /// 主要的集合视图
-    private lazy var collectionView: UICollectionView = {
+    /// 图片列表集合视图（对外只读）
+    public private(set) lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
@@ -136,14 +129,14 @@ public final class JXPhotoBrowser: UIViewController {
     
     // MARK: - Lifecycle Methods
     
-    public override func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupCollectionView()
         applyCollectionViewConfig()
     }
     
-    public override func viewDidAppear(_ animated: Bool) {
+    open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if !didScrollToInitial {
             scrollToInitialIndex()
@@ -151,7 +144,7 @@ public final class JXPhotoBrowser: UIViewController {
         }
     }
     
-    public override func viewDidLayoutSubviews() {
+    open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             if layout.itemSize != view.bounds.size {
@@ -168,14 +161,14 @@ public final class JXPhotoBrowser: UIViewController {
     // MARK: - Private Methods
     
     /// 将虚拟索引转换为真实索引
-    private func realIndex(fromVirtual index: Int) -> Int {
+    open func realIndex(fromVirtual index: Int) -> Int {
         let count = realCount
         guard count > 0 else { return 0 }
         return index % count
     }
     
     /// 滚动到初始索引位置
-    private func scrollToInitialIndex() {
+    open func scrollToInitialIndex() {
         let count = realCount
         guard count > 0 else { return }
         let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
@@ -184,14 +177,14 @@ public final class JXPhotoBrowser: UIViewController {
     }
     
     /// 关闭浏览器
-    @objc private func dismissSelf() {
+    @objc open func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
     }
     
     // MARK: - Public Methods
     
     /// 从指定视图控制器展示浏览器
-    public func present(from vc: UIViewController) {
+    open func present(from vc: UIViewController) {
         modalPresentationStyle = .fullScreen
         if transitionType != .none { transitioningDelegate = self }
         vc.present(self, animated: transitionType != .none, completion: nil)
@@ -200,7 +193,7 @@ public final class JXPhotoBrowser: UIViewController {
     /// 供转场动画调用：在展示动画开始前，尽量让初始 Cell 就绪
     /// - 做法：强制布局、刷新数据并滚动到初始索引，然后再次布局
     /// - 目的：避免在 Present 阶段无法拿到目标 Cell 导致的 `destIV == nil`
-    public func prepareForPresentTransitionIfNeeded() {
+    open func prepareForPresentTransitionIfNeeded() {
         view.layoutIfNeeded()
         collectionView.reloadData()
         collectionView.layoutIfNeeded()
@@ -212,7 +205,7 @@ public final class JXPhotoBrowser: UIViewController {
     }
     
     /// 当前展示中的 PhotoCell（用于转场目标等）
-    public func visiblePhotoCell() -> JXPhotoCell? {
+    open func visiblePhotoCell() -> JXPhotoCell? {
         let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
         guard !cells.isEmpty else { return nil }
 
@@ -233,7 +226,7 @@ public final class JXPhotoBrowser: UIViewController {
     // MARK: - Setup & Configuration
     
     /// 添加并约束集合视图
-    private func setupCollectionView() {
+    open func setupCollectionView() {
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -244,9 +237,9 @@ public final class JXPhotoBrowser: UIViewController {
     }
     
     /// 根据当前属性应用集合视图配置（支持运行时切换）
-    private func applyCollectionViewConfig() {
-        // 分页开关
-        collectionView.isPagingEnabled = isPagingEnabled
+    open func applyCollectionViewConfig() {
+        // 分页固定开启
+        collectionView.isPagingEnabled = true
         
         // 更新滚动方向
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
@@ -274,11 +267,11 @@ public final class JXPhotoBrowser: UIViewController {
 
 extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, JXPhotoCellLifecycleDelegate {
     
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return virtualCount
     }
     
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
         cell.lifecycleDelegate = self
         if realCount > 0 {
@@ -292,27 +285,27 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     }
     
     // 生命周期：Cell 即将显示
-    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? JXPhotoCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
         dataSource?.photoBrowser(self, willDisplay: cell, at: real)
     }
     
     // 生命周期：Cell 已消失
-    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? JXPhotoCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
         dataSource?.photoBrowser(self, didEndDisplaying: cell, at: real)
     }
     
     // 来自 Cell 的复用回调
-    func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
+    open func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
         guard let last = lastIndex else { return }
         dataSource?.photoBrowser(self, willReuse: cell, at: last)
     }
 
     // 来自 Cell 的单击手势回调：关闭浏览器
-    func photoCellDidSingleTap(_ cell: JXPhotoCell) {
+    open func photoCellDidSingleTap(_ cell: JXPhotoCell) {
         dismissSelf()
     }
 }
@@ -321,7 +314,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
 
 extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
     
-    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    open func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch transitionType {
         case .fade: return JXFadeAnimator(isPresenting: true)
         case .zoom: return JXZoomPresentAnimator()
@@ -329,7 +322,7 @@ extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
         }
     }
     
-    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    open func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch transitionType {
         case .fade: return JXFadeAnimator(isPresenting: false)
         case .zoom: return JXZoomDismissAnimator()

@@ -6,12 +6,12 @@
 import UIKit
 import AVFoundation
 
-class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-    func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval {
+open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+    open func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.25
     }
     
-    func animateTransition(using ctx: UIViewControllerContextTransitioning) {
+    open func animateTransition(using ctx: UIViewControllerContextTransitioning) {
         let container = ctx.containerView
         let duration = transitionDuration(using: ctx)
         
@@ -68,8 +68,8 @@ class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
     // MARK: - Helpers
     
-    /// 降级为淡出动画（不缩放）
-    private func animateFadeOut(view: UIView, duration: TimeInterval, ctx: UIViewControllerContextTransitioning) {
+    /// 降级为淡出动画（不缩放，可覆写）
+    open func animateFadeOut(view: UIView, duration: TimeInterval, ctx: UIViewControllerContextTransitioning) {
         UIView.animate(withDuration: duration, animations: {
             view.alpha = 0
         }) { _ in

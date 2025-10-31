@@ -5,16 +5,17 @@
 
 import UIKit
 
-class JXFadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-    let isPresenting: Bool
+open class JXFadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
+    /// 是否为展示阶段动画
+    public let isPresenting: Bool
     
-    init(isPresenting: Bool) {
+    public init(isPresenting: Bool) {
         self.isPresenting = isPresenting
     }
     
-    func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.25 }
+    open func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval { 0.25 }
     
-    func animateTransition(using ctx: UIViewControllerContextTransitioning) {
+    open func animateTransition(using ctx: UIViewControllerContextTransitioning) {
         let container = ctx.containerView
         if isPresenting {
             guard let toView = ctx.view(forKey: .to) else {
