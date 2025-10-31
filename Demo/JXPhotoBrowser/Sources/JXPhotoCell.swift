@@ -83,9 +83,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
 
         scrollView.delegate = self
         scrollView.addSubview(imageView)
-        // 初始采用 frame 等于 scrollView 边界，缩放时由 UIScrollView 管理 contentSize
-        imageView.frame = scrollView.bounds
-        scrollView.contentSize = imageView.frame.size
+        
         // 添加双击缩放
         scrollView.addGestureRecognizer(doubleTapGesture)
         // 添加单击关闭，并与双击冲突处理
@@ -133,9 +131,8 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     /// 根据图片实际尺寸，调整 imageView 的 frame（可覆写）
     open func adjustImageViewFrame() {
         guard let image = imageView.image else {
-            // 无图时，重置为容器大小
-            imageView.frame = scrollView.bounds
-            scrollView.contentSize = imageView.frame.size
+            imageView.frame = .zero
+            scrollView.contentSize = .zero
             return
         }
         let containerSize = scrollView.bounds.size

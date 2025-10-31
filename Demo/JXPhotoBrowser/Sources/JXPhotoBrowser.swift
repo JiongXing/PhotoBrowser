@@ -81,8 +81,6 @@ open class JXPhotoBrowser: UIViewController {
         }
     }
     
-    
-    
     /// 是否启用无限循环滚动
     public var isLoopingEnabled: Bool = true
     

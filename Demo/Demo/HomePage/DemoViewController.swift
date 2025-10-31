@@ -127,16 +127,21 @@ extension DemoViewController: JXPhotoBrowserDataSource {
         cell.imageView.kf.cancelDownloadTask()
     }
 
-    // 生命周期：已复用（为新 index 配置内容）
+    // 生命周期：已复用（为复用的 cell 配置内容）
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {
         if case let .remoteImage(imageURL, thumbnailURL) = items[index].source {
             // 先显示缩略图作为占位图（若存在），再加载原图
             if let thumbURL = thumbnailURL {
                 cell.imageView.kf.setImage(with: thumbURL)
-                cell.imageView.kf.setImage(with: imageURL, options: [.keepCurrentImageWhileLoading])
+                cell.imageView.kf.setImage(with: imageURL, options: [.keepCurrentImageWhileLoading]) { [weak cell] _ in
+                    cell?.adjustImageViewFrame()
+                    cell?.centerImageIfNeeded()
+                }
             } else {
                 cell.imageView.kf.setImage(with: imageURL)
             }
+            cell.adjustImageViewFrame()
+            cell.centerImageIfNeeded()
         } else {
             cell.imageView.image = nil
         }
@@ -148,21 +153,20 @@ extension DemoViewController: JXPhotoBrowserDataSource {
     // 生命周期：已消失（可回收资源）
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) { }
 
-    // 为 Zoom 提供源缩略图视图
+    // 为 Zoom 转场提供源缩略图视图（用于起点几何计算）
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
         let ip = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
-        return cell.transitionImageView
+        return cell.imageView
     }
 
     // 提供 Zoom 转场使用的临时 ZoomView（转场结束即移除）
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? {
         let ip = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
-        let srcIV = cell.transitionImageView
-        guard let image = srcIV.image else { return nil }
+        guard let image = cell.imageView.image else { return nil }
         let iv = UIImageView(image: image)
-        iv.contentMode = srcIV.contentMode
+        iv.contentMode = cell.imageView.contentMode
         iv.clipsToBounds = true
         return iv
     }

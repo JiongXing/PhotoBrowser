@@ -31,7 +31,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         // 前置条件不满足则直接降级为淡入
         guard let originView = toVC.dataSource?.photoBrowser(toVC, zoomOriginViewAt: toVC.initialIndex),
               let zoomView = toVC.dataSource?.photoBrowser(toVC, zoomViewForItemAt: toVC.initialIndex, isPresenting: true),
-              let targetIV = toVC.visiblePhotoCell()?.transitionImageView else {
+              let targetIV = toVC.visiblePhotoCell()?.transitionImageView, targetIV.bounds.size != .zero else {
             animateFadeIn(view: toView, duration: duration, ctx: ctx)
             return
         }

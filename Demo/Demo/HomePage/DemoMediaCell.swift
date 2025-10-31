@@ -21,7 +21,7 @@ final class DemoMediaCell: UICollectionViewCell {
     // MARK: - UI Components
     
     /// 主要的图片显示视图
-    private let imageView: UIImageView = {
+    let imageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
@@ -101,11 +101,6 @@ final class DemoMediaCell: UICollectionViewCell {
             }
         }
     }
-    
-    // MARK: - Transition Helper
-    
-    /// 提供转场所需的缩略图 ImageView（用于几何匹配动画）
-    var transitionImageView: UIImageView { imageView }
     
     // MARK: - Private Methods
     
