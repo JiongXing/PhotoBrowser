@@ -31,7 +31,7 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         guard let srcCell = fromVC.visiblePhotoCell(),
               let srcIV = srcCell.transitionImageView, srcIV.bounds.size != .zero,
               let idx = srcCell.currentIndex,
-              let originView = fromVC.dataSource?.photoBrowser(fromVC, zoomOriginViewAt: idx) else {
+              let originView = fromVC.delegate?.photoBrowser(fromVC, zoomOriginViewAt: idx) else {
             animateFadeOut(view: fromView, duration: duration, ctx: ctx)
             return
         }

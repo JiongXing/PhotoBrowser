@@ -6,9 +6,9 @@
 import UIKit
 import AVFoundation
 
-// MARK: - Data Source Protocol
+// MARK: - Delegate Protocol
 
-public protocol JXPhotoBrowserDataSource: AnyObject {
+public protocol JXPhotoBrowserDelegate: AnyObject {
     /// 返回项目总数
     func numberOfItems(in browser: JXPhotoBrowser) -> Int
     
@@ -31,7 +31,7 @@ public protocol JXPhotoBrowserDataSource: AnyObject {
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
 }
 
-public extension JXPhotoBrowserDataSource {
+public extension JXPhotoBrowserDelegate {
     // 默认空实现，便于增量接入
     func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {}
@@ -66,8 +66,8 @@ open class JXPhotoBrowser: UIViewController {
     
     // MARK: - Public Properties
     
-    /// 数据源代理
-    public weak var dataSource: JXPhotoBrowserDataSource?
+    /// 浏览器代理
+    public weak var delegate: JXPhotoBrowserDelegate?
     
     /// 初始显示的图片索引
     public var initialIndex: Int = 0
@@ -114,7 +114,7 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 真实数据源数量
     private var realCount: Int {
-        dataSource?.numberOfItems(in: self) ?? 0
+        delegate?.numberOfItems(in: self) ?? 0
     }
     
     /// 虚拟数据源数量（用于无限循环）
@@ -275,7 +275,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
         if realCount > 0 {
             let real = realIndex(fromVirtual: indexPath.item)
             cell.currentIndex = real
-            dataSource?.photoBrowser(self, didReuse: cell, at: real)
+            delegate?.photoBrowser(self, didReuse: cell, at: real)
         } else {
             cell.currentIndex = nil
         }
@@ -286,20 +286,20 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? JXPhotoCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        dataSource?.photoBrowser(self, willDisplay: cell, at: real)
+        delegate?.photoBrowser(self, willDisplay: cell, at: real)
     }
     
     // 生命周期：Cell 已消失
     open func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? JXPhotoCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        dataSource?.photoBrowser(self, didEndDisplaying: cell, at: real)
+        delegate?.photoBrowser(self, didEndDisplaying: cell, at: real)
     }
     
     // 来自 Cell 的复用回调
     open func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
         guard let last = lastIndex else { return }
-        dataSource?.photoBrowser(self, willReuse: cell, at: last)
+        delegate?.photoBrowser(self, willReuse: cell, at: last)
     }
 
     // 来自 Cell 的单击手势回调：关闭浏览器

@@ -95,7 +95,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         switch media.source {
         case .remoteImage:
             let browser = JXPhotoBrowser()
-            browser.dataSource = self
+            browser.delegate = self
             browser.initialIndex = indexPath.item
             browser.scrollDirection = .horizontal // 可改为 .vertical 支持竖向浏览
             browser.transitionType = .zoom // 可改为 .fade 或 .none
@@ -116,8 +116,8 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
 }
 
 
-// MARK: - JXPhotoBrowser DataSource
-extension DemoViewController: JXPhotoBrowserDataSource {
+// MARK: - JXPhotoBrowser Delegate
+extension DemoViewController: JXPhotoBrowserDelegate {
     func numberOfItems(in browser: JXPhotoBrowser) -> Int {
         return items.count
     }
