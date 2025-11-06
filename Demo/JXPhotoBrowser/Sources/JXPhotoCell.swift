@@ -126,7 +126,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
 
     // MARK: - Layout Helper
     /// 根据图片实际尺寸，调整 imageView 的 frame
-    /// 根据图片实际尺寸，调整 imageView 的 frame（可覆写）
     open func adjustImageViewFrame() {
         guard let image = imageView.image else {
             imageView.frame = .zero
@@ -158,7 +157,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     // MARK: - Helpers
-    /// 在内容小于容器时居中展示（可覆写）
+    /// 在内容小于容器时居中展示
     open func centerImageIfNeeded() {
         let boundsSize = scrollView.bounds.size
         var frameToCenter = imageView.frame
@@ -192,7 +191,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         }
     }
 
-    /// 计算目标缩放矩形（可覆写）
+    /// 计算目标缩放矩形
     open func zoomRect(for scale: CGFloat, centeredAt center: CGPoint) -> CGRect {
         // 以 scrollView 的可视尺寸反推在内容坐标系下应显示的区域尺寸
         let boundsSize = scrollView.bounds.size
@@ -225,13 +224,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
                 return ImageCache.default.retrieveImageInMemoryCache(forKey: thumbURL.absoluteString)
             }()
 
-            let options: KingfisherOptionsInfo = [
-                .transition(.fade(0.2)),
-                .backgroundDecode,
-                .cacheOriginalImage
-            ]
-
-            imageView.kf.setImage(with: res.imageURL, placeholder: placeholder, options: options) { [weak self] _ in
+            imageView.kf.setImage(with: res.imageURL, placeholder: placeholder) { [weak self] _ in
                 self?.adjustImageViewFrame()
                 self?.centerImageIfNeeded()
             }
