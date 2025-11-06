@@ -4,14 +4,7 @@
 //
 
 import UIKit
-
-public protocol JXPhotoCellLifecycleDelegate: AnyObject {
-    /// 即将被复用
-    func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?)
-    
-    /// 单击图片（关闭Browser）
-    func photoCellDidSingleTap(_ cell: JXPhotoCell)
-}
+import Kingfisher
 
 /// 支持图片捏合缩放查看的 Cell
 open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
@@ -62,12 +55,16 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         return g
     }()
     
-    // MARK: - Lifecycle Delegate & State
-    /// 生命周期代理（复用/点击等回调）
-    public weak var lifecycleDelegate: JXPhotoCellLifecycleDelegate?
+    // MARK: - State
+    /// 弱引用的浏览器（用于调用关闭）
+    public weak var browser: JXPhotoBrowser?
 
-    /// 当前关联的真实索引
-    public var currentIndex: Int?
+    /// 当前关联的真实索引（变更即触发内容加载）
+    public var currentIndex: Int? {
+        didSet {
+            reloadContent()
+        }
+    }
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -99,8 +96,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     // MARK: - Lifecycle
     open override func prepareForReuse() {
         super.prepareForReuse()
-        // 通知即将复用（携带上一次的 index）
-        lifecycleDelegate?.photoCellWillReuse(self, lastIndex: currentIndex)
+        // 取消正在进行的下载任务
+        imageView.kf.cancelDownloadTask()
+        
         // 清空旧图像与状态
         imageView.image = nil
         currentIndex = nil
@@ -206,6 +204,43 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     @objc open func handleSingleTap(_ gesture: UITapGestureRecognizer) {
-        lifecycleDelegate?.photoCellDidSingleTap(self)
+        browser?.dismissSelf()
+    }
+
+    // MARK: - Content Loading
+    /// 从浏览器委托获取资源并加载到 imageView
+    open func reloadContent() {
+        guard let browser = browser, let index = currentIndex else {
+            imageView.image = nil
+            return
+        }
+
+        // 取消上一次可能的下载任务
+        imageView.kf.cancelDownloadTask()
+
+        // 请求业务资源：直接加载原图，若缩略图已在缓存，则作为占位图
+        if let res = browser.delegate?.photoBrowser(browser, resourceForItemAt: index) {
+            let placeholder: UIImage? = {
+                guard let thumbURL = res.thumbnailURL else { return nil }
+                return ImageCache.default.retrieveImageInMemoryCache(forKey: thumbURL.absoluteString)
+            }()
+
+            let options: KingfisherOptionsInfo = [
+                .transition(.fade(0.2)),
+                .backgroundDecode,
+                .cacheOriginalImage
+            ]
+
+            imageView.kf.setImage(with: res.imageURL, placeholder: placeholder, options: options) { [weak self] _ in
+                self?.adjustImageViewFrame()
+                self?.centerImageIfNeeded()
+            }
+
+            // 初始布局调整（即便异步完成前也保证基本布局）
+            adjustImageViewFrame()
+            centerImageIfNeeded()
+        } else {
+            imageView.image = nil
+        }
     }
 }

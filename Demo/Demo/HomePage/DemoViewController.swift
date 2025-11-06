@@ -9,7 +9,6 @@ import UIKit
 import AVKit
 import AVFoundation
 import JXPhotoBrowser
-import Kingfisher
 import Network
 
 // MARK: - ViewController
@@ -122,29 +121,12 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         return items.count
     }
 
-    // 生命周期：即将复用（可在此取消下载、清理状态）
-    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int) {
-        cell.imageView.kf.cancelDownloadTask()
-    }
-
-    // 生命周期：已复用（为复用的 cell 配置内容）
-    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {
+    /// 提供图片资源（原图 + 缩略图），加载逻辑由 Cell 内部处理
+    func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? {
         if case let .remoteImage(imageURL, thumbnailURL) = items[index].source {
-            // 先显示缩略图作为占位图（若存在），再加载原图
-            if let thumbURL = thumbnailURL {
-                cell.imageView.kf.setImage(with: thumbURL)
-                cell.imageView.kf.setImage(with: imageURL, options: [.keepCurrentImageWhileLoading]) { [weak cell] _ in
-                    cell?.adjustImageViewFrame()
-                    cell?.centerImageIfNeeded()
-                }
-            } else {
-                cell.imageView.kf.setImage(with: imageURL)
-            }
-            cell.adjustImageViewFrame()
-            cell.centerImageIfNeeded()
-        } else {
-            cell.imageView.image = nil
+            return JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
         }
+        return nil
     }
 
     // 生命周期：将要显示（可做轻量 UI 调整）

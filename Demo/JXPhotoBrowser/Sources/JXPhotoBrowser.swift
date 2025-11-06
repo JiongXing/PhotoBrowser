@@ -6,6 +6,22 @@
 import UIKit
 import AVFoundation
 
+// MARK: - Resource Model
+
+/// 图片资源（原图 + 可选缩略图）
+public struct JXPhotoResource {
+    /// 原图 URL
+    public let imageURL: URL
+    
+    /// 缩略图 URL（可选）
+    public let thumbnailURL: URL?
+    
+    public init(imageURL: URL, thumbnailURL: URL? = nil) {
+        self.imageURL = imageURL
+        self.thumbnailURL = thumbnailURL
+    }
+}
+
 // MARK: - Delegate Protocol
 
 public protocol JXPhotoBrowserDelegate: AnyObject {
@@ -29,6 +45,9 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     /// - 返回值：需要业务方提前创建并配置内容的视图实例（未添加到任意父视图）。
     /// 若返回 nil，则将自动降级为 Fade 动画。
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
+    
+    /// 提供 Cell 加载图片所需的资源（原图 + 可选缩略图）
+    func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource?
 }
 
 public extension JXPhotoBrowserDelegate {
@@ -40,6 +59,8 @@ public extension JXPhotoBrowserDelegate {
     
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? { nil }
 }
 
 // MARK: - Enums
@@ -263,7 +284,7 @@ open class JXPhotoBrowser: UIViewController {
 
 // MARK: - UICollectionView DataSource & Delegate
 
-extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, JXPhotoCellLifecycleDelegate {
+extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return virtualCount
@@ -271,7 +292,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
-        cell.lifecycleDelegate = self
+        cell.browser = self
         if realCount > 0 {
             let real = realIndex(fromVirtual: indexPath.item)
             cell.currentIndex = real
@@ -296,16 +317,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
         delegate?.photoBrowser(self, didEndDisplaying: cell, at: real)
     }
     
-    // 来自 Cell 的复用回调
-    open func photoCellWillReuse(_ cell: JXPhotoCell, lastIndex: Int?) {
-        guard let last = lastIndex else { return }
-        delegate?.photoBrowser(self, willReuse: cell, at: last)
-    }
-
-    // 来自 Cell 的单击手势回调：关闭浏览器
-    open func photoCellDidSingleTap(_ cell: JXPhotoCell) {
-        dismissSelf()
-    }
+    // （生命周期代理已移除，复用与点击关闭由 Cell 内部处理）
 }
 
 // MARK: - Transition Animation
