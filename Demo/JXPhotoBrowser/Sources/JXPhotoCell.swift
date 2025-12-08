@@ -5,6 +5,7 @@
 
 import UIKit
 import Kingfisher
+import AVFoundation
 
 /// 支持图片捏合缩放查看的 Cell
 open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
@@ -37,7 +38,23 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         iv.clipsToBounds = true
         return iv
     }()
-
+    
+    /// 视频播放按钮（当资源为视频时显示）
+    public let playButton: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "play.circle.fill"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.tintColor = .white
+        iv.contentMode = .scaleAspectFit
+        iv.isHidden = true
+        iv.isUserInteractionEnabled = true // 允许点击
+        return iv
+    }()
+    
+    // MARK: - Video Properties
+    // 移除私有视频属性，转交由子类 JXVideoCell 实现，或者改为 open 供子类使用
+    // 为了响应用户需求“新增单独的视频播放cell”，我们将 JXPhotoCell 还原为纯图片 Cell
+    // 但保留 playButton 供子类使用
+    
     // 双击手势：小于 1.1 放大到 2x，否则还原
     public private(set) lazy var doubleTapGesture: UITapGestureRecognizer = {
         let g = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
@@ -81,6 +98,15 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         scrollView.delegate = self
         scrollView.addSubview(imageView)
         
+        // 添加播放按钮
+        contentView.addSubview(playButton)
+        NSLayoutConstraint.activate([
+            playButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            playButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            playButton.widthAnchor.constraint(equalToConstant: 60),
+            playButton.heightAnchor.constraint(equalToConstant: 60)
+        ])
+        
         // 添加双击缩放
         scrollView.addGestureRecognizer(doubleTapGesture)
         // 添加单击关闭，并与双击冲突处理
@@ -108,6 +134,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         // 恢复初始布局
         imageView.frame = scrollView.bounds
         scrollView.contentSize = imageView.frame.size
+        
+        // 视频重置
+        playButton.isHidden = true
     }
     
     // MARK: - Transition Helper
@@ -179,6 +208,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        // 视频播放时可能禁用双击缩放，这里暂时保持一致
         let currentScale = scrollView.zoomScale
         if currentScale < 1.1 {
             let targetScale = min(2.0, scrollView.maximumZoomScale)
@@ -205,7 +235,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     @objc open func handleSingleTap(_ gesture: UITapGestureRecognizer) {
         browser?.dismissSelf()
     }
-
+    
     // MARK: - Content Loading
     /// 从浏览器委托获取资源并加载到 imageView
     open func reloadContent() {
@@ -234,6 +264,10 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
             centerImageIfNeeded()
         } else {
             imageView.image = nil
+            playButton.isHidden = true
         }
     }
+    
+    // MARK: - Video Playback
+    // 视频相关方法已移除，由子类实现
 }

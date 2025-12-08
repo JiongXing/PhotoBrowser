@@ -8,17 +8,21 @@ import AVFoundation
 
 // MARK: - Resource Model
 
-/// 图片资源（原图 + 可选缩略图）
+/// 图片资源（原图 + 可选缩略图 + 可选视频）
 public struct JXPhotoResource {
-    /// 原图 URL
+    /// 原图 URL（若为视频，可作为封面图）
     public let imageURL: URL
     
     /// 缩略图 URL（可选）
     public let thumbnailURL: URL?
     
-    public init(imageURL: URL, thumbnailURL: URL? = nil) {
+    /// 视频 URL（可选，若存在则为视频资源）
+    public let videoURL: URL?
+    
+    public init(imageURL: URL, thumbnailURL: URL? = nil, videoURL: URL? = nil) {
         self.imageURL = imageURL
         self.thumbnailURL = thumbnailURL
+        self.videoURL = videoURL
     }
 }
 
@@ -48,6 +52,8 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     
     /// 提供 Cell 加载图片所需的资源（原图 + 可选缩略图）
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource?
+    /// 提供 Cell 类，若返回 nil，则使用默认的 JXPhotoCell
+    func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass?
 }
 
 public extension JXPhotoBrowserDelegate {
@@ -61,6 +67,7 @@ public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
     
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass? { nil }
 }
 
 // MARK: - Enums
@@ -127,6 +134,7 @@ open class JXPhotoBrowser: UIViewController {
         cv.showsVerticalScrollIndicator = false
         cv.isPagingEnabled = true
         cv.register(JXPhotoCell.self, forCellWithReuseIdentifier: JXPhotoCell.reuseIdentifier)
+        cv.register(JXVideoCell.self, forCellWithReuseIdentifier: JXVideoCell.videoReuseIdentifier)
         return cv
     }()
     
@@ -423,10 +431,20 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     }
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+        let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
+        let cellClass = delegate?.photoBrowser(self, cellClassForItemAt: real)
+        
+        // 默认为 JXPhotoCell
+        let reuseIdentifier: String
+        if cellClass == JXVideoCell.self {
+            reuseIdentifier = JXVideoCell.videoReuseIdentifier
+        } else {
+            reuseIdentifier = JXPhotoCell.reuseIdentifier
+        }
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! JXPhotoCell
         cell.browser = self
         if realCount > 0 {
-            let real = realIndex(fromVirtual: indexPath.item)
             cell.currentIndex = real
             delegate?.photoBrowser(self, didReuse: cell, at: real)
         } else {
