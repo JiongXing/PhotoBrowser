@@ -264,8 +264,9 @@ open class JXPhotoBrowser: UIViewController {
             let velocity = gesture.velocity(in: view)
             let translation = gesture.translation(in: view)
             
-            // 下拉足够距离或速度够快则关闭
-            if translation.y > 100 || velocity.y > 800 {
+            // 松手时有向下的速度则关闭
+            let shouldDismiss = velocity.y > 10
+            if shouldDismiss {
                 dismissSelf()
                 // 不恢复 ScrollEnabled，直到页面消失
             } else {
