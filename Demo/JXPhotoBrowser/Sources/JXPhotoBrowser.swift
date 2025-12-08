@@ -120,7 +120,7 @@ open class JXPhotoBrowser: UIViewController {
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .black
+        cv.backgroundColor = .clear
         cv.dataSource = self
         cv.delegate = self
         cv.showsHorizontalScrollIndicator = false
@@ -146,6 +146,15 @@ open class JXPhotoBrowser: UIViewController {
     /// 是否已滚动到初始位置（避免重复滚动）
     fileprivate var didScrollToInitial = false
     
+    /// 交互手势
+    private var panGesture: UIPanGestureRecognizer!
+    
+    /// 当前被隐藏的源视图（用于保持“抽离”效果）
+    private weak var currentHiddenView: UIView?
+    
+    /// 正在进行下拉交互的 Cell（避免滚动导致目标错误）
+    private weak var interactiveDismissCell: JXPhotoCell?
+    
     // MARK: - Lifecycle Methods
     
     open override func viewDidLoad() {
@@ -153,6 +162,10 @@ open class JXPhotoBrowser: UIViewController {
         view.backgroundColor = .black
         setupCollectionView()
         applyCollectionViewConfig()
+        
+        panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        panGesture.delegate = self
+        view.addGestureRecognizer(panGesture)
     }
     
     open override func viewDidAppear(_ animated: Bool) {
@@ -160,6 +173,19 @@ open class JXPhotoBrowser: UIViewController {
         if !didScrollToInitial {
             scrollToInitialIndex()
             didScrollToInitial = true
+        }
+        // 初始显示时隐藏源视图
+        if let cell = visiblePhotoCell(), let index = cell.currentIndex {
+            updateHiddenOriginView(at: index)
+        }
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // 页面消失时（如非交互关闭），尝试恢复
+        // 注意：交互关闭时会由 Animator 处理恢复，这里只是兜底
+        if transitionCoordinator == nil {
+             currentHiddenView?.isHidden = false
         }
     }
     
@@ -179,6 +205,85 @@ open class JXPhotoBrowser: UIViewController {
     
     // MARK: - Private Methods
     
+    /// 更新隐藏的源视图
+    private func updateHiddenOriginView(at index: Int) {
+        let newView = delegate?.photoBrowser(self, zoomOriginViewAt: index)
+        
+        // 如果相同则不处理
+        if newView === currentHiddenView { return }
+        
+        // 恢复之前的
+        if let old = currentHiddenView {
+            old.isHidden = false
+        }
+        
+        // 隐藏当前的
+        if let view = newView {
+            view.isHidden = true
+            currentHiddenView = view
+        } else {
+            currentHiddenView = nil
+        }
+    }
+    
+    @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            guard let cell = visiblePhotoCell() else { return }
+            interactiveDismissCell = cell
+            collectionView.isScrollEnabled = false
+            
+            // 确保源视图隐藏
+            if let index = cell.currentIndex {
+                updateHiddenOriginView(at: index)
+            }
+            
+        case .changed:
+            guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else { return }
+            let translation = gesture.translation(in: view)
+            
+            // 下拉时缩小；上拉时（负值）不放大，保持原大小但跟随位移
+            let progress = translation.y / view.bounds.height
+            let scale = translation.y > 0 ? max(0.5, 1 - abs(progress)) : 1.0
+            
+            // 变换图片
+            let transform = CGAffineTransform(translationX: translation.x, y: translation.y)
+                .scaledBy(x: scale, y: scale)
+            imageView.transform = transform
+            
+            // 背景透明度：只有下拉时才变透明
+            let alpha = translation.y > 0 ? max(0, 1 - abs(progress) * 1.5) : 1.0
+            view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
+            
+        case .ended, .cancelled:
+            guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else {
+                collectionView.isScrollEnabled = true
+                return
+            }
+            
+            let velocity = gesture.velocity(in: view)
+            let translation = gesture.translation(in: view)
+            
+            // 下拉足够距离或速度够快则关闭
+            if translation.y > 100 || velocity.y > 800 {
+                dismissSelf()
+                // 不恢复 ScrollEnabled，直到页面消失
+            } else {
+                // 恢复
+                UIView.animate(withDuration: 0.25, animations: {
+                    imageView.transform = .identity
+                    self.view.backgroundColor = .black
+                }) { _ in
+                    self.collectionView.isScrollEnabled = true
+                    self.interactiveDismissCell = nil
+                }
+            }
+        default:
+            collectionView.isScrollEnabled = true
+            interactiveDismissCell = nil
+        }
+    }
+
     /// 将虚拟索引转换为真实索引
     open func realIndex(fromVirtual index: Int) -> Int {
         let count = realCount
@@ -204,7 +309,7 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 从指定视图控制器展示浏览器
     open func present(from vc: UIViewController) {
-        modalPresentationStyle = .fullScreen
+        modalPresentationStyle = .overFullScreen
         if transitionType != .none { transitioningDelegate = self }
         vc.present(self, animated: transitionType != .none, completion: nil)
     }
@@ -318,6 +423,42 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     }
     
     // （生命周期代理已移除，复用与点击关闭由 Cell 内部处理）
+    
+    open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let center = CGPoint(
+            x: collectionView.bounds.midX + collectionView.contentOffset.x,
+            y: collectionView.bounds.midY + collectionView.contentOffset.y
+        )
+        if let indexPath = collectionView.indexPathForItem(at: center) {
+            let real = realIndex(fromVirtual: indexPath.item)
+            updateHiddenOriginView(at: real)
+        }
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension JXPhotoBrowser: UIGestureRecognizerDelegate {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == panGesture {
+            guard let cell = visiblePhotoCell() else { return false }
+            // 只有在未缩放且处于顶部时才响应下拉
+            let isZoomed = cell.scrollView.zoomScale > 1.0 + 0.01
+            // 允许一定误差
+            let isAtTop = cell.scrollView.contentOffset.y <= 1.0
+            
+            if isZoomed { return false }
+            
+            let velocity = panGesture.velocity(in: view)
+            // 只响应垂直向下的手势
+            return velocity.y > 0 && abs(velocity.y) > abs(velocity.x)
+        }
+        return true
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        // 允许与 ScrollView 滚动共存
+        return true
+    }
 }
 
 // MARK: - Transition Animation

@@ -54,7 +54,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         }) { finished in
             // 还原
             targetIV.isHidden = false
-            originView.isHidden = false
+            // originView.isHidden = false // 保持隐藏，交由浏览器或 Dismiss 动画处理
             zoomView.removeFromSuperview()
             ctx.completeTransition(finished)
         }

@@ -86,7 +86,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         // 添加单击关闭，并与双击冲突处理
         scrollView.addGestureRecognizer(singleTapGesture)
         singleTapGesture.require(toFail: doubleTapGesture)
-        backgroundColor = .black
+        backgroundColor = .clear
     }
     
     public required init?(coder: NSCoder) {
