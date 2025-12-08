@@ -155,6 +155,12 @@ open class JXPhotoBrowser: UIViewController {
     /// 正在进行下拉交互的 Cell（避免滚动导致目标错误）
     private weak var interactiveDismissCell: JXPhotoCell?
     
+    /// 下拉交互开始时的触摸点（用于计算跟随偏移）
+    private var initialTouchPoint: CGPoint = .zero
+    
+    /// 下拉交互开始时的图片中心点
+    private var initialImageCenter: CGPoint = .zero
+    
     // MARK: - Lifecycle Methods
     
     open override func viewDidLoad() {
@@ -232,6 +238,13 @@ open class JXPhotoBrowser: UIViewController {
             guard let cell = visiblePhotoCell() else { return }
             interactiveDismissCell = cell
             collectionView.isScrollEnabled = false
+            cell.scrollView.isScrollEnabled = false
+            
+            // 记录初始状态以计算跟随
+            initialTouchPoint = gesture.location(in: cell.scrollView)
+            if let imageView = cell.transitionImageView {
+                initialImageCenter = imageView.center
+            }
             
             // 确保源视图隐藏
             if let index = cell.currentIndex {
@@ -246,8 +259,17 @@ open class JXPhotoBrowser: UIViewController {
             let progress = translation.y / view.bounds.height
             let scale = translation.y > 0 ? max(0.5, 1 - abs(progress)) : 1.0
             
-            // 变换图片
-            let transform = CGAffineTransform(translationX: translation.x, y: translation.y)
+            // 计算让图片跟随手指的偏移量
+            // 触摸点相对于图片中心的向量
+            let vector = CGPoint(x: initialTouchPoint.x - initialImageCenter.x,
+                                 y: initialTouchPoint.y - initialImageCenter.y)
+            // 当图片缩小时，为了保持触摸点位置不变，需要补偿的位移
+            // 公式：Offset = Vector * (1 - Scale)
+            let adjustX = vector.x * (1 - scale)
+            let adjustY = vector.y * (1 - scale)
+            
+            // 变换图片：Translation + Adjustment
+            let transform = CGAffineTransform(translationX: translation.x + adjustX, y: translation.y + adjustY)
                 .scaledBy(x: scale, y: scale)
             imageView.transform = transform
             
@@ -262,10 +284,10 @@ open class JXPhotoBrowser: UIViewController {
             }
             
             let velocity = gesture.velocity(in: view)
-            let translation = gesture.translation(in: view)
             
-            // 松手时有向下的速度则关闭
+            // 只要有向下的速度则关闭
             let shouldDismiss = velocity.y > 10
+            
             if shouldDismiss {
                 dismissSelf()
                 // 不恢复 ScrollEnabled，直到页面消失
@@ -276,11 +298,15 @@ open class JXPhotoBrowser: UIViewController {
                     self.view.backgroundColor = .black
                 }) { _ in
                     self.collectionView.isScrollEnabled = true
+                    cell.scrollView.isScrollEnabled = true
                     self.interactiveDismissCell = nil
                 }
             }
         default:
             collectionView.isScrollEnabled = true
+            if let cell = interactiveDismissCell {
+                cell.scrollView.isScrollEnabled = true
+            }
             interactiveDismissCell = nil
         }
     }
@@ -450,8 +476,8 @@ extension JXPhotoBrowser: UIGestureRecognizerDelegate {
             if isZoomed { return false }
             
             let velocity = panGesture.velocity(in: view)
-            // 只响应垂直向下的手势
-            return velocity.y > 0 && abs(velocity.y) > abs(velocity.x)
+            // 只响应垂直向下的手势，且处于顶部
+            return isAtTop && velocity.y > 0 && abs(velocity.y) > abs(velocity.x)
         }
         return true
     }
