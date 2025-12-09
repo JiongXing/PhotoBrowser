@@ -267,7 +267,4 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
             playButton.isHidden = true
         }
     }
-    
-    // MARK: - Video Playback
-    // 视频相关方法已移除，由子类实现
 }

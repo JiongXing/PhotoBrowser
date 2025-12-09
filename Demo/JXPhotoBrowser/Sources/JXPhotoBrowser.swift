@@ -57,15 +57,12 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
 }
 
 public extension JXPhotoBrowserDelegate {
-    // 默认空实现，便于增量接入
     func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) {}
-    
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
-    
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass? { nil }
 }
@@ -432,7 +429,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
-        let cellClass = delegate?.photoBrowser(self, cellClassForItemAt: real)
+        let cellClass: AnyClass? = delegate?.photoBrowser(self, cellClassForItemAt: real)
         
         // 默认为 JXPhotoCell
         let reuseIdentifier: String
@@ -466,8 +463,6 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
         let real = realIndex(fromVirtual: indexPath.item)
         delegate?.photoBrowser(self, didEndDisplaying: cell, at: real)
     }
-    
-    // （生命周期代理已移除，复用与点击关闭由 Cell 内部处理）
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let center = CGPoint(

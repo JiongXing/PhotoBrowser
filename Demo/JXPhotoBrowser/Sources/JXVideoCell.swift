@@ -18,7 +18,6 @@ open class JXVideoCell: JXPhotoCell {
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        // 视频 Cell 特有的初始化逻辑（如果有）
     }
     
     public required init?(coder: NSCoder) {
@@ -57,28 +56,6 @@ open class JXVideoCell: JXPhotoCell {
             browser?.dismissSelf()
         }
     }
-    
-    // 覆写父类的播放按钮点击事件（需在父类中将 handlePlayButtonTap 暴露或修改访问控制）
-    // 由于父类是 private，我们这里通过添加新的 target 来覆盖或者重写 UI 逻辑
-    // 为了简单，我们直接重写 playVideo 等逻辑
-    
-    // 注意：由于父类中 playVideo 等方法是 private，我们无法直接 override。
-    // 我们需要在 JXPhotoCell 中将它们改为 open 或 public，或者在这里重新实现一套。
-    // 鉴于用户要求“新增一个单独的视频播放cell”，我们可以将 JXPhotoCell 中的视频逻辑剥离，
-    // 或者在 JXVideoCell 中完全重写视频逻辑。
-    // 这里选择重写视频逻辑，并让 JXPhotoCell 回归纯图片（或保留兼容）。
-    // 但为了代码复用，最好是修改父类。
-    // 考虑到工具限制，我将重新实现视频逻辑。
-    
-    // 实际上，父类 JXPhotoCell 已经包含了视频逻辑。
-    // 用户的需求是 "新增一个单独的视频播放cell"，这意味着 JXPhotoCell 应该只负责图片，
-    // 而 JXVideoCell 负责视频。
-    // 所以我们需要：
-    // 1. 将 JXPhotoCell 中的视频逻辑移除（或保留但默认禁用）。
-    // 2. 在 JXVideoCell 中实现视频逻辑。
-    
-    // 为了不破坏现有逻辑，我们可以在 JXVideoCell 中覆盖 reloadContent 并实现自己的播放逻辑。
-    // 并且我们需要在 JXPhotoBrowser 中支持注册不同的 Cell 类。
 }
 
 // 重新实现播放逻辑
@@ -90,13 +67,6 @@ extension JXVideoCell {
             playerLayer.frame = imageView.bounds
         }
     }
-    
-    // 模拟重写 playButton 的点击
-    // 我们需要在 init 中移除父类的 target 并添加自己的（如果父类加了的话）
-    // 或者简单地，我们在 reloadContent 中配置 playButton
-    
-    // 让我们假设父类的 handlePlayButtonTap 是 private 的，我们无法 override。
-    // 但 playButton 是 public 的。
     
     private func setupVideoActions() {
         // 移除可能的旧 targets
