@@ -41,6 +41,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         let endFrame = targetIV.convert(targetIV.bounds, to: container)
 
         // 隐藏真实视图，避免重影
+        // 仍需隐藏起点视图以避免动画期间的重影；业务方若有外部控制可同步处理
         originView.isHidden = true
         targetIV.isHidden = true
 
@@ -54,7 +55,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         }) { finished in
             // 还原
             targetIV.isHidden = false
-            // originView.isHidden = false // 保持隐藏，交由浏览器或 Dismiss 动画处理
+            originView.isHidden = false
             zoomView.removeFromSuperview()
             ctx.completeTransition(finished)
         }

@@ -60,6 +60,7 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             fromView.alpha = 0
         }) { _ in
             originView.isHidden = false
+            fromVC.delegate?.photoBrowser(fromVC, setOriginViewHidden: false, at: idx)
             zoomIV.removeFromSuperview()
             fromView.removeFromSuperview()
             ctx.completeTransition(true)

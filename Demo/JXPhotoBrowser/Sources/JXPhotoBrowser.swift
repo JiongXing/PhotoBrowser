@@ -41,6 +41,9 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     /// 生命周期：Cell 已消失
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int)
     
+    /// 可选：浏览器在某个索引的源缩略图需要被隐藏/恢复时调用，业务方可根据索引自行控制对应视图的显隐（用于避免 Cell 复用导致的状态错乱）
+    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int)
+    
     /// 可选：为 Zoom 转场提供源缩略图视图（用于起点几何计算）。
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
     
@@ -61,6 +64,7 @@ public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? { nil }
@@ -154,8 +158,8 @@ open class JXPhotoBrowser: UIViewController {
     /// 交互手势
     private var panGesture: UIPanGestureRecognizer!
     
-    /// 当前被隐藏的源视图（用于保持“抽离”效果）
-    private weak var currentHiddenView: UIView?
+    /// 当前被隐藏的源视图对应的索引（由业务方控制显隐）
+    private var currentHiddenIndex: Int?
     
     /// 正在进行下拉交互的 Cell（避免滚动导致目标错误）
     private weak var interactiveDismissCell: JXPhotoCell?
@@ -195,8 +199,13 @@ open class JXPhotoBrowser: UIViewController {
         super.viewWillDisappear(animated)
         // 页面消失时（如非交互关闭），尝试恢复
         // 注意：交互关闭时会由 Animator 处理恢复，这里只是兜底
-        if transitionCoordinator == nil {
-             currentHiddenView?.isHidden = false
+        if let coordinator = transitionCoordinator {
+            // 在转场结束后统一恢复，避免提前显示导致重影
+            coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+                self?.restoreHiddenOriginViewIfNeeded()
+            }
+        } else {
+            restoreHiddenOriginViewIfNeeded()
         }
     }
     
@@ -216,25 +225,25 @@ open class JXPhotoBrowser: UIViewController {
     
     // MARK: - Private Methods
     
-    /// 更新隐藏的源视图
+    /// 更新隐藏的源视图：切换时先恢复旧的，再隐藏新的，并通知业务层
     private func updateHiddenOriginView(at index: Int) {
-        let newView = delegate?.photoBrowser(self, zoomOriginViewAt: index)
+        // 如果索引未变化且已有记录，直接返回
+        if currentHiddenIndex == index { return }
         
-        // 如果相同则不处理
-        if newView === currentHiddenView { return }
+        // 先恢复旧的
+        restoreHiddenOriginViewIfNeeded()
         
-        // 恢复之前的
-        if let old = currentHiddenView {
-            old.isHidden = false
+        // 仅通知业务层，由业务层决定是否以及如何隐藏源缩略图
+        delegate?.photoBrowser(self, setOriginViewHidden: true, at: index)
+        currentHiddenIndex = index
+    }
+    
+    /// 恢复当前隐藏的源视图，并通知业务层
+    private func restoreHiddenOriginViewIfNeeded() {
+        if let index = currentHiddenIndex {
+            delegate?.photoBrowser(self, setOriginViewHidden: false, at: index)
         }
-        
-        // 隐藏当前的
-        if let view = newView {
-            view.isHidden = true
-            currentHiddenView = view
-        } else {
-            currentHiddenView = nil
-        }
+        currentHiddenIndex = nil
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
@@ -313,6 +322,18 @@ open class JXPhotoBrowser: UIViewController {
                 cell.scrollView.isScrollEnabled = true
             }
             interactiveDismissCell = nil
+        }
+    }
+    
+    /// 计算当前居中的真实索引并更新隐藏视图
+    private func updateHiddenOriginViewForCurrentCenter() {
+        let center = CGPoint(
+            x: collectionView.bounds.midX + collectionView.contentOffset.x,
+            y: collectionView.bounds.midY + collectionView.contentOffset.y
+        )
+        if let indexPath = collectionView.indexPathForItem(at: center) {
+            let real = realIndex(fromVirtual: indexPath.item)
+            updateHiddenOriginView(at: real)
         }
     }
 
@@ -465,14 +486,17 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let center = CGPoint(
-            x: collectionView.bounds.midX + collectionView.contentOffset.x,
-            y: collectionView.bounds.midY + collectionView.contentOffset.y
-        )
-        if let indexPath = collectionView.indexPathForItem(at: center) {
-            let real = realIndex(fromVirtual: indexPath.item)
-            updateHiddenOriginView(at: real)
+        updateHiddenOriginViewForCurrentCenter()
+    }
+    
+    open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            updateHiddenOriginViewForCurrentCenter()
         }
+    }
+    
+    open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        updateHiddenOriginViewForCurrentCenter()
     }
 }
 
