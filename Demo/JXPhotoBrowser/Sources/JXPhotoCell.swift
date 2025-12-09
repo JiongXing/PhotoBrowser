@@ -146,7 +146,8 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     open override func layoutSubviews() {
         super.layoutSubviews()
         // 在未缩放状态下，根据图片比例调整 imageView.frame
-        if scrollView.zoomScale == scrollView.minimumZoomScale {
+        // 或者如果 imageView 大小为 0 (异常状态)，也强制调整
+        if scrollView.zoomScale == scrollView.minimumZoomScale || imageView.frame.isEmpty {
             adjustImageViewFrame()
         }
         // 任何时候（包括缩放时），都对图片做居中处理
@@ -156,12 +157,22 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     // MARK: - Layout Helper
     /// 根据图片实际尺寸，调整 imageView 的 frame
     open func adjustImageViewFrame() {
+        var containerSize = scrollView.bounds.size
+        // 如果 scrollView 布局尚未完成，尝试使用 cell 自身的 bounds 作为兜底
+        if containerSize.width == 0 && bounds.width > 0 {
+            containerSize = bounds.size
+        }
+        
         guard let image = imageView.image else {
-            imageView.frame = .zero
-            scrollView.contentSize = .zero
+            // 避免设为 zero，保持 bounds 大小，维持 ScrollView 结构
+            // 这样即便图片未加载，Cell 也有正常的布局占位
+            if containerSize.width > 0 && containerSize.height > 0 {
+                imageView.frame = CGRect(origin: .zero, size: containerSize)
+                scrollView.contentSize = imageView.frame.size
+            }
             return
         }
-        let containerSize = scrollView.bounds.size
+        
         // 容器或图片尺寸无效时，不做处理
         guard containerSize.width > 0, containerSize.height > 0, image.size.width > 0 else {
             return
@@ -257,8 +268,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
             imageView.kf.setImage(with: res.imageURL, placeholder: placeholder) { [weak self] _ in
                 self?.adjustImageViewFrame()
                 self?.centerImageIfNeeded()
+                self?.setNeedsLayout()
             }
-
+            
             // 初始布局调整（即便异步完成前也保证基本布局）
             adjustImageViewFrame()
             centerImageIfNeeded()

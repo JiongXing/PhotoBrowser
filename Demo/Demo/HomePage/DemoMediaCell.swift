@@ -74,6 +74,7 @@ final class DemoMediaCell: UICollectionViewCell {
         super.prepareForReuse()
         imageView.kf.cancelDownloadTask()
         imageView.image = nil
+        imageView.isHidden = false
         playOverlay.isHidden = true
     }
     

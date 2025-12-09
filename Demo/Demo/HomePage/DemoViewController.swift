@@ -25,6 +25,8 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     // 数据源
     private var items: [DemoMedia] = []
     
+    private weak var photoBrowser: JXPhotoBrowser?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupData()
@@ -90,6 +92,12 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DemoMediaCell.reuseIdentifier, for: indexPath) as! DemoMediaCell
         cell.configure(with: items[indexPath.item])
+        
+        if let browser = photoBrowser, browser.pageIndex == indexPath.item {
+            cell.imageView.isHidden = true
+        } else {
+            cell.imageView.isHidden = false
+        }
         return cell
     }
     
@@ -116,6 +124,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         browser.transitionType = .zoom
         browser.isLoopingEnabled = true
         
+        self.photoBrowser = browser
         browser.present(from: self)
     }
     
@@ -180,6 +189,26 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         iv.contentMode = cell.imageView.contentMode
         iv.clipsToBounds = true
         return iv
+    }
+    
+    // 控制源缩略图的显隐（浏览器切换图片时调用）
+    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {
+        // 由于我们现在依赖 browser.pageIndex 来控制显隐（在 cellForItemAt 中），
+        // 且 browser.pageIndex 在调用此代理方法前已经更新。
+        // 所以我们只需要触发受影响 Cell 的更新即可。
+        
+        // 1. 找到当前 index 对应的 Cell 并更新
+        let ip = IndexPath(item: index, section: 0)
+        if let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell {
+            // 直接触发 configure 或者手动设置 isHidden
+            // 推荐手动设置，比 reloadItems 更轻量
+            cell.imageView.isHidden = hidden
+        }
+        
+        // 2. 如果是显示（hidden=false），说明可能是上一个页面，需要恢复
+        // 但其实上一个页面的恢复在 updateHiddenOriginView 中已经通过 restoreHiddenOriginViewIfNeeded 处理了
+        // restore 会调用 setOriginViewHidden(false, at: oldIndex)
+        // 所以这里只要处理好当前传进来的 index 即可
     }
 }
 

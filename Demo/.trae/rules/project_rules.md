@@ -1,0 +1,7 @@
+# 项目介绍
+本项目是一个仿 微信/iOS系统相册 的开源的图片/视频浏览器框架。
+- "JXPhotoBrowser"目录是框架SDK，支持cocoapods集成方式。
+- "Demo"目录是示例工程，提供了相册列表数据，使用cocoapods集成"JXPhotoBrowser"。
+
+# 开发语言
+使用 Swift + UIKit 开发。
