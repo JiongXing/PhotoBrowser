@@ -313,21 +313,24 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 根据滚动偏移量更新当前页索引
     private func updateCurrentPageIndex() {
+        let virtualItem = calculateCurrentVirtualIndex()
+        pageIndex = realIndex(fromVirtual: virtualItem)
+    }
+    
+    /// 计算当前基于偏移量的虚拟索引
+    private func calculateCurrentVirtualIndex() -> Int {
         let size = collectionView.bounds.size
         let offset = collectionView.contentOffset
-        guard size.width > 0, size.height > 0 else { return }
+        guard size.width > 0, size.height > 0 else { return 0 }
         
-        var virtualItem: Int = 0
+        var virtualItem: Int
         if scrollDirection == .horizontal {
             virtualItem = Int(round(offset.x / size.width))
         } else {
             virtualItem = Int(round(offset.y / size.height))
         }
         
-        // 防止越界（虽然理论上不会，但在弹簧效果下可能出现负值或超大值）
-        virtualItem = max(0, min(virtualItem, virtualCount - 1))
-        
-        pageIndex = realIndex(fromVirtual: virtualItem)
+        return max(0, min(virtualItem, virtualCount - 1))
     }
 
     /// 将虚拟索引转换为真实索引
@@ -379,15 +382,10 @@ open class JXPhotoBrowser: UIViewController {
         let cells = collectionView.visibleCells.compactMap { $0 as? JXPhotoCell }
         guard !cells.isEmpty else { return nil }
         
-        // 【为何不用 pageIndex 查找？】
-        // pageIndex 仅在滚动停止时更新。若用户在滚动过程中（如手指按住微调、快速滑动中）触发交互（如手势），
-        // pageIndex 可能尚未更新或已过时。
-        // 使用“几何中心距离”计算始终能获取当前视觉上最中心的 Cell，符合“所见即所得”，最为稳妥。
-        
-        // 使用坐标转换计算距离，避免直接操作 contentOffset 带来的大数值计算
+        // 使用几何中心距离计算，确保在滚动中也能准确获取视觉中心的 Cell
         let viewCenter = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
         
-        let nearestCell = cells.min { lhs, rhs in
+        return cells.min { lhs, rhs in
             let lhsCenter = lhs.convert(CGPoint(x: lhs.bounds.midX, y: lhs.bounds.midY), to: view)
             let rhsCenter = rhs.convert(CGPoint(x: rhs.bounds.midX, y: rhs.bounds.midY), to: view)
             
@@ -395,8 +393,6 @@ open class JXPhotoBrowser: UIViewController {
             let dr = hypot(rhsCenter.x - viewCenter.x, rhsCenter.y - viewCenter.y)
             return dl < dr
         }
-
-        return nearestCell
     }
     
     // MARK: - Setup & Configuration
@@ -428,20 +424,8 @@ open class JXPhotoBrowser: UIViewController {
         
         // 保持当前可见项居中（在已滚动到初始项后）
         if didScrollToInitial {
-            // 使用数学计算获取当前虚拟索引，避免 indexPathForItem 在大偏移量下可能失败的问题
-            let size = collectionView.bounds.size
-            let offset = collectionView.contentOffset
-            if size.width > 0, size.height > 0 {
-                var virtualItem: Int = 0
-                if scrollDirection == .horizontal {
-                    virtualItem = Int(round(offset.x / size.width))
-                } else {
-                    virtualItem = Int(round(offset.y / size.height))
-                }
-                virtualItem = max(0, min(virtualItem, virtualCount - 1))
-                
-                collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: scrollDirection.scrollPosition, animated: false)
-            }
+            let virtualItem = calculateCurrentVirtualIndex()
+            collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: scrollDirection.scrollPosition, animated: false)
         }
     }
 }

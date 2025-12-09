@@ -51,9 +51,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }()
     
     // MARK: - Video Properties
-    // 移除私有视频属性，转交由子类 JXVideoCell 实现，或者改为 open 供子类使用
-    // 为了响应用户需求“新增单独的视频播放cell”，我们将 JXPhotoCell 还原为纯图片 Cell
-    // 但保留 playButton 供子类使用
     
     // 双击手势：小于 1.1 放大到 2x，否则还原
     public private(set) lazy var doubleTapGesture: UITapGestureRecognizer = {
@@ -131,9 +128,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         // 重置缩放与偏移
         scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
         scrollView.contentOffset = .zero
+        
         // 恢复初始布局
-        imageView.frame = scrollView.bounds
-        scrollView.contentSize = imageView.frame.size
+        adjustImageViewFrame()
         
         // 视频重置
         playButton.isHidden = true
@@ -155,35 +152,30 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     // MARK: - Layout Helper
+    
+    /// 获取有效的容器尺寸（兼容 ScrollView 尚未布局的情况）
+    private var effectiveContentSize: CGSize {
+        let size = scrollView.bounds.size
+        return (size.width > 0 && size.height > 0) ? size : bounds.size
+    }
+
     /// 根据图片实际尺寸，调整 imageView 的 frame
     open func adjustImageViewFrame() {
-        var containerSize = scrollView.bounds.size
-        // 如果 scrollView 布局尚未完成，尝试使用 cell 自身的 bounds 作为兜底
-        if containerSize.width == 0 && bounds.width > 0 {
-            containerSize = bounds.size
-        }
+        let containerSize = effectiveContentSize
+        guard containerSize.width > 0, containerSize.height > 0 else { return }
         
-        guard let image = imageView.image else {
-            // 避免设为 zero，保持 bounds 大小，维持 ScrollView 结构
-            // 这样即便图片未加载，Cell 也有正常的布局占位
-            if containerSize.width > 0 && containerSize.height > 0 {
-                imageView.frame = CGRect(origin: .zero, size: containerSize)
-                scrollView.contentSize = imageView.frame.size
-            }
-            return
-        }
-        
-        // 容器或图片尺寸无效时，不做处理
-        guard containerSize.width > 0, containerSize.height > 0, image.size.width > 0 else {
+        guard let image = imageView.image, image.size.width > 0 else {
+            // 图片未加载时，撑满容器以维持 ScrollView 结构
+            imageView.frame = CGRect(origin: .zero, size: containerSize)
+            scrollView.contentSize = containerSize
             return
         }
         
         // 宽度与容器一致，高度等比缩放
         let imageRatio = image.size.height / image.size.width
-        let newWidth = containerSize.width
-        let newHeight = newWidth * imageRatio
+        let newHeight = containerSize.width * imageRatio
         
-        imageView.frame = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
+        imageView.frame = CGRect(x: 0, y: 0, width: containerSize.width, height: newHeight)
         scrollView.contentSize = imageView.frame.size
     }
 
