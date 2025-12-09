@@ -13,6 +13,6 @@ struct DemoMedia {
 
     enum SourceType {
         case remoteImage(imageURL: URL, thumbnailURL: URL?)
-        case remoteVideo(url: URL)
+        case remoteVideo(url: URL, thumbnailURL: URL)
     }
 }

@@ -45,43 +45,8 @@ open class JXVideoCell: JXPhotoCell {
             // 确保 playButton 响应视频播放
             setupVideoActions()
             
-            // 封面图处理：
-            // 如果 imageURL 与 videoURL 相同，说明没有提供独立封面，需要生成首帧
-            // 否则直接加载 imageURL
-            if res.imageURL == res.videoURL {
-                // 尝试生成首帧（异步）
-                // 占位
-                imageView.image = nil
-                loadVideoThumbnail(from: res.imageURL)
-            } else {
-                // 复用父类加载逻辑（Kingfisher）
-                super.reloadContent()
-            }
-        }
-    }
-    
-    private func loadVideoThumbnail(from url: URL) {
-        // 简单的异步生成首帧
-        DispatchQueue.global().async {
-            let asset = AVAsset(url: url)
-            let generator = AVAssetImageGenerator(asset: asset)
-            generator.appliesPreferredTrackTransform = true
-            generator.requestedTimeToleranceBefore = .zero
-            generator.requestedTimeToleranceAfter = .zero
-            
-            do {
-                let cgImage = try generator.copyCGImage(at: .zero, actualTime: nil)
-                let image = UIImage(cgImage: cgImage)
-                DispatchQueue.main.async { [weak self] in
-                    // 确保 URL 没变（Cell 复用）
-                    guard let self = self, self.videoURL == url else { return }
-                    self.imageView.image = image
-                    self.adjustImageViewFrame()
-                    self.centerImageIfNeeded()
-                }
-            } catch {
-                print("Thumbnail generation failed: \(error)")
-            }
+            // 直接加载封面图（使用父类的加载逻辑）
+            super.reloadContent()
         }
     }
     

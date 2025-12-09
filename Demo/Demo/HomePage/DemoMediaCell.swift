@@ -80,45 +80,23 @@ final class DemoMediaCell: UICollectionViewCell {
     // MARK: - Configuration Methods
 
     /// 配置 Cell 内容
-    /// - 参数 shouldLoad: 是否允许进行网络加载（未连通时仅展示占位）
-    func configure(with media: DemoMedia, shouldLoad: Bool) {
+    func configure(with media: DemoMedia) {
         imageView.image = nil
         playOverlay.isHidden = true
 
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
-            guard shouldLoad else { break }
             if let thumb = thumbnailURL {
                 imageView.kf.setImage(with: thumb)
             } else {
                 imageView.kf.setImage(with: imageURL)
             }
 
-        case let .remoteVideo(url):
+        case let .remoteVideo(_, thumbnailURL):
             playOverlay.isHidden = false
-            if shouldLoad {
-                generateThumbnail(for: url)
-            }
+            imageView.kf.setImage(with: thumbnailURL)
         }
     }
     
     // MARK: - Private Methods
-    
-    private func generateThumbnail(for url: URL) {
-        let asset = AVURLAsset(url: url)
-        let generator = AVAssetImageGenerator(asset: asset)
-        generator.appliesPreferredTrackTransform = true
-        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            do {
-                let cgImage = try generator.copyCGImage(at: time, actualTime: nil)
-                let image = UIImage(cgImage: cgImage)
-                DispatchQueue.main.async {
-                    self?.imageView.image = image
-                }
-            } catch {
-                // 保持占位背景
-            }
-        }
-    }
 }
