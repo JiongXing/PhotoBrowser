@@ -116,6 +116,13 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         super.init(coder: coder)
     }
     
+    // MARK: - Layout State
+    /// 上一次布局的容器尺寸（用于旋转时重置缩放）
+    private var lastBoundsSize: CGSize = .zero
+    
+    /// 调试日志开关
+    private let enableDebugLog: Bool = true
+    
     // MARK: - Lifecycle
     open override func prepareForReuse() {
         super.prepareForReuse()
@@ -128,6 +135,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         // 重置缩放与偏移
         scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
         scrollView.contentOffset = .zero
+        scrollView.contentInset = .zero
         
         // 恢复初始布局
         adjustImageViewFrame()
@@ -142,12 +150,20 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        // 在未缩放状态下，根据图片比例调整 imageView.frame
-        // 或者如果 imageView 大小为 0 (异常状态)，也强制调整
-        if scrollView.zoomScale == scrollView.minimumZoomScale || imageView.frame.isEmpty {
+        
+        let sizeChanged = lastBoundsSize != bounds.size
+        if sizeChanged {
+            lastBoundsSize = bounds.size
+            // 旋转后重置缩放，避免旧尺寸导致的缩放计算错误
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
+            adjustImageViewFrame()
+            debugLog("layout sizeChanged=\(sizeChanged) bounds=\(bounds.size) zoom=\(scrollView.zoomScale) contentSize=\(scrollView.contentSize)")
+        } else if scrollView.zoomScale == scrollView.minimumZoomScale || imageView.frame.isEmpty {
+            // 在未缩放状态下，根据图片比例调整 imageView.frame
+            // 或者如果 imageView 大小为 0 (异常状态)，也强制调整
             adjustImageViewFrame()
         }
-        // 任何时候（包括缩放时），都对图片做居中处理
+        // 任何时候（包括缩放时），都通过 inset 进行居中处理
         centerImageIfNeeded()
     }
 
@@ -159,7 +175,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         return (size.width > 0 && size.height > 0) ? size : bounds.size
     }
 
-    /// 根据图片实际尺寸，调整 imageView 的 frame
+    /// 根据图片实际尺寸，调整 imageView 的 frame（原点保持 (0,0)）
     open func adjustImageViewFrame() {
         let containerSize = effectiveContentSize
         guard containerSize.width > 0, containerSize.height > 0 else { return }
@@ -189,25 +205,55 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     // MARK: - Helpers
-    /// 在内容小于容器时居中展示
+    /// 在内容小于容器时居中展示（通过 contentInset 处理，避免 frame 偏移残留）
     open func centerImageIfNeeded() {
-        let boundsSize = scrollView.bounds.size
-        var frameToCenter = imageView.frame
-
-        // 计算水平/垂直偏移以在内容小于可视区域时居中
-        if frameToCenter.size.width < boundsSize.width {
-            frameToCenter.origin.x = (boundsSize.width - frameToCenter.size.width) * 0.5
-        } else {
-            frameToCenter.origin.x = 0
+        // 使用 scrollView 已布局的尺寸，若为 0 则回退到 cell 自身尺寸
+        var containerSize = scrollView.bounds.size
+        if containerSize.width <= 0 || containerSize.height <= 0 {
+            containerSize = bounds.size
         }
-
-        if frameToCenter.size.height < boundsSize.height {
-            frameToCenter.origin.y = (boundsSize.height - frameToCenter.size.height) * 0.5
-        } else {
-            frameToCenter.origin.y = 0
+        
+        let imageSize = imageView.frame.size
+        if containerSize.width <= 0 || containerSize.height <= 0 {
+            debugLog("center skip: container zero container=\(containerSize) image=\(imageSize)")
+            return
         }
-
-        imageView.frame = frameToCenter
+        if imageSize.width <= 0 || imageSize.height <= 0 {
+            debugLog("center skip: image zero container=\(containerSize) image=\(imageSize)")
+            return
+        }
+        
+        // 使用 contentInset 而非调整 frame，避免分页复用时的偏移遗留
+        let horizontalInset = max(0, (containerSize.width - imageSize.width) * 0.5)
+        let verticalInset = max(0, (containerSize.height - imageSize.height) * 0.5)
+        
+        let newInset = UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
+        let insetChanged = scrollView.contentInset != newInset
+        if insetChanged {
+            scrollView.contentInset = newInset
+        }
+        
+        if scrollView.zoomScale == scrollView.minimumZoomScale {
+            // 让内容视觉上居中，需要把 offset 调整到 inset 的负值
+            let targetOffset = CGPoint(x: -horizontalInset, y: -verticalInset)
+            if scrollView.contentOffset != targetOffset {
+                scrollView.contentOffset = targetOffset
+            }
+        }
+        
+        let shouldCenterVertically = imageSize.height < containerSize.height
+        if shouldCenterVertically {
+            debugLog("center inset vertical=\(verticalInset) horizontal=\(horizontalInset) insetChanged=\(insetChanged) image=\(imageSize) container=\(containerSize) zoom=\(scrollView.zoomScale) offset=\(scrollView.contentOffset)")
+        } else {
+            debugLog("center no vertical inset image>=container image=\(imageSize) container=\(containerSize) zoom=\(scrollView.zoomScale) offset=\(scrollView.contentOffset)")
+        }
+    }
+    
+    /// 调试输出
+    private func debugLog(_ message: String) {
+        guard enableDebugLog else { return }
+        let idx = currentIndex.map { "\($0)" } ?? "nil"
+        print("[JXPhotoCell][index:\(idx)] \(message)")
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
@@ -261,6 +307,12 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
                 self?.adjustImageViewFrame()
                 self?.centerImageIfNeeded()
                 self?.setNeedsLayout()
+                // 再走一帧保证容器尺寸有效后重新居中
+                DispatchQueue.main.async { [weak self] in
+                    self?.setNeedsLayout()
+                    self?.layoutIfNeeded()
+                    self?.centerImageIfNeeded()
+                }
             }
             
             // 初始布局调整（即便异步完成前也保证基本布局）

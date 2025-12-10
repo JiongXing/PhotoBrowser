@@ -232,6 +232,22 @@ open class JXPhotoBrowser: UIViewController {
         }
     }
     
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        guard realCount > 0 else { return }
+        
+        let currentVirtual = calculateCurrentVirtualIndex()
+        let currentReal = realIndex(fromVirtual: currentVirtual)
+        let targetVirtual = nearestVirtualIndex(for: currentReal, near: currentVirtual)
+        
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            self?.scrollToVirtualIndex(targetVirtual, size: size)
+        }, completion: { [weak self] _ in
+            self?.scrollToVirtualIndex(targetVirtual, size: size)
+            self?.updateCurrentPageIndex()
+        })
+    }
+    
     // MARK: - Private Methods
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
@@ -333,6 +349,35 @@ open class JXPhotoBrowser: UIViewController {
         return max(0, min(virtualItem, virtualCount - 1))
     }
 
+    /// 找到与当前虚拟索引最接近的同实索引虚拟项
+    private func nearestVirtualIndex(for realIndex: Int, near currentVirtual: Int) -> Int {
+        let count = realCount
+        guard count > 0 else { return 0 }
+        
+        if !isLoopingEnabled { return realIndex }
+        
+        let block = currentVirtual / count
+        var candidate = block * count + realIndex
+        
+        if candidate >= virtualCount, block > 0 {
+            candidate = (block - 1) * count + realIndex
+        }
+        
+        return max(0, min(candidate, virtualCount - 1))
+    }
+    
+    /// 根据虚拟索引滚动到目标位置，保持当前项
+    private func scrollToVirtualIndex(_ index: Int, size: CGSize) {
+        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout, layout.itemSize != size {
+            layout.itemSize = size
+            layout.invalidateLayout()
+        }
+        
+        let indexPath = IndexPath(item: index, section: 0)
+        collectionView.scrollToItem(at: indexPath, at: scrollDirection.scrollPosition, animated: false)
+        collectionView.layoutIfNeeded()
+    }
+    
     /// 将虚拟索引转换为真实索引
     open func realIndex(fromVirtual index: Int) -> Int {
         let count = realCount
