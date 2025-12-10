@@ -69,6 +69,13 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         return g
     }()
     
+    /// 长按手势：用于触发业务方弹窗（下载等）
+    public private(set) lazy var longPressGesture: UILongPressGestureRecognizer = {
+        let g = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        g.minimumPressDuration = 0.5
+        return g
+    }()
+    
     // MARK: - State
     /// 弱引用的浏览器（用于调用关闭）
     public weak var browser: JXPhotoBrowser?
@@ -79,6 +86,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
             reloadContent()
         }
     }
+    
+    /// 当前 Cell 对应的资源（图片 / 视频）
+    public private(set) var currentResource: JXPhotoResource?
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -109,6 +119,8 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         // 添加单击关闭，并与双击冲突处理
         scrollView.addGestureRecognizer(singleTapGesture)
         singleTapGesture.require(toFail: doubleTapGesture)
+        // 添加长按
+        scrollView.addGestureRecognizer(longPressGesture)
         backgroundColor = .clear
     }
     
@@ -128,6 +140,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         
         // 清空旧图像与状态
         imageView.image = nil
+        currentResource = nil
         currentIndex = nil
         // 重置缩放与偏移
         scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
@@ -261,6 +274,11 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         browser?.dismissSelf()
     }
     
+    @objc open func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        browser?.handleLongPress(from: self)
+    }
+    
     // MARK: - Content Loading
     /// 从浏览器委托获取资源并加载到 imageView
     open func reloadContent() {
@@ -274,6 +292,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
 
         // 请求业务资源：直接加载原图，若缩略图已在缓存，则作为占位图
         if let res = browser.delegate?.photoBrowser(browser, resourceForItemAt: index) {
+            currentResource = res
             let placeholder: UIImage? = {
                 guard let thumbURL = res.thumbnailURL else { return nil }
                 return ImageCache.default.retrieveImageInMemoryCache(forKey: thumbURL.absoluteString)

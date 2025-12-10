@@ -10,6 +10,7 @@ import AVKit
 import AVFoundation
 import JXPhotoBrowser
 import Network
+import Photos
 
 // MARK: - ViewController
 class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
@@ -210,6 +211,21 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         // restore 会调用 setOriginViewHidden(false, at: oldIndex)
         // 所以这里只要处理好当前传进来的 index 即可
     }
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, didLongPressItemAt index: Int, resource: JXPhotoResource?, sourceView: UIView) {
+        guard let resource = resource else { return }
+        let downloadTitle = resource.videoURL == nil ? "下载图片到系统相册" : "下载视频到系统相册"
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: downloadTitle, style: .default, handler: { [weak self] _ in
+            self?.downloadToAlbum(resource: resource, presentingViewController: browser)
+        }))
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = sourceView
+            popover.sourceRect = sourceView.bounds
+        }
+        browser.present(alert, animated: true)
+    }
 }
 
 // MARK: - Network Monitoring
@@ -228,6 +244,91 @@ private extension DemoViewController {
         }
         
         networkMonitor.start(queue: networkQueue)
+    }
+    
+    /// 下载图片 / 视频并保存到系统相册
+    func downloadToAlbum(resource: JXPhotoResource, presentingViewController: UIViewController) {
+        requestPhotoAuthorization { [weak self] granted in
+            guard let self = self else { return }
+            guard granted else {
+                DispatchQueue.main.async {
+                    self.presentToast(message: "未获得相册权限，无法保存", on: presentingViewController)
+                }
+                return
+            }
+            
+            if let videoURL = resource.videoURL {
+                self.downloadVideoAndSave(videoURL, presentingViewController: presentingViewController)
+            } else {
+                self.downloadImageAndSave(resource.imageURL, presentingViewController: presentingViewController)
+            }
+        }
+    }
+    
+    /// 请求相册权限
+    func requestPhotoAuthorization(completion: @escaping (Bool) -> Void) {
+        let status = PHPhotoLibrary.authorizationStatus()
+//        if status == .authorized || status == .limited {
+        if status == .authorized {
+            completion(true)
+            return
+        }
+        
+        PHPhotoLibrary.requestAuthorization { newStatus in
+//            completion(newStatus == .authorized || newStatus == .limited)
+            completion(newStatus == .authorized)
+        }
+    }
+    
+    /// 下载图片后保存
+    func downloadImageAndSave(_ url: URL, presentingViewController: UIViewController) {
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+            guard let self = self else { return }
+            guard let data = data, error == nil, let image = UIImage(data: data) else {
+                DispatchQueue.main.async {
+                    self.presentToast(message: "图片下载失败", on: presentingViewController)
+                }
+                return
+            }
+            
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }) { success, _ in
+                DispatchQueue.main.async {
+                    self.presentToast(message: success ? "已保存到系统相册" : "保存失败", on: presentingViewController)
+                }
+            }
+        }.resume()
+    }
+    
+    /// 下载视频后保存
+    func downloadVideoAndSave(_ url: URL, presentingViewController: UIViewController) {
+        URLSession.shared.downloadTask(with: url) { [weak self] tempURL, _, error in
+            guard let self = self else { return }
+            guard let tempURL = tempURL, error == nil else {
+                DispatchQueue.main.async {
+                    self.presentToast(message: "视频下载失败", on: presentingViewController)
+                }
+                return
+            }
+            
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: tempURL)
+            }) { success, _ in
+                DispatchQueue.main.async {
+                    self.presentToast(message: success ? "已保存到系统相册" : "保存失败", on: presentingViewController)
+                }
+            }
+        }.resume()
+    }
+    
+    /// 简单提示
+    func presentToast(message: String, on viewController: UIViewController) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        viewController.present(alert, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak alert] in
+            alert?.dismiss(animated: true)
+        }
     }
 }
 

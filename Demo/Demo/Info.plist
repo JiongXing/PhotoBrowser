@@ -21,5 +21,9 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>保存图片或视频到系统相册</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>保存图片或视频到系统相册</string>
 </dict>
 </plist>

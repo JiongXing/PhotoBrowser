@@ -57,6 +57,13 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource?
     /// 提供 Cell 类，若返回 nil，则使用默认的 JXPhotoCell
     func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass?
+    
+    /// 长按当前资源的回调（用于业务方弹窗、保存等操作）
+    /// - Parameters:
+    ///   - index: 当前资源索引
+    ///   - resource: 当前资源（图片 / 视频）
+    ///   - sourceView: 触发长按的视图，便于弹窗锚点
+    func photoBrowser(_ browser: JXPhotoBrowser, didLongPressItemAt index: Int, resource: JXPhotoResource?, sourceView: UIView)
 }
 
 public extension JXPhotoBrowserDelegate {
@@ -69,6 +76,7 @@ public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, didLongPressItemAt index: Int, resource: JXPhotoResource?, sourceView: UIView) {}
 }
 
 // MARK: - Enums
@@ -397,6 +405,15 @@ open class JXPhotoBrowser: UIViewController {
     /// 关闭浏览器
     @objc open func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
+    }
+    
+    /// Cell 触发的长按事件回调给业务方
+    /// - Parameter cell: 触发长按的 Cell
+    func handleLongPress(from cell: JXPhotoCell) {
+        guard let index = cell.currentIndex else { return }
+        let resource = cell.currentResource ?? delegate?.photoBrowser(self, resourceForItemAt: index)
+        let sourceView = cell.transitionImageView ?? cell
+        delegate?.photoBrowser(self, didLongPressItemAt: index, resource: resource, sourceView: sourceView)
     }
     
     // MARK: - Public Methods
