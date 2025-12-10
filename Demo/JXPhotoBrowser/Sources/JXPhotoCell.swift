@@ -191,8 +191,8 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         guard containerSize.width > 0, containerSize.height > 0 else { return }
         
         guard let image = imageView.image, image.size.width > 0, image.size.height > 0 else {
-            // 图片未加载时，撑满容器以维持 ScrollView 结构
-            imageView.frame = CGRect(origin: .zero, size: containerSize)
+            // 图片未加载时，不再先铺满容器，避免先拉伸后收缩的闪动
+            imageView.frame = .zero
             scrollView.contentSize = containerSize
             return
         }
