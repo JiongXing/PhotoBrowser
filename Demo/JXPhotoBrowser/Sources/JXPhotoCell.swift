@@ -185,22 +185,29 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     /// 根据图片实际尺寸，调整 imageView 的 frame（原点保持 (0,0)）
+    /// 使用 scaleAspectFit 方式：让长边铺满容器，短边等比例缩放，居中展示
     open func adjustImageViewFrame() {
         let containerSize = effectiveContentSize
         guard containerSize.width > 0, containerSize.height > 0 else { return }
         
-        guard let image = imageView.image, image.size.width > 0 else {
+        guard let image = imageView.image, image.size.width > 0, image.size.height > 0 else {
             // 图片未加载时，撑满容器以维持 ScrollView 结构
             imageView.frame = CGRect(origin: .zero, size: containerSize)
             scrollView.contentSize = containerSize
             return
         }
         
-        // 宽度与容器一致，高度等比缩放
-        let imageRatio = image.size.height / image.size.width
-        let newHeight = containerSize.width * imageRatio
+        // scaleAspectFit 逻辑：计算缩放比例，让长边铺满容器
+        let widthScale = containerSize.width / image.size.width
+        let heightScale = containerSize.height / image.size.height
+        // 选择较小的缩放比例，确保长边铺满容器，短边等比例缩放
+        let scale = min(widthScale, heightScale)
         
-        imageView.frame = CGRect(x: 0, y: 0, width: containerSize.width, height: newHeight)
+        // 计算缩放后的尺寸
+        let scaledWidth = image.size.width * scale
+        let scaledHeight = image.size.height * scale
+        
+        imageView.frame = CGRect(x: 0, y: 0, width: scaledWidth, height: scaledHeight)
         scrollView.contentSize = imageView.frame.size
     }
 
