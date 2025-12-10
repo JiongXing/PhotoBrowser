@@ -52,7 +52,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     
     // MARK: - Video Properties
     
-    // 双击手势：小于 1.1 放大到 2x，否则还原
+    /// 双击手势：在初始缩放状态下切换缩放模式（长边铺满 ↔ 短边铺满），在非初始缩放状态下切换回初始状态
     public private(set) lazy var doubleTapGesture: UITapGestureRecognizer = {
         let g = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
         g.numberOfTapsRequired = 2

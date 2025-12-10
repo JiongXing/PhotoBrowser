@@ -7,13 +7,14 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片浏览器，仿
 - **多模式浏览**：支持水平（Horizontal）和垂直（Vertical）两个方向的滚动浏览。
 - **无限循环**：支持无限循环滚动（Looping），无缝切换首尾图片。
 - **手势交互**：
-  - **双击缩放**：支持双击放大/恢复。
-  - **捏合缩放**：支持双指捏合随意缩放。
+  - **双击缩放**：仿系统相册支持双击切换缩放模式。
+  - **捏合缩放**：支持双指捏合随意缩放（1.0x - 3.0x）。
   - **拖拽关闭**：支持下滑手势（Pan）交互式关闭，伴随图片缩小和背景渐变效果。
 - **转场动画**：
   - **Fade**：经典的渐隐渐现效果。
   - **Zoom**：类似微信/系统相册的缩放转场效果，无缝衔接列表与大图。
   - **None**：无动画直接显示。
+- **横竖屏切换**：完美支持设备横竖屏旋转，自动适配屏幕尺寸，图片居中显示，缩放状态智能重置。
 - **高性能**：基于 `UICollectionView` 复用机制，内存占用低，滑动流畅。
 - **网络图片**：内置 `Kingfisher` 支持，自动处理图片加载、缓存和占位图。
 
@@ -29,11 +30,26 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片浏览器，仿
     - 通过 `virtualCount = realCount * multiplier` 创建虚拟数据源，利用 `UICollectionView` 的复用机制实现视觉上的无限滚动。
     - 初始定位到中间位置，确保用户可以向前或向后滚动。
 
-2.  **交互式转场 (Interactive Transition)**:
+2.  **图片/视频缩放 (Image/Video Scaling)**:
+    - **初始显示模式**：图片/视频默认采用 `scaleAspectFit` 方式显示，即长边铺满容器，短边等比例缩放，居中展示。确保图片完整可见，不会裁剪。
+    - **双击切换模式**：
+      - 在初始缩放状态下双击，可在两种模式间切换：
+        - **长边铺满模式**（scaleAspectFit）：长边铺满容器，短边等比例缩放，居中显示。适合查看完整图片。
+        - **短边铺满模式**（scaleAspectFill）：短边铺满容器，长边等比例缩放，可能裁剪部分内容。适合填充屏幕查看细节。
+      - 在捏合缩放后的任意状态下双击，快速切换回初始的长边铺满模式。
+    - **捏合缩放**：基于 `UIScrollView` 的 `viewForZooming` 机制，支持 1.0x - 3.0x 的连续缩放，双击可快速恢复。
+    - **居中处理**：通过 `contentInset` 和 `contentOffset` 的组合使用，确保图片在任何缩放状态下都能正确居中显示。
+
+3.  **交互式转场 (Interactive Transition)**:
     - 实现了 `UIViewControllerTransitioningDelegate` 和 `UIViewControllerAnimatedTransitioning` 协议。
     - **JXZoomPresentAnimator** / **JXZoomDismissAnimator**: 计算源视图（列表中的缩略图）和目标视图（浏览器中的大图）在屏幕坐标系下的位置，通过临时的 `UIImageView` 进行插值动画，实现平滑的缩放效果。
 
-3.  **手势冲突处理**:
+4.  **横竖屏适配 (Orientation Support)**:
+    - 在 `JXPhotoCell` 的 `layoutSubviews` 中监听 `bounds.size` 变化，检测到屏幕旋转时自动重置缩放比例和图片布局。
+    - 旋转后重置为初始的长边铺满模式，确保图片在新尺寸下正确居中显示。
+    - 通过 `lastBoundsSize` 跟踪容器尺寸变化，避免不必要的布局计算。
+
+5.  **手势冲突处理**:
     - 在 `JXPhotoCell` 中处理 `UITapGestureRecognizer`（单击/双击）与 `UIScrollView` 内置手势的冲突。
     - 在 `JXPhotoBrowser` 中处理下滑关闭的 `UIPanGestureRecognizer` 与 `UICollectionView` 滚动手势的共存与互斥逻辑。
 
