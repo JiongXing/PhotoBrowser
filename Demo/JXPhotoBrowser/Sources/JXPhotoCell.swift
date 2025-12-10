@@ -120,9 +120,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     /// 上一次布局的容器尺寸（用于旋转时重置缩放）
     private var lastBoundsSize: CGSize = .zero
     
-    /// 调试日志开关
-    private let enableDebugLog: Bool = true
-    
     // MARK: - Lifecycle
     open override func prepareForReuse() {
         super.prepareForReuse()
@@ -157,7 +154,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
             // 旋转后重置缩放，避免旧尺寸导致的缩放计算错误
             scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
             adjustImageViewFrame()
-            debugLog("layout sizeChanged=\(sizeChanged) bounds=\(bounds.size) zoom=\(scrollView.zoomScale) contentSize=\(scrollView.contentSize)")
         } else if scrollView.zoomScale == scrollView.minimumZoomScale || imageView.frame.isEmpty {
             // 在未缩放状态下，根据图片比例调整 imageView.frame
             // 或者如果 imageView 大小为 0 (异常状态)，也强制调整
@@ -214,14 +210,8 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         }
         
         let imageSize = imageView.frame.size
-        if containerSize.width <= 0 || containerSize.height <= 0 {
-            debugLog("center skip: container zero container=\(containerSize) image=\(imageSize)")
-            return
-        }
-        if imageSize.width <= 0 || imageSize.height <= 0 {
-            debugLog("center skip: image zero container=\(containerSize) image=\(imageSize)")
-            return
-        }
+        if containerSize.width <= 0 || containerSize.height <= 0 { return }
+        if imageSize.width <= 0 || imageSize.height <= 0 { return }
         
         // 使用 contentInset 而非调整 frame，避免分页复用时的偏移遗留
         let horizontalInset = max(0, (containerSize.width - imageSize.width) * 0.5)
@@ -240,20 +230,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
                 scrollView.contentOffset = targetOffset
             }
         }
-        
-        let shouldCenterVertically = imageSize.height < containerSize.height
-        if shouldCenterVertically {
-            debugLog("center inset vertical=\(verticalInset) horizontal=\(horizontalInset) insetChanged=\(insetChanged) image=\(imageSize) container=\(containerSize) zoom=\(scrollView.zoomScale) offset=\(scrollView.contentOffset)")
-        } else {
-            debugLog("center no vertical inset image>=container image=\(imageSize) container=\(containerSize) zoom=\(scrollView.zoomScale) offset=\(scrollView.contentOffset)")
-        }
-    }
-    
-    /// 调试输出
-    private func debugLog(_ message: String) {
-        guard enableDebugLog else { return }
-        let idx = currentIndex.map { "\($0)" } ?? "nil"
-        print("[JXPhotoCell][index:\(idx)] \(message)")
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
