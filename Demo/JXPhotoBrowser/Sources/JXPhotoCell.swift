@@ -132,6 +132,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     /// 上一次布局的容器尺寸（用于旋转时重置缩放）
     private var lastBoundsSize: CGSize = .zero
     
+    /// 缩放模式：true 表示短边铺满（scaleAspectFill），false 表示长边铺满（scaleAspectFit）
+    private var isShortEdgeFit: Bool = false
+    
     // MARK: - Lifecycle
     open override func prepareForReuse() {
         super.prepareForReuse()
@@ -146,6 +149,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
         scrollView.contentOffset = .zero
         scrollView.contentInset = .zero
+        
+        // 重置缩放模式为初始状态（长边铺满）
+        isShortEdgeFit = false
         
         // 恢复初始布局
         adjustImageViewFrame()
@@ -164,8 +170,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         let sizeChanged = lastBoundsSize != bounds.size
         if sizeChanged {
             lastBoundsSize = bounds.size
-            // 旋转后重置缩放，避免旧尺寸导致的缩放计算错误
+            // 旋转后重置缩放和缩放模式，避免旧尺寸导致的缩放计算错误
             scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
+            isShortEdgeFit = false
             adjustImageViewFrame()
         } else if scrollView.zoomScale == scrollView.minimumZoomScale || imageView.frame.isEmpty {
             // 在未缩放状态下，根据图片比例调整 imageView.frame
@@ -185,7 +192,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     /// 根据图片实际尺寸，调整 imageView 的 frame（原点保持 (0,0)）
-    /// 使用 scaleAspectFit 方式：让长边铺满容器，短边等比例缩放，居中展示
+    /// 根据 isShortEdgeFit 状态选择缩放方式：
+    /// - false: scaleAspectFit（长边铺满容器，短边等比例缩放，居中展示）
+    /// - true: scaleAspectFill（短边铺满容器，长边等比例缩放）
     open func adjustImageViewFrame() {
         let containerSize = effectiveContentSize
         guard containerSize.width > 0, containerSize.height > 0 else { return }
@@ -197,11 +206,17 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
             return
         }
         
-        // scaleAspectFit 逻辑：计算缩放比例，让长边铺满容器
         let widthScale = containerSize.width / image.size.width
         let heightScale = containerSize.height / image.size.height
-        // 选择较小的缩放比例，确保长边铺满容器，短边等比例缩放
-        let scale = min(widthScale, heightScale)
+        
+        let scale: CGFloat
+        if isShortEdgeFit {
+            // scaleAspectFill 逻辑：选择较大的缩放比例，确保短边铺满容器，长边等比例缩放
+            scale = max(widthScale, heightScale)
+        } else {
+            // scaleAspectFit 逻辑：选择较小的缩放比例，确保长边铺满容器，短边等比例缩放
+            scale = min(widthScale, heightScale)
+        }
         
         // 计算缩放后的尺寸
         let scaledWidth = image.size.width * scale
@@ -253,16 +268,39 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
-        // 视频播放时可能禁用双击缩放，这里暂时保持一致
         let currentScale = scrollView.zoomScale
-        if currentScale < 1.1 {
-            let targetScale = min(2.0, scrollView.maximumZoomScale)
-            let tapPointInScroll = gesture.location(in: scrollView)
-            let tapPointInImage = imageView.convert(tapPointInScroll, from: scrollView)
-            let rect = zoomRect(for: targetScale, centeredAt: tapPointInImage)
-            scrollView.zoom(to: rect, animated: true)
+        let isInitialScale = abs(currentScale - scrollView.minimumZoomScale) < 0.01
+        
+        if isInitialScale {
+            // 在初始缩放状态下，切换缩放模式（长边铺满 <-> 短边铺满）
+            isShortEdgeFit.toggle()
+            // 先计算新的 frame
+            let oldFrame = imageView.frame
+            adjustImageViewFrame()
+            let newFrame = imageView.frame
+            let newContentSize = imageView.frame.size
+            
+            // 恢复旧 frame 用于动画起点
+            imageView.frame = oldFrame
+            scrollView.contentSize = oldFrame.size
+            centerImageIfNeeded()
+            
+            // 使用动画平滑切换
+            UIView.animate(withDuration: 0.3, animations: {
+                self.imageView.frame = newFrame
+                self.scrollView.contentSize = newContentSize
+                self.centerImageIfNeeded()
+            })
         } else {
+            // 在非初始缩放状态下，切换回初始状态（长边铺满模式）
+            isShortEdgeFit = false
             scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+            // 动画完成后调整 frame
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self = self else { return }
+                self.adjustImageViewFrame()
+                self.centerImageIfNeeded()
+            }
         }
     }
 

@@ -268,14 +268,12 @@ private extension DemoViewController {
     /// 请求相册权限
     func requestPhotoAuthorization(completion: @escaping (Bool) -> Void) {
         let status = PHPhotoLibrary.authorizationStatus()
-//        if status == .authorized || status == .limited {
         if status == .authorized {
             completion(true)
             return
         }
         
         PHPhotoLibrary.requestAuthorization { newStatus in
-//            completion(newStatus == .authorized || newStatus == .limited)
             completion(newStatus == .authorized)
         }
     }
