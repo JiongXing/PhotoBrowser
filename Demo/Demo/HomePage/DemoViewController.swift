@@ -145,6 +145,13 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         // 无论是图片还是视频，都使用 JXPhotoBrowser 进行浏览
         // 如果是视频，JXPhotoBrowser 内部会处理播放逻辑
         let browser = JXPhotoBrowser()
+        
+        // 【示例】注册自定义Cell（方式1：提前注册，推荐）
+        // 使用自定义reuseIdentifier
+        browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
+        // 或者不提供reuseIdentifier，框架会自动生成
+        // browser.register(CustomPhotoCell.self)
+        
         browser.delegate = self
         browser.initialIndex = indexPath.item
         
@@ -174,10 +181,15 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     }
     
     /// 提供 Cell 类，用于区分视频和图片
+    /// 【示例】演示如何使用自定义Cell：对于前3个图片使用自定义Cell
     func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass? {
         let media = items[index]
         switch media.source {
         case .remoteImage:
+            // 示例：前3个图片使用自定义Cell，其他使用默认Cell
+            if index < 3 {
+                return CustomPhotoCell.self
+            }
             return JXPhotoCell.self
         case .remoteVideo:
             return JXVideoCell.self

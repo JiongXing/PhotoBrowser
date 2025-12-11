@@ -143,6 +143,9 @@ open class JXPhotoBrowser: UIViewController {
     /// 转场动画类型
     public var transitionType: JXPhotoBrowserTransitionType = .fade
     
+    /// Cell注册管理器（用于注册自定义Cell类）
+    public let cellRegistry = JXPhotoBrowserCellRegistry.shared
+    
     
     // MARK: - Private Properties
     
@@ -161,8 +164,11 @@ open class JXPhotoBrowser: UIViewController {
         cv.showsHorizontalScrollIndicator = false
         cv.showsVerticalScrollIndicator = false
         cv.isPagingEnabled = true
+        
+        // 注册默认Cell
         cv.register(JXPhotoCell.self, forCellWithReuseIdentifier: JXPhotoCell.reuseIdentifier)
         cv.register(JXVideoCell.self, forCellWithReuseIdentifier: JXVideoCell.videoReuseIdentifier)
+        
         return cv
     }()
     
@@ -469,6 +475,20 @@ open class JXPhotoBrowser: UIViewController {
     
     // MARK: - Setup & Configuration
     
+    /// 注册自定义Cell类
+    /// - Parameters:
+    ///   - cellClass: 要注册的Cell类（必须继承自JXPhotoCell）
+    ///   - reuseIdentifier: 可选的复用标识符，如果为nil则自动生成
+    /// - Returns: 实际使用的reuseIdentifier
+    /// - Note: 建议在创建JXPhotoBrowser实例后、设置delegate之前调用此方法
+    @discardableResult
+    public func register(_ cellClass: AnyClass, forReuseIdentifier reuseIdentifier: String? = nil) -> String {
+        // 注册到管理器
+        let identifier = cellRegistry.register(cellClass, forReuseIdentifier: reuseIdentifier)
+        collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
+        return identifier
+    }
+    
     /// 添加并约束集合视图
     open func setupCollectionView() {
         view.addSubview(collectionView)
@@ -514,11 +534,20 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
         let cellClass: AnyClass? = delegate?.photoBrowser(self, cellClassForItemAt: real)
         
-        // 默认为 JXPhotoCell
+        // 确定使用的reuseIdentifier
         let reuseIdentifier: String
-        if cellClass == JXVideoCell.self {
-            reuseIdentifier = JXVideoCell.videoReuseIdentifier
+        if let cellClass = cellClass {
+            // 尝试从注册管理器获取reuseIdentifier
+            if let identifier = cellRegistry.reuseIdentifier(for: cellClass) {
+                reuseIdentifier = identifier
+                // 重复注册是安全的，不会造成问题
+                collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
+            } else {
+                // 如果未注册，自动注册（会同时注册到管理器和collectionView）
+                reuseIdentifier = register(cellClass)
+            }
         } else {
+            // 默认使用 JXPhotoCell
             reuseIdentifier = JXPhotoCell.reuseIdentifier
         }
         
