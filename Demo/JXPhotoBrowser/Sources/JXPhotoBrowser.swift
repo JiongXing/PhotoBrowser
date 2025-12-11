@@ -283,6 +283,9 @@ open class JXPhotoBrowser: UIViewController {
     // MARK: - Private Methods
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        // 垂直滚动模式下禁用下拉关闭手势，避免与列表滚动冲突
+        if scrollDirection == .vertical { return }
+        
         switch gesture.state {
         case .began:
             guard let cell = visiblePhotoCell() else { return }
@@ -582,6 +585,8 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
 extension JXPhotoBrowser: UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == panGesture {
+            if scrollDirection == .vertical { return false }
+            
             guard let cell = visiblePhotoCell() else { return false }
             // 只有在未缩放且处于顶部时才响应下拉
             let isZoomed = cell.scrollView.zoomScale > 1.0 + 0.01
