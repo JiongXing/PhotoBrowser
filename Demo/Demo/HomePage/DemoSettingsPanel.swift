@@ -148,12 +148,12 @@ class DemoSettingsPanel: UIView {
         backgroundColor = .clear
         
         addSubview(containerView)
+        containerView.addSubview(transitionTypeLabel)
+        containerView.addSubview(transitionTypeSegmentedControl)
         containerView.addSubview(scrollDirectionLabel)
         containerView.addSubview(scrollDirectionSegmentedControl)
         containerView.addSubview(loopingLabel)
         containerView.addSubview(loopingSwitch)
-        containerView.addSubview(transitionTypeLabel)
-        containerView.addSubview(transitionTypeSegmentedControl)
         containerView.addSubview(rotationLabel)
         containerView.addSubview(rotationSwitch)
         
@@ -164,17 +164,8 @@ class DemoSettingsPanel: UIView {
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
             
-            // 滚动方向
-            scrollDirectionLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
-            scrollDirectionLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            scrollDirectionLabel.widthAnchor.constraint(equalToConstant: 80),
-            
-            scrollDirectionSegmentedControl.centerYAnchor.constraint(equalTo: scrollDirectionLabel.centerYAnchor),
-            scrollDirectionSegmentedControl.leadingAnchor.constraint(equalTo: scrollDirectionLabel.trailingAnchor, constant: 12),
-            scrollDirectionSegmentedControl.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            
             // 转场动画
-            transitionTypeLabel.topAnchor.constraint(equalTo: scrollDirectionLabel.bottomAnchor, constant: 20),
+            transitionTypeLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 16),
             transitionTypeLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             transitionTypeLabel.widthAnchor.constraint(equalToConstant: 80),
             
@@ -182,8 +173,17 @@ class DemoSettingsPanel: UIView {
             transitionTypeSegmentedControl.leadingAnchor.constraint(equalTo: transitionTypeLabel.trailingAnchor, constant: 12),
             transitionTypeSegmentedControl.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             
+            // 滚动方向
+            scrollDirectionLabel.topAnchor.constraint(equalTo: transitionTypeLabel.bottomAnchor, constant: 20),
+            scrollDirectionLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            scrollDirectionLabel.widthAnchor.constraint(equalToConstant: 80),
+            
+            scrollDirectionSegmentedControl.centerYAnchor.constraint(equalTo: scrollDirectionLabel.centerYAnchor),
+            scrollDirectionSegmentedControl.leadingAnchor.constraint(equalTo: scrollDirectionLabel.trailingAnchor, constant: 12),
+            scrollDirectionSegmentedControl.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            
             // 无限循环
-            loopingLabel.topAnchor.constraint(equalTo: transitionTypeLabel.bottomAnchor, constant: 20),
+            loopingLabel.topAnchor.constraint(equalTo: scrollDirectionLabel.bottomAnchor, constant: 20),
             loopingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             loopingLabel.widthAnchor.constraint(equalToConstant: 80),
             
