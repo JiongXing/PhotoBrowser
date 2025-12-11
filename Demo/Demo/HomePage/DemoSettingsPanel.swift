@@ -40,13 +40,6 @@ class DemoSettingsPanel: UIView {
         }
     }
     
-    /// 是否允许屏幕旋转
-    var allowsRotation: Bool = true {
-        didSet {
-            rotationSwitch.isOn = allowsRotation
-        }
-    }
-    
     // MARK: - Private Properties
     
     /// 滚动方向标签
@@ -101,22 +94,6 @@ class DemoSettingsPanel: UIView {
     }()
     
     /// 屏幕旋转标签
-    private let rotationLabel: UILabel = {
-        let label = UILabel()
-        label.text = "允许旋转"
-        label.font = .systemFont(ofSize: 14)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    /// 屏幕旋转开关
-    private let rotationSwitch: UISwitch = {
-        let switchControl = UISwitch()
-        switchControl.isOn = true
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
-        return switchControl
-    }()
-    
     /// 容器视图
     private let containerView: UIView = {
         let view = UIView()
@@ -154,8 +131,6 @@ class DemoSettingsPanel: UIView {
         containerView.addSubview(scrollDirectionSegmentedControl)
         containerView.addSubview(loopingLabel)
         containerView.addSubview(loopingSwitch)
-        containerView.addSubview(rotationLabel)
-        containerView.addSubview(rotationSwitch)
         
         NSLayoutConstraint.activate([
             // 容器视图
@@ -186,18 +161,9 @@ class DemoSettingsPanel: UIView {
             loopingLabel.topAnchor.constraint(equalTo: scrollDirectionLabel.bottomAnchor, constant: 20),
             loopingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             loopingLabel.widthAnchor.constraint(equalToConstant: 80),
-            
             loopingSwitch.centerYAnchor.constraint(equalTo: loopingLabel.centerYAnchor),
             loopingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            
-            // 屏幕旋转
-            rotationLabel.topAnchor.constraint(equalTo: loopingLabel.bottomAnchor, constant: 20),
-            rotationLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            rotationLabel.widthAnchor.constraint(equalToConstant: 80),
-            rotationLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),
-            
-            rotationSwitch.centerYAnchor.constraint(equalTo: rotationLabel.centerYAnchor),
-            rotationSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16)
+            loopingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])
     }
     
@@ -205,7 +171,6 @@ class DemoSettingsPanel: UIView {
         scrollDirectionSegmentedControl.addTarget(self, action: #selector(scrollDirectionChanged), for: .valueChanged)
         loopingSwitch.addTarget(self, action: #selector(loopingChanged), for: .valueChanged)
         transitionTypeSegmentedControl.addTarget(self, action: #selector(transitionTypeChanged), for: .valueChanged)
-        rotationSwitch.addTarget(self, action: #selector(rotationChanged), for: .valueChanged)
     }
     
     // MARK: - Action Methods
@@ -229,9 +194,5 @@ class DemoSettingsPanel: UIView {
         default:
             break
         }
-    }
-    
-    @objc private func rotationChanged() {
-        allowsRotation = rotationSwitch.isOn
     }
 }

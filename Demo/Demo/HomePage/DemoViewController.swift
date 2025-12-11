@@ -31,6 +31,16 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     private weak var photoBrowser: JXPhotoBrowser?
     
+    /// 是否允许自动旋转（固定为 false，不支持设备旋转）
+    open override var shouldAutorotate: Bool {
+        return false
+    }
+    
+    /// 支持的屏幕方向（固定为竖屏）
+    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupData()
@@ -142,7 +152,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         browser.scrollDirection = settingsPanel.scrollDirection
         browser.transitionType = settingsPanel.transitionType
         browser.isLoopingEnabled = settingsPanel.isLoopingEnabled
-        browser.allowsRotation = settingsPanel.allowsRotation
         
         self.photoBrowser = browser
         browser.present(from: self)

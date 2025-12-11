@@ -9,6 +9,3 @@ alwaysApply: true
 
 # 开发语言
 使用 Swift + UIKit 开发。
-
-# 项目说明
-项目说明文件是 README.md，如果新增了功能特性或变更了外部调用接口，请同步更新 README。

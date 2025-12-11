@@ -143,9 +143,6 @@ open class JXPhotoBrowser: UIViewController {
     /// 转场动画类型
     public var transitionType: JXPhotoBrowserTransitionType = .fade
     
-    /// 是否允许屏幕旋转（默认允许）
-    public var allowsRotation: Bool = true
-    
     
     // MARK: - Private Properties
     
@@ -254,30 +251,14 @@ open class JXPhotoBrowser: UIViewController {
         }
     }
     
-    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        guard realCount > 0 else { return }
-        
-        let currentVirtual = calculateCurrentVirtualIndex()
-        let currentReal = realIndex(fromVirtual: currentVirtual)
-        let targetVirtual = nearestVirtualIndex(for: currentReal, near: currentVirtual)
-        
-        coordinator.animate(alongsideTransition: { [weak self] _ in
-            self?.scrollToVirtualIndex(targetVirtual, size: size)
-        }, completion: { [weak self] _ in
-            self?.scrollToVirtualIndex(targetVirtual, size: size)
-            self?.updateCurrentPageIndex()
-        })
-    }
-    
-    /// 是否允许自动旋转
+    /// 是否允许自动旋转（固定为 false，不支持设备旋转）
     open override var shouldAutorotate: Bool {
-        return allowsRotation
+        return false
     }
     
-    /// 支持的屏幕方向
+    /// 支持的屏幕方向（固定为竖屏）
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return allowsRotation ? .all : .portrait
+        return .portrait
     }
     
     // MARK: - Private Methods
