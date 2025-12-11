@@ -114,10 +114,13 @@ open class JXPhotoBrowser: UIViewController {
     public private(set) var pageIndex: Int = 0 {
         didSet {
             if pageIndex != oldValue {
-                // 恢复旧的
-                delegate?.photoBrowser(self, setOriginViewHidden: false, at: oldValue)
-                // 隐藏新的
-                delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+                // 仅在 Zoom 转场动画时，才对源视图进行显隐操作
+                if transitionType == .zoom {
+                    // 恢复旧的
+                    delegate?.photoBrowser(self, setOriginViewHidden: false, at: oldValue)
+                    // 隐藏新的
+                    delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+                }
             }
         }
     }
@@ -214,22 +217,26 @@ open class JXPhotoBrowser: UIViewController {
             scrollToInitialIndex()
             didScrollToInitial = true
         }
-        // 初始显示时隐藏源视图
-        delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+        // 仅在 Zoom 转场动画时，初始显示时隐藏源视图
+        if transitionType == .zoom {
+            delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+        }
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        // 页面消失时（如非交互关闭），尝试恢复
+        // 仅在 Zoom 转场动画时，页面消失时（如非交互关闭），尝试恢复
         // 注意：交互关闭时会由 Animator 处理恢复，这里只是兜底
-        if let coordinator = transitionCoordinator {
-            // 在转场结束后统一恢复，避免提前显示导致重影
-            coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-                guard let self = self else { return }
-                self.delegate?.photoBrowser(self, setOriginViewHidden: false, at: self.pageIndex)
+        if transitionType == .zoom {
+            if let coordinator = transitionCoordinator {
+                // 在转场结束后统一恢复，避免提前显示导致重影
+                coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.delegate?.photoBrowser(self, setOriginViewHidden: false, at: self.pageIndex)
+                }
+            } else {
+                delegate?.photoBrowser(self, setOriginViewHidden: false, at: pageIndex)
             }
-        } else {
-            delegate?.photoBrowser(self, setOriginViewHidden: false, at: pageIndex)
         }
     }
     
@@ -289,8 +296,10 @@ open class JXPhotoBrowser: UIViewController {
                 initialImageCenter = imageView.center
             }
             
-            // 确保源视图隐藏
-            delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+            // 仅在 Zoom 转场动画时，确保源视图隐藏
+            if transitionType == .zoom {
+                delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+            }
             
         case .changed:
             guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else { return }
