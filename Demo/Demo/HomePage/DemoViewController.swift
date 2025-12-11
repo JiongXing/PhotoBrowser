@@ -15,6 +15,9 @@ import Photos
 // MARK: - ViewController
 class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
+    /// 功能设置面板
+    private var settingsPanel: JXPhotoBrowserSettingsPanel!
+    
     private var collectionView: UICollectionView!
     
     /// 网络状态监视器（监听网络连通性变化）
@@ -32,10 +35,23 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         super.viewDidLoad()
         setupData()
         setupNetworkMonitoring()
+        setupSettingsPanel()
         setupCollectionView()
     }
     
     // MARK: - Helper Methods
+    
+    private func setupSettingsPanel() {
+        settingsPanel = JXPhotoBrowserSettingsPanel()
+        settingsPanel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(settingsPanel)
+        
+        NSLayoutConstraint.activate([
+            settingsPanel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            settingsPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            settingsPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
     
     private func setupData() {
         let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
@@ -74,7 +90,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.topAnchor.constraint(equalTo: settingsPanel.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -121,9 +137,12 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         let browser = JXPhotoBrowser()
         browser.delegate = self
         browser.initialIndex = indexPath.item
-        browser.scrollDirection = .horizontal
-        browser.transitionType = .zoom
-        browser.isLoopingEnabled = true
+        
+        // 使用设置面板的配置
+        browser.scrollDirection = settingsPanel.scrollDirection
+        browser.transitionType = settingsPanel.transitionType
+        browser.isLoopingEnabled = settingsPanel.isLoopingEnabled
+        browser.allowsRotation = settingsPanel.allowsRotation
         
         self.photoBrowser = browser
         browser.present(from: self)
