@@ -1,5 +1,5 @@
 //
-//  JXPhotoBrowserSettingsPanel.swift
+//  DemoSettingsPanel.swift
 //  Demo
 //
 //  Created by jxing on 2025/10/24.
@@ -9,7 +9,7 @@ import UIKit
 import JXPhotoBrowser
 
 /// JXPhotoBrowser 功能设置面板
-class JXPhotoBrowserSettingsPanel: UIView {
+class DemoSettingsPanel: UIView {
     
     // MARK: - Public Properties
     
@@ -17,13 +17,6 @@ class JXPhotoBrowserSettingsPanel: UIView {
     var scrollDirection: JXPhotoBrowserScrollDirection = .horizontal {
         didSet {
             scrollDirectionSegmentedControl.selectedSegmentIndex = scrollDirection == .horizontal ? 0 : 1
-        }
-    }
-    
-    /// 是否启用无限循环滚动
-    var isLoopingEnabled: Bool = true {
-        didSet {
-            loopingSwitch.isOn = isLoopingEnabled
         }
     }
     
@@ -37,6 +30,13 @@ class JXPhotoBrowserSettingsPanel: UIView {
             case .none: index = 2
             }
             transitionTypeSegmentedControl.selectedSegmentIndex = index
+        }
+    }
+    
+    /// 是否启用无限循环滚动
+    var isLoopingEnabled: Bool = true {
+        didSet {
+            loopingSwitch.isOn = isLoopingEnabled
         }
     }
     
@@ -66,23 +66,6 @@ class JXPhotoBrowserSettingsPanel: UIView {
         return control
     }()
     
-    /// 无限循环标签
-    private let loopingLabel: UILabel = {
-        let label = UILabel()
-        label.text = "无限循环"
-        label.font = .systemFont(ofSize: 14)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    /// 无限循环开关
-    private let loopingSwitch: UISwitch = {
-        let switchControl = UISwitch()
-        switchControl.isOn = true
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
-        return switchControl
-    }()
-    
     /// 转场动画标签
     private let transitionTypeLabel: UILabel = {
         let label = UILabel()
@@ -98,6 +81,23 @@ class JXPhotoBrowserSettingsPanel: UIView {
         control.selectedSegmentIndex = 1
         control.translatesAutoresizingMaskIntoConstraints = false
         return control
+    }()
+    
+    /// 无限循环标签
+    private let loopingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "无限循环"
+        label.font = .systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    /// 无限循环开关
+    private let loopingSwitch: UISwitch = {
+        let switchControl = UISwitch()
+        switchControl.isOn = true
+        switchControl.translatesAutoresizingMaskIntoConstraints = false
+        return switchControl
     }()
     
     /// 屏幕旋转标签
@@ -173,16 +173,8 @@ class JXPhotoBrowserSettingsPanel: UIView {
             scrollDirectionSegmentedControl.leadingAnchor.constraint(equalTo: scrollDirectionLabel.trailingAnchor, constant: 12),
             scrollDirectionSegmentedControl.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             
-            // 无限循环
-            loopingLabel.topAnchor.constraint(equalTo: scrollDirectionLabel.bottomAnchor, constant: 20),
-            loopingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            loopingLabel.widthAnchor.constraint(equalToConstant: 80),
-            
-            loopingSwitch.centerYAnchor.constraint(equalTo: loopingLabel.centerYAnchor),
-            loopingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            
             // 转场动画
-            transitionTypeLabel.topAnchor.constraint(equalTo: loopingLabel.bottomAnchor, constant: 20),
+            transitionTypeLabel.topAnchor.constraint(equalTo: scrollDirectionLabel.bottomAnchor, constant: 20),
             transitionTypeLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             transitionTypeLabel.widthAnchor.constraint(equalToConstant: 80),
             
@@ -190,8 +182,16 @@ class JXPhotoBrowserSettingsPanel: UIView {
             transitionTypeSegmentedControl.leadingAnchor.constraint(equalTo: transitionTypeLabel.trailingAnchor, constant: 12),
             transitionTypeSegmentedControl.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             
+            // 无限循环
+            loopingLabel.topAnchor.constraint(equalTo: transitionTypeLabel.bottomAnchor, constant: 20),
+            loopingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            loopingLabel.widthAnchor.constraint(equalToConstant: 80),
+            
+            loopingSwitch.centerYAnchor.constraint(equalTo: loopingLabel.centerYAnchor),
+            loopingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            
             // 屏幕旋转
-            rotationLabel.topAnchor.constraint(equalTo: transitionTypeLabel.bottomAnchor, constant: 20),
+            rotationLabel.topAnchor.constraint(equalTo: loopingLabel.bottomAnchor, constant: 20),
             rotationLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
             rotationLabel.widthAnchor.constraint(equalToConstant: 80),
             rotationLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16),

@@ -34,10 +34,13 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     
     /// 生命周期：Cell 即将复用（传入上一次对应的 index）
     func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int)
+    
     /// 生命周期：Cell 复用完成（已关联到新的 index）
     func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int)
+    
     /// 生命周期：Cell 即将显示
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int)
+    
     /// 生命周期：Cell 已消失
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int)
     
@@ -55,6 +58,7 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     
     /// 提供 Cell 加载图片所需的资源（原图 + 可选缩略图）
     func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource?
+    
     /// 提供 Cell 类，若返回 nil，则使用默认的 JXPhotoCell
     func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass?
     

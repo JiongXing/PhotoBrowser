@@ -16,7 +16,7 @@ import Photos
 class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
     /// 功能设置面板
-    private var settingsPanel: JXPhotoBrowserSettingsPanel!
+    private var settingsPanel: DemoSettingsPanel!
     
     private var collectionView: UICollectionView!
     
@@ -42,7 +42,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     // MARK: - Helper Methods
     
     private func setupSettingsPanel() {
-        settingsPanel = JXPhotoBrowserSettingsPanel()
+        settingsPanel = DemoSettingsPanel()
         settingsPanel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(settingsPanel)
         
