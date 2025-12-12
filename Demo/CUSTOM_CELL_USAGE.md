@@ -50,12 +50,23 @@ func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> A
 
 ## 创建自定义Cell
 
-### 基本要求
+### 方式一：继承 JXPhotoCell（推荐，简单易用）
 
 1. **继承自 `JXPhotoCell`**：
 ```swift
 class CustomPhotoCell: JXPhotoCell {
     // 自定义实现
+    // 自动获得缩放、转场、手势等功能
+}
+```
+
+### 方式二：实现协议（高自由度，完全自定义）
+
+1. **实现 `JXPhotoBrowserCellProtocol` 协议**：
+```swift
+class StandaloneCustomCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
+    // 完全自定义实现
+    // 需要自己实现所有功能
 }
 ```
 
@@ -85,9 +96,36 @@ override func reloadContent() {
 }
 ```
 
+### 协议方式的要求
+
+如果选择实现协议（不继承 `JXPhotoCell`），只需要实现以下**两个必需属性**：
+
+```swift
+weak var browser: JXPhotoBrowser? { get set }
+var currentIndex: Int? { get set }
+```
+
+**框架会自动设置这两个属性**：
+- `browser`：框架在创建Cell时自动设置，可用于调用浏览器方法（如 `browser?.dismissSelf()`）
+- `currentIndex`：框架在Cell复用时自动设置，自定义Cell可以监听此属性变化来加载内容
+
+**可选扩展**（提供默认实现，按需实现）：
+```swift
+var transitionImageView: UIImageView? { get }  // 用于Zoom转场动画，默认nil（使用Fade动画）
+var interactiveScrollView: UIScrollView? { get }  // 用于下拉关闭手势，默认nil（不支持下拉关闭）
+```
+
+**数据模型和加载逻辑完全自由**：
+- 不需要使用 `JXPhotoResource`，可以使用任何自定义数据模型
+- 不需要实现 `reloadContent()`，可以自己监听 `currentIndex` 的变化来加载内容
+- 可以通过 `browser?.delegate?.photoBrowser(_:resourceForItemAt:)` 获取框架提供的数据，也可以完全使用自己的数据源
+
+**注意**：实现协议方式需要自己处理所有功能（图片加载、转场动画、手势等），适合需要完全自定义的场景。
+
 ### 完整示例
 
-参考 `Demo/HomePage/CustomPhotoCell.swift` 中的完整实现示例。
+- **继承方式**：参考 `Demo/HomePage/CustomPhotoCell.swift`
+- **协议方式**：参考 `Demo/HomePage/StandaloneCustomCell.swift`
 
 ## API 说明
 
@@ -115,7 +153,9 @@ Cell注册管理器的只读属性，用于访问注册信息。
 
 ## 注意事项
 
-1. **Cell类必须继承自 `JXPhotoCell`**：框架依赖 `JXPhotoCell` 的基础功能（如缩放、转场等）
+1. **Cell类要求**：
+   - **方式一（继承）**：必须继承自 `JXPhotoCell`，自动获得缩放、转场、手势等功能
+   - **方式二（协议）**：必须实现 `JXPhotoBrowserCellProtocol` 协议，需要自己实现所有功能
 
 2. **reuseIdentifier 唯一性**：如果指定自定义 `reuseIdentifier`，请确保其唯一性，避免与其他Cell冲突
 

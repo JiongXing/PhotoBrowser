@@ -31,7 +31,7 @@ public class JXPhotoBrowserCellRegistry {
     
     /// 注册自定义Cell类
     /// - Parameters:
-    ///   - cellClass: 要注册的Cell类（必须继承自JXPhotoCell）
+    ///   - cellClass: 要注册的Cell类（必须实现JXPhotoBrowserCellProtocol协议）
     ///   - reuseIdentifier: 可选的复用标识符，如果为nil则自动生成
     /// - Returns: 实际使用的reuseIdentifier
     @discardableResult

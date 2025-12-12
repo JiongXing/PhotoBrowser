@@ -191,14 +191,15 @@ open class JXPhotoBrowser: UIViewController {
     /// 交互手势
     private var panGesture: UIPanGestureRecognizer!
     
-    /// 正在进行下拉交互的 Cell（避免滚动导致目标错误）
-    private weak var interactiveDismissCell: JXPhotoCell?
     
     /// 下拉交互开始时的触摸点（用于计算跟随偏移）
     private var initialTouchPoint: CGPoint = .zero
     
     /// 下拉交互开始时的图片中心点
     private var initialImageCenter: CGPoint = .zero
+    
+    /// 正在进行下拉交互的Cell（使用协议类型以支持自定义Cell）
+    private weak var interactiveDismissCellProtocol: JXPhotoBrowserCellProtocol?
     
     // MARK: - Lifecycle Methods
     
@@ -275,13 +276,15 @@ open class JXPhotoBrowser: UIViewController {
         
         switch gesture.state {
         case .began:
-            guard let cell = visiblePhotoCell() else { return }
-            interactiveDismissCell = cell
+            // 优先使用协议类型（支持自定义Cell），如果失败则使用JXPhotoCell（向后兼容）
+            guard let cell = (visibleCell() ?? visiblePhotoCell() as? JXPhotoBrowserCellProtocol) else { return }
+            interactiveDismissCellProtocol = cell
             collectionView.isScrollEnabled = false
-            cell.scrollView.isScrollEnabled = false
+            cell.interactiveScrollView?.isScrollEnabled = false
             
             // 记录初始状态以计算跟随
-            initialTouchPoint = gesture.location(in: cell.scrollView)
+            let scrollView = cell.interactiveScrollView ?? collectionView
+            initialTouchPoint = gesture.location(in: scrollView)
             if let imageView = cell.transitionImageView {
                 initialImageCenter = imageView.center
             }
@@ -292,7 +295,7 @@ open class JXPhotoBrowser: UIViewController {
             }
             
         case .changed:
-            guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else { return }
+            guard let cell = interactiveDismissCellProtocol, let imageView = cell.transitionImageView else { return }
             let translation = gesture.translation(in: view)
             
             // 下拉时缩小；上拉时（负值）不放大，保持原大小但跟随位移
@@ -318,7 +321,7 @@ open class JXPhotoBrowser: UIViewController {
             view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
             
         case .ended, .cancelled:
-            guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else {
+            guard let cell = interactiveDismissCellProtocol, let imageView = cell.transitionImageView else {
                 collectionView.isScrollEnabled = true
                 return
             }
@@ -338,16 +341,16 @@ open class JXPhotoBrowser: UIViewController {
                     self.view.backgroundColor = .black
                 }) { _ in
                     self.collectionView.isScrollEnabled = true
-                    cell.scrollView.isScrollEnabled = true
-                    self.interactiveDismissCell = nil
+                    cell.interactiveScrollView?.isScrollEnabled = true
+                    self.interactiveDismissCellProtocol = nil
                 }
             }
         default:
             collectionView.isScrollEnabled = true
-            if let cell = interactiveDismissCell {
-                cell.scrollView.isScrollEnabled = true
+            if let cell = interactiveDismissCellProtocol {
+                cell.interactiveScrollView?.isScrollEnabled = true
             }
-            interactiveDismissCell = nil
+            interactiveDismissCellProtocol = nil
         }
     }
     
@@ -425,9 +428,10 @@ open class JXPhotoBrowser: UIViewController {
     
     /// Cell 触发的长按事件回调给业务方
     /// - Parameter cell: 触发长按的 Cell
-    func handleLongPress(from cell: JXPhotoCell) {
+    func handleLongPress(from cell: JXPhotoBrowserCellProtocol) {
         guard let index = cell.currentIndex else { return }
-        let resource = cell.currentResource ?? delegate?.photoBrowser(self, resourceForItemAt: index)
+        // 从delegate获取资源（不再依赖cell.currentResource）
+        let resource = delegate?.photoBrowser(self, resourceForItemAt: index)
         let sourceView = cell.transitionImageView ?? cell
         delegate?.photoBrowser(self, didLongPressItemAt: index, resource: resource, sourceView: sourceView)
     }
@@ -473,11 +477,16 @@ open class JXPhotoBrowser: UIViewController {
         }
     }
     
+    /// 当前展示中的 Cell（协议类型，支持自定义Cell）
+    open func visibleCell() -> JXPhotoBrowserCellProtocol? {
+        return visiblePhotoCell() as? JXPhotoBrowserCellProtocol
+    }
+    
     // MARK: - Setup & Configuration
     
     /// 注册自定义Cell类
     /// - Parameters:
-    ///   - cellClass: 要注册的Cell类（必须继承自JXPhotoCell）
+    ///   - cellClass: 要注册的Cell类（必须实现JXPhotoBrowserCellProtocol协议）
     ///   - reuseIdentifier: 可选的复用标识符，如果为nil则自动生成
     /// - Returns: 实际使用的reuseIdentifier
     /// - Note: 建议在创建JXPhotoBrowser实例后、设置delegate之前调用此方法
@@ -551,29 +560,59 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
             reuseIdentifier = JXPhotoCell.reuseIdentifier
         }
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! JXPhotoCell
-        cell.browser = self
-        if realCount > 0 {
-            cell.currentIndex = real
-            delegate?.photoBrowser(self, didReuse: cell, at: real)
-        } else {
-            cell.currentIndex = nil
+        // Dequeue cell并尝试转换为协议类型（支持自定义Cell）
+        let dequeuedCell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+        
+        // 尝试转换为协议类型
+        if let cell = dequeuedCell as? JXPhotoBrowserCellProtocol {
+            // 设置协议要求的属性
+            cell.browser = self
+            if realCount > 0 {
+                cell.currentIndex = real
+                // 如果也是JXPhotoCell类型，调用delegate方法（向后兼容）
+                if let photoCell = cell as? JXPhotoCell {
+                    delegate?.photoBrowser(self, didReuse: photoCell, at: real)
+                }
+            } else {
+                cell.currentIndex = nil
+            }
+            return dequeuedCell
         }
-        return cell
+        
+        // 如果转换失败，尝试转换为JXPhotoCell（向后兼容）
+        guard let fallbackCell = dequeuedCell as? JXPhotoCell else {
+            // 如果都不符合，返回原始cell（虽然不应该发生）
+            return dequeuedCell
+        }
+        
+        fallbackCell.browser = self
+        if realCount > 0 {
+            fallbackCell.currentIndex = real
+            delegate?.photoBrowser(self, didReuse: fallbackCell, at: real)
+        } else {
+            fallbackCell.currentIndex = nil
+        }
+        return fallbackCell
     }
     
     // 生命周期：Cell 即将显示
     open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? JXPhotoCell else { return }
+        guard let protocolCell = cell as? JXPhotoBrowserCellProtocol else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        delegate?.photoBrowser(self, willDisplay: cell, at: real)
+        // 如果也是JXPhotoCell类型，调用delegate方法（向后兼容）
+        if let photoCell = protocolCell as? JXPhotoCell {
+            delegate?.photoBrowser(self, willDisplay: photoCell, at: real)
+        }
     }
     
     // 生命周期：Cell 已消失
     open func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? JXPhotoCell else { return }
+        guard let protocolCell = cell as? JXPhotoBrowserCellProtocol else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        delegate?.photoBrowser(self, didEndDisplaying: cell, at: real)
+        // 如果也是JXPhotoCell类型，调用delegate方法（向后兼容）
+        if let photoCell = protocolCell as? JXPhotoCell {
+            delegate?.photoBrowser(self, didEndDisplaying: photoCell, at: real)
+        }
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {

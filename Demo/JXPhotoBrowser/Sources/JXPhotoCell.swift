@@ -8,7 +8,7 @@ import Kingfisher
 import AVFoundation
 
 /// 支持图片捏合缩放查看的 Cell
-open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
+open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrowserCellProtocol {
     // MARK: - Static
     public static let reuseIdentifier = "JXPhotoCell"
     
@@ -163,9 +163,13 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate {
         playButton.isHidden = true
     }
     
-    // MARK: - Transition Helper
+    // MARK: - JXPhotoBrowserCellProtocol
+    
     /// 若调用方提供的是 UIImageView，则可参与几何匹配 Zoom 动画
     open var transitionImageView: UIImageView? { imageView }
+    
+    /// 用于下拉关闭手势的滚动视图
+    open var interactiveScrollView: UIScrollView? { scrollView }
 
     open override func layoutSubviews() {
         super.layoutSubviews()
