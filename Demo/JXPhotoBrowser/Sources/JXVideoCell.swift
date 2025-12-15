@@ -5,7 +5,6 @@
 
 import UIKit
 import AVFoundation
-import Kingfisher
 
 open class JXVideoCell: JXPhotoCell {
     public static let videoReuseIdentifier = "JXVideoCell"
@@ -31,22 +30,13 @@ open class JXVideoCell: JXPhotoCell {
     }
     
     open override func reloadContent() {
-        // 视频相关逻辑
-        guard let browser = browser, let index = currentIndex else { return }
-        
-        // 重置状态
         stopVideo()
-        
-        if let res = browser.delegate?.photoBrowser(browser, resourceForItemAt: index) {
-            self.videoURL = res.videoURL
-            playButton.isHidden = (res.videoURL == nil)
-            
-            // 确保 playButton 响应视频播放
+        videoURL = currentResource?.videoURL
+        playButton.isHidden = (videoURL == nil)
+        if videoURL != nil {
             setupVideoActions()
-            
-            // 直接加载封面图（使用父类的加载逻辑）
-            super.reloadContent()
         }
+        super.reloadContent()
     }
     
     open override func handleSingleTap(_ gesture: UITapGestureRecognizer) {

@@ -22,17 +22,17 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         }
 
         container.addSubview(toView)
-        toView.alpha = 0
-        toView.layoutIfNeeded()
-
-        // 确保初始 Cell 已经就绪，避免目标视图为空
-        toVC.prepareForPresentTransitionIfNeeded()
 
         // 前置条件不满足则直接降级为淡入
         guard let originView = toVC.delegate?.photoBrowser(toVC, zoomOriginViewAt: toVC.initialIndex),
               let zoomView = toVC.delegate?.photoBrowser(toVC, zoomViewForItemAt: toVC.initialIndex, isPresenting: true),
               let targetIV = toVC.visiblePhotoCell()?.transitionImageView, targetIV.bounds.size != .zero else {
-            animateFadeIn(view: toView, duration: duration, ctx: ctx)
+            toView.alpha = 0
+            UIView.animate(withDuration: duration, animations: {
+                toView.alpha = 1
+            }) { finished in
+                ctx.completeTransition(finished)
+            }
             return
         }
 
@@ -51,23 +51,12 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
 
         UIView.animate(withDuration: duration, animations: {
             zoomView.frame = endFrame
-            toView.alpha = 1
+//            toView.alpha = 1
         }) { finished in
             // 还原
             targetIV.isHidden = false
             originView.isHidden = false
             zoomView.removeFromSuperview()
-            ctx.completeTransition(finished)
-        }
-    }
-
-    // MARK: - Helpers
-
-    /// 降级为淡入动画（可覆写）
-    open func animateFadeIn(view: UIView, duration: TimeInterval, ctx: UIViewControllerContextTransitioning) {
-        UIView.animate(withDuration: duration, animations: {
-            view.alpha = 1
-        }) { finished in
             ctx.completeTransition(finished)
         }
     }

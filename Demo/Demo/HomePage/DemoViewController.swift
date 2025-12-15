@@ -142,15 +142,10 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     // MARK: - 交互：点击视频进行播放
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // 无论是图片还是视频，都使用 JXPhotoBrowser 进行浏览
-        // 如果是视频，JXPhotoBrowser 内部会处理播放逻辑
         let browser = JXPhotoBrowser()
         
-        // 【示例】注册自定义Cell（方式1：提前注册，推荐）
-        // 使用自定义reuseIdentifier
+        // 【示例】注册自定义Cell
         browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
-        // 或者不提供reuseIdentifier，框架会自动生成
-        // browser.register(CustomPhotoCell.self)
         
         browser.delegate = self
         browser.initialIndex = indexPath.item
@@ -180,39 +175,29 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         return items.count
     }
     
-    /// 提供 Cell 类，用于区分视频和图片
-    /// 【示例】演示如何使用自定义Cell：对于前3个图片使用自定义Cell
-    func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass? {
-        let media = items[index]
-        switch media.source {
-        case .remoteImage:
-            // 示例：前3个图片使用自定义Cell，其他使用默认Cell
-            if index < 3 {
-                return CustomPhotoCell.self
-            }
-            return JXPhotoCell.self
-        case .remoteVideo:
-            return JXVideoCell.self
-        }
-    }
-    
-    /// 提供资源（原图 + 缩略图 + 视频），加载逻辑由 Cell 内部处理
-    func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? {
+    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let media = items[index]
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
-            return JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+            if index < 3 {
+                let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
+                cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+                return cell
+            } else {
+                let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+                cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+                return cell
+            }
         case let .remoteVideo(url, thumbnailURL):
-            // 视频模式下，直接使用提供的封面图 URL
-            return JXPhotoResource(imageURL: thumbnailURL, thumbnailURL: thumbnailURL, videoURL: url)
+            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXVideoCell.videoReuseIdentifier, for: indexPath) as! JXVideoCell
+            cell.currentResource = JXPhotoResource(imageURL: thumbnailURL, thumbnailURL: thumbnailURL, videoURL: url)
+            return cell
         }
     }
     
-    // 生命周期：将要显示（可做轻量 UI 调整）
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) { }
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) { }
     
-    // 生命周期：已消失（可回收资源）
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) { }
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) { }
     
     // 为 Zoom 转场提供源缩略图视图（用于起点几何计算）
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
@@ -234,37 +219,10 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     
     // 控制源缩略图的显隐（浏览器切换图片时调用）
     func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {
-        // 由于我们现在依赖 browser.pageIndex 来控制显隐（在 cellForItemAt 中），
-        // 且 browser.pageIndex 在调用此代理方法前已经更新。
-        // 所以我们只需要触发受影响 Cell 的更新即可。
-        
-        // 1. 找到当前 index 对应的 Cell 并更新
         let ip = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell {
-            // 直接触发 configure 或者手动设置 isHidden
-            // 推荐手动设置，比 reloadItems 更轻量
             cell.imageView.isHidden = hidden
         }
-        
-        // 2. 如果是显示（hidden=false），说明可能是上一个页面，需要恢复
-        // 但其实上一个页面的恢复在 updateHiddenOriginView 中已经通过 restoreHiddenOriginViewIfNeeded 处理了
-        // restore 会调用 setOriginViewHidden(false, at: oldIndex)
-        // 所以这里只要处理好当前传进来的 index 即可
-    }
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, didLongPressItemAt index: Int, resource: JXPhotoResource?, sourceView: UIView) {
-        guard let resource = resource else { return }
-        let downloadTitle = resource.videoURL == nil ? "下载图片到系统相册" : "下载视频到系统相册"
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: downloadTitle, style: .default, handler: { [weak self] _ in
-            self?.downloadToAlbum(resource: resource, presentingViewController: browser)
-        }))
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
-        if let popover = alert.popoverPresentationController {
-            popover.sourceView = sourceView
-            popover.sourceRect = sourceView.bounds
-        }
-        browser.present(alert, animated: true)
     }
 }
 
@@ -369,4 +327,3 @@ private extension DemoViewController {
         }
     }
 }
-

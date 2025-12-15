@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   - 支持无限循环滑动
   - 内置 Zoom/Fade/None 转场动画
   - 支持从缩略图几何匹配无缝缩放
-  - 远程图片加载依赖 Kingfisher
+  - 图片加载通过协议抽象，可自由接入第三方库
   DESC
 
   s.homepage         = 'https://example.com/JXPhotoBrowser'
@@ -22,5 +22,4 @@ Pod::Spec.new do |s|
   s.source_files     = 'Sources/**/*.{swift}'
 
   s.frameworks       = 'UIKit', 'AVFoundation'
-  s.dependency       'Kingfisher'
 end

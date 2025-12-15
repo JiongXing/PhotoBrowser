@@ -28,59 +28,36 @@ public struct JXPhotoResource {
 
 // MARK: - Delegate Protocol
 
+public typealias JXPhotoBrowserAnyCell = UICollectionViewCell & JXPhotoBrowserCellProtocol
+
 public protocol JXPhotoBrowserDelegate: AnyObject {
-    /// 返回项目总数
     func numberOfItems(in browser: JXPhotoBrowser) -> Int
     
-    /// 生命周期：Cell 即将复用（传入上一次对应的 index）
-    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int)
+    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell
     
-    /// 生命周期：Cell 复用完成（已关联到新的 index）
-    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int)
+    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoBrowserAnyCell, at index: Int)
     
-    /// 生命周期：Cell 即将显示
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int)
+    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoBrowserAnyCell, at index: Int)
     
-    /// 生命周期：Cell 已消失
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int)
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int)
     
-    /// 可选：浏览器在某个索引的源缩略图需要被隐藏/恢复时调用，业务方可根据索引自行控制对应视图的显隐（用于避免 Cell 复用导致的状态错乱）
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int)
+    
     func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int)
     
-    /// 可选：为 Zoom 转场提供源缩略图视图（用于起点几何计算）。
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
     
-    /// 为 Zoom 转场提供一个临时 ZoomView（仅用于动画期间展示，完成后即移除）。
-    /// - 参数 isPresenting: true 表示 present 转场，false 表示 dismiss 转场。
-    /// - 返回值：需要业务方提前创建并配置内容的视图实例（未添加到任意父视图）。
-    /// 若返回 nil，则将自动降级为 Fade 动画。
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
-    
-    /// 提供 Cell 加载图片所需的资源（原图 + 可选缩略图）
-    func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource?
-    
-    /// 提供 Cell 类，若返回 nil，则使用默认的 JXPhotoCell
-    func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass?
-    
-    /// 长按当前资源的回调（用于业务方弹窗、保存等操作）
-    /// - Parameters:
-    ///   - index: 当前资源索引
-    ///   - resource: 当前资源（图片 / 视频）
-    ///   - sourceView: 触发长按的视图，便于弹窗锚点
-    func photoBrowser(_ browser: JXPhotoBrowser, didLongPressItemAt index: Int, resource: JXPhotoResource?, sourceView: UIView)
 }
 
 public extension JXPhotoBrowserDelegate {
-    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoCell, at index: Int) {}
-    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoCell, at index: Int) {}
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoCell, at index: Int) {}
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, willReuse cell: JXPhotoBrowserAnyCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, didReuse cell: JXPhotoBrowserAnyCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {}
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
-    func photoBrowser(_ browser: JXPhotoBrowser, resourceForItemAt index: Int) -> JXPhotoResource? { nil }
-    func photoBrowser(_ browser: JXPhotoBrowser, cellClassForItemAt index: Int) -> AnyClass? { nil }
-    func photoBrowser(_ browser: JXPhotoBrowser, didLongPressItemAt index: Int, resource: JXPhotoResource?, sourceView: UIView) {}
 }
 
 // MARK: - Enums
@@ -277,7 +254,7 @@ open class JXPhotoBrowser: UIViewController {
         switch gesture.state {
         case .began:
             // 优先使用协议类型（支持自定义Cell），如果失败则使用JXPhotoCell（向后兼容）
-            guard let cell = (visibleCell() ?? visiblePhotoCell() as? JXPhotoBrowserCellProtocol) else { return }
+            guard let cell = (visibleCell() ?? visiblePhotoCell()) else { return }
             interactiveDismissCellProtocol = cell
             collectionView.isScrollEnabled = false
             cell.interactiveScrollView?.isScrollEnabled = false
@@ -426,16 +403,6 @@ open class JXPhotoBrowser: UIViewController {
         dismiss(animated: transitionType != .none, completion: nil)
     }
     
-    /// Cell 触发的长按事件回调给业务方
-    /// - Parameter cell: 触发长按的 Cell
-    func handleLongPress(from cell: JXPhotoBrowserCellProtocol) {
-        guard let index = cell.currentIndex else { return }
-        // 从delegate获取资源（不再依赖cell.currentResource）
-        let resource = delegate?.photoBrowser(self, resourceForItemAt: index)
-        let sourceView = cell.transitionImageView ?? cell
-        delegate?.photoBrowser(self, didLongPressItemAt: index, resource: resource, sourceView: sourceView)
-    }
-    
     // MARK: - Public Methods
     
     /// 从指定视图控制器展示浏览器
@@ -443,20 +410,6 @@ open class JXPhotoBrowser: UIViewController {
         modalPresentationStyle = .overFullScreen
         if transitionType != .none { transitioningDelegate = self }
         vc.present(self, animated: transitionType != .none, completion: nil)
-    }
-    
-    /// 供转场动画调用：在展示动画开始前，尽量让初始 Cell 就绪
-    /// - 做法：强制布局、刷新数据并滚动到初始索引，然后再次布局
-    /// - 目的：避免在 Present 阶段无法拿到目标 Cell 导致的 `destIV == nil`
-    open func prepareForPresentTransitionIfNeeded() {
-        view.layoutIfNeeded()
-        collectionView.reloadData()
-        collectionView.layoutIfNeeded()
-        if !didScrollToInitial {
-            scrollToInitialIndex()
-            didScrollToInitial = true
-            collectionView.layoutIfNeeded()
-        }
     }
     
     /// 当前展示中的 PhotoCell（用于转场目标等）
@@ -479,7 +432,7 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 当前展示中的 Cell（协议类型，支持自定义Cell）
     open func visibleCell() -> JXPhotoBrowserCellProtocol? {
-        return visiblePhotoCell() as? JXPhotoBrowserCellProtocol
+        return visiblePhotoCell()
     }
     
     // MARK: - Setup & Configuration
@@ -496,6 +449,20 @@ open class JXPhotoBrowser: UIViewController {
         let identifier = cellRegistry.register(cellClass, forReuseIdentifier: reuseIdentifier)
         collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
         return identifier
+    }
+    
+    /// 获取复用的Cell
+    /// - Parameters:
+    ///   - reuseIdentifier: 复用标识符
+    ///   - indexPath: 索引路径
+    /// - Returns: 符合JXPhotoBrowserCellProtocol协议的Cell
+    /// - Note: 如果dequeue的Cell不符合协议要求，会触发断言失败
+    public func dequeueReusableCell(withReuseIdentifier reuseIdentifier: String, for indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+        guard let protocolCell = cell as? JXPhotoBrowserAnyCell else {
+            fatalError("Cell with identifier '\(reuseIdentifier)' must conform to JXPhotoBrowserCellProtocol")
+        }
+        return protocolCell
     }
     
     /// 添加并约束集合视图
@@ -541,78 +508,30 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
-        let cellClass: AnyClass? = delegate?.photoBrowser(self, cellClassForItemAt: real)
-        
-        // 确定使用的reuseIdentifier
-        let reuseIdentifier: String
-        if let cellClass = cellClass {
-            // 尝试从注册管理器获取reuseIdentifier
-            if let identifier = cellRegistry.reuseIdentifier(for: cellClass) {
-                reuseIdentifier = identifier
-                // 重复注册是安全的，不会造成问题
-                collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
-            } else {
-                // 如果未注册，自动注册（会同时注册到管理器和collectionView）
-                reuseIdentifier = register(cellClass)
-            }
-        } else {
-            // 默认使用 JXPhotoCell
-            reuseIdentifier = JXPhotoCell.reuseIdentifier
+        guard let delegate = delegate else {
+            return collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath)
         }
-        
-        // Dequeue cell并尝试转换为协议类型（支持自定义Cell）
-        let dequeuedCell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
-        
-        // 尝试转换为协议类型
-        if let cell = dequeuedCell as? JXPhotoBrowserCellProtocol {
-            // 设置协议要求的属性
-            cell.browser = self
-            if realCount > 0 {
-                cell.currentIndex = real
-                // 如果也是JXPhotoCell类型，调用delegate方法（向后兼容）
-                if let photoCell = cell as? JXPhotoCell {
-                    delegate?.photoBrowser(self, didReuse: photoCell, at: real)
-                }
-            } else {
-                cell.currentIndex = nil
-            }
-            return dequeuedCell
-        }
-        
-        // 如果转换失败，尝试转换为JXPhotoCell（向后兼容）
-        guard let fallbackCell = dequeuedCell as? JXPhotoCell else {
-            // 如果都不符合，返回原始cell（虽然不应该发生）
-            return dequeuedCell
-        }
-        
-        fallbackCell.browser = self
+        let cell = delegate.photoBrowser(self, cellForItemAt: real, at: indexPath)
+        cell.browser = self
         if realCount > 0 {
-            fallbackCell.currentIndex = real
-            delegate?.photoBrowser(self, didReuse: fallbackCell, at: real)
+            cell.currentIndex = real
+            delegate.photoBrowser(self, didReuse: cell, at: real)
         } else {
-            fallbackCell.currentIndex = nil
+            cell.currentIndex = nil
         }
-        return fallbackCell
+        return cell
     }
     
-    // 生命周期：Cell 即将显示
     open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let protocolCell = cell as? JXPhotoBrowserCellProtocol else { return }
+        guard let protocolCell = cell as? JXPhotoBrowserAnyCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        // 如果也是JXPhotoCell类型，调用delegate方法（向后兼容）
-        if let photoCell = protocolCell as? JXPhotoCell {
-            delegate?.photoBrowser(self, willDisplay: photoCell, at: real)
-        }
+        delegate?.photoBrowser(self, willDisplay: protocolCell, at: real)
     }
     
-    // 生命周期：Cell 已消失
     open func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let protocolCell = cell as? JXPhotoBrowserCellProtocol else { return }
+        guard let protocolCell = cell as? JXPhotoBrowserAnyCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        // 如果也是JXPhotoCell类型，调用delegate方法（向后兼容）
-        if let photoCell = protocolCell as? JXPhotoCell {
-            delegate?.photoBrowser(self, didEndDisplaying: photoCell, at: real)
-        }
+        delegate?.photoBrowser(self, didEndDisplaying: protocolCell, at: real)
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {

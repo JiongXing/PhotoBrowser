@@ -4,8 +4,72 @@
 //
 
 import UIKit
-import Kingfisher
 import AVFoundation
+
+public protocol JXPhotoBrowserImageLoader {
+    func setImage(on imageView: UIImageView, url: URL, placeholder: UIImage?, completion: @escaping (Result<UIImage, Error>) -> Void)
+    func cancel(for imageView: UIImageView)
+    func cachedImage(for url: URL) -> UIImage?
+}
+
+public final class JXDefaultImageLoader: JXPhotoBrowserImageLoader {
+    public static let shared = JXDefaultImageLoader()
+    
+    private let session: URLSession
+    private var tasks: [ObjectIdentifier: URLSessionDataTask] = [:]
+    private let cache = NSCache<NSURL, UIImage>()
+    
+    public init(session: URLSession = .shared) {
+        self.session = session
+    }
+    
+    public func setImage(on imageView: UIImageView, url: URL, placeholder: UIImage?, completion: @escaping (Result<UIImage, Error>) -> Void) {
+        cancel(for: imageView)
+        if let cached = cachedImage(for: url) {
+            imageView.image = cached
+            completion(.success(cached))
+            return
+        }
+        imageView.image = placeholder
+        let token = ObjectIdentifier(imageView)
+        let task = session.dataTask(with: url) { [weak self, weak imageView] data, _, error in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                guard let imageView = imageView else { return }
+                self.tasks[token] = nil
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                guard let data = data, let image = UIImage(data: data) else {
+                    completion(.failure(NSError(domain: "JXPhotoBrowserImageLoader", code: -1, userInfo: nil)))
+                    return
+                }
+                self.cache.setObject(image, forKey: url as NSURL)
+                imageView.image = image
+                completion(.success(image))
+            }
+        }
+        tasks[token] = task
+        task.resume()
+    }
+    
+    public func cancel(for imageView: UIImageView) {
+        let token = ObjectIdentifier(imageView)
+        if let task = tasks[token] {
+            task.cancel()
+            tasks[token] = nil
+        }
+    }
+    
+    public func cachedImage(for url: URL) -> UIImage? {
+        cache.object(forKey: url as NSURL)
+    }
+}
+
+public struct JXPhotoBrowserImageLoaderConfig {
+    public static var shared: JXPhotoBrowserImageLoader = JXDefaultImageLoader.shared
+}
 
 /// 支持图片捏合缩放查看的 Cell
 open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrowserCellProtocol {
@@ -69,26 +133,19 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         return g
     }()
     
-    /// 长按手势：用于触发业务方弹窗（下载等）
-    public private(set) lazy var longPressGesture: UILongPressGestureRecognizer = {
-        let g = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        g.minimumPressDuration = 0.5
-        return g
-    }()
-    
     // MARK: - State
     /// 弱引用的浏览器（用于调用关闭）
     public weak var browser: JXPhotoBrowser?
 
-    /// 当前关联的真实索引（变更即触发内容加载）
-    public var currentIndex: Int? {
+    /// 当前关联的真实索引
+    public var currentIndex: Int?
+    
+    /// 当前 Cell 对应的资源（图片 / 视频）
+    public var currentResource: JXPhotoResource? {
         didSet {
             reloadContent()
         }
     }
-    
-    /// 当前 Cell 对应的资源（图片 / 视频）
-    public private(set) var currentResource: JXPhotoResource?
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -119,8 +176,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         // 添加单击关闭，并与双击冲突处理
         scrollView.addGestureRecognizer(singleTapGesture)
         singleTapGesture.require(toFail: doubleTapGesture)
-        // 添加长按
-        scrollView.addGestureRecognizer(longPressGesture)
         backgroundColor = .clear
     }
     
@@ -138,8 +193,7 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     // MARK: - Lifecycle
     open override func prepareForReuse() {
         super.prepareForReuse()
-        // 取消正在进行的下载任务
-        imageView.kf.cancelDownloadTask()
+        JXPhotoBrowserImageLoaderConfig.shared.cancel(for: imageView)
         
         // 清空旧图像与状态
         imageView.image = nil
@@ -334,55 +388,33 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         browser?.dismissSelf()
     }
     
-    @objc open func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began else { return }
-        browser?.handleLongPress(from: self)
-    }
-    
     // MARK: - Content Loading
-    /// 从浏览器委托获取资源并加载到 imageView
     open func reloadContent() {
-        guard let browser = browser, let index = currentIndex else {
-            imageView.image = nil
-            return
-        }
-
-        // 重置布局状态，确保使用当前bounds尺寸进行布局计算
         lastBoundsSize = .zero
-
-        // 取消上一次可能的下载任务
-        imageView.kf.cancelDownloadTask()
-
-        // 请求业务资源：直接加载原图，若缩略图已在缓存，则作为占位图
-        if let res = browser.delegate?.photoBrowser(browser, resourceForItemAt: index) {
-            currentResource = res
-            let placeholder: UIImage? = {
-                guard let thumbURL = res.thumbnailURL else { return nil }
-                return ImageCache.default.retrieveImageInMemoryCache(forKey: thumbURL.absoluteString)
-            }()
-
-            imageView.kf.setImage(with: res.imageURL, placeholder: placeholder) { [weak self] _ in
-                guard let self = self else { return }
-                // 强制重置布局状态，确保使用当前bounds尺寸
-                self.lastBoundsSize = .zero
-                self.adjustImageViewFrame()
-                self.centerImageIfNeeded()
-                self.setNeedsLayout()
-                // 再走一帧保证容器尺寸有效后重新居中
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.setNeedsLayout()
-                    self.layoutIfNeeded()
-                    self.centerImageIfNeeded()
-                }
-            }
-            
-            // 初始布局调整（即便异步完成前也保证基本布局）
-            adjustImageViewFrame()
-            centerImageIfNeeded()
-        } else {
+        JXPhotoBrowserImageLoaderConfig.shared.cancel(for: imageView)
+        guard let res = currentResource else {
             imageView.image = nil
             playButton.isHidden = true
+            return
         }
+        let placeholder: UIImage? = {
+            guard let thumbURL = res.thumbnailURL else { return nil }
+            return JXPhotoBrowserImageLoaderConfig.shared.cachedImage(for: thumbURL)
+        }()
+        JXPhotoBrowserImageLoaderConfig.shared.setImage(on: imageView, url: res.imageURL, placeholder: placeholder) { [weak self] _ in
+            guard let self = self else { return }
+            self.lastBoundsSize = .zero
+            self.adjustImageViewFrame()
+            self.centerImageIfNeeded()
+            self.setNeedsLayout()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.setNeedsLayout()
+                self.layoutIfNeeded()
+                self.centerImageIfNeeded()
+            }
+        }
+        adjustImageViewFrame()
+        centerImageIfNeeded()
     }
 }
