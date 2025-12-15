@@ -2,10 +2,91 @@
 alwaysApply: true
 ---
 
-# 项目介绍
-本项目是一个仿 微信/iOS系统相册 的开源的图片/视频浏览器框架。
-- "JXPhotoBrowser"目录是框架SDK，支持cocoapods集成方式。
-- "Demo"目录是示例工程，提供了相册列表数据，使用cocoapods集成"JXPhotoBrowser"。
+# JXPhotoBrowser 项目规则
 
-# 开发语言
-使用 Swift + UIKit 开发。
+## 项目介绍
+
+本项目是一个仿 **微信/iOS系统相册** 的开源的图片/视频浏览器框架。
+
+### 目录结构
+
+- **JXPhotoBrowser** 目录是框架SDK，支持 CocoaPods 集成方式
+- **Demo** 目录是示例工程，提供了相册列表数据，使用 CocoaPods 集成 "JXPhotoBrowser"
+
+## 技术栈
+
+- **开发语言**: Swift
+- **UI框架**: UIKit
+- **最低支持版本**: iOS 13.0+
+
+## 代码规范
+
+### 格式规范
+
+- **方法与方法之间要换行**
+- **类属性之间要换行，且要注释**
+- **关键方法、核心逻辑、复杂难懂的逻辑要注释**
+
+### 代码组织
+
+- 使用 `// MARK: -` 注释来组织代码结构，如：
+  - `// MARK: - Public Properties`
+  - `// MARK: - Private Properties`
+  - `// MARK: - Lifecycle`
+  - `// MARK: - Public Methods`
+  - `// MARK: - Private Methods`
+
+### 注释规范
+
+- **公开API**: 使用文档注释 `///` 描述方法、属性、类的用途
+- **属性注释**: 每个公开属性都应该有注释说明其用途
+- **复杂逻辑**: 对于算法、业务逻辑等复杂代码，添加行内注释说明
+
+### 命名规范
+
+- 遵循 Swift API 设计指南
+- 类名、协议名使用大驼峰命名（PascalCase）
+- 方法名、变量名使用小驼峰命名（camelCase）
+- 常量使用小驼峰命名，或根据场景使用大驼峰
+
+### 示例代码风格
+
+```swift
+// MARK: - Public Properties
+
+/// 浏览器代理
+public weak var delegate: JXPhotoBrowserDelegate?
+
+/// 当前显示的图片索引
+public private(set) var pageIndex: Int = 0 {
+    didSet {
+        // 处理逻辑
+    }
+}
+
+// MARK: - Private Properties
+
+/// 内部使用的集合视图
+private var collectionView: UICollectionView!
+
+// MARK: - Lifecycle
+
+public override func viewDidLoad() {
+    super.viewDidLoad()
+    setupUI()
+}
+
+// MARK: - Public Methods
+
+/// 显示图片浏览器
+public func show() {
+    // 实现逻辑
+}
+
+// MARK: - Private Methods
+
+/// 设置UI界面
+private func setupUI() {
+    // 实现逻辑
+}
+```
