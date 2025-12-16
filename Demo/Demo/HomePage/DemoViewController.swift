@@ -179,15 +179,15 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         let media = items[index]
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
-            if index < 3 {
-                let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
-                cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
-                return cell
-            } else {
+//            if index < 3 {
+//                let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
+//                cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+//                return cell
+//            } else {
                 let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
                 cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
                 return cell
-            }
+//            }
         case let .remoteVideo(url, thumbnailURL):
             let cell = browser.dequeueReusableCell(withReuseIdentifier: JXVideoCell.videoReuseIdentifier, for: indexPath) as! JXVideoCell
             cell.currentResource = JXPhotoResource(imageURL: thumbnailURL, thumbnailURL: thumbnailURL, videoURL: url)

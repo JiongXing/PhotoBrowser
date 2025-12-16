@@ -132,9 +132,9 @@ open class JXPhotoBrowser: UIViewController {
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         layout.itemSize = view.bounds.size
-        
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.translatesAutoresizingMaskIntoConstraints = false
+        print("layout.itemSize: \(layout.itemSize)")
+        let cv = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         cv.backgroundColor = .clear
         cv.dataSource = self
         cv.delegate = self
@@ -182,8 +182,8 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        pageIndex = initialIndex
         view.backgroundColor = .black
+        pageIndex = initialIndex
         setupCollectionView()
         applyCollectionViewConfig()
         
@@ -192,15 +192,27 @@ open class JXPhotoBrowser: UIViewController {
         view.addGestureRecognizer(panGesture)
     }
     
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if !didScrollToInitial {
-            scrollToInitialIndex()
-            didScrollToInitial = true
-        }
+        
         // 仅在 Zoom 转场动画时，初始显示时隐藏源视图
         if transitionType == .zoom {
             delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            print("viewDidAppear (async) collectionView frame: \(self.collectionView.frame)")
+            print("viewDidAppear (async) collectionView bounds: \(self.collectionView.bounds)")
+            print("viewDidAppear (async) collectionView contentOffset: \(self.collectionView.contentOffset)")
+            print("viewDidAppear (async) collectionView contentSize: \(self.collectionView.contentSize)")
+            let virtualIndex = self.calculateCurrentVirtualIndex()
+            let realIndex = self.realIndex(fromVirtual: virtualIndex)
+            print("viewDidAppear (async) current virtualIndex: \(virtualIndex), realIndex: \(realIndex)")
         }
     }
     
@@ -223,16 +235,25 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
+        collectionView.frame = view.bounds
+        
+        print("viewDidLayoutSubviews view bounds: \(view.bounds)")
+        print("viewDidLayoutSubviews collectionView frame: \(collectionView.frame)")
+        print("viewDidLayoutSubviews collectionView bounds: \(collectionView.bounds)")
+        print("viewDidLayoutSubviews collectionView contentOffset: \(collectionView.contentOffset)")
+        print("viewDidLayoutSubviews collectionView contentSize: \(collectionView.contentSize)")
+        
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            if layout.itemSize != view.bounds.size {
-                layout.itemSize = view.bounds.size
+            let size = collectionView.bounds.size
+            if size != .zero, layout.itemSize != size {
+                layout.itemSize = size
                 layout.invalidateLayout()
+                print("viewDidLayoutSubviews update layout.itemSize: \(size)")
             }
         }
-        if !didScrollToInitial {
-            scrollToInitialIndex()
-            didScrollToInitial = true
-        }
+        
+        scrollToInitialIndexIfNeeded()
     }
     
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
@@ -390,12 +411,46 @@ open class JXPhotoBrowser: UIViewController {
     }
     
     /// 滚动到初始索引位置
-    open func scrollToInitialIndex() {
+    open func scrollToInitialIndexIfNeeded() {
+        guard didScrollToInitial == false else {
+            return
+        }
+        
+        let bounds = collectionView.bounds
+        if bounds.size == .zero {
+            print("scrollToInitialIndexIfNeeded skipped, collectionView bounds is zero")
+            return
+        }
+        
+        didScrollToInitial = true
+        
+        collectionView.reloadData()
+        collectionView.layoutIfNeeded()
+        
         let count = realCount
-        guard count > 0 else { return }
+        guard count > 0 else {
+            print("scrollToInitialIndexIfNeeded realCount is zero")
+            return
+        }
+        
         let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
         let target = base + max(0, min(initialIndex % count, count - 1))
-        collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
+        
+        print("scrollToInitialIndexIfNeeded perform scroll, initialIndex = \(initialIndex), target = \(target)")
+        let offset: CGPoint
+        if scrollDirection == .horizontal {
+            offset = CGPoint(x: CGFloat(target) * bounds.width, y: 0)
+        } else {
+            offset = CGPoint(x: 0, y: CGFloat(target) * bounds.height)
+        }
+        collectionView.setContentOffset(offset, animated: false)
+        collectionView.layoutIfNeeded()
+        
+        pageIndex = initialIndex
+        
+        print("scrollToInitialIndexIfNeeded done, collectionView frame: \(collectionView.frame)")
+        print("scrollToInitialIndexIfNeeded contentOffset: \(collectionView.contentOffset)")
+        print("scrollToInitialIndexIfNeeded contentSize: \(collectionView.contentSize)")
     }
     
     /// 关闭浏览器
@@ -508,7 +563,9 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
+        print("collectionView cellForItemAt indexPath: \(indexPath)")
         guard let delegate = delegate else {
+            print("collectionView cellForItemAt indexPath: delegate is nil")
             return collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath)
         }
         let cell = delegate.photoBrowser(self, cellForItemAt: real, at: indexPath)
@@ -519,6 +576,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
         } else {
             cell.currentIndex = nil
         }
+        print("collectionView cellForItemAt indexPath: cell is not nil")
         return cell
     }
     
