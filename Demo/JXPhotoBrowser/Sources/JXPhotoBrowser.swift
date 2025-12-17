@@ -123,11 +123,7 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 转场动画类型
     public var transitionType: JXPhotoBrowserTransitionType = .fade
-    
-    /// Cell注册管理器（用于注册自定义Cell类）
-    public let cellRegistry = JXPhotoBrowserCellRegistry.shared
-    
-    
+        
     // MARK: - Private Properties
     
     /// 图片列表集合视图（对外只读）
@@ -471,15 +467,25 @@ open class JXPhotoBrowser: UIViewController {
     /// 注册自定义Cell类
     /// - Parameters:
     ///   - cellClass: 要注册的Cell类（必须实现JXPhotoBrowserCellProtocol协议）
-    ///   - reuseIdentifier: 可选的复用标识符，如果为nil则自动生成
-    /// - Returns: 实际使用的reuseIdentifier
+    ///   - reuseIdentifier: 必须提供的复用标识符（与调用方复用时保持一致）
+    /// - Returns: 注册是否成功（false 表示参数不合法或未实现协议）
     /// - Note: 建议在创建JXPhotoBrowser实例后、设置delegate之前调用此方法
     @discardableResult
-    public func register(_ cellClass: AnyClass, forReuseIdentifier reuseIdentifier: String? = nil) -> String {
-        // 注册到管理器
-        let identifier = cellRegistry.register(cellClass, forReuseIdentifier: reuseIdentifier)
-        collectionView.register(cellClass, forCellWithReuseIdentifier: identifier)
-        return identifier
+    public func register(_ cellClass: AnyClass, forReuseIdentifier reuseIdentifier: String) -> Bool {
+        let trimmed = reuseIdentifier.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            assertionFailure("JXPhotoBrowser.register(_:forReuseIdentifier:) 失败：reuseIdentifier 不能为空")
+            return false
+        }
+        
+        // 运行时校验：必须满足 JXPhotoBrowserCellProtocol（即 JXPhotoBrowserAnyCell）
+        guard cellClass is JXPhotoBrowserCellProtocol.Type else {
+            assertionFailure("JXPhotoBrowser.register(_:forReuseIdentifier:) 失败：\(cellClass) 未实现 JXPhotoBrowserCellProtocol")
+            return false
+        }
+        
+        collectionView.register(cellClass, forCellWithReuseIdentifier: trimmed)
+        return true
     }
     
     /// 获取复用的Cell
@@ -536,7 +542,6 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
-        print("collectionView cellForItemAt indexPath: \(indexPath), realIndex: \(real)")
         guard let delegate = delegate else {
             return collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath)
         }
