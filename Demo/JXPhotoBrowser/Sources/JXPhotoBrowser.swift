@@ -240,34 +240,28 @@ open class JXPhotoBrowser: UIViewController {
     
     // MARK: - Private Methods
     
-    /// 计算 itemSize（从代理获取，如果没有实现则返回 collectionView.bounds.size）
-    private func calculateItemSize(for index: Int? = nil) -> CGSize {
-        // 如果指定了索引，尝试从代理获取该索引的尺寸
-        if let index = index, let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: index) {
-            // 确保代理返回的尺寸有效（非零）
-            if delegateSize.width > 0 && delegateSize.height > 0 {
-                return delegateSize
-            }
+    /// 计算指定索引的 item 尺寸
+    /// - Parameter index: 实际数据源中的索引
+    /// - Returns: 合法的 CGSize，优先使用代理返回值，否则使用 collectionView.bounds / view.bounds
+    private func calculateItemSize(for index: Int) -> CGSize {
+        if let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: index),
+           delegateSize.width > 0,
+           delegateSize.height > 0 {
+            return delegateSize
         }
-        // 如果没有指定索引或代理未实现，使用当前索引
-        if let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: pageIndex) {
-            // 确保代理返回的尺寸有效（非零）
-            if delegateSize.width > 0 && delegateSize.height > 0 {
-                return delegateSize
-            }
+        
+        let collectionSize = collectionView.bounds.size
+        if collectionSize.width > 0 && collectionSize.height > 0 {
+            return collectionSize
         }
-        // 默认返回 collectionView.bounds.size，如果为 .zero 则使用 view.bounds.size
-        let defaultSize = collectionView.bounds.size
-        if defaultSize.width > 0 && defaultSize.height > 0 {
-            return defaultSize
-        }
-        // 如果 collectionView.bounds 还是 .zero（初始化阶段），使用 view.bounds.size 作为后备
+        
         let viewSize = view.bounds.size
         if viewSize.width > 0 && viewSize.height > 0 {
             return viewSize
         }
-        // 最后的后备值（理论上不应该到达这里）
-        return CGSize(width: 414, height: 896)
+        
+        let screenSize = UIScreen.main.bounds.size
+        return screenSize
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
