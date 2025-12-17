@@ -48,6 +48,9 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
     
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
+    
+    /// 返回指定索引的 item 尺寸（可选，默认返回 collectionView.bounds.size）
+    func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize?
 }
 
 public extension JXPhotoBrowserDelegate {
@@ -58,6 +61,7 @@ public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize? { nil }
 }
 
 // MARK: - Enums
@@ -131,9 +135,8 @@ open class JXPhotoBrowser: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
-        layout.itemSize = .zero
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.translatesAutoresizingMaskIntoConstraints = false
+        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         cv.backgroundColor = .clear
         cv.dataSource = self
         cv.delegate = self
@@ -149,7 +152,7 @@ open class JXPhotoBrowser: UIViewController {
     }()
     
     /// 无限循环倍数
-    private let loopMultiplier: Int = 1000
+    private let loopMultiplier: Int = 10
     
     /// 真实数据源数量
     private var realCount: Int {
@@ -167,7 +170,6 @@ open class JXPhotoBrowser: UIViewController {
     /// 交互手势
     private var panGesture: UIPanGestureRecognizer!
     
-    
     /// 下拉交互开始时的触摸点（用于计算跟随偏移）
     private var initialTouchPoint: CGPoint = .zero
     
@@ -181,16 +183,13 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        print("viewDidLoad view.frame: \(view.frame)")
         view.backgroundColor = .black
-        pageIndex = initialIndex
         setupCollectionView()
         applyCollectionViewConfig()
         
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         panGesture.delegate = self
         view.addGestureRecognizer(panGesture)
-        print("viewDidLoad finish collectionView frame: \(collectionView.frame)")
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -199,59 +198,31 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        scrollToInitialIndexIfNeeded()
         
         // 仅在 Zoom 转场动画时，初始显示时隐藏源视图
         if transitionType == .zoom {
             delegate?.photoBrowser(self, setOriginViewHidden: true, at: pageIndex)
         }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            print("viewDidAppear (async) collectionView frame: \(self.collectionView.frame)")
-            print("viewDidAppear (async) collectionView bounds: \(self.collectionView.bounds)")
-            print("viewDidAppear (async) collectionView contentOffset: \(self.collectionView.contentOffset)")
-            print("viewDidAppear (async) collectionView contentSize: \(self.collectionView.contentSize)")
-            let virtualIndex = self.calculateCurrentVirtualIndex()
-            let realIndex = self.realIndex(fromVirtual: virtualIndex)
-            print("viewDidAppear (async) current virtualIndex: \(virtualIndex), realIndex: \(realIndex)")
-        }
     }
     
-    open override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        // 仅在 Zoom 转场动画时，页面消失时（如非交互关闭），尝试恢复
-        // 注意：交互关闭时会由 Animator 处理恢复，这里只是兜底
-        if transitionType == .zoom {
-            if let coordinator = transitionCoordinator {
-                // 在转场结束后统一恢复，避免提前显示导致重影
-                coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-                    guard let self = self else { return }
-                    self.delegate?.photoBrowser(self, setOriginViewHidden: false, at: self.pageIndex)
-                }
-            } else {
-                delegate?.photoBrowser(self, setOriginViewHidden: false, at: pageIndex)
-            }
+    open override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        
+        // 在布局前设置 frame，确保 collectionView 有正确的尺寸
+        // 这样在系统调用 sizeForItemAt 时，collectionView.bounds 就不会是 .zero
+        // 使用 autoresizingMask 确保即使 view.bounds 变化也会自动调整
+        if collectionView.frame != view.bounds {
+            collectionView.frame = view.bounds
         }
     }
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        print("viewDidLayoutSubviews view bounds: \(view.bounds)")
-        print("viewDidLayoutSubviews collectionView frame: \(collectionView.frame)")
-        print("viewDidLayoutSubviews collectionView bounds: \(collectionView.bounds)")
-        print("viewDidLayoutSubviews collectionView contentOffset: \(collectionView.contentOffset)")
-        print("viewDidLayoutSubviews collectionView contentSize: \(collectionView.contentSize)")
-        
+        // 由于已实现 UICollectionViewDelegateFlowLayout，系统会自动调用代理方法获取 itemSize
+        // 这里只需要在布局变化时触发重新布局
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
-            let size = collectionView.bounds.size
-            if size != .zero, layout.itemSize != size {
-                layout.itemSize = size
-                layout.invalidateLayout()
-                print("viewDidLayoutSubviews update layout.itemSize: \(size)")
-            }
+            layout.invalidateLayout()
         }
         
         scrollToInitialIndexIfNeeded()
@@ -268,6 +239,36 @@ open class JXPhotoBrowser: UIViewController {
     }
     
     // MARK: - Private Methods
+    
+    /// 计算 itemSize（从代理获取，如果没有实现则返回 collectionView.bounds.size）
+    private func calculateItemSize(for index: Int? = nil) -> CGSize {
+        // 如果指定了索引，尝试从代理获取该索引的尺寸
+        if let index = index, let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: index) {
+            // 确保代理返回的尺寸有效（非零）
+            if delegateSize.width > 0 && delegateSize.height > 0 {
+                return delegateSize
+            }
+        }
+        // 如果没有指定索引或代理未实现，使用当前索引
+        if let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: pageIndex) {
+            // 确保代理返回的尺寸有效（非零）
+            if delegateSize.width > 0 && delegateSize.height > 0 {
+                return delegateSize
+            }
+        }
+        // 默认返回 collectionView.bounds.size，如果为 .zero 则使用 view.bounds.size
+        let defaultSize = collectionView.bounds.size
+        if defaultSize.width > 0 && defaultSize.height > 0 {
+            return defaultSize
+        }
+        // 如果 collectionView.bounds 还是 .zero（初始化阶段），使用 view.bounds.size 作为后备
+        let viewSize = view.bounds.size
+        if viewSize.width > 0 && viewSize.height > 0 {
+            return viewSize
+        }
+        // 最后的后备值（理论上不应该到达这里）
+        return CGSize(width: 414, height: 896)
+    }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
         // 垂直滚动模式下禁用下拉关闭手势，避免与列表滚动冲突
@@ -392,18 +393,6 @@ open class JXPhotoBrowser: UIViewController {
         return max(0, min(candidate, virtualCount - 1))
     }
     
-    /// 根据虚拟索引滚动到目标位置，保持当前项
-    private func scrollToVirtualIndex(_ index: Int, size: CGSize) {
-        if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout, layout.itemSize != size {
-            layout.itemSize = size
-            layout.invalidateLayout()
-        }
-        
-        let indexPath = IndexPath(item: index, section: 0)
-        collectionView.scrollToItem(at: indexPath, at: scrollDirection.scrollPosition, animated: false)
-        collectionView.layoutIfNeeded()
-    }
-    
     /// 将虚拟索引转换为真实索引
     open func realIndex(fromVirtual index: Int) -> Int {
         let count = realCount
@@ -418,19 +407,16 @@ open class JXPhotoBrowser: UIViewController {
         }
         
         guard view.window != nil else {
-            print("scrollToInitialIndexIfNeeded skipped, view not in window")
             return
         }
         
         let bounds = collectionView.bounds
         if bounds.size == .zero {
-            print("scrollToInitialIndexIfNeeded skipped, collectionView bounds is zero")
             return
         }
 
         let count = realCount
         guard count > 0 else {
-            print("scrollToInitialIndexIfNeeded realCount is zero")
             return
         }
 
@@ -443,20 +429,9 @@ open class JXPhotoBrowser: UIViewController {
 
         let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
         let target = base + safeInitialIndex
-
-        collectionView.reloadData()
-        collectionView.layoutIfNeeded()
         
-        print("scrollToInitialIndexIfNeeded done, collectionView frame: \(collectionView.frame)")
-        print("scrollToInitialIndexIfNeeded contentOffset: \(collectionView.contentOffset)")
-        print("scrollToInitialIndexIfNeeded contentSize: \(collectionView.contentSize)")
-        print("scrollToInitialIndexIfNeeded perform scroll, initialIndex = \(initialIndex), target = \(target)")
         collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
-        collectionView.layoutIfNeeded()
-        print("scrollToInitialIndexIfNeeded contentOffset: \(collectionView.contentOffset)")
-
         didScrollToInitial = true
-
         pageIndex = safeInitialIndex
     }
     
@@ -527,15 +502,12 @@ open class JXPhotoBrowser: UIViewController {
         return protocolCell
     }
     
-    /// 添加并约束集合视图
+    /// 添加并设置集合视图的 frame（使用 frame 布局，避免初始化时 bounds 为 .zero 的问题）
     open func setupCollectionView() {
         view.addSubview(collectionView)
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        // 使用 frame 布局，立即设置 frame 为 view.bounds，确保 bounds 不为 .zero
+        // 这样在 sizeForItemAt 被调用时就能获得有效的尺寸
+        collectionView.frame = view.bounds
     }
     
     /// 根据当前属性应用集合视图配置（支持运行时切换）
@@ -562,7 +534,7 @@ open class JXPhotoBrowser: UIViewController {
 
 // MARK: - UICollectionView DataSource & Delegate
 
-extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
+extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return virtualCount
@@ -610,6 +582,15 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         updateCurrentPageIndex()
+    }
+    
+    // MARK: - UICollectionViewDelegateFlowLayout
+    
+    /// 动态计算每个 item 的尺寸（从代理获取）
+    open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let real = realIndex(fromVirtual: indexPath.item)
+        // 从代理获取 itemSize，如果没有实现则返回 collectionView.bounds.size
+        return calculateItemSize(for: real)
     }
 }
 

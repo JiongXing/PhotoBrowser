@@ -142,7 +142,8 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     // MARK: - 交互：点击视频进行播放
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browser = JXPhotoBrowser()
-        
+        // 【示例】注册自定义Cell
+        browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
         browser.delegate = self
         browser.initialIndex = indexPath.item
         
@@ -152,12 +153,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         browser.isLoopingEnabled = settingsPanel.isLoopingEnabled
         
         self.photoBrowser = browser
-        
-        // 【示例】注册自定义Cell
-//        browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
-//        let _ = browser.collectionView
-        let _ = browser.view
-        print("即将打开 browser")
         browser.present(from: self)
     }
     
