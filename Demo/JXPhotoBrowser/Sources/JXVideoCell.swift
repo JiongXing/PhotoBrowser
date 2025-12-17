@@ -32,11 +32,12 @@ open class JXVideoCell: JXPhotoCell {
     open override func reloadContent() {
         stopVideo()
         videoURL = currentResource?.videoURL
-        playButton.isHidden = (videoURL == nil)
-        if videoURL != nil {
-            setupVideoActions()
-        }
         super.reloadContent()
+        
+        // 若是视频资源，图片加载完成后自动开始播放
+        if videoURL != nil {
+            playVideo()
+        }
     }
     
     open override func handleSingleTap(_ gesture: UITapGestureRecognizer) {
@@ -58,19 +59,6 @@ extension JXVideoCell {
         }
     }
     
-    private func setupVideoActions() {
-        // 移除可能的旧 targets
-        playButton.gestureRecognizers?.forEach { playButton.removeGestureRecognizer($0) }
-        
-        let playTap = UITapGestureRecognizer(target: self, action: #selector(handleVideoPlayTap))
-        playButton.addGestureRecognizer(playTap)
-        playButton.isUserInteractionEnabled = true
-    }
-    
-    @objc private func handleVideoPlayTap() {
-        playVideo()
-    }
-    
     private func playVideo() {
         guard let url = videoURL else { return }
         
@@ -85,13 +73,11 @@ extension JXVideoCell {
         }
         
         player?.play()
-        playButton.isHidden = true
         isPlaying = true
     }
     
     private func pauseVideo() {
         player?.pause()
-        playButton.isHidden = false
         isPlaying = false
     }
     

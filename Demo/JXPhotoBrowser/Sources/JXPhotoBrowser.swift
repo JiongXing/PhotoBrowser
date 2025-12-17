@@ -554,7 +554,6 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let protocolCell = cell as? JXPhotoBrowserAnyCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
-        print("collectionView willDisplay indexPath: \(indexPath), realIndex: \(real)")
         delegate?.photoBrowser(self, willDisplay: protocolCell, at: real)
     }
     

@@ -103,17 +103,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         return iv
     }()
     
-    /// 视频播放按钮（当资源为视频时显示）
-    public let playButton: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "play.circle.fill"))
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.tintColor = .white
-        iv.contentMode = .scaleAspectFit
-        iv.isHidden = true
-        iv.isUserInteractionEnabled = true // 允许点击
-        return iv
-    }()
-    
     // MARK: - Video Properties
     
     /// 双击手势：在初始缩放状态下切换缩放模式（长边铺满 ↔ 短边铺满），在非初始缩放状态下切换回初始状态
@@ -162,15 +151,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         scrollView.delegate = self
         scrollView.addSubview(imageView)
         
-        // 添加播放按钮
-        contentView.addSubview(playButton)
-        NSLayoutConstraint.activate([
-            playButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            playButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            playButton.widthAnchor.constraint(equalToConstant: 60),
-            playButton.heightAnchor.constraint(equalToConstant: 60)
-        ])
-        
         // 添加双击缩放
         scrollView.addGestureRecognizer(doubleTapGesture)
         // 添加单击关闭，并与双击冲突处理
@@ -212,9 +192,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         
         // 恢复初始布局
         adjustImageViewFrame()
-        
-        // 视频重置
-        playButton.isHidden = true
     }
     
     // MARK: - JXPhotoBrowserCellProtocol
@@ -394,7 +371,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         JXPhotoBrowserImageLoaderConfig.shared.cancel(for: imageView)
         guard let res = currentResource else {
             imageView.image = nil
-            playButton.isHidden = true
             return
         }
         let placeholder: UIImage? = {
