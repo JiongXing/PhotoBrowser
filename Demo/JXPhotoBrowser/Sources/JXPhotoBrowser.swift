@@ -131,10 +131,9 @@ open class JXPhotoBrowser: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
-        layout.itemSize = view.bounds.size
-        print("layout.itemSize: \(layout.itemSize)")
-        let cv = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
-        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        layout.itemSize = .zero
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .clear
         cv.dataSource = self
         cv.delegate = self
@@ -182,6 +181,7 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
+        print("viewDidLoad view.frame: \(view.frame)")
         view.backgroundColor = .black
         pageIndex = initialIndex
         setupCollectionView()
@@ -190,6 +190,7 @@ open class JXPhotoBrowser: UIViewController {
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         panGesture.delegate = self
         view.addGestureRecognizer(panGesture)
+        print("viewDidLoad finish collectionView frame: \(collectionView.frame)")
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -198,6 +199,8 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        scrollToInitialIndexIfNeeded()
         
         // 仅在 Zoom 转场动画时，初始显示时隐藏源视图
         if transitionType == .zoom {
@@ -235,8 +238,6 @@ open class JXPhotoBrowser: UIViewController {
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
-        collectionView.frame = view.bounds
         
         print("viewDidLayoutSubviews view bounds: \(view.bounds)")
         print("viewDidLayoutSubviews collectionView frame: \(collectionView.frame)")
@@ -416,41 +417,47 @@ open class JXPhotoBrowser: UIViewController {
             return
         }
         
+        guard view.window != nil else {
+            print("scrollToInitialIndexIfNeeded skipped, view not in window")
+            return
+        }
+        
         let bounds = collectionView.bounds
         if bounds.size == .zero {
             print("scrollToInitialIndexIfNeeded skipped, collectionView bounds is zero")
             return
         }
-        
-        didScrollToInitial = true
-        
-        collectionView.reloadData()
-        collectionView.layoutIfNeeded()
-        
+
         let count = realCount
         guard count > 0 else {
             print("scrollToInitialIndexIfNeeded realCount is zero")
             return
         }
-        
-        let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
-        let target = base + max(0, min(initialIndex % count, count - 1))
-        
-        print("scrollToInitialIndexIfNeeded perform scroll, initialIndex = \(initialIndex), target = \(target)")
-        let offset: CGPoint
-        if scrollDirection == .horizontal {
-            offset = CGPoint(x: CGFloat(target) * bounds.width, y: 0)
+
+        let safeInitialIndex: Int
+        if isLoopingEnabled {
+            safeInitialIndex = ((initialIndex % count) + count) % count
         } else {
-            offset = CGPoint(x: 0, y: CGFloat(target) * bounds.height)
+            safeInitialIndex = max(0, min(initialIndex, count - 1))
         }
-        collectionView.setContentOffset(offset, animated: false)
+
+        let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
+        let target = base + safeInitialIndex
+
+        collectionView.reloadData()
         collectionView.layoutIfNeeded()
-        
-        pageIndex = initialIndex
         
         print("scrollToInitialIndexIfNeeded done, collectionView frame: \(collectionView.frame)")
         print("scrollToInitialIndexIfNeeded contentOffset: \(collectionView.contentOffset)")
         print("scrollToInitialIndexIfNeeded contentSize: \(collectionView.contentSize)")
+        print("scrollToInitialIndexIfNeeded perform scroll, initialIndex = \(initialIndex), target = \(target)")
+        collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
+        collectionView.layoutIfNeeded()
+        print("scrollToInitialIndexIfNeeded contentOffset: \(collectionView.contentOffset)")
+
+        didScrollToInitial = true
+
+        pageIndex = safeInitialIndex
     }
     
     /// 关闭浏览器
@@ -563,9 +570,8 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
-        print("collectionView cellForItemAt indexPath: \(indexPath)")
+        print("collectionView cellForItemAt indexPath: \(indexPath), realIndex: \(real)")
         guard let delegate = delegate else {
-            print("collectionView cellForItemAt indexPath: delegate is nil")
             return collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath)
         }
         let cell = delegate.photoBrowser(self, cellForItemAt: real, at: indexPath)
@@ -576,13 +582,13 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate {
         } else {
             cell.currentIndex = nil
         }
-        print("collectionView cellForItemAt indexPath: cell is not nil")
         return cell
     }
     
     open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let protocolCell = cell as? JXPhotoBrowserAnyCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
+        print("collectionView willDisplay indexPath: \(indexPath), realIndex: \(real)")
         delegate?.photoBrowser(self, willDisplay: protocolCell, at: real)
     }
     
