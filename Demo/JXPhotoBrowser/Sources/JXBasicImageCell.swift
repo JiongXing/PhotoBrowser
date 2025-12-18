@@ -17,17 +17,8 @@ open class JXBasicImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     /// 当前真实索引（由框架自动注入）
     public var currentIndex: Int?
     
-    /// 当前 Cell 对应的资源
-    public var resource: JXPhotoResource? {
-        didSet {
-            reloadContent()
-        }
-    }
-    
     /// 复用标识符
     public static let reuseIdentifier = "JXBasicImageCell"
-    
-    // MARK: - Private Properties
     
     /// 内部图片视图，仅做展示
     public let imageView: UIImageView = {
@@ -52,9 +43,7 @@ open class JXBasicImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     
     open override func prepareForReuse() {
         super.prepareForReuse()
-        JXPhotoBrowserImageLoaderConfig.shared.cancel(for: imageView)
         imageView.image = nil
-        resource = nil
         currentIndex = nil
     }
     
@@ -70,23 +59,5 @@ open class JXBasicImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
             imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
         backgroundColor = .clear
-    }
-    
-    /// 加载图片资源
-    private func reloadContent() {
-        guard let res = resource else {
-            imageView.image = nil
-            return
-        }
-        
-        let placeholder: UIImage? = {
-            guard let thumbURL = res.thumbnailURL else { return nil }
-            return JXPhotoBrowserImageLoaderConfig.shared.cachedImage(for: thumbURL)
-        }()
-        
-        JXPhotoBrowserImageLoaderConfig.shared.setImage(on: imageView, url: res.imageURL, placeholder: placeholder) { [weak self] _ in
-            guard let self = self else { return }
-            self.setNeedsLayout()
-        }
     }
 }

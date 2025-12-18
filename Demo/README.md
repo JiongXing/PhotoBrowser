@@ -4,9 +4,10 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片/视频浏览�
 
 ## 🌟 核心设计亮点
 
-- **协议驱动的数据与 UI 解耦**：`JXPhotoBrowserDelegate` 只关心数量、Cell 与转场，不再要求提供统一的数据模型，业务方可以完全使用自己的数据结构。
+- **零数据模型依赖**：框架不定义任何数据模型，业务方完全使用自己的数据结构，通过 delegate 配置 Cell 内容。
+- **图片加载完全开放**：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
 - **Cell 协议抽象**：通过 `JXPhotoBrowserCellProtocol` 将浏览器与具体 Cell 实现解耦，既可以直接使用内置的 `JXPhotoCell` / `JXVideoCell`，也可以实现完全自定义的 Cell。
-- **图片加载可插拔**：提供 `JXPhotoBrowserImageLoader` 协议与默认实现 `JXDefaultImageLoader`，框架本身不强依赖任何第三方图片库，业务可以按需接入 Kingfisher、SDWebImage 等。
+- **协议驱动的数据与 UI 解耦**：`JXPhotoBrowserDelegate` 只关心数量、Cell 与转场，不强制统一的数据模型。
 - **默认实现与深度定制兼顾**：开箱即用的默认 Cell + 转场动画 + 手势交互，同时保留足够的扩展点，适合从简单集成到复杂自定义的多种场景。
 
 ## ✨ 功能特性
@@ -28,10 +29,10 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片/视频浏览�
 
 ### 核心架构
 - **JXPhotoBrowser**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片/视频页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
-- **JXPhotoCell / JXVideoCell**：默认图片与视频展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击、长按等交互。
+- **JXPhotoCell / JXVideoCell**：默认图片与视频展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击、长按等交互。提供 `setImage(_:)` 和 `setPlaceholder(_:)` 方法供业务方设置图片。
+- **JXBasicImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
 - **JXPhotoBrowserCellProtocol**：Cell 协议抽象，自定义 Cell 只需实现 `browser` 与 `currentIndex` 等必要属性即可接入浏览器，不强制依赖特定基类。
-- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例以及转场动画所需的源视图等，不再强制要求统一的数据模型。
-- **JXPhotoBrowserImageLoader**：图片加载协议，默认实现基于系统 `URLSession` 与内存缓存，业务方可替换为任意图片加载框架。
+- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例以及转场动画所需的源视图等，不强制要求统一的数据模型。
 
 ### 关键实现
 1.  **无限循环 (Infinite Loop)**:
@@ -94,17 +95,30 @@ browser.present(from: self)
 遵守 `JXPhotoBrowserDelegate` 协议，提供数据和转场支持：
 
 ```swift
+import Kingfisher // 示例使用 Kingfisher，可替换为任意图片加载库
+
 extension ViewController: JXPhotoBrowserDelegate {
     // 1. 返回图片总数
     func numberOfItems(in browser: JXPhotoBrowser) -> Int {
         return items.count
     }
     
-    // 2. 提供用于展示的 Cell（业务方自己管理数据和加载逻辑）
+    // 2. 提供用于展示的 Cell，并使用业务方选择的图片加载库加载图片
     func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-        let cell = browser.collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
         let item = items[index]
-        cell.currentResource = JXPhotoResource(imageURL: item.originalURL, thumbnailURL: item.thumbnailURL)
+        
+        // 使用 Kingfisher 加载图片（可替换为 SDWebImage 或其他库）
+        cell.imageView.kf.setImage(with: item.thumbnailURL) { [weak cell] result in
+            if case .success(let value) = result {
+                cell?.setPlaceholder(value.image)
+            }
+        }
+        cell.imageView.kf.setImage(with: item.originalURL) { [weak cell] result in
+            if case .success(let value) = result {
+                cell?.setImage(value.image)
+            }
+        }
         return cell
     }
     
@@ -131,9 +145,9 @@ extension ViewController: JXPhotoBrowserDelegate {
 
 ## 📄 依赖
 
-- 框架本身依赖：`UIKit`、`AVFoundation`。
-- 图片加载：通过 `JXPhotoBrowserImageLoader` 协议抽象，默认实现基于系统 `URLSession` 和内存缓存。
-- 示例工程：为方便演示列表缩略图加载，Demo 中额外使用了 `Kingfisher`，但这不是框架的强制依赖。
+- 框架本身依赖：`UIKit`、`AVFoundation`，**无任何第三方依赖**。
+- 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
+- 示例工程：Demo 使用 `Kingfisher` 演示图片加载。
 
 ## ⚖️ License
 

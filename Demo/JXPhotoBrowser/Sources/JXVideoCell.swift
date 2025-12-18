@@ -7,13 +7,26 @@ import UIKit
 import AVFoundation
 
 open class JXVideoCell: JXPhotoCell {
+    
+    // MARK: - Static Properties
+    
     public static let videoReuseIdentifier = "JXVideoCell"
     
     // MARK: - Video Properties
+    
+    /// 视频播放器
     private var player: AVPlayer?
+    
+    /// 视频播放图层
     private var playerLayer: AVPlayerLayer?
-    private var videoURL: URL?
+    
+    /// 当前视频 URL
+    public private(set) var videoURL: URL?
+    
+    /// 是否正在播放
     private var isPlaying: Bool = false
+    
+    // MARK: - Lifecycle
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,15 +42,19 @@ open class JXVideoCell: JXPhotoCell {
         videoURL = nil
     }
     
-    open override func reloadContent() {
+    // MARK: - Public Methods
+    
+    /// 配置视频资源
+    /// - Parameters:
+    ///   - videoURL: 视频 URL
+    ///   - coverImage: 封面图（可选）
+    open func configure(videoURL: URL, coverImage: UIImage? = nil) {
         stopVideo()
-        videoURL = currentResource?.videoURL
-        super.reloadContent()
-        
-        // 若是视频资源，图片加载完成后自动开始播放
-        if videoURL != nil {
-            playVideo()
+        self.videoURL = videoURL
+        if let cover = coverImage {
+            setImage(cover)
         }
+        playVideo()
     }
     
     open override func handleSingleTap(_ gesture: UITapGestureRecognizer) {

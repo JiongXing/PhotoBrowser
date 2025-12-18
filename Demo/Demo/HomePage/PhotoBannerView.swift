@@ -7,6 +7,7 @@
 
 import UIKit
 import JXPhotoBrowser
+import Kingfisher
 
 /// 横向滚动的图片 Banner 视图
 /// 使用 JXPhotoBrowser 实现，支持分页滚动和循环滚动
@@ -29,8 +30,8 @@ class PhotoBannerView: UIView {
         }
     }
     
-    /// 图片资源列表
-    public var resources: [JXPhotoResource] = [] {
+    /// 图片资源列表（imageURL, thumbnailURL）
+    public var resources: [(imageURL: URL, thumbnailURL: URL?)] = [] {
         didSet {
             browser?.collectionView.reloadData()
         }
@@ -79,11 +80,10 @@ class PhotoBannerView: UIView {
     // MARK: - Public Methods
     
     /// 配置 Banner 数据
-    /// - Parameter resources: 图片资源数组
-    public func configure(with resources: [JXPhotoResource]) {
+    /// - Parameter resources: 图片资源数组（imageURL, thumbnailURL）
+    public func configure(with resources: [(imageURL: URL, thumbnailURL: URL?)]) {
         self.resources = resources
     }
-    
     
     // MARK: - Private Methods
     
@@ -133,7 +133,10 @@ extension PhotoBannerView: JXPhotoBrowserDelegate {
     
     func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXBasicImageCell.reuseIdentifier, for: indexPath) as! JXBasicImageCell
-        cell.resource = resources[index]
+        let resource = resources[index]
+        // 使用 Kingfisher 加载图片
+        let url = resource.thumbnailURL ?? resource.imageURL
+        cell.imageView.kf.setImage(with: url)
         return cell
     }
     

@@ -8,9 +8,10 @@
 import UIKit
 import AVKit
 import AVFoundation
-import JXPhotoBrowser
 import Network
 import Photos
+import JXPhotoBrowser
+import Kingfisher
 
 // MARK: - ViewController
 class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
@@ -90,10 +91,10 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     /// 初始化顶部 Banner 区域
     private func setupBannerBrowser() {
         // 从 items 中提取仅包含图片的资源列表
-        let bannerResources = items.compactMap { media -> JXPhotoResource? in
+        let bannerResources: [(imageURL: URL, thumbnailURL: URL?)] = items.compactMap { media in
             switch media.source {
             case let .remoteImage(imageURL, thumbnailURL):
-                return JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+                return (imageURL, thumbnailURL)
             case .remoteVideo:
                 return nil
             }
@@ -222,17 +223,43 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         case let .remoteImage(imageURL, thumbnailURL):
             if index < 3 {
                 let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
-                cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+                loadImage(for: cell, imageURL: imageURL, thumbnailURL: thumbnailURL)
                 return cell
             } else {
                 let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
-                cell.currentResource = JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+                loadImage(for: cell, imageURL: imageURL, thumbnailURL: thumbnailURL)
                 return cell
             }
-        case let .remoteVideo(url, thumbnailURL):
+        case let .remoteVideo(videoURL, thumbnailURL):
             let cell = browser.dequeueReusableCell(withReuseIdentifier: JXVideoCell.videoReuseIdentifier, for: indexPath) as! JXVideoCell
-            cell.currentResource = JXPhotoResource(imageURL: thumbnailURL, thumbnailURL: thumbnailURL, videoURL: url)
+            // 先加载封面图，再配置视频
+            cell.imageView.kf.setImage(with: thumbnailURL) { [weak cell] result in
+                guard let cell = cell else { return }
+                if case .success(let value) = result {
+                    cell.configure(videoURL: videoURL, coverImage: value.image)
+                } else {
+                    cell.configure(videoURL: videoURL, coverImage: nil)
+                }
+            }
             return cell
+        }
+    }
+    
+    /// 使用 Kingfisher 加载图片到 JXPhotoCell
+    private func loadImage(for cell: JXPhotoCell, imageURL: URL, thumbnailURL: URL?) {
+        // 先设置缩略图作为占位
+        if let thumbURL = thumbnailURL {
+            cell.imageView.kf.setImage(with: thumbURL) { [weak cell] result in
+                if case .success(let value) = result {
+                    cell?.setPlaceholder(value.image)
+                }
+            }
+        }
+        // 加载原图
+        cell.imageView.kf.setImage(with: imageURL) { [weak cell] result in
+            if case .success(let value) = result {
+                cell?.setImage(value.image)
+            }
         }
     }
     
@@ -286,7 +313,7 @@ private extension DemoViewController {
     }
     
     /// 下载图片 / 视频并保存到系统相册
-    func downloadToAlbum(resource: JXPhotoResource, presentingViewController: UIViewController) {
+    func downloadToAlbum(imageURL: URL?, videoURL: URL?, presentingViewController: UIViewController) {
         requestPhotoAuthorization { [weak self] granted in
             guard let self = self else { return }
             guard granted else {
@@ -296,10 +323,10 @@ private extension DemoViewController {
                 return
             }
             
-            if let videoURL = resource.videoURL {
+            if let videoURL = videoURL {
                 self.downloadVideoAndSave(videoURL, presentingViewController: presentingViewController)
-            } else {
-                self.downloadImageAndSave(resource.imageURL, presentingViewController: presentingViewController)
+            } else if let imageURL = imageURL {
+                self.downloadImageAndSave(imageURL, presentingViewController: presentingViewController)
             }
         }
     }

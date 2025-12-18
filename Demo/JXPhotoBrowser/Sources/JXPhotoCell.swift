@@ -6,71 +6,6 @@
 import UIKit
 import AVFoundation
 
-public protocol JXPhotoBrowserImageLoader {
-    func setImage(on imageView: UIImageView, url: URL, placeholder: UIImage?, completion: @escaping (Result<UIImage, Error>) -> Void)
-    func cancel(for imageView: UIImageView)
-    func cachedImage(for url: URL) -> UIImage?
-}
-
-public final class JXDefaultImageLoader: JXPhotoBrowserImageLoader {
-    public static let shared = JXDefaultImageLoader()
-    
-    private let session: URLSession
-    private var tasks: [ObjectIdentifier: URLSessionDataTask] = [:]
-    private let cache = NSCache<NSURL, UIImage>()
-    
-    public init(session: URLSession = .shared) {
-        self.session = session
-    }
-    
-    public func setImage(on imageView: UIImageView, url: URL, placeholder: UIImage?, completion: @escaping (Result<UIImage, Error>) -> Void) {
-        cancel(for: imageView)
-        if let cached = cachedImage(for: url) {
-            imageView.image = cached
-            completion(.success(cached))
-            return
-        }
-        imageView.image = placeholder
-        let token = ObjectIdentifier(imageView)
-        let task = session.dataTask(with: url) { [weak self, weak imageView] data, _, error in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                guard let imageView = imageView else { return }
-                self.tasks[token] = nil
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                guard let data = data, let image = UIImage(data: data) else {
-                    completion(.failure(NSError(domain: "JXPhotoBrowserImageLoader", code: -1, userInfo: nil)))
-                    return
-                }
-                self.cache.setObject(image, forKey: url as NSURL)
-                imageView.image = image
-                completion(.success(image))
-            }
-        }
-        tasks[token] = task
-        task.resume()
-    }
-    
-    public func cancel(for imageView: UIImageView) {
-        let token = ObjectIdentifier(imageView)
-        if let task = tasks[token] {
-            task.cancel()
-            tasks[token] = nil
-        }
-    }
-    
-    public func cachedImage(for url: URL) -> UIImage? {
-        cache.object(forKey: url as NSURL)
-    }
-}
-
-public struct JXPhotoBrowserImageLoaderConfig {
-    public static var shared: JXPhotoBrowserImageLoader = JXDefaultImageLoader.shared
-}
-
 /// 支持图片捏合缩放查看的 Cell
 open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrowserCellProtocol {
     // MARK: - Static
@@ -123,18 +58,12 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     }()
     
     // MARK: - State
+    
     /// 弱引用的浏览器（用于调用关闭）
     public weak var browser: JXPhotoBrowser?
 
     /// 当前关联的真实索引
     public var currentIndex: Int?
-    
-    /// 当前 Cell 对应的资源（图片 / 视频）
-    public var currentResource: JXPhotoResource? {
-        didSet {
-            reloadContent()
-        }
-    }
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -171,14 +100,14 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     private var isShortEdgeFit: Bool = false
     
     // MARK: - Lifecycle
+    
     open override func prepareForReuse() {
         super.prepareForReuse()
-        JXPhotoBrowserImageLoaderConfig.shared.cancel(for: imageView)
         
         // 清空旧图像与状态
         imageView.image = nil
-        currentResource = nil
         currentIndex = nil
+        
         // 重置缩放与偏移
         scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
         scrollView.contentOffset = .zero
@@ -365,31 +294,23 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
         browser?.dismissSelf()
     }
     
-    // MARK: - Content Loading
-    open func reloadContent() {
+    // MARK: - Public Methods
+    
+    /// 设置图片并刷新布局
+    /// - Parameter image: 要显示的图片
+    /// - Note: 业务方应在加载图片完成后调用此方法设置图片
+    open func setImage(_ image: UIImage?) {
         lastBoundsSize = .zero
-        JXPhotoBrowserImageLoaderConfig.shared.cancel(for: imageView)
-        guard let res = currentResource else {
-            imageView.image = nil
-            return
-        }
-        let placeholder: UIImage? = {
-            guard let thumbURL = res.thumbnailURL else { return nil }
-            return JXPhotoBrowserImageLoaderConfig.shared.cachedImage(for: thumbURL)
-        }()
-        JXPhotoBrowserImageLoaderConfig.shared.setImage(on: imageView, url: res.imageURL, placeholder: placeholder) { [weak self] _ in
-            guard let self = self else { return }
-            self.lastBoundsSize = .zero
-            self.adjustImageViewFrame()
-            self.centerImageIfNeeded()
-            self.setNeedsLayout()
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.setNeedsLayout()
-                self.layoutIfNeeded()
-                self.centerImageIfNeeded()
-            }
-        }
+        imageView.image = image
+        adjustImageViewFrame()
+        centerImageIfNeeded()
+        setNeedsLayout()
+    }
+    
+    /// 设置占位图（图片加载前的临时展示）
+    /// - Parameter placeholder: 占位图
+    open func setPlaceholder(_ placeholder: UIImage?) {
+        imageView.image = placeholder
         adjustImageViewFrame()
         centerImageIfNeeded()
     }
