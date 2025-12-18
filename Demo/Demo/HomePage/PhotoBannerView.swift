@@ -84,19 +84,6 @@ class PhotoBannerView: UIView {
         self.resources = resources
     }
     
-    /// 在指定的父视图控制器中嵌入 Banner
-    /// - Parameter parentViewController: 父视图控制器
-    public func embed(in parentViewController: UIViewController) {
-        guard let browser = browser else { return }
-        parentViewController.addChild(browser)
-        browser.didMove(toParent: parentViewController)
-    }
-    
-    /// 从父视图控制器中移除 Banner
-    public func removeFromParent() {
-        browser?.willMove(toParent: nil)
-        browser?.removeFromParent()
-    }
     
     // MARK: - Private Methods
     

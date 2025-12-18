@@ -124,9 +124,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
             photoBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             photoBannerView.heightAnchor.constraint(equalToConstant: photoBannerView.bannerHeight)
         ])
-        
-        // 将 Banner 嵌入到当前视图控制器
-        photoBannerView.embed(in: self)
     }
     
     private func setupCollectionView() {
