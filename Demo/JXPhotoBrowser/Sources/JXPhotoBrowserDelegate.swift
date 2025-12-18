@@ -26,7 +26,7 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     /// 返回指定索引的 item 的源视图，可选实现
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
     
-    /// 返回指定索引的 item 的缩放视图，可选实现
+    /// 返回 Zoom 转场动画使用的临时 ZoomView（转场结束即移除）
     func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
     
     /// 返回指定索引的 item 尺寸，可选实现，默认返回 collectionView.bounds.size
