@@ -523,16 +523,11 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
         guard let delegate = delegate else {
-            return collectionView.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath)
+            assertionFailure("JXPhotoBrowser.collectionView(_:cellForItemAt:) 失败：delegate 不能为 nil")
+            return UICollectionViewCell()
         }
         let cell = delegate.photoBrowser(self, cellForItemAt: real, at: indexPath)
         cell.browser = self
-        if realCount > 0 {
-            cell.currentIndex = real
-            delegate.photoBrowser(self, didReuse: cell, at: real)
-        } else {
-            cell.currentIndex = nil
-        }
         return cell
     }
     

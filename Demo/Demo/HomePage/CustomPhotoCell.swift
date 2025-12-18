@@ -18,6 +18,11 @@ class CustomPhotoCell: JXPhotoCell {
     /// 自定义的reuseIdentifier
     static let customReuseIdentifier = "CustomPhotoCell"
     
+    // MARK: - Public Properties
+    
+    /// 当前索引（由业务方设置，用于显示信息）
+    var currentIndex: Int?
+    
     // MARK: - Private Properties
     
     /// 自定义标签：显示图片信息
@@ -57,6 +62,7 @@ class CustomPhotoCell: JXPhotoCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         // 重置自定义状态
+        currentIndex = nil
         infoLabel.isHidden = true
         infoLabel.text = nil
     }

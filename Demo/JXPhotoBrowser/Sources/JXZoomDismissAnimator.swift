@@ -27,11 +27,11 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             toView.layoutIfNeeded()
         }
         
+        let pageIndex = fromVC.pageIndex
         // 前置条件不满足则直接降级为淡出
         guard let srcCell = fromVC.visiblePhotoCell(),
               let srcIV = srcCell.transitionImageView, srcIV.bounds.size != .zero,
-              let idx = srcCell.currentIndex,
-              let originView = fromVC.delegate?.photoBrowser(fromVC, zoomOriginViewAt: idx) else {
+              let originView = fromVC.delegate?.photoBrowser(fromVC, zoomOriginViewAt: pageIndex) else {
             animateFadeOut(view: fromView, duration: duration, ctx: ctx)
             return
         }
@@ -60,7 +60,7 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             fromView.alpha = 0
         }) { _ in
             originView.isHidden = false
-            fromVC.delegate?.photoBrowser(fromVC, setOriginViewHidden: false, at: idx)
+            fromVC.delegate?.photoBrowser(fromVC, setOriginViewHidden: false, at: pageIndex)
             zoomIV.removeFromSuperview()
             fromView.removeFromSuperview()
             ctx.completeTransition(true)

@@ -11,12 +11,6 @@ open class JXBasicImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     
     // MARK: - Public Properties
     
-    /// 浏览器实例（由框架自动注入）
-    public weak var browser: JXPhotoBrowser?
-    
-    /// 当前真实索引（由框架自动注入）
-    public var currentIndex: Int?
-    
     /// 复用标识符
     public static let reuseIdentifier = "JXBasicImageCell"
     
@@ -44,7 +38,6 @@ open class JXBasicImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     open override func prepareForReuse() {
         super.prepareForReuse()
         imageView.image = nil
-        currentIndex = nil
     }
     
     // MARK: - Private Methods

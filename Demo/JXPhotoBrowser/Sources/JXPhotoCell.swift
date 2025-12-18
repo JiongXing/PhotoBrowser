@@ -61,9 +61,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     
     /// 弱引用的浏览器（用于调用关闭）
     public weak var browser: JXPhotoBrowser?
-
-    /// 当前关联的真实索引
-    public var currentIndex: Int?
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -104,9 +101,8 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     open override func prepareForReuse() {
         super.prepareForReuse()
         
-        // 清空旧图像与状态
+        // 清空旧图像
         imageView.image = nil
-        currentIndex = nil
         
         // 重置缩放与偏移
         scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)

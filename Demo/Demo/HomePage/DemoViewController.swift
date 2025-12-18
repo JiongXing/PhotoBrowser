@@ -103,7 +103,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         // 创建 Banner 视图
         photoBannerView = PhotoBannerView()
         photoBannerView.translatesAutoresizingMaskIntoConstraints = false
-        photoBannerView.bannerHeight = 100
         photoBannerView.isLoopingEnabled = settingsPanel.isLoopingEnabled
         photoBannerView.itemSpacing = settingsPanel.isItemSpacingEnabled ? 8 : 0
         photoBannerView.configure(with: bannerResources)
@@ -223,6 +222,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         case let .remoteImage(imageURL, thumbnailURL):
             if index < 3 {
                 let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
+                cell.currentIndex = index
                 loadImage(for: cell, imageURL: imageURL, thumbnailURL: thumbnailURL)
                 return cell
             } else {
