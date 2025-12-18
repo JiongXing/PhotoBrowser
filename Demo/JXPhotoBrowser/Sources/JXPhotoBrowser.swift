@@ -119,10 +119,24 @@ open class JXPhotoBrowser: UIViewController {
     }
     
     /// 是否启用无限循环滚动
-    public var isLoopingEnabled: Bool = true
+    public var isLoopingEnabled: Bool = true {
+        didSet {
+            guard oldValue != isLoopingEnabled, isViewLoaded else { return }
+            reloadForLoopingChange()
+        }
+    }
     
     /// 转场动画类型
     public var transitionType: JXPhotoBrowserTransitionType = .fade
+    
+    /// 图片之间的间距（默认 0）
+    public var itemSpacing: CGFloat = 0 {
+        didSet {
+            if isViewLoaded {
+                applyCollectionViewConfig()
+            }
+        }
+    }
         
     // MARK: - Private Properties
     
@@ -205,11 +219,23 @@ open class JXPhotoBrowser: UIViewController {
         super.viewWillLayoutSubviews()
         
         // 在布局前设置 frame，确保 collectionView 有正确的尺寸
-        // 这样在系统调用 sizeForItemAt 时，collectionView.bounds 就不会是 .zero
-        // 使用 autoresizingMask 确保即使 view.bounds 变化也会自动调整
-        if collectionView.frame != view.bounds {
-            collectionView.frame = view.bounds
+        // 有间距时，扩展 collectionView 尺寸，使 bounds = itemSize + spacing，确保分页正常
+        let targetFrame = calculateCollectionViewFrame()
+        if collectionView.frame != targetFrame {
+            collectionView.frame = targetFrame
         }
+    }
+    
+    /// 计算 collectionView 的 frame
+    /// 扩展尺寸使 bounds = itemSize + spacing，确保 isPagingEnabled 分页单位正确
+    private func calculateCollectionViewFrame() -> CGRect {
+        var frame = view.bounds
+        if scrollDirection == .horizontal {
+            frame.size.width += itemSpacing
+        } else {
+            frame.size.height += itemSpacing
+        }
+        return frame
     }
     
     open override func viewDidLayoutSubviews() {
@@ -238,7 +264,7 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 计算指定索引的 item 尺寸
     /// - Parameter index: 实际数据源中的索引
-    /// - Returns: 合法的 CGSize，优先使用代理返回值，否则使用 collectionView.bounds / view.bounds
+    /// - Returns: 合法的 CGSize，优先使用代理返回值，否则使用 view.bounds（满屏）
     private func calculateItemSize(for index: Int) -> CGSize {
         if let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: index),
            delegateSize.width > 0,
@@ -246,18 +272,13 @@ open class JXPhotoBrowser: UIViewController {
             return delegateSize
         }
         
-        let collectionSize = collectionView.bounds.size
-        if collectionSize.width > 0 && collectionSize.height > 0 {
-            return collectionSize
-        }
-        
+        // itemSize 始终等于 view.bounds（满屏）
         let viewSize = view.bounds.size
         if viewSize.width > 0 && viewSize.height > 0 {
             return viewSize
         }
         
-        let screenSize = UIScreen.main.bounds.size
-        return screenSize
+        return UIScreen.main.bounds.size
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
@@ -425,6 +446,27 @@ open class JXPhotoBrowser: UIViewController {
         pageIndex = safeInitialIndex
     }
     
+    /// 循环模式变更时重新加载数据并调整位置
+    private func reloadForLoopingChange() {
+        let currentReal = pageIndex
+        collectionView.reloadData()
+        
+        let count = realCount
+        guard count > 0 else { return }
+        
+        // 计算新的目标索引
+        let targetIndex: Int
+        if isLoopingEnabled {
+            // 切换到循环模式：定位到中间位置
+            targetIndex = (loopMultiplier / 2) * count + currentReal
+        } else {
+            // 切换到非循环模式：定位到真实索引
+            targetIndex = min(currentReal, count - 1)
+        }
+        
+        collectionView.scrollToItem(at: IndexPath(item: targetIndex, section: 0), at: scrollDirection.scrollPosition, animated: false)
+    }
+    
     /// 关闭浏览器
     @objc open func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
@@ -505,23 +547,39 @@ open class JXPhotoBrowser: UIViewController {
     /// 添加并设置集合视图的 frame（使用 frame 布局，避免初始化时 bounds 为 .zero 的问题）
     open func setupCollectionView() {
         view.addSubview(collectionView)
-        // 使用 frame 布局，立即设置 frame 为 view.bounds，确保 bounds 不为 .zero
-        // 这样在 sizeForItemAt 被调用时就能获得有效的尺寸
-        collectionView.frame = view.bounds
+        view.clipsToBounds = true  // 裁剪超出部分，隐藏扩展的间距区域
+        // 使用 frame 布局，立即设置 frame，确保 bounds 不为 .zero
+        collectionView.frame = calculateCollectionViewFrame()
     }
     
     /// 根据当前属性应用集合视图配置（支持运行时切换）
     open func applyCollectionViewConfig() {
-        // 分页固定开启
+        // 始终开启系统分页（itemSize 已适配间距）
         collectionView.isPagingEnabled = true
         
-        // 更新滚动方向
+        // 更新滚动方向和间距
         if let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             let newDirection = scrollDirection.flowDirection
             if layout.scrollDirection != newDirection {
                 layout.scrollDirection = newDirection
                 layout.invalidateLayout()
             }
+            
+            // 应用图片间距
+            if scrollDirection == .horizontal {
+                layout.minimumLineSpacing = itemSpacing
+                layout.minimumInteritemSpacing = 0
+            } else {
+                layout.minimumLineSpacing = 0
+                layout.minimumInteritemSpacing = itemSpacing
+            }
+        }
+        
+        // 为最后一个 item 右侧（或底部）添加 inset，补偿缺失的间距
+        if scrollDirection == .horizontal {
+            collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: itemSpacing)
+        } else {
+            collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: itemSpacing, right: 0)
         }
         
         // 保持当前可见项居中（在已滚动到初始项后）

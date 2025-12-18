@@ -1,0 +1,166 @@
+//
+//  PhotoBannerView.swift
+//  Demo
+//
+//  Created on 2025/12/17.
+//
+
+import UIKit
+import JXPhotoBrowser
+
+/// 横向滚动的图片 Banner 视图
+/// 使用 JXPhotoBrowser 实现，支持分页滚动和循环滚动
+class PhotoBannerView: UIView {
+    
+    // MARK: - Public Properties
+    
+    /// Banner 高度（默认 100pt）
+    public var bannerHeight: CGFloat = 100 {
+        didSet {
+            heightConstraint?.constant = bannerHeight
+        }
+    }
+    
+    /// 左右两侧边距（默认 12pt）
+    public var horizontalMargin: CGFloat = 12 {
+        didSet {
+            leadingConstraint?.constant = horizontalMargin
+            trailingConstraint?.constant = -horizontalMargin
+        }
+    }
+    
+    /// 图片资源列表
+    public var resources: [JXPhotoResource] = [] {
+        didSet {
+            browser?.collectionView.reloadData()
+        }
+    }
+    
+    /// 是否启用无限循环滚动
+    public var isLoopingEnabled: Bool = true {
+        didSet {
+            browser?.isLoopingEnabled = isLoopingEnabled
+        }
+    }
+    
+    /// 图片之间的间距
+    public var itemSpacing: CGFloat = 8 {
+        didSet {
+            browser?.itemSpacing = itemSpacing
+        }
+    }
+    
+    // MARK: - Private Properties
+    
+    /// 嵌入的图片浏览器
+    private var browser: JXPhotoBrowser?
+    
+    /// 高度约束
+    private var heightConstraint: NSLayoutConstraint?
+    
+    /// 左侧边距约束
+    private var leadingConstraint: NSLayoutConstraint?
+    
+    /// 右侧边距约束
+    private var trailingConstraint: NSLayoutConstraint?
+    
+    // MARK: - Lifecycle
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupBrowser()
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupBrowser()
+    }
+    
+    // MARK: - Public Methods
+    
+    /// 配置 Banner 数据
+    /// - Parameter resources: 图片资源数组
+    public func configure(with resources: [JXPhotoResource]) {
+        self.resources = resources
+    }
+    
+    /// 在指定的父视图控制器中嵌入 Banner
+    /// - Parameter parentViewController: 父视图控制器
+    public func embed(in parentViewController: UIViewController) {
+        guard let browser = browser else { return }
+        parentViewController.addChild(browser)
+        browser.didMove(toParent: parentViewController)
+    }
+    
+    /// 从父视图控制器中移除 Banner
+    public func removeFromParent() {
+        browser?.willMove(toParent: nil)
+        browser?.removeFromParent()
+    }
+    
+    // MARK: - Private Methods
+    
+    /// 初始化并设置图片浏览器
+    private func setupBrowser() {
+        backgroundColor = .clear
+        
+        let browser = JXPhotoBrowser()
+        browser.delegate = self
+        browser.scrollDirection = .horizontal
+        browser.transitionType = .none
+        browser.isLoopingEnabled = true
+        browser.itemSpacing = 8  // 设置图片之间的间距
+        browser.register(JXBasicImageCell.self, forReuseIdentifier: JXBasicImageCell.reuseIdentifier)
+        
+        // 设置浏览器视图背景为透明，与页面背景融为一体
+        browser.view.backgroundColor = .clear
+        
+        // 将浏览器视图添加到当前视图，并设置左右边距
+        let browserView = browser.view!
+        browserView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(browserView)
+        
+        let leading = browserView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalMargin)
+        let trailing = browserView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalMargin)
+        leadingConstraint = leading
+        trailingConstraint = trailing
+        
+        NSLayoutConstraint.activate([
+            browserView.topAnchor.constraint(equalTo: topAnchor),
+            leading,
+            trailing,
+            browserView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        
+        self.browser = browser
+    }
+}
+
+// MARK: - JXPhotoBrowserDelegate
+
+extension PhotoBannerView: JXPhotoBrowserDelegate {
+    
+    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+        return resources.count
+    }
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXBasicImageCell.reuseIdentifier, for: indexPath) as! JXBasicImageCell
+        cell.resource = resources[index]
+        return cell
+    }
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {}
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {}
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
+        return nil
+    }
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? {
+        return nil
+    }
+    
+    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {}
+}

@@ -37,8 +37,23 @@ class DemoSettingsPanel: UIView {
     var isLoopingEnabled: Bool = true {
         didSet {
             loopingSwitch.isOn = isLoopingEnabled
+            onLoopingChanged?(isLoopingEnabled)
         }
     }
+    
+    /// 无限循环开关变化回调
+    var onLoopingChanged: ((Bool) -> Void)?
+    
+    /// 是否启用图片间距
+    var isItemSpacingEnabled: Bool = true {
+        didSet {
+            itemSpacingSwitch.isOn = isItemSpacingEnabled
+            onItemSpacingChanged?(isItemSpacingEnabled)
+        }
+    }
+    
+    /// 图片间距开关变化回调
+    var onItemSpacingChanged: ((Bool) -> Void)?
     
     // MARK: - Private Properties
     
@@ -93,7 +108,23 @@ class DemoSettingsPanel: UIView {
         return switchControl
     }()
     
-    /// 屏幕旋转标签
+    /// 图片间距标签
+    private let itemSpacingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "图片间距"
+        label.font = .systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    /// 图片间距开关
+    private let itemSpacingSwitch: UISwitch = {
+        let switchControl = UISwitch()
+        switchControl.isOn = true
+        switchControl.translatesAutoresizingMaskIntoConstraints = false
+        return switchControl
+    }()
+    
     /// 容器视图
     private let containerView: UIView = {
         let view = UIView()
@@ -131,6 +162,8 @@ class DemoSettingsPanel: UIView {
         containerView.addSubview(scrollDirectionSegmentedControl)
         containerView.addSubview(loopingLabel)
         containerView.addSubview(loopingSwitch)
+        containerView.addSubview(itemSpacingLabel)
+        containerView.addSubview(itemSpacingSwitch)
         
         NSLayoutConstraint.activate([
             // 容器视图
@@ -163,7 +196,14 @@ class DemoSettingsPanel: UIView {
             loopingLabel.widthAnchor.constraint(equalToConstant: 80),
             loopingSwitch.centerYAnchor.constraint(equalTo: loopingLabel.centerYAnchor),
             loopingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            loopingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
+            
+            // 图片间距
+            itemSpacingLabel.topAnchor.constraint(equalTo: loopingLabel.bottomAnchor, constant: 20),
+            itemSpacingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            itemSpacingLabel.widthAnchor.constraint(equalToConstant: 80),
+            itemSpacingSwitch.centerYAnchor.constraint(equalTo: itemSpacingLabel.centerYAnchor),
+            itemSpacingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            itemSpacingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])
     }
     
@@ -171,6 +211,7 @@ class DemoSettingsPanel: UIView {
         scrollDirectionSegmentedControl.addTarget(self, action: #selector(scrollDirectionChanged), for: .valueChanged)
         loopingSwitch.addTarget(self, action: #selector(loopingChanged), for: .valueChanged)
         transitionTypeSegmentedControl.addTarget(self, action: #selector(transitionTypeChanged), for: .valueChanged)
+        itemSpacingSwitch.addTarget(self, action: #selector(itemSpacingChanged), for: .valueChanged)
     }
     
     // MARK: - Action Methods
@@ -181,6 +222,10 @@ class DemoSettingsPanel: UIView {
     
     @objc private func loopingChanged() {
         isLoopingEnabled = loopingSwitch.isOn
+    }
+    
+    @objc private func itemSpacingChanged() {
+        isItemSpacingEnabled = itemSpacingSwitch.isOn
     }
     
     @objc private func transitionTypeChanged() {

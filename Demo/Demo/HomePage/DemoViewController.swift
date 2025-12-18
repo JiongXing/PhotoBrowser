@@ -20,6 +20,9 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     private var collectionView: UICollectionView!
     
+    /// 顶部横向 Banner 视图
+    private var photoBannerView: PhotoBannerView!
+    
     /// 网络状态监视器（监听网络连通性变化）
     private let networkMonitor = NWPathMonitor()
     
@@ -46,6 +49,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         setupData()
         setupNetworkMonitoring()
         setupSettingsPanel()
+        setupBannerBrowser()
         setupCollectionView()
     }
     
@@ -83,6 +87,48 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         items = photos + videos
     }
     
+    /// 初始化顶部 Banner 区域
+    private func setupBannerBrowser() {
+        // 从 items 中提取仅包含图片的资源列表
+        let bannerResources = items.compactMap { media -> JXPhotoResource? in
+            switch media.source {
+            case let .remoteImage(imageURL, thumbnailURL):
+                return JXPhotoResource(imageURL: imageURL, thumbnailURL: thumbnailURL)
+            case .remoteVideo:
+                return nil
+            }
+        }
+        
+        // 创建 Banner 视图
+        photoBannerView = PhotoBannerView()
+        photoBannerView.translatesAutoresizingMaskIntoConstraints = false
+        photoBannerView.bannerHeight = 100
+        photoBannerView.isLoopingEnabled = settingsPanel.isLoopingEnabled
+        photoBannerView.itemSpacing = settingsPanel.isItemSpacingEnabled ? 8 : 0
+        photoBannerView.configure(with: bannerResources)
+        view.addSubview(photoBannerView)
+        
+        // 监听设置面板的无限循环开关变化
+        settingsPanel.onLoopingChanged = { [weak self] isLoopingEnabled in
+            self?.photoBannerView.isLoopingEnabled = isLoopingEnabled
+        }
+        
+        // 监听设置面板的图片间距开关变化
+        settingsPanel.onItemSpacingChanged = { [weak self] isItemSpacingEnabled in
+            self?.photoBannerView.itemSpacing = isItemSpacingEnabled ? 8 : 0
+        }
+        
+        NSLayoutConstraint.activate([
+            photoBannerView.topAnchor.constraint(equalTo: settingsPanel.bottomAnchor, constant: 8),
+            photoBannerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            photoBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            photoBannerView.heightAnchor.constraint(equalToConstant: photoBannerView.bannerHeight)
+        ])
+        
+        // 将 Banner 嵌入到当前视图控制器
+        photoBannerView.embed(in: self)
+    }
+    
     private func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -100,7 +146,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: settingsPanel.bottomAnchor, constant: 8),
+            collectionView.topAnchor.constraint(equalTo: photoBannerView.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -151,6 +197,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         browser.scrollDirection = settingsPanel.scrollDirection
         browser.transitionType = settingsPanel.transitionType
         browser.isLoopingEnabled = settingsPanel.isLoopingEnabled
+        browser.itemSpacing = settingsPanel.isItemSpacingEnabled ? 20 : 0
         
         self.photoBrowser = browser
         browser.present(from: self)
