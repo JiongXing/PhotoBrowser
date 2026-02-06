@@ -16,8 +16,11 @@ import Kingfisher
 // MARK: - ViewController
 class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
     
-    /// 功能设置面板
-    private var settingsPanel: DemoSettingsPanel!
+    /// Banner 设置面板（控制无限循环、自动轮播）
+    private var bannerSettingsPanel: BannerSettingsPanel!
+    
+    /// 浏览器设置面板（控制转场动画、滚动方向）
+    private var browserSettingsPanel: BrowserSettingsPanel!
     
     private var collectionView: UICollectionView!
     
@@ -49,22 +52,38 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         super.viewDidLoad()
         setupData()
         setupNetworkMonitoring()
-        setupSettingsPanel()
+        setupBannerSettingsPanel()
         setupBannerBrowser()
+        setupBrowserSettingsPanel()
         setupCollectionView()
     }
     
+    
     // MARK: - Helper Methods
     
-    private func setupSettingsPanel() {
-        settingsPanel = DemoSettingsPanel()
-        settingsPanel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(settingsPanel)
+    /// 初始化 Banner 设置面板（位于 Banner 上方）
+    private func setupBannerSettingsPanel() {
+        bannerSettingsPanel = BannerSettingsPanel()
+        bannerSettingsPanel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(bannerSettingsPanel)
         
         NSLayoutConstraint.activate([
-            settingsPanel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            settingsPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            settingsPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            bannerSettingsPanel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            bannerSettingsPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bannerSettingsPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    /// 初始化浏览器设置面板（位于 Banner 下方）
+    private func setupBrowserSettingsPanel() {
+        browserSettingsPanel = BrowserSettingsPanel()
+        browserSettingsPanel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(browserSettingsPanel)
+        
+        NSLayoutConstraint.activate([
+            browserSettingsPanel.topAnchor.constraint(equalTo: photoBannerView.bottomAnchor, constant: 8),
+            browserSettingsPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            browserSettingsPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
     
@@ -103,23 +122,19 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         // 创建 Banner 视图
         photoBannerView = PhotoBannerView()
         photoBannerView.translatesAutoresizingMaskIntoConstraints = false
-        photoBannerView.isLoopingEnabled = settingsPanel.isLoopingEnabled
-        photoBannerView.itemSpacing = settingsPanel.isItemSpacingEnabled ? 8 : 0
         photoBannerView.configure(with: bannerResources)
         view.addSubview(photoBannerView)
         
-        // 监听设置面板的无限循环开关变化
-        settingsPanel.onLoopingChanged = { [weak self] isLoopingEnabled in
+        // 监听 Banner 设置面板的开关变化，实时更新 Banner 行为
+        bannerSettingsPanel.onLoopingChanged = { [weak self] isLoopingEnabled in
             self?.photoBannerView.isLoopingEnabled = isLoopingEnabled
         }
-        
-        // 监听设置面板的图片间距开关变化
-        settingsPanel.onItemSpacingChanged = { [weak self] isItemSpacingEnabled in
-            self?.photoBannerView.itemSpacing = isItemSpacingEnabled ? 8 : 0
+        bannerSettingsPanel.onAutoPlayChanged = { [weak self] isAutoPlayEnabled in
+            self?.photoBannerView.isAutoPlayEnabled = isAutoPlayEnabled
         }
         
         NSLayoutConstraint.activate([
-            photoBannerView.topAnchor.constraint(equalTo: settingsPanel.bottomAnchor, constant: 8),
+            photoBannerView.topAnchor.constraint(equalTo: bannerSettingsPanel.bottomAnchor),
             photoBannerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             photoBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             photoBannerView.heightAnchor.constraint(equalToConstant: photoBannerView.bannerHeight)
@@ -143,7 +158,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: photoBannerView.bottomAnchor, constant: 8),
+            collectionView.topAnchor.constraint(equalTo: browserSettingsPanel.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -191,11 +206,10 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         browser.delegate = self
         browser.initialIndex = indexPath.item
         
-        // 使用设置面板的配置
-        browser.scrollDirection = settingsPanel.scrollDirection
-        browser.transitionType = settingsPanel.transitionType
-        browser.isLoopingEnabled = settingsPanel.isLoopingEnabled
-        browser.itemSpacing = settingsPanel.isItemSpacingEnabled ? 20 : 0
+        // 使用浏览器设置面板的配置
+        browser.scrollDirection = browserSettingsPanel.scrollDirection
+        browser.transitionType = browserSettingsPanel.transitionType
+        browser.itemSpacing = 20
         
         self.photoBrowser = browser
         browser.present(from: self)

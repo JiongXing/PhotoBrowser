@@ -66,7 +66,16 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 是否启用自动轮播（默认 false）
     /// 自动轮播会在到达最后一页后自动停止
-    public var isAutoPlayEnabled: Bool = false
+    public var isAutoPlayEnabled: Bool = false {
+        didSet {
+            guard isAutoPlayEnabled != oldValue else { return }
+            if isAutoPlayEnabled {
+                startAutoPlayIfNeeded()
+            } else {
+                stopAutoPlay()
+            }
+        }
+    }
     
     /// 自动轮播间隔时间（默认 3.0 秒）
     public var autoPlayInterval: TimeInterval = 3.0

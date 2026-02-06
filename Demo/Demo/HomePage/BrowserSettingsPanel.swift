@@ -1,24 +1,18 @@
 //
-//  DemoSettingsPanel.swift
+//  BrowserSettingsPanel.swift
 //  Demo
 //
-//  Created by jxing on 2025/10/24.
+//  控制图片大图浏览器行为的设置面板
 //
 
 import UIKit
 import JXPhotoBrowser
 
-/// JXPhotoBrowser 功能设置面板
-class DemoSettingsPanel: UIView {
+/// 浏览器设置面板
+/// 控制图片大图浏览器的转场动画和滚动方向
+class BrowserSettingsPanel: UIView {
     
     // MARK: - Public Properties
-    
-    /// 滚动方向
-    var scrollDirection: JXPhotoBrowserScrollDirection = .horizontal {
-        didSet {
-            scrollDirectionSegmentedControl.selectedSegmentIndex = scrollDirection == .horizontal ? 0 : 1
-        }
-    }
     
     /// 转场动画类型
     var transitionType: JXPhotoBrowserTransitionType = .zoom {
@@ -33,46 +27,14 @@ class DemoSettingsPanel: UIView {
         }
     }
     
-    /// 是否启用无限循环滚动
-    var isLoopingEnabled: Bool = true {
+    /// 滚动方向
+    var scrollDirection: JXPhotoBrowserScrollDirection = .horizontal {
         didSet {
-            loopingSwitch.isOn = isLoopingEnabled
-            onLoopingChanged?(isLoopingEnabled)
+            scrollDirectionSegmentedControl.selectedSegmentIndex = scrollDirection == .horizontal ? 0 : 1
         }
     }
-    
-    /// 无限循环开关变化回调
-    var onLoopingChanged: ((Bool) -> Void)?
-    
-    /// 是否启用图片间距
-    var isItemSpacingEnabled: Bool = true {
-        didSet {
-            itemSpacingSwitch.isOn = isItemSpacingEnabled
-            onItemSpacingChanged?(isItemSpacingEnabled)
-        }
-    }
-    
-    /// 图片间距开关变化回调
-    var onItemSpacingChanged: ((Bool) -> Void)?
     
     // MARK: - Private Properties
-    
-    /// 滚动方向标签
-    private let scrollDirectionLabel: UILabel = {
-        let label = UILabel()
-        label.text = "滚动方向"
-        label.font = .systemFont(ofSize: 14)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    /// 滚动方向选择器
-    private let scrollDirectionSegmentedControl: UISegmentedControl = {
-        let control = UISegmentedControl(items: ["水平", "垂直"])
-        control.selectedSegmentIndex = 0
-        control.translatesAutoresizingMaskIntoConstraints = false
-        return control
-    }()
     
     /// 转场动画标签
     private let transitionTypeLabel: UILabel = {
@@ -91,38 +53,21 @@ class DemoSettingsPanel: UIView {
         return control
     }()
     
-    /// 无限循环标签
-    private let loopingLabel: UILabel = {
+    /// 滚动方向标签
+    private let scrollDirectionLabel: UILabel = {
         let label = UILabel()
-        label.text = "无限循环"
+        label.text = "滚动方向"
         label.font = .systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    /// 无限循环开关
-    private let loopingSwitch: UISwitch = {
-        let switchControl = UISwitch()
-        switchControl.isOn = true
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
-        return switchControl
-    }()
-    
-    /// 图片间距标签
-    private let itemSpacingLabel: UILabel = {
-        let label = UILabel()
-        label.text = "图片间距"
-        label.font = .systemFont(ofSize: 14)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    /// 图片间距开关
-    private let itemSpacingSwitch: UISwitch = {
-        let switchControl = UISwitch()
-        switchControl.isOn = true
-        switchControl.translatesAutoresizingMaskIntoConstraints = false
-        return switchControl
+    /// 滚动方向选择器
+    private let scrollDirectionSegmentedControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: ["水平", "垂直"])
+        control.selectedSegmentIndex = 0
+        control.translatesAutoresizingMaskIntoConstraints = false
+        return control
     }()
     
     /// 容器视图
@@ -160,10 +105,6 @@ class DemoSettingsPanel: UIView {
         containerView.addSubview(transitionTypeSegmentedControl)
         containerView.addSubview(scrollDirectionLabel)
         containerView.addSubview(scrollDirectionSegmentedControl)
-        containerView.addSubview(loopingLabel)
-        containerView.addSubview(loopingSwitch)
-        containerView.addSubview(itemSpacingLabel)
-        containerView.addSubview(itemSpacingSwitch)
         
         NSLayoutConstraint.activate([
             // 容器视图
@@ -190,43 +131,16 @@ class DemoSettingsPanel: UIView {
             scrollDirectionSegmentedControl.leadingAnchor.constraint(equalTo: scrollDirectionLabel.trailingAnchor, constant: 12),
             scrollDirectionSegmentedControl.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             
-            // 无限循环
-            loopingLabel.topAnchor.constraint(equalTo: scrollDirectionLabel.bottomAnchor, constant: 20),
-            loopingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            loopingLabel.widthAnchor.constraint(equalToConstant: 80),
-            loopingSwitch.centerYAnchor.constraint(equalTo: loopingLabel.centerYAnchor),
-            loopingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            
-            // 图片间距
-            itemSpacingLabel.topAnchor.constraint(equalTo: loopingLabel.bottomAnchor, constant: 20),
-            itemSpacingLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            itemSpacingLabel.widthAnchor.constraint(equalToConstant: 80),
-            itemSpacingSwitch.centerYAnchor.constraint(equalTo: itemSpacingLabel.centerYAnchor),
-            itemSpacingSwitch.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            itemSpacingLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
+            scrollDirectionLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -16)
         ])
     }
     
     private func setupActions() {
-        scrollDirectionSegmentedControl.addTarget(self, action: #selector(scrollDirectionChanged), for: .valueChanged)
-        loopingSwitch.addTarget(self, action: #selector(loopingChanged), for: .valueChanged)
         transitionTypeSegmentedControl.addTarget(self, action: #selector(transitionTypeChanged), for: .valueChanged)
-        itemSpacingSwitch.addTarget(self, action: #selector(itemSpacingChanged), for: .valueChanged)
+        scrollDirectionSegmentedControl.addTarget(self, action: #selector(scrollDirectionChanged), for: .valueChanged)
     }
     
     // MARK: - Action Methods
-    
-    @objc private func scrollDirectionChanged() {
-        scrollDirection = scrollDirectionSegmentedControl.selectedSegmentIndex == 0 ? .horizontal : .vertical
-    }
-    
-    @objc private func loopingChanged() {
-        isLoopingEnabled = loopingSwitch.isOn
-    }
-    
-    @objc private func itemSpacingChanged() {
-        isItemSpacingEnabled = itemSpacingSwitch.isOn
-    }
     
     @objc private func transitionTypeChanged() {
         switch transitionTypeSegmentedControl.selectedSegmentIndex {
@@ -239,5 +153,9 @@ class DemoSettingsPanel: UIView {
         default:
             break
         }
+    }
+    
+    @objc private func scrollDirectionChanged() {
+        scrollDirection = scrollDirectionSegmentedControl.selectedSegmentIndex == 0 ? .horizontal : .vertical
     }
 }
