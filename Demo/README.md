@@ -52,6 +52,7 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片/视频浏览�
 3.  **交互式转场 (Interactive Transition)**:
     - 实现了 `UIViewControllerTransitioningDelegate` 和 `UIViewControllerAnimatedTransitioning` 协议。
     - **JXZoomPresentAnimator** / **JXZoomDismissAnimator**: 计算源视图（列表中的缩略图）和目标视图（浏览器中的大图）在屏幕坐标系下的位置，通过临时的 `UIImageView` 进行插值动画，实现平滑的缩放效果。
+    - **Zoom 动画注意事项**：为确保 Zoom 转场动画效果最佳，建议在 `cellForItemAt` 中同步设置占位图（如从缓存中取出缩略图），使 Cell 的 `imageView` 在转场时有正确的尺寸。
 
 4.  **手势冲突处理**:
     - 在 `JXPhotoCell` 中处理 `UITapGestureRecognizer`（单击/双击）与 `UIScrollView` 内置手势的冲突。
@@ -148,6 +149,31 @@ extension ViewController: JXPhotoBrowserDelegate {
 - 框架本身依赖：`UIKit`、`AVFoundation`，**无任何第三方依赖**。
 - 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
 - 示例工程：Demo 使用 `Kingfisher` 演示图片加载。
+
+## ❓ 常见问题 (FAQ)
+
+### Q: Zoom 转场动画时图片尺寸不对或有闪烁现象？
+
+**A**: 这通常是因为打开浏览器时，目标 Cell 的 `imageView` 还没有设置图片，导致其 `bounds` 为 zero。
+
+**解决方案**：在 `cellForItemAt` 代理方法中，确保同步设置占位图。例如使用 Kingfisher 时：
+
+```swift
+func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+    
+    // 同步从缓存取出缩略图作为占位图
+    let placeholder = thumbnailURL.flatMap { ImageCache.default.retrieveImageInMemoryCache(forKey: $0.absoluteString) }
+    cell.imageView.kf.setImage(with: imageURL, placeholder: placeholder) { [weak cell] result in
+        if case .success(let value) = result {
+            cell?.setImage(value.image)
+        }
+    }
+    return cell
+}
+```
+
+这样可以确保转场动画开始时，Cell 已经有正确尺寸的图片，动画效果更加流畅。
 
 ## ⚖️ License
 

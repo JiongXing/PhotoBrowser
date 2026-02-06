@@ -289,25 +289,4 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     @objc open func handleSingleTap(_ gesture: UITapGestureRecognizer) {
         browser?.dismissSelf()
     }
-    
-    // MARK: - Public Methods
-    
-    /// 设置图片并刷新布局
-    /// - Parameter image: 要显示的图片
-    /// - Note: 业务方应在加载图片完成后调用此方法设置图片
-    open func setImage(_ image: UIImage?) {
-        lastBoundsSize = .zero
-        imageView.image = image
-        adjustImageViewFrame()
-        centerImageIfNeeded()
-        setNeedsLayout()
-    }
-    
-    /// 设置占位图（图片加载前的临时展示）
-    /// - Parameter placeholder: 占位图
-    open func setPlaceholder(_ placeholder: UIImage?) {
-        imageView.image = placeholder
-        adjustImageViewFrame()
-        centerImageIfNeeded()
-    }
 }

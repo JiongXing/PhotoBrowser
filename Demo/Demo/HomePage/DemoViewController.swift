@@ -219,53 +219,41 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let media = items[index]
         switch media.source {
-        case let .remoteImage(imageURL, thumbnailURL):
-            if index < 3 {
-                let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
-                cell.currentIndex = index
-                loadImage(for: cell, imageURL: imageURL, thumbnailURL: thumbnailURL)
-                return cell
-            } else {
-                let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
-                loadImage(for: cell, imageURL: imageURL, thumbnailURL: thumbnailURL)
-                return cell
-            }
-        case let .remoteVideo(videoURL, thumbnailURL):
+        case .remoteImage:
+            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+            return cell
+        case .remoteVideo:
             let cell = browser.dequeueReusableCell(withReuseIdentifier: JXVideoCell.videoReuseIdentifier, for: indexPath) as! JXVideoCell
-            // 先加载封面图，再配置视频
-            cell.imageView.kf.setImage(with: thumbnailURL) { [weak cell] result in
-                guard let cell = cell else { return }
-                if case .success(let value) = result {
-                    cell.configure(videoURL: videoURL, coverImage: value.image)
-                } else {
-                    cell.configure(videoURL: videoURL, coverImage: nil)
-                }
-            }
             return cell
         }
     }
     
-    /// 使用 Kingfisher 加载图片到 JXPhotoCell
-    private func loadImage(for cell: JXPhotoCell, imageURL: URL, thumbnailURL: URL?) {
-        // 先设置缩略图作为占位
-        if let thumbURL = thumbnailURL {
-            cell.imageView.kf.setImage(with: thumbURL) { [weak cell] result in
-                if case .success(let value) = result {
-                    cell?.setPlaceholder(value.image)
-                }
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+        let media = items[index]
+        switch media.source {
+        case let .remoteImage(imageURL, thumbnailURL):
+            guard let photoCell = cell as? JXPhotoCell else { return }
+            print("[willDisplay] index: \(index), imageURL: \(imageURL)")
+            // 同步取出缓存的缩略图作为占位图，然后加载原图
+            let placeholder = thumbnailURL.flatMap { ImageCache.default.retrieveImageInMemoryCache(forKey: $0.absoluteString) }
+            photoCell.imageView.kf.setImage(with: imageURL, placeholder: placeholder) { [weak photoCell] _ in
+                photoCell?.setNeedsLayout()
             }
-        }
-        // 加载原图
-        cell.imageView.kf.setImage(with: imageURL) { [weak cell] result in
-            if case .success(let value) = result {
-                cell?.setImage(value.image)
-            }
+        case let .remoteVideo(videoURL, thumbnailURL):
+            guard let videoCell = cell as? JXVideoCell else { return }
+            print("[willDisplay] index: \(index), videoURL: \(videoURL)")
+            // 同步取出缓存的缩略图作为占位图，然后配置视频
+            let placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)
+            videoCell.configure(videoURL: videoURL, coverImage: placeholder)
         }
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) { }
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) { }
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
+        // 停止视频播放
+        if let videoCell = cell as? JXVideoCell {
+            videoCell.stopVideo()
+        }
+    }
     
     // 为 Zoom 转场提供源缩略图视图（用于起点几何计算）
     func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {

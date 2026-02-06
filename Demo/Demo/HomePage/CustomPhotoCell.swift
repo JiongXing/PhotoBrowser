@@ -91,17 +91,6 @@ class CustomPhotoCell: JXPhotoCell {
         infoLabel.isHidden = text.isEmpty
     }
     
-    /// 重写 setImage 以添加自定义逻辑
-    override func setImage(_ image: UIImage?) {
-        super.setImage(image)
-        
-        // 在图片设置后，显示索引信息
-        if let index = currentIndex {
-            let info = "索引: \(index)\n类型: 图片"
-            configureInfo(info)
-        }
-    }
-    
     @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
         guard gesture.state == .began else { return }
         guard let browser = browser else { return }

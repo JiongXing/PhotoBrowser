@@ -51,9 +51,8 @@ open class JXVideoCell: JXPhotoCell {
     open func configure(videoURL: URL, coverImage: UIImage? = nil) {
         stopVideo()
         self.videoURL = videoURL
-        if let cover = coverImage {
-            setImage(cover)
-        }
+        imageView.image = coverImage
+        setNeedsLayout()
         playVideo()
     }
     
@@ -98,7 +97,8 @@ extension JXVideoCell {
         isPlaying = false
     }
     
-    private func stopVideo() {
+    /// 停止视频播放并清理资源
+    public func stopVideo() {
         player?.pause()
         player = nil
         playerLayer?.removeFromSuperlayer()
