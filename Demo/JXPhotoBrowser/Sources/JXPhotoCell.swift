@@ -4,7 +4,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 /// 支持图片捏合缩放查看的 Cell
 open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrowserCellProtocol {
@@ -123,9 +122,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     
     /// 若调用方提供的是 UIImageView，则可参与几何匹配 Zoom 动画
     open var transitionImageView: UIImageView? { imageView }
-    
-    /// 用于下拉关闭手势的滚动视图
-    open var interactiveScrollView: UIScrollView? { scrollView }
 
     open override func layoutSubviews() {
         super.layoutSubviews()
@@ -273,17 +269,6 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
                 self.centerImageIfNeeded()
             }
         }
-    }
-
-    /// 计算目标缩放矩形
-    open func zoomRect(for scale: CGFloat, centeredAt center: CGPoint) -> CGRect {
-        // 以 scrollView 的可视尺寸反推在内容坐标系下应显示的区域尺寸
-        let boundsSize = scrollView.bounds.size
-        let width = boundsSize.width / scale
-        let height = boundsSize.height / scale
-        let originX = center.x - (width * 0.5)
-        let originY = center.y - (height * 0.5)
-        return CGRect(x: originX, y: originY, width: width, height: height)
     }
 
     @objc open func handleSingleTap(_ gesture: UITapGestureRecognizer) {

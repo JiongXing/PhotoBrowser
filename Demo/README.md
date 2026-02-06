@@ -1,12 +1,12 @@
 # JXPhotoBrowser
 
-JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片/视频浏览器，仿照 iOS 系统相册的交互体验设计。支持缩放、拖拽关闭、自定义转场动画等特性，架构清晰，易于集成和扩展。
+JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，仿照 iOS 系统相册的交互体验设计。支持缩放、拖拽关闭、自定义转场动画等特性，架构清晰，易于集成和扩展。
 
-## 🌟 核心设计亮点
+## 🌟 核心设计
 
 - **零数据模型依赖**：框架不定义任何数据模型，业务方完全使用自己的数据结构，通过 delegate 配置 Cell 内容。
 - **图片加载完全开放**：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
-- **Cell 协议抽象**：通过 `JXPhotoBrowserCellProtocol` 将浏览器与具体 Cell 实现解耦，既可以直接使用内置的 `JXPhotoCell` / `JXVideoCell`，也可以实现完全自定义的 Cell。
+- **极简 Cell 协议**：`JXPhotoBrowserCellProtocol` 仅包含 `browser` 和 `transitionImageView` 两个属性，将浏览器与具体 Cell 实现解耦，既可以直接使用内置的 `JXPhotoCell` / `JXVideoCell`，也可以实现完全自定义的 Cell。
 - **协议驱动的数据与 UI 解耦**：`JXPhotoBrowserDelegate` 只关心数量、Cell 与转场，不强制统一的数据模型。
 - **默认实现与深度定制兼顾**：开箱即用的默认 Cell + 转场动画 + 手势交互，同时保留足够的扩展点，适合从简单集成到复杂自定义的多种场景。
 
@@ -31,8 +31,8 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片/视频浏览�
 - **JXPhotoBrowser**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片/视频页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
 - **JXPhotoCell / JXVideoCell**：默认图片与视频展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击、长按等交互。提供 `setImage(_:)` 和 `setPlaceholder(_:)` 方法供业务方设置图片。
 - **JXBasicImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
-- **JXPhotoBrowserCellProtocol**：Cell 协议抽象，自定义 Cell 只需实现 `browser` 与 `currentIndex` 等必要属性即可接入浏览器，不强制依赖特定基类。
-- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例以及转场动画所需的源视图等，不强制要求统一的数据模型。
+- **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，不强制依赖特定基类。
+- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。Zoom 转场的临时视图由框架自动构造，业务方只需提供缩略图视图即可。
 
 ### 关键实现
 1.  **无限循环 (Infinite Loop)**:
@@ -51,7 +51,7 @@ JXPhotoBrowser 是一个轻量级、高度可定制的 iOS 图片/视频浏览�
 
 3.  **交互式转场 (Interactive Transition)**:
     - 实现了 `UIViewControllerTransitioningDelegate` 和 `UIViewControllerAnimatedTransitioning` 协议。
-    - **JXZoomPresentAnimator** / **JXZoomDismissAnimator**: 计算源视图（列表中的缩略图）和目标视图（浏览器中的大图）在屏幕坐标系下的位置，通过临时的 `UIImageView` 进行插值动画，实现平滑的缩放效果。
+    - **JXZoomPresentAnimator** / **JXZoomDismissAnimator**: 计算源视图（列表中的缩略图）和目标视图（浏览器中的大图）在屏幕坐标系下的位置，框架自动基于缩略图构造临时 `UIImageView` 进行插值动画，业务方无需手动创建转场视图。
     - **Zoom 动画注意事项**：为确保 Zoom 转场动画效果最佳，建议在 `cellForItemAt` 中同步设置占位图（如从缓存中取出缩略图），使 Cell 的 `imageView` 在转场时有正确的尺寸。
 
 4.  **手势冲突处理**:
@@ -123,30 +123,27 @@ extension ViewController: JXPhotoBrowserDelegate {
         return cell
     }
     
-    // 3. (可选) 支持 Zoom 转场：提供列表界面的源视图
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
+    // 3. (可选) 支持 Zoom 转场：提供列表中的缩略图视图
+    //    框架会自动基于此视图构造转场动画，无需手动创建临时视图
+    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
         let indexPath = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: indexPath) as? MyCell else { return nil }
         return cell.imageView
     }
     
-    // 4. (可选) 支持 Zoom 转场：提供临时的转场视图
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? {
+    // 4. (可选) 控制缩略图显隐，避免 Zoom 转场时视觉重叠
+    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
-        guard let cell = collectionView.cellForItem(at: indexPath) as? MyCell else { return nil }
-        guard let image = cell.imageView.image else { return nil }
-        
-        let iv = UIImageView(image: image)
-        iv.contentMode = cell.imageView.contentMode
-        iv.clipsToBounds = true
-        return iv
+        if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {
+            cell.imageView.isHidden = hidden
+        }
     }
 }
 ```
 
 ## 📄 依赖
 
-- 框架本身依赖：`UIKit`、`AVFoundation`，**无任何第三方依赖**。
+- 框架本身依赖：`UIKit`（核心）、`AVFoundation`（仅 `JXVideoCell` 需要），**无任何第三方依赖**。
 - 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
 - 示例工程：Demo 使用 `Kingfisher` 演示图片加载。
 

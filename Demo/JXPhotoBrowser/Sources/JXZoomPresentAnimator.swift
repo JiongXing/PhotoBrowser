@@ -4,7 +4,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     
@@ -18,12 +17,9 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
 
         guard let toVC = ctx.viewController(forKey: .to) as? JXPhotoBrowser,
               let toView = ctx.view(forKey: .to) else {
-            print("[JXZoomPresentAnimator] ❌ 降级原因: toVC 或 toView 为 nil")
             ctx.completeTransition(false)
             return
         }
-        
-        print("[JXZoomPresentAnimator] 🚀 开始 Zoom 转场动画, initialIndex: \(toVC.initialIndex)")
 
         // 添加目标视图并强制布局，确保 collectionView 有可见 Cell
         container.addSubview(toView)
@@ -33,46 +29,28 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         // 滚动到初始位置，确保目标 Cell 可见
         toVC.scrollToInitialIndexIfNeeded()
         toVC.collectionView.layoutIfNeeded()
-        
-        print("[JXZoomPresentAnimator] 📐 toView.frame: \(toView.frame)")
-        print("[JXZoomPresentAnimator] 📐 collectionView.frame: \(toVC.collectionView.frame)")
-        print("[JXZoomPresentAnimator] 📐 visibleCells.count: \(toVC.collectionView.visibleCells.count)")
 
-        // 检查前置条件
-        guard let originView = toVC.delegate?.photoBrowser(toVC, zoomOriginViewAt: toVC.initialIndex) else {
-            print("[JXZoomPresentAnimator] ❌ 降级原因: originView 为 nil (delegate 未实现 zoomOriginViewAt)")
+        // 检查前置条件：需要源缩略图视图
+        guard let thumbnailView = toVC.delegate?.photoBrowser(toVC, thumbnailViewAt: toVC.initialIndex) else {
             fallbackToFade(toView: toView, duration: duration, ctx: ctx)
             return
         }
-        print("[JXZoomPresentAnimator] ✅ originView: \(originView), bounds: \(originView.bounds)")
         
-        guard let zoomView = toVC.delegate?.photoBrowser(toVC, zoomViewForItemAt: toVC.initialIndex, isPresenting: true) else {
-            print("[JXZoomPresentAnimator] ❌ 降级原因: zoomView 为 nil (delegate 未实现 zoomViewForItemAt)")
-            fallbackToFade(toView: toView, duration: duration, ctx: ctx)
-            return
-        }
-        print("[JXZoomPresentAnimator] ✅ zoomView: \(zoomView)")
-        
-        let visibleCell = toVC.visiblePhotoCell()
-        print("[JXZoomPresentAnimator] 📍 visiblePhotoCell: \(String(describing: visibleCell))")
-        
+        let visibleCell = toVC.visibleCell()
         let targetIV = visibleCell?.transitionImageView
-        print("[JXZoomPresentAnimator] ✅ targetIV: \(String(describing: targetIV)), bounds: \(targetIV?.bounds ?? .zero)")
 
         // 起止几何
-        let startFrame = originView.convert(originView.bounds, to: container)
+        let startFrame = thumbnailView.convert(thumbnailView.bounds, to: container)
         
-        // 计算目标 frame：优先使用 targetIV，否则基于 originView 比例计算居中位置
+        // 计算目标 frame：优先使用 targetIV，否则基于缩略图比例计算居中位置
         let endFrame: CGRect
         if let targetIV = targetIV, targetIV.bounds.size != .zero {
             endFrame = targetIV.convert(targetIV.bounds, to: container)
-            print("[JXZoomPresentAnimator] 🎯 使用 targetIV 计算 endFrame")
         } else {
-            // targetIV 不可用（图片未加载），基于 originView 的比例计算目标位置
+            // targetIV 不可用（图片未加载），基于缩略图的比例计算目标位置
             let containerSize = container.bounds.size
-            let originSize = originView.bounds.size
-            guard originSize.width > 0 && originSize.height > 0 else {
-                print("[JXZoomPresentAnimator] ❌ 降级原因: originView.bounds.size 为 zero")
+            let originSize = thumbnailView.bounds.size
+            guard originSize.width > 0, originSize.height > 0 else {
                 fallbackToFade(toView: toView, duration: duration, ctx: ctx)
                 return
             }
@@ -83,17 +61,16 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
             let targetX = (containerSize.width - targetWidth) / 2
             let targetY = (containerSize.height - targetHeight) / 2
             endFrame = CGRect(x: targetX, y: targetY, width: targetWidth, height: targetHeight)
-            print("[JXZoomPresentAnimator] 🎯 基于 originView 比例计算 endFrame")
         }
-        print("[JXZoomPresentAnimator] 🎯 startFrame: \(startFrame)")
-        print("[JXZoomPresentAnimator] 🎯 endFrame: \(endFrame)")
+
+        // 框架自动构造临时 ZoomView（无需业务方提供）
+        let zoomView = Self.makeZoomView(from: thumbnailView)
 
         // 隐藏真实视图，避免重影
-        originView.isHidden = true
+        thumbnailView.isHidden = true
         targetIV?.isHidden = true
         toView.backgroundColor = .clear
 
-        // 使用业务方提供的 ZoomView 作为临时视图
         zoomView.frame = startFrame
         container.addSubview(zoomView)
 
@@ -101,18 +78,36 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
             zoomView.frame = endFrame
             toView.backgroundColor = .black
         }) { finished in
-            print("[JXZoomPresentAnimator] ✅ Zoom 动画完成")
             // 还原
             targetIV?.isHidden = false
-            originView.isHidden = false
+            thumbnailView.isHidden = false
             zoomView.removeFromSuperview()
             ctx.completeTransition(finished)
         }
     }
     
+    // MARK: - Helpers
+    
+    /// 基于源视图自动构造转场用的临时 UIImageView
+    private static func makeZoomView(from sourceView: UIView) -> UIImageView {
+        let zoomIV = UIImageView()
+        if let imageView = sourceView as? UIImageView {
+            zoomIV.image = imageView.image
+            zoomIV.contentMode = imageView.contentMode
+        } else {
+            // 非 UIImageView 时，截取源视图快照
+            let renderer = UIGraphicsImageRenderer(bounds: sourceView.bounds)
+            zoomIV.image = renderer.image { ctx in
+                sourceView.drawHierarchy(in: sourceView.bounds, afterScreenUpdates: false)
+            }
+            zoomIV.contentMode = .scaleAspectFill
+        }
+        zoomIV.clipsToBounds = true
+        return zoomIV
+    }
+    
     /// 降级为淡入动画
     private func fallbackToFade(toView: UIView, duration: TimeInterval, ctx: UIViewControllerContextTransitioning) {
-        print("[JXZoomPresentAnimator] ⚠️ 降级为 Fade 动画")
         toView.alpha = 0
         UIView.animate(withDuration: duration, animations: {
             toView.alpha = 1

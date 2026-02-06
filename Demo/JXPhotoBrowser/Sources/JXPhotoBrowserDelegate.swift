@@ -20,14 +20,12 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     /// 当 Cell 已经显示时调用，可选实现
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int)
     
-    /// 设置指定索引的 item 的源视图的隐藏状态，可选实现
-    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int)
+    /// 返回指定索引的 item 在列表中的缩略图视图（用于 Zoom 转场的起止位置计算）
+    /// 返回 nil 时 Zoom 转场将降级为 Fade 动画
+    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView?
     
-    /// 返回指定索引的 item 的源视图，可选实现
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView?
-    
-    /// 返回 Zoom 转场动画使用的临时 ZoomView（转场结束即移除）
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView?
+    /// 设置指定索引的 item 的缩略图视图的显隐状态（Zoom 转场时隐藏源视图，避免视觉重叠）
+    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int)
     
     /// 返回指定索引的 item 尺寸，可选实现，默认返回 collectionView.bounds.size
     func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize?
@@ -36,8 +34,7 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
 public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {}
-    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {}
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? { nil }
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize? { nil }
 }

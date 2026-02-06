@@ -140,17 +140,5 @@ extension PhotoBannerView: JXPhotoBrowserDelegate {
         return cell
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {}
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {}
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
-        return nil
-    }
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? {
-        return nil
-    }
-    
-    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {}
+    // Banner 场景不需要 Zoom 转场，以上可选方法均使用默认实现
 }

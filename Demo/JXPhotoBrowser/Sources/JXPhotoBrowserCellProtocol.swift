@@ -19,11 +19,6 @@ public protocol JXPhotoBrowserCellProtocol: UICollectionViewCell {
     /// 如果返回非nil，框架会使用此视图进行Zoom转场动画
     /// 如果返回nil，转场动画将降级为Fade动画
     var transitionImageView: UIImageView? { get }
-    
-    /// 用于下拉关闭手势的滚动视图（可选）
-    /// 如果返回非nil，框架会在此视图上禁用滚动以支持下拉关闭
-    /// 如果返回nil，下拉关闭功能可能不可用
-    var interactiveScrollView: UIScrollView? { get }
 }
 
 // MARK: - 默认实现
@@ -36,7 +31,5 @@ public extension JXPhotoBrowserCellProtocol {
     }
     
     var transitionImageView: UIImageView? { nil }
-    
-    var interactiveScrollView: UIScrollView? { nil }
 }
 

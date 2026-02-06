@@ -4,7 +4,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     open func transitionDuration(using ctx: UIViewControllerContextTransitioning?) -> TimeInterval {
@@ -29,9 +28,9 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         
         let pageIndex = fromVC.pageIndex
         // 前置条件不满足则直接降级为淡出
-        guard let srcCell = fromVC.visiblePhotoCell(),
+        guard let srcCell = fromVC.visibleCell(),
               let srcIV = srcCell.transitionImageView, srcIV.bounds.size != .zero,
-              let originView = fromVC.delegate?.photoBrowser(fromVC, zoomOriginViewAt: pageIndex) else {
+              let thumbnailView = fromVC.delegate?.photoBrowser(fromVC, thumbnailViewAt: pageIndex) else {
             animateFadeOut(view: fromView, duration: duration, ctx: ctx)
             return
         }
@@ -46,11 +45,11 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         
         // 起止几何
         let startFrame = srcIV.convert(srcIV.bounds, to: container)
-        let endFrame = originView.convert(originView.bounds, to: container)
+        let endFrame = thumbnailView.convert(thumbnailView.bounds, to: container)
         
         // 隐藏真实视图，避免重影
         srcIV.isHidden = true
-        originView.isHidden = true
+        thumbnailView.isHidden = true
         
         zoomIV.frame = startFrame
         container.addSubview(zoomIV)
@@ -59,8 +58,8 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             zoomIV.frame = endFrame
             fromView.alpha = 0
         }) { _ in
-            originView.isHidden = false
-            fromVC.delegate?.photoBrowser(fromVC, setOriginViewHidden: false, at: pageIndex)
+            thumbnailView.isHidden = false
+            fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
             zoomIV.removeFromSuperview()
             fromView.removeFromSuperview()
             ctx.completeTransition(true)

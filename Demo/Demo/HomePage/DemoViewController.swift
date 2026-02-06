@@ -255,26 +255,15 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         }
     }
     
-    // 为 Zoom 转场提供源缩略图视图（用于起点几何计算）
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomOriginViewAt index: Int) -> UIView? {
+    // 为 Zoom 转场提供列表中的缩略图视图（用于起止位置计算）
+    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
         let ip = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
         return cell.imageView
     }
     
-    // 提供 Zoom 转场使用的临时 ZoomView（转场结束即移除）
-    func photoBrowser(_ browser: JXPhotoBrowser, zoomViewForItemAt index: Int, isPresenting: Bool) -> UIView? {
-        let ip = IndexPath(item: index, section: 0)
-        guard let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
-        guard let image = cell.imageView.image else { return nil }
-        let iv = UIImageView(image: image)
-        iv.contentMode = cell.imageView.contentMode
-        iv.clipsToBounds = true
-        return iv
-    }
-    
-    // 控制源缩略图的显隐（浏览器切换图片时调用）
-    func photoBrowser(_ browser: JXPhotoBrowser, setOriginViewHidden hidden: Bool, at index: Int) {
+    // 控制缩略图的显隐（Zoom 转场时隐藏源视图，避免视觉重叠）
+    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
         let ip = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell {
             cell.imageView.isHidden = hidden
