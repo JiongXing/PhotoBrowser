@@ -1,16 +1,20 @@
 //
-//  JXVideoCell.swift
-//  JXPhotoBrowser
+//  DemoVideoCell.swift
+//  Demo
 //
+//  示例视频播放 Cell，展示如何在 Demo 中实现自定义的视频 Cell
 
 import UIKit
 import AVFoundation
+import JXPhotoBrowser
 
-open class JXVideoCell: JXPhotoCell {
+/// Demo 中的视频展示 Cell
+/// 继承自 JXPhotoCell，添加视频播放功能
+open class DemoVideoCell: JXPhotoCell {
     
     // MARK: - Static Properties
     
-    public static let videoReuseIdentifier = "JXVideoCell"
+    public static let videoReuseIdentifier = "DemoVideoCell"
     
     // MARK: - Video Properties
     
@@ -66,7 +70,7 @@ open class JXVideoCell: JXPhotoCell {
 }
 
 // 重新实现播放逻辑
-extension JXVideoCell {
+extension DemoVideoCell {
     
     override open func layoutSubviews() {
         super.layoutSubviews()

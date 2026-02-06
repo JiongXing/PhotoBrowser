@@ -77,7 +77,6 @@ open class JXPhotoBrowser: UIViewController {
         
         // 注册默认Cell
         cv.register(JXPhotoCell.self, forCellWithReuseIdentifier: JXPhotoCell.reuseIdentifier)
-        cv.register(JXVideoCell.self, forCellWithReuseIdentifier: JXVideoCell.videoReuseIdentifier)
         
         return cv
     }()

@@ -187,6 +187,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         let browser = JXPhotoBrowser()
         // 【示例】注册自定义Cell
         browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
+        browser.register(DemoVideoCell.self, forReuseIdentifier: DemoVideoCell.videoReuseIdentifier)
         browser.delegate = self
         browser.initialIndex = indexPath.item
         
@@ -223,7 +224,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
             let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
             return cell
         case .remoteVideo:
-            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXVideoCell.videoReuseIdentifier, for: indexPath) as! JXVideoCell
+            let cell = browser.dequeueReusableCell(withReuseIdentifier: DemoVideoCell.videoReuseIdentifier, for: indexPath) as! DemoVideoCell
             return cell
         }
     }
@@ -240,7 +241,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
                 photoCell?.setNeedsLayout()
             }
         case let .remoteVideo(videoURL, thumbnailURL):
-            guard let videoCell = cell as? JXVideoCell else { return }
+            guard let videoCell = cell as? DemoVideoCell else { return }
             print("[willDisplay] index: \(index), videoURL: \(videoURL)")
             // 同步取出缓存的缩略图作为占位图，然后配置视频
             let placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)
@@ -250,7 +251,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
         // 停止视频播放
-        if let videoCell = cell as? JXVideoCell {
+        if let videoCell = cell as? DemoVideoCell {
             videoCell.stopVideo()
         }
     }
