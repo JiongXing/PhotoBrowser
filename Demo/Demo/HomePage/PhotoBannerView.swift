@@ -51,6 +51,20 @@ class PhotoBannerView: UIView {
         }
     }
     
+    /// 是否启用自动轮播（默认 true）
+    public var isAutoPlayEnabled: Bool = true {
+        didSet {
+            browser?.isAutoPlayEnabled = isAutoPlayEnabled
+        }
+    }
+    
+    /// 自动轮播间隔时间（默认 3.0 秒）
+    public var autoPlayInterval: TimeInterval = 3.0 {
+        didSet {
+            browser?.autoPlayInterval = autoPlayInterval
+        }
+    }
+    
     // MARK: - Private Properties
     
     /// 嵌入的图片浏览器
@@ -97,6 +111,8 @@ class PhotoBannerView: UIView {
         browser.transitionType = .none
         browser.isLoopingEnabled = true
         browser.itemSpacing = 8  // 设置图片之间的间距
+        browser.isAutoPlayEnabled = true  // 开启自动轮播
+        browser.autoPlayInterval = 3.0  // 轮播间隔 3 秒
         browser.register(JXBasicImageCell.self, forReuseIdentifier: JXBasicImageCell.reuseIdentifier)
         
         // 装载页码指示器
@@ -140,10 +156,7 @@ extension PhotoBannerView: JXPhotoBrowserDelegate {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXBasicImageCell.reuseIdentifier, for: indexPath) as! JXBasicImageCell
         let resource = resources[index]
         // 使用 Kingfisher 加载图片
-        let url = resource.thumbnailURL ?? resource.imageURL
-        cell.imageView.kf.setImage(with: url)
+        cell.imageView.kf.setImage(with: resource.imageURL)
         return cell
     }
-    
-    // Banner 场景不需要 Zoom 转场，以上可选方法均使用默认实现
 }

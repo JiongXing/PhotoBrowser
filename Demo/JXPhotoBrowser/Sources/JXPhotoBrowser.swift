@@ -63,8 +63,21 @@ open class JXPhotoBrowser: UIViewController {
     
     /// 已装载的 Overlay 组件列表（默认为空，不装载任何组件）
     public private(set) var overlays: [JXPhotoBrowserOverlay] = []
+    
+    /// 是否启用自动轮播（默认 false）
+    /// 自动轮播会在到达最后一页后自动停止
+    public var isAutoPlayEnabled: Bool = false
+    
+    /// 自动轮播间隔时间（默认 3.0 秒）
+    public var autoPlayInterval: TimeInterval = 3.0
         
     // MARK: - Private Properties
+    
+    /// 自动轮播定时器
+    private var autoPlayTimer: Timer?
+    
+    /// 用户是否正在手动滚动（用于暂停自动轮播）
+    private var isUserInteracting: Bool = false
     
     /// 图片列表集合视图（对外只读）
     public private(set) lazy var collectionView: UICollectionView = {
@@ -141,6 +154,16 @@ open class JXPhotoBrowser: UIViewController {
         if transitionType == .zoom {
             delegate?.photoBrowser(self, setThumbnailHidden: true, at: pageIndex)
         }
+        
+        // 启动自动轮播
+        startAutoPlayIfNeeded()
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // 停止自动轮播
+        stopAutoPlay()
     }
     
     open override func viewWillLayoutSubviews() {
@@ -380,6 +403,9 @@ open class JXPhotoBrowser: UIViewController {
         collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
         didScrollToInitial = true
         pageIndex = safeInitialIndex
+        
+        // 初始定位完成后，启动自动轮播（支持嵌入式使用场景）
+        startAutoPlayIfNeeded()
     }
     
     /// 循环模式变更时重新加载数据并调整位置
@@ -406,6 +432,67 @@ open class JXPhotoBrowser: UIViewController {
     /// 关闭浏览器
     @objc open func dismissSelf() {
         dismiss(animated: transitionType != .none, completion: nil)
+    }
+    
+    // MARK: - Auto Play
+    
+    /// 判断是否可以启动自动轮播
+    private var canStartAutoPlay: Bool {
+        guard isAutoPlayEnabled, !isUserInteracting else { return false }
+        
+        let count = realCount
+        guard count > 1 else { return false }
+        
+        // 开启无限循环时，始终可以自动轮播
+        if isLoopingEnabled { return true }
+        
+        // 未开启无限循环时，仅当未到达最后一页时可以轮播
+        return pageIndex < count - 1
+    }
+    
+    /// 启动自动轮播定时器
+    private func startAutoPlayIfNeeded() {
+        guard canStartAutoPlay else { return }
+        
+        // 避免重复启动
+        stopAutoPlay()
+        
+        autoPlayTimer = Timer.scheduledTimer(withTimeInterval: autoPlayInterval, repeats: true) { [weak self] _ in
+            self?.autoPlayToNextPage()
+        }
+    }
+    
+    /// 停止自动轮播定时器
+    private func stopAutoPlay() {
+        autoPlayTimer?.invalidate()
+        autoPlayTimer = nil
+    }
+    
+    /// 自动滚动到下一页
+    private func autoPlayToNextPage() {
+        let count = realCount
+        guard count > 1 else {
+            stopAutoPlay()
+            return
+        }
+        
+        // 未开启无限循环且已到达最后一页，停止轮播
+        if !isLoopingEnabled && pageIndex >= count - 1 {
+            stopAutoPlay()
+            return
+        }
+        
+        // 自动轮播始终向前滚动：直接使用下一个虚拟索引，确保动画方向正确
+        let currentVirtual = calculateCurrentVirtualIndex()
+        let targetVirtual = currentVirtual + 1
+        
+        // 边界保护：确保目标索引在有效范围内
+        guard targetVirtual < virtualCount else {
+            stopAutoPlay()
+            return
+        }
+        
+        collectionView.scrollToItem(at: IndexPath(item: targetVirtual, section: 0), at: scrollDirection.scrollPosition, animated: true)
     }
     
     // MARK: - Public Methods
@@ -593,18 +680,35 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
         delegate?.photoBrowser(self, didEndDisplaying: protocolCell, at: real)
     }
     
+    open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        // 用户开始手动滚动，暂停自动轮播
+        isUserInteracting = true
+        stopAutoPlay()
+    }
+    
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         updateCurrentPageIndex()
+        
+        // 用户滚动结束，恢复自动轮播
+        isUserInteracting = false
+        startAutoPlayIfNeeded()
     }
     
     open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
             updateCurrentPageIndex()
+            
+            // 用户滚动结束，恢复自动轮播
+            isUserInteracting = false
+            startAutoPlayIfNeeded()
         }
     }
     
     open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         updateCurrentPageIndex()
+        
+        // 动画滚动结束后，检查是否需要继续自动轮播
+        startAutoPlayIfNeeded()
     }
     
     // MARK: - UICollectionViewDelegateFlowLayout

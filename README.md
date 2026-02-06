@@ -25,6 +25,7 @@
 - [x] 支持自定义Cell，框架提供了常用的图片展示Cell的实现
 - [x] 支持网络图片加载、查看原图加载，由用户自由选择其他框架进行图片加载与缓存
 - [x] 支持添加附加控件，框架提供了两种页面指示器的实现，以及在例子工程提供了加载进度环的实现
+- [x] 支持自动轮播，可配置轮播间隔，支持循环轮播或到达末页自动停止
 
 ## 近期版本更新
 
@@ -315,6 +316,24 @@ browser.reloadData()
 ```swift
 open var scrollDirection: JXPhotoBrowser.ScrollDirection = .horizontal
 ```
+
+### 自动轮播
+
+框架支持自动轮播功能，适用于 Banner 等场景。自动轮播默认关闭。
+
+```swift
+let browser = JXPhotoBrowser()
+// 开启自动轮播（默认 false）
+browser.isAutoPlayEnabled = true
+// 设置轮播间隔（默认 3.0 秒）
+browser.autoPlayInterval = 3.0
+```
+
+自动轮播的行为与无限循环设置相关：
+- `isLoopingEnabled = true`（默认）：自动轮播会无限循环
+- `isLoopingEnabled = false`：到达最后一页时自动停止
+
+用户手动滚动时会自动暂停轮播，滚动结束后恢复。
 
 ### 视频浏览
 
