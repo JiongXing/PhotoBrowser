@@ -23,6 +23,8 @@ open class JXPhotoBrowser: UIViewController {
                     // 隐藏新的
                     delegate?.photoBrowser(self, setThumbnailHidden: true, at: pageIndex)
                 }
+                // 通知所有 Overlay 页码变化
+                overlays.forEach { $0.didChangedPageIndex(pageIndex) }
             }
         }
     }
@@ -58,6 +60,9 @@ open class JXPhotoBrowser: UIViewController {
             }
         }
     }
+    
+    /// 已装载的 Overlay 组件列表（默认为空，不装载任何组件）
+    public private(set) var overlays: [JXPhotoBrowserOverlay] = []
         
     // MARK: - Private Properties
     
@@ -120,6 +125,9 @@ open class JXPhotoBrowser: UIViewController {
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         panGesture.delegate = self
         view.addGestureRecognizer(panGesture)
+        
+        // 安装在 viewDidLoad 之前通过 addOverlay 注册的组件
+        overlays.forEach { installOverlay($0) }
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -168,6 +176,10 @@ open class JXPhotoBrowser: UIViewController {
         }
         
         scrollToInitialIndexIfNeeded()
+        
+        // 通知所有 Overlay 刷新数据（布局变化后更新位置和内容）
+        let count = realCount
+        overlays.forEach { $0.reloadData(numberOfItems: count, pageIndex: pageIndex) }
     }
     
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
@@ -426,6 +438,42 @@ open class JXPhotoBrowser: UIViewController {
     /// 当前展示中的 PhotoCell（便捷方法，仅返回 JXPhotoCell 类型）
     open func visiblePhotoCell() -> JXPhotoCell? {
         return visibleCell() as? JXPhotoCell
+    }
+    
+    // MARK: - Overlay Management
+    
+    /// 装载一个 Overlay 组件到浏览器
+    /// Overlay 会被添加到浏览器 view 的最上层，并在适当时机收到页码变化等通知
+    ///
+    /// 使用示例：
+    /// ```swift
+    /// let browser = JXPhotoBrowser()
+    /// browser.addOverlay(JXPageIndicatorOverlay())
+    /// ```
+    ///
+    /// - Parameter overlay: 遵循 `JXPhotoBrowserOverlay` 协议的视图组件
+    /// - Note: 可在 viewDidLoad 之前或之后调用。如果 view 已加载，会立即添加到视图并触发 setup
+    open func addOverlay(_ overlay: JXPhotoBrowserOverlay) {
+        overlays.append(overlay)
+        
+        // 如果 view 已加载，立即装载到视图
+        if isViewLoaded {
+            installOverlay(overlay)
+        }
+    }
+    
+    /// 移除指定的 Overlay 组件
+    /// - Parameter overlay: 要移除的 Overlay 实例
+    open func removeOverlay(_ overlay: JXPhotoBrowserOverlay) {
+        overlay.removeFromSuperview()
+        overlays.removeAll { $0 === overlay }
+    }
+    
+    /// 将 Overlay 安装到视图层级并触发 setup
+    private func installOverlay(_ overlay: JXPhotoBrowserOverlay) {
+        view.addSubview(overlay)
+        overlay.setup(with: self)
+        overlay.reloadData(numberOfItems: realCount, pageIndex: pageIndex)
     }
     
     // MARK: - Setup & Configuration

@@ -23,6 +23,7 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片浏览器，仿照 iO
   - **None**：无动画直接显示。
 - **浏览体验优化**：基于 `UICollectionView` 复用机制，内存占用低，滑动流畅。
 - **自定义 Cell 支持**：内置图片 `JXPhotoCell`，也支持通过协议与注册机制接入完全自定义的 Cell（如视频播放 Cell）。
+- **Overlay 组件机制**：支持按需装载附加 UI 组件（如页码指示器、关闭按钮等），默认不装载任何组件，零开销。内置 `JXPageIndicatorOverlay` 页码指示器。
 
 ## 核心架构
 
@@ -31,6 +32,8 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片浏览器，仿照 iO
 - **JXBasicImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
 - **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，不强制依赖特定基类。
 - **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。
+- **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
+- **JXPageIndicatorOverlay**：内置页码指示器组件，基于 `UIPageControl`，支持自定义位置和样式，通过 `addOverlay` 按需装载。
 
 ## 安装
 
@@ -174,6 +177,61 @@ func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexP
     let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
     return cell
 }
+```
+
+## Overlay 组件
+
+框架提供了通用的 Overlay 组件机制，用于在浏览器上层叠加附加 UI（如页码指示器、关闭按钮、标题栏等）。**默认不装载任何 Overlay，业务方按需装载**。
+
+### 使用内置页码指示器
+
+框架内置了 `JXPageIndicatorOverlay`（基于 `UIPageControl`），一行代码即可装载：
+
+```swift
+let browser = JXPhotoBrowser()
+browser.addOverlay(JXPageIndicatorOverlay())
+```
+
+支持自定义位置和样式：
+
+```swift
+let indicator = JXPageIndicatorOverlay()
+indicator.position = .bottom(padding: 20)  // 位置：底部距离 20pt（也支持 .top）
+indicator.hidesForSinglePage = true         // 仅一页时自动隐藏
+indicator.pageControl.currentPageIndicatorTintColor = .white
+indicator.pageControl.pageIndicatorTintColor = .lightGray
+browser.addOverlay(indicator)
+```
+
+### 自定义 Overlay
+
+实现 `JXPhotoBrowserOverlay` 协议即可创建自定义组件：
+
+```swift
+class CloseButtonOverlay: UIView, JXPhotoBrowserOverlay {
+    
+    func setup(with browser: JXPhotoBrowser) {
+        // 在此完成布局（如添加约束）
+    }
+    
+    func reloadData(numberOfItems: Int, pageIndex: Int) {
+        // 数据或布局变化时更新
+    }
+    
+    func didChangedPageIndex(_ index: Int) {
+        // 页码变化时更新
+    }
+}
+
+// 装载
+browser.addOverlay(CloseButtonOverlay())
+```
+
+多个 Overlay 可同时装载，互不干扰：
+
+```swift
+browser.addOverlay(JXPageIndicatorOverlay())
+browser.addOverlay(CloseButtonOverlay())
 ```
 
 ## 依赖

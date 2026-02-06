@@ -99,6 +99,11 @@ class PhotoBannerView: UIView {
         browser.itemSpacing = 8  // 设置图片之间的间距
         browser.register(JXBasicImageCell.self, forReuseIdentifier: JXBasicImageCell.reuseIdentifier)
         
+        // 装载页码指示器
+        let pageIndicator = JXPageIndicatorOverlay()
+        pageIndicator.position = .bottom(padding: 0)
+        browser.addOverlay(pageIndicator)
+        
         // 设置浏览器视图背景为透明，与页面背景融为一体
         browser.view.backgroundColor = .clear
         
