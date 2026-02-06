@@ -1,0 +1,31 @@
+---
+description: JXPhotoBrowser 项目结构与开发规范
+alwaysApply: true
+---
+
+# JXPhotoBrowser 项目概述
+
+本项目是一个**开源的 iOS 图片浏览器框架**。
+
+## 项目结构
+
+| 目录 | 说明 |
+|------|------|
+| `JXPhotoBrowser/Sources/` | 开源框架核心代码 |
+| `Demo/HomePage/` | 框架使用示例 Demo |
+| `README.md` | 项目说明文档 |
+
+## 开发规范
+
+### README 同步更新
+
+**任何功能性代码改动，都必须同步更新 `README.md`**：
+
+- 新增功能：在 README 中添加功能说明和使用示例
+- 修改 API：更新 README 中相关的接口文档
+- 删除功能：从 README 中移除对应内容
+
+### 代码职责划分
+
+- **框架代码** (`JXPhotoBrowser/Sources/`)：通用、可复用的图片浏览器功能
+- **Demo 代码** (`Demo/HomePage/`)：展示框架用法，不应包含框架核心逻辑
