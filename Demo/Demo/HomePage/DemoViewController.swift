@@ -72,14 +72,14 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
         
         // 图片数据
-        let photos = (0...9).map { i -> DemoMedia in
+        let photos = (0..<9).map { i -> DemoMedia in
             let original = base.appendingPathComponent("photo_\(i).png")
             let thumbnail = base.appendingPathComponent("photo_\(i)_thumbnail.png")
             return DemoMedia(source: .remoteImage(imageURL: original, thumbnailURL: thumbnail))
         }
         
         // 视频数据
-        let videos = (0...2).map { i -> DemoMedia in
+        let videos = (0..<3).map { i -> DemoMedia in
             let videoURL = base.appendingPathComponent("video_\(i).mp4")
             let thumbnailURL = base.appendingPathComponent("video_thumbnail_\(i).png")
             return DemoMedia(source: .remoteVideo(url: videoURL, thumbnailURL: thumbnailURL))
