@@ -634,13 +634,9 @@ open class JXPhotoBrowser: UIViewController {
             }
             
             // 应用图片间距
-            if scrollDirection == .horizontal {
-                layout.minimumLineSpacing = itemSpacing
-                layout.minimumInteritemSpacing = 0
-            } else {
-                layout.minimumLineSpacing = 0
-                layout.minimumInteritemSpacing = itemSpacing
-            }
+            // minimumLineSpacing 始终表示滚动方向上的间距（水平→列间距，垂直→行间距）
+            layout.minimumLineSpacing = itemSpacing
+            layout.minimumInteritemSpacing = 0
         }
         
         // 为最后一个 item 右侧（或底部）添加 inset，补偿缺失的间距

@@ -197,7 +197,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         return CGSize(width: itemWidth, height: itemWidth)
     }
     
-    // MARK: - 交互：点击视频进行播放
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browser = JXPhotoBrowser()
         // 【示例】注册自定义Cell
