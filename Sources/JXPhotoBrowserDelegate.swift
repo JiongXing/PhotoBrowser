@@ -5,6 +5,8 @@
 //  Created by jxing on 2025/12/18.
 //
 
+import UIKit
+
 public typealias JXPhotoBrowserAnyCell = UICollectionViewCell & JXPhotoBrowserCellProtocol
 
 public protocol JXPhotoBrowserDelegate: AnyObject {

@@ -5,6 +5,8 @@
 //  Created by jxing on 2025/12/18.
 //
 
+import UIKit
+
 public enum JXPhotoBrowserScrollDirection {
     case horizontal, vertical
     

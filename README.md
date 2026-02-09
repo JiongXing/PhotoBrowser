@@ -38,7 +38,7 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 ## 系统要求
 
 - iOS 11.0+
-- Swift 5.0+
+- Swift 5.4+
 
 ## 安装
 
@@ -148,6 +148,75 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
 }
 ```
+
+## 在 SwiftUI 中使用
+
+JXPhotoBrowser 是基于 UIKit 的框架，在 SwiftUI 项目中可通过桥接方式集成。Demo-SwiftUI 示例工程演示了完整的集成方案。
+
+### 核心思路
+
+1. **网格和设置面板**使用纯 SwiftUI 实现（`LazyVGrid`、`Picker`、`AsyncImage` 等）
+2. **全屏图片浏览器**通过桥接层调用 `JXPhotoBrowser`
+3. 创建一个 Presenter 类实现 `JXPhotoBrowserDelegate`，获取当前 `UIViewController` 后调用 `browser.present(from:)`
+
+### 桥接层示例
+
+```swift
+import JXPhotoBrowser
+
+/// 封装 JXPhotoBrowser 的创建、配置和呈现
+final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
+    private let items: [MyMediaItem]
+
+    func present(initialIndex: Int) {
+        guard let viewController = topViewController() else { return }
+
+        let browser = JXPhotoBrowser()
+        browser.delegate = self
+        browser.initialIndex = initialIndex
+        browser.transitionType = .fade
+        browser.addOverlay(JXPageIndicatorOverlay())
+        browser.present(from: viewController)
+    }
+
+    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+        items.count
+    }
+
+    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+        browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
+    }
+
+    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+        guard let photoCell = cell as? JXZoomImageCell else { return }
+        // 加载图片到 photoCell.imageView ...
+    }
+}
+```
+
+### 在 SwiftUI View 中调用
+
+```swift
+struct ContentView: View {
+    // 持有 presenter（JXPhotoBrowser.delegate 为 weak，需要外部强引用）
+    @State private var presenter: PhotoBrowserPresenter?
+
+    var body: some View {
+        LazyVGrid(columns: columns) {
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                AsyncImage(url: item.thumbnailURL)
+                    .onTapGesture {
+                        let p = PhotoBrowserPresenter(items: items)
+                        presenter = p
+                        p.present(initialIndex: index)
+                    }
+            }
+        }
+    }
+}
+```
+
+> **注意**：`JXPhotoBrowser` 的 `delegate` 是 `weak` 引用，必须在 SwiftUI 侧用 `@State` 持有 Presenter 实例，否则它会在创建后立即被释放。
 
 ## JXImageCell 加载指示器
 
@@ -401,7 +470,9 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
 
 - 框架本身依赖：`UIKit`（核心），**无任何第三方依赖**。
 - 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
-- 示例工程：Demo 使用 `Kingfisher` 演示图片加载。
+- 示例工程：
+  - **Demo-UIKit**：UIKit 示例，使用 CocoaPods 集成，依赖 `Kingfisher` 加载图片，演示完整功能（图片浏览、视频播放、Banner 轮播等）。
+  - **Demo-SwiftUI**：SwiftUI 示例，使用 SPM 集成，演示如何通过桥接层在 SwiftUI 中使用 JXPhotoBrowser（媒体网格、设置面板、图片浏览）。
 
 ## 常见问题 (FAQ)
 
