@@ -30,8 +30,8 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 - **JXPhotoBrowser**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
 - **JXPhotoBrowserCell**：默认图片展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击等交互。通过 `imageView` 属性供业务方设置图片。
 - **JXBasicImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
-- **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，不强制依赖特定基类。
-- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。
+- **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，另提供 `photoBrowserDismissInteractionDidChange` 可选方法响应下拉关闭交互，不强制依赖特定基类。
+- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例、生命周期回调（`willDisplay`/`didEndDisplaying`）以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。
 - **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
 - **JXPageIndicatorOverlay**：内置页码指示器组件，基于 `UIPageControl`，支持自定义位置和样式，通过 `addOverlay` 按需装载。
 
@@ -47,7 +47,7 @@ pod 'JXPhotoBrowser'
 
 ### 手动安装
 
-将 `JXPhotoBrowser/Sources` 目录下的所有文件拖入你的工程中。
+将 `Sources` 目录下的所有文件拖入你的工程中。
 
 ## 快速开始
 
@@ -101,19 +101,29 @@ extension ViewController: JXPhotoBrowserDelegate {
         }
     }
     
-    // 4. (可选) 支持 Zoom 转场：提供列表中的缩略图视图
+    // 4. (可选) Cell 结束显示时清理资源（如取消加载、停止播放等）
+    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
+        // 可用于取消图片加载、停止视频播放等
+    }
+    
+    // 5. (可选) 支持 Zoom 转场：提供列表中的缩略图视图
     func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
         let indexPath = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: indexPath) as? MyCell else { return nil }
         return cell.imageView
     }
     
-    // 5. (可选) 控制缩略图显隐，避免 Zoom 转场时视觉重叠
+    // 6. (可选) 控制缩略图显隐，避免 Zoom 转场时视觉重叠
     func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {
             cell.imageView.isHidden = hidden
         }
+    }
+    
+    // 7. (可选) 自定义 Cell 尺寸，默认使用浏览器全屏尺寸
+    func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize? {
+        return nil // 返回 nil 使用默认尺寸
     }
 }
 ```
@@ -174,6 +184,13 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     override init(frame: CGRect) {
         super.init(frame: frame)
         // 自定义初始化
+    }
+    
+    // 可选实现：下拉关闭交互状态变化时调用
+    // isInteracting 为 true 表示用户正在下拉（图片缩小跟随手指），false 表示交互结束（回弹恢复）
+    // 适用于在拖拽关闭过程中暂停视频、隐藏附加 UI 等场景
+    func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {
+        // 例如：下拉时暂停视频播放
     }
 }
 ```

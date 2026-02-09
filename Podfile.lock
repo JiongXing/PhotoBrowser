@@ -9,7 +9,7 @@ PODS:
   - SDWebImage/Core (5.21.3)
 
 DEPENDENCIES:
-  - JXPhotoBrowser (from `./JXPhotoBrowser`)
+  - JXPhotoBrowser (from `.`)
   - Kingfisher
   - LookinServer
   - SDWebImage
@@ -22,7 +22,7 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   JXPhotoBrowser:
-    :path: "./JXPhotoBrowser"
+    :path: "."
 
 SPEC CHECKSUMS:
   JXPhotoBrowser: 2dee426d20ba2d62eac1ec8effb419d19a6968d4
@@ -30,6 +30,6 @@ SPEC CHECKSUMS:
   LookinServer: 1b2b61c6402ae29fa22182d48f5cd067b4e99e80
   SDWebImage: 16309af6d214ba3f77a7c6f6fdda888cb313a50a
 
-PODFILE CHECKSUM: 51f0ef37c87710a56120a0be284ee5ec00a73559
+PODFILE CHECKSUM: ca4f05625c1a81f7762639570a9435a2aed0983a
 
 COCOAPODS: 1.16.2
