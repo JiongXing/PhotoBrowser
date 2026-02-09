@@ -6,6 +6,7 @@
 
 import UIKit
 import AVFoundation
+import Photos
 import JXPhotoBrowser
 
 /// 视频播放 Cell
@@ -39,6 +40,9 @@ open class VideoPlayerCell: JXZoomImageCell {
     /// 是否正在下拉交互中（用于下拉时隐藏 loading）
     private var isDismissInteracting: Bool = false
     
+    /// 是否正在保存视频
+    private var isSavingVideo: Bool = false
+    
     // MARK: - Loading UI
     
     /// 视频加载指示器
@@ -55,12 +59,14 @@ open class VideoPlayerCell: JXZoomImageCell {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupLoadingIndicator()
+        setupLongPressGesture()
         setupAppLifecycleObservers()
     }
     
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupLoadingIndicator()
+        setupLongPressGesture()
         setupAppLifecycleObservers()
     }
     
@@ -83,6 +89,12 @@ open class VideoPlayerCell: JXZoomImageCell {
             loadingIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
+    }
+    
+    private func setupLongPressGesture() {
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        longPress.minimumPressDuration = 0.5
+        scrollView.addGestureRecognizer(longPress)
     }
     
     private func setupAppLifecycleObservers() {
@@ -237,6 +249,182 @@ open class VideoPlayerCell: JXZoomImageCell {
     @objc private func videoDidReachEnd() {
         player?.seek(to: .zero)
         player?.play()
+    }
+    
+    // MARK: - Long Press & Save Video
+    
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began, videoURL != nil else { return }
+        presentSaveActionSheet()
+    }
+    
+    private func presentSaveActionSheet() {
+        guard let viewController = browser else { return }
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "保存视频", style: .default) { [weak self] _ in
+            self?.saveVideoToAlbum()
+        })
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
+        
+        // iPad 适配 popover
+        if let popover = alert.popoverPresentationController {
+            popover.sourceView = contentView
+            popover.sourceRect = CGRect(x: contentView.bounds.midX, y: contentView.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        
+        viewController.present(alert, animated: true)
+    }
+    
+    private func saveVideoToAlbum() {
+        guard let url = videoURL, !isSavingVideo else { return }
+        isSavingVideo = true
+        
+        // 先请求相册权限
+        let status: PHAuthorizationStatus
+        if #available(iOS 14, *) {
+            status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        } else {
+            status = PHPhotoLibrary.authorizationStatus()
+        }
+        
+        switch status {
+        case .authorized, .limited:
+            downloadAndSaveVideo(from: url)
+        case .notDetermined:
+            if #available(iOS 14, *) {
+                PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] newStatus in
+                    DispatchQueue.main.async {
+                        if newStatus == .authorized || newStatus == .limited {
+                            self?.downloadAndSaveVideo(from: url)
+                        } else {
+                            self?.isSavingVideo = false
+                            self?.showToast("需要相册权限才能保存视频")
+                        }
+                    }
+                }
+            } else {
+                PHPhotoLibrary.requestAuthorization { [weak self] newStatus in
+                    DispatchQueue.main.async {
+                        if newStatus == .authorized {
+                            self?.downloadAndSaveVideo(from: url)
+                        } else {
+                            self?.isSavingVideo = false
+                            self?.showToast("需要相册权限才能保存视频")
+                        }
+                    }
+                }
+            }
+        default:
+            isSavingVideo = false
+            showToast("请在系统设置中允许访问相册")
+        }
+    }
+    
+    private func downloadAndSaveVideo(from url: URL) {
+        // 本地文件直接保存
+        if url.isFileURL {
+            performSaveToAlbum(fileURL: url)
+            return
+        }
+        
+        showToast("正在保存...")
+        
+        let task = URLSession.shared.downloadTask(with: url) { [weak self] tempURL, response, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                
+                if let error {
+                    self.isSavingVideo = false
+                    self.showToast("下载失败：\(error.localizedDescription)")
+                    return
+                }
+                
+                guard let tempURL else {
+                    self.isSavingVideo = false
+                    self.showToast("下载失败")
+                    return
+                }
+                
+                // 将临时文件移动到 tmp 目录（带 .mp4 后缀），避免系统自动清理
+                let destinationURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent(UUID().uuidString)
+                    .appendingPathExtension("mp4")
+                do {
+                    try FileManager.default.moveItem(at: tempURL, to: destinationURL)
+                    self.performSaveToAlbum(fileURL: destinationURL)
+                } catch {
+                    self.isSavingVideo = false
+                    self.showToast("保存失败")
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    private func performSaveToAlbum(fileURL: URL) {
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileURL)
+        }) { [weak self] success, error in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isSavingVideo = false
+                
+                // 清理非本地源的临时文件
+                if !fileURL.isFileURL || fileURL.path.contains(NSTemporaryDirectory()) {
+                    try? FileManager.default.removeItem(at: fileURL)
+                }
+                
+                if success {
+                    self.showToast("已保存到相册")
+                } else {
+                    self.showToast("保存失败：\(error?.localizedDescription ?? "未知错误")")
+                }
+            }
+        }
+    }
+    
+    // MARK: - Toast
+    
+    private func showToast(_ message: String) {
+        guard let superView = browser?.view ?? window else { return }
+        
+        let toastLabel = UILabel()
+        toastLabel.text = message
+        toastLabel.textColor = .white
+        toastLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        toastLabel.textAlignment = .center
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.75)
+        toastLabel.layer.cornerRadius = 8
+        toastLabel.clipsToBounds = true
+        toastLabel.numberOfLines = 0
+        toastLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // 内边距
+        let padding: CGFloat = 16
+        toastLabel.frame.size = toastLabel.sizeThatFits(CGSize(width: superView.bounds.width - 80, height: .greatestFiniteMagnitude))
+        
+        superView.addSubview(toastLabel)
+        NSLayoutConstraint.activate([
+            toastLabel.centerXAnchor.constraint(equalTo: superView.centerXAnchor),
+            toastLabel.bottomAnchor.constraint(equalTo: superView.safeAreaLayoutGuide.bottomAnchor, constant: -60),
+            toastLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: toastLabel.frame.width + padding * 2),
+            toastLabel.heightAnchor.constraint(equalToConstant: toastLabel.frame.height + padding)
+        ])
+        
+        toastLabel.alpha = 0
+        UIView.animate(withDuration: 0.25) {
+            toastLabel.alpha = 1
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            UIView.animate(withDuration: 0.25, animations: {
+                toastLabel.alpha = 0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
     }
     
     // MARK: - App Lifecycle

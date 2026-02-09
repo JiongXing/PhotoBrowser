@@ -137,7 +137,7 @@ extension ViewController: JXPhotoBrowserDelegate {
 
 `JXImageCell` 内置了一个 `UIActivityIndicatorView` 加载指示器，**默认不启用**。适用于 Banner 等嵌入式场景下展示图片加载状态。
 
-### 基础用法
+### 启用加载指示器
 
 ```swift
 let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
@@ -300,6 +300,85 @@ browser.addOverlay(CloseButtonOverlay())
 ```swift
 browser.addOverlay(JXPageIndicatorOverlay())
 browser.addOverlay(CloseButtonOverlay())
+```
+
+## 保存图片/视频到相册
+
+框架本身不内置保存功能，业务方可自行实现。Demo 中演示了通过长按手势弹出 ActionSheet 保存媒体到系统相册的完整流程。
+
+> **前提**：需要在 `Info.plist` 中配置 `NSPhotoLibraryAddUsageDescription`（写入相册权限描述）。
+
+### 核心步骤
+
+1. **添加长按手势**：在自定义 Cell 中添加 `UILongPressGestureRecognizer`。
+2. **弹出 ActionSheet**：通过 `browser` 属性获取浏览器控制器来 present。
+3. **请求权限并保存**：使用 `PHPhotoLibrary` 请求权限，下载后写入相册。
+
+### 示例：在自定义 Cell 中长按保存
+
+以 Demo 中的 `VideoPlayerCell` 为例，继承 `JXZoomImageCell` 后添加长按保存能力：
+
+```swift
+import Photos
+
+class VideoPlayerCell: JXZoomImageCell {
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        // 添加长按手势
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        scrollView.addGestureRecognizer(longPress)
+    }
+    
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "保存视频", style: .default) { [weak self] _ in
+            self?.saveVideoToAlbum()
+        })
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
+        
+        // 通过 browser 属性获取浏览器控制器来 present
+        browser?.present(alert, animated: true)
+    }
+    
+    private func saveVideoToAlbum() {
+        guard let url = videoURL else { return }
+        
+        // 1. 请求相册写入权限
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            guard status == .authorized || status == .limited else { return }
+            
+            // 2. 下载视频（远程 URL 需先下载到本地）
+            URLSession.shared.downloadTask(with: url) { tempURL, _, _ in
+                guard let tempURL else { return }
+                
+                // 3. 写入相册
+                PHPhotoLibrary.shared().performChanges({
+                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: tempURL)
+                }) { success, error in
+                    // 处理结果...
+                }
+            }.resume()
+        }
+    }
+}
+```
+
+保存图片的流程类似，将下载部分替换为图片写入即可：
+
+```swift
+// 下载图片数据
+URLSession.shared.dataTask(with: imageURL) { data, _, _ in
+    guard let data, let image = UIImage(data: data) else { return }
+    
+    PHPhotoLibrary.shared().performChanges({
+        PHAssetChangeRequest.creationRequestForAsset(from: image)
+    }) { success, error in
+        // 处理结果...
+    }
+}.resume()
 ```
 
 ## 依赖
