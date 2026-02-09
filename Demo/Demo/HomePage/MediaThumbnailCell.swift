@@ -16,7 +16,7 @@ final class MediaThumbnailCell: UICollectionViewCell {
     // MARK: - Static Properties
     
     /// 复用标识符
-    static let reuseIdentifier = "MediaThumbnailCell"
+    static let reuseIdentifier = "MediaCell"
     
     // MARK: - UI Components
     

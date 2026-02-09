@@ -364,7 +364,7 @@ func photoBrowserDismissInteractionDidChange(isInteracting: Bool)
 典型应用场景：视频 Cell 在下拉交互时隐藏 loading 指示器，避免遮挡缩小中的画面。
 
 ```swift
-class VideoCell: JXPhotoCell {
+class VideoCell: JXPhotoBrowserCell {
     func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {
         if isInteracting {
             // 下拉时隐藏 loading

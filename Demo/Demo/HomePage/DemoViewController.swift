@@ -154,7 +154,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         collectionView.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(DemoMediaCell.self, forCellWithReuseIdentifier: DemoMediaCell.reuseIdentifier)
+        collectionView.register(MediaThumbnailCell.self, forCellWithReuseIdentifier: MediaThumbnailCell.reuseIdentifier)
         
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([
@@ -175,7 +175,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DemoMediaCell.reuseIdentifier, for: indexPath) as! DemoMediaCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaThumbnailCell.reuseIdentifier, for: indexPath) as! MediaThumbnailCell
         cell.configure(with: items[indexPath.item])
         if let browser = photoBrowser, browser.pageIndex == indexPath.item {
             cell.imageView.isHidden = true
@@ -199,7 +199,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browser = JXPhotoBrowser()
-        browser.register(DemoVideoCell.self, forReuseIdentifier: DemoVideoCell.videoReuseIdentifier)
+        browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
         browser.delegate = self
         browser.initialIndex = indexPath.item
         
@@ -232,10 +232,10 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         let media = items[index]
         switch media.source {
         case .remoteImage:
-            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoCell.reuseIdentifier, for: indexPath) as! JXPhotoCell
+            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoBrowserCell.reuseIdentifier, for: indexPath) as! JXPhotoBrowserCell
             return cell
         case .remoteVideo:
-            let cell = browser.dequeueReusableCell(withReuseIdentifier: DemoVideoCell.videoReuseIdentifier, for: indexPath) as! DemoVideoCell
+            let cell = browser.dequeueReusableCell(withReuseIdentifier: VideoPlayerCell.videoReuseIdentifier, for: indexPath) as! VideoPlayerCell
             return cell
         }
     }
@@ -244,7 +244,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         let media = items[index]
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
-            guard let photoCell = cell as? JXPhotoCell else { return }
+            guard let photoCell = cell as? JXPhotoBrowserCell else { return }
             print("[willDisplay] index: \(index), imageURL: \(imageURL)")
             // 同步取出缓存的缩略图作为占位图，然后加载原图
             let placeholder = thumbnailURL.flatMap { ImageCache.default.retrieveImageInMemoryCache(forKey: $0.absoluteString) }
@@ -252,7 +252,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
                 photoCell?.setNeedsLayout()
             }
         case let .remoteVideo(videoURL, thumbnailURL):
-            guard let videoCell = cell as? DemoVideoCell else { return }
+            guard let videoCell = cell as? VideoPlayerCell else { return }
             print("[willDisplay] index: \(index), videoURL: \(videoURL)")
             // 先尝试从内存缓存同步获取封面图
             let memoryImage = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)
@@ -269,7 +269,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     
     func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
         // 停止视频播放
-        if let videoCell = cell as? DemoVideoCell {
+        if let videoCell = cell as? VideoPlayerCell {
             videoCell.stopVideo()
         }
     }
@@ -277,14 +277,14 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     // 为 Zoom 转场提供列表中的缩略图视图（用于起止位置计算）
     func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
         let ip = IndexPath(item: index, section: 0)
-        guard let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell else { return nil }
+        guard let cell = collectionView.cellForItem(at: ip) as? MediaThumbnailCell else { return nil }
         return cell.imageView
     }
     
     // 控制缩略图的显隐（Zoom 转场时隐藏源视图，避免视觉重叠）
     func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
         let ip = IndexPath(item: index, section: 0)
-        if let cell = collectionView.cellForItem(at: ip) as? DemoMediaCell {
+        if let cell = collectionView.cellForItem(at: ip) as? MediaThumbnailCell {
             cell.imageView.isHidden = hidden
         }
     }
