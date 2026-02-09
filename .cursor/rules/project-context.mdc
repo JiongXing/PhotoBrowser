@@ -12,9 +12,12 @@ alwaysApply: true
 | 目录/文件 | 说明 |
 |---|---|
 | `Sources/` | 开源框架核心代码 |
-| `Demo/HomePage/` | 框架使用示例 Demo |
+| `Demo-UIKit/` | UIKit 示例工程（CocoaPods 集成） |
+| `Demo-SwiftUI/` | SwiftUI 示例工程 |
+| `Medias/` | 示例用媒体资源（图片、视频） |
 | `README.md` | 项目说明文档 |
 | `JXPhotoBrowser.podspec` | CocoaPods 配置（位于项目根目录） |
+| `Package.swift` | Swift Package Manager 配置 |
 
 ## 开发规范
 
@@ -29,4 +32,4 @@ alwaysApply: true
 ### 代码职责划分
 
 - **框架代码** (`Sources/`)：通用、可复用的图片浏览器功能
-- **Demo 代码** (`Demo/HomePage/`)：展示框架用法，不应包含框架核心逻辑
+- **Demo 代码** (`Demo-UIKit/`、`Demo-SwiftUI/`)：展示框架用法，不应包含框架核心逻辑
