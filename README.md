@@ -42,6 +42,22 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 
 ## 安装
 
+### Swift Package Manager
+
+在 Xcode 中：
+
+1. 选择 **File > Add Package Dependencies...**
+2. 输入仓库地址：`https://github.com/JiongXing/PhotoBrowser`
+3. 选择版本规则后点击 **Add Package**
+
+或在 `Package.swift` 中添加依赖：
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.0")
+]
+```
+
 ### CocoaPods
 
 在你的 `Podfile` 中添加：
