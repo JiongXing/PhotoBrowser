@@ -51,6 +51,13 @@ class PhotoBannerView: UIView {
         }
     }
     
+    /// Banner 圆角半径（默认 12pt）
+    public var cornerRadius: CGFloat = 12 {
+        didSet {
+            browser?.view.layer.cornerRadius = cornerRadius
+        }
+    }
+    
     /// 是否启用自动轮播（默认 true）
     public var isAutoPlayEnabled: Bool = true {
         didSet {
@@ -123,9 +130,11 @@ class PhotoBannerView: UIView {
         // 设置浏览器视图背景为透明，与页面背景融为一体
         browser.view.backgroundColor = .clear
         
-        // 将浏览器视图添加到当前视图，并设置左右边距
+        // 将浏览器视图添加到当前视图，并设置左右边距和圆角
         let browserView = browser.view!
         browserView.translatesAutoresizingMaskIntoConstraints = false
+        browserView.layer.cornerRadius = cornerRadius
+        browserView.clipsToBounds = true
         addSubview(browserView)
         
         let leading = browserView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalMargin)
