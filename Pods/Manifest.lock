@@ -1,5 +1,5 @@
 PODS:
-  - JXPhotoBrowser (0.1.0)
+  - JXPhotoBrowser (4.0.0)
   - Kingfisher (8.6.0)
   - LookinServer (1.2.8):
     - LookinServer/Core (= 1.2.8)
@@ -25,7 +25,7 @@ EXTERNAL SOURCES:
     :path: "."
 
 SPEC CHECKSUMS:
-  JXPhotoBrowser: 2dee426d20ba2d62eac1ec8effb419d19a6968d4
+  JXPhotoBrowser: 1b81898b12b231063e537c3bd100c2d22b51440b
   Kingfisher: 64278f126a815d0e2d391cdf71311b85882c4de0
   LookinServer: 1b2b61c6402ae29fa22182d48f5cd067b4e99e80
   SDWebImage: 16309af6d214ba3f77a7c6f6fdda888cb313a50a

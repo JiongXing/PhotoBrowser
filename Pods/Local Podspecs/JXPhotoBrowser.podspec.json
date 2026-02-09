@@ -1,6 +1,6 @@
 {
   "name": "JXPhotoBrowser",
-  "version": "0.1.0",
+  "version": "4.0.0",
   "summary": "轻量级图片/视频浏览器，支持无限循环与缩放转场。",
   "description": "JXPhotoBrowser 是一个轻量级的照片/视频浏览组件：\n- 支持水平/竖直浏览与分页\n- 支持无限循环滑动\n- 内置 Zoom/Fade/None 转场动画\n- 支持从缩略图几何匹配无缝缩放\n- 图片加载通过协议抽象，可自由接入第三方库",
   "homepage": "https://example.com/JXPhotoBrowser",
@@ -12,7 +12,7 @@
     "jiongxing": "liangjiongxing@qq.com"
   },
   "platforms": {
-    "ios": "13.0"
+    "ios": "11.0"
   },
   "source": {
     "path": "."

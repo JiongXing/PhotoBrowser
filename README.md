@@ -35,6 +35,11 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 - **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
 - **JXPageIndicatorOverlay**：内置页码指示器组件，基于 `UIPageControl`，支持自定义位置和样式，通过 `addOverlay` 按需装载。
 
+## 系统要求
+
+- iOS 11.0+
+- Swift 5.0+
+
 ## 安装
 
 ### CocoaPods

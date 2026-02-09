@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'JXPhotoBrowser'
-  s.version          = '0.1.0'
+  s.version          = '4.0.0'
   s.summary          = '轻量级图片/视频浏览器，支持无限循环与缩放转场。'
 
   s.description      = <<-DESC
@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'jiongxing' => 'liangjiongxing@qq.com' }
 
-  s.platform         = :ios, '13.0'
+  s.platform         = :ios, '11.0'
 
   s.source           = { :path => '.' }
   s.source_files     = 'Sources/**/*.{swift}'
