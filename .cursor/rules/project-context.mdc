@@ -10,7 +10,7 @@ alwaysApply: true
 ## 项目结构
 
 | 目录/文件 | 说明 |
-|---|---|
+| --- | --- |
 | `Sources/` | 开源框架核心代码 |
 | `Demo-UIKit/` | UIKit 示例工程（CocoaPods 集成） |
 | `Demo-SwiftUI/` | SwiftUI 示例工程 |

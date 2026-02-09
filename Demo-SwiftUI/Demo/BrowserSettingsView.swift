@@ -11,9 +11,10 @@ import JXPhotoBrowser
 // MARK: - SwiftUI 侧的枚举类型
 
 /// 转场动画类型（映射 JXPhotoBrowserTransitionType）
+/// 注意：Zoom 转场需要通过 delegate 获取列表中缩略图的 UIView 引用，
+/// SwiftUI 的 AsyncImage 无法提供底层 UIView，因此 SwiftUI 仅支持 Fade 和 None。
 enum TransitionType: String, CaseIterable, Identifiable {
     case fade = "淡入淡出"
-    case zoom = "缩放"
     case none = "无"
     
     var id: String { rawValue }
@@ -22,7 +23,6 @@ enum TransitionType: String, CaseIterable, Identifiable {
     var browserTransitionType: JXPhotoBrowserTransitionType {
         switch self {
         case .fade: return .fade
-        case .zoom: return .zoom
         case .none: return .none
         }
     }

@@ -62,8 +62,17 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         guard let imageURL = items[index].fullImageURL else { return }
         
-        // 使用 Kingfisher 加载全尺寸图片
-        photoCell.imageView.kf.setImage(with: imageURL) { [weak photoCell] _ in
+        // 先尝试从 Kingfisher 缓存中获取缩略图作为占位图
+        var placeholder: UIImage?
+        if let thumbnailURL = items[index].thumbnailURL {
+            placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.cacheKey)
+        }
+        
+        // 先展示缩略图占位，再加载全尺寸原图
+        photoCell.imageView.kf.setImage(
+            with: imageURL,
+            placeholder: placeholder
+        ) { [weak photoCell] _ in
             photoCell?.setNeedsLayout()
         }
     }
