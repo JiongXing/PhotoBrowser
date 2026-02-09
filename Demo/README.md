@@ -124,16 +124,33 @@ extension ViewController: JXPhotoBrowserDelegate {
 
 ### 方式一：继承 JXPhotoCell（推荐）
 
-继承 `JXPhotoCell` 可自动获得缩放、转场、手势等功能：
+继承 `JXPhotoCell` 可自动获得缩放、转场、手势等功能。以 Demo 中的 `DemoVideoCell` 为例，它继承 `JXPhotoCell` 并添加了视频播放能力：
 
 ```swift
-class CustomPhotoCell: JXPhotoCell {
-    static let customReuseIdentifier = "CustomPhotoCell"
+class DemoVideoCell: JXPhotoCell {
+    static let videoReuseIdentifier = "DemoVideoCell"
     
-    // 添加自定义 UI 或重写行为
+    private var player: AVPlayer?
+    private var playerLayer: AVPlayerLayer?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        // 自定义初始化
+        // 自定义初始化：添加 loading 指示器等
+    }
+    
+    /// 配置视频资源
+    func configure(videoURL: URL, coverImage: UIImage? = nil) {
+        imageView.image = coverImage
+        // 创建播放器并开始播放...
+    }
+    
+    /// 重写单击手势：暂停视频或关闭浏览器
+    override func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+        if isPlaying {
+            pauseVideo()
+        } else {
+            browser?.dismissSelf()
+        }
     }
 }
 ```
@@ -167,14 +184,15 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
 let browser = JXPhotoBrowser()
 
 // 注册自定义 Cell（必须在设置 delegate 之前）
-browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
+browser.register(DemoVideoCell.self, forReuseIdentifier: DemoVideoCell.videoReuseIdentifier)
 
 browser.delegate = self
 browser.present(from: self)
 
 // 在 delegate 中使用
 func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-    let cell = browser.dequeueReusableCell(withReuseIdentifier: CustomPhotoCell.customReuseIdentifier, for: indexPath) as! CustomPhotoCell
+    let cell = browser.dequeueReusableCell(withReuseIdentifier: DemoVideoCell.videoReuseIdentifier, for: indexPath) as! DemoVideoCell
+    cell.configure(videoURL: url, coverImage: thumbnail)
     return cell
 }
 ```

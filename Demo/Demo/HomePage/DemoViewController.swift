@@ -199,8 +199,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browser = JXPhotoBrowser()
-        // 【示例】注册自定义Cell
-        browser.register(CustomPhotoCell.self, forReuseIdentifier: CustomPhotoCell.customReuseIdentifier)
         browser.register(DemoVideoCell.self, forReuseIdentifier: DemoVideoCell.videoReuseIdentifier)
         browser.delegate = self
         browser.initialIndex = indexPath.item
