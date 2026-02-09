@@ -8,6 +8,5 @@ target 'Demo' do
   pod 'JXPhotoBrowser', :path => '.'
   pod 'SDWebImage'
   pod 'Kingfisher'
-  pod 'LookinServer', :configurations => ['Debug']
 
 end
