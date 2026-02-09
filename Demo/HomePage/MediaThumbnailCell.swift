@@ -29,6 +29,15 @@ final class MediaThumbnailCell: UICollectionViewCell {
         return iv
     }()
     
+    /// 图片加载指示器
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.hidesWhenStopped = true
+        indicator.color = .gray
+        return indicator
+    }()
+    
     /// 视频播放按钮覆盖层
     private let playOverlay: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "play.circle.fill"))
@@ -56,6 +65,7 @@ final class MediaThumbnailCell: UICollectionViewCell {
     private func setup() {
         contentView.addSubview(imageView)
         contentView.addSubview(playOverlay)
+        contentView.addSubview(loadingIndicator)
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -64,7 +74,9 @@ final class MediaThumbnailCell: UICollectionViewCell {
             playOverlay.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             playOverlay.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             playOverlay.widthAnchor.constraint(equalToConstant: 40),
-            playOverlay.heightAnchor.constraint(equalToConstant: 40)
+            playOverlay.heightAnchor.constraint(equalToConstant: 40),
+            loadingIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }
     
@@ -76,6 +88,7 @@ final class MediaThumbnailCell: UICollectionViewCell {
         imageView.image = nil
         imageView.isHidden = false
         playOverlay.isHidden = true
+        loadingIndicator.stopAnimating()
     }
     
     // MARK: - Configuration Methods
@@ -84,18 +97,20 @@ final class MediaThumbnailCell: UICollectionViewCell {
     func configure(with media: DemoMedia) {
         imageView.image = nil
         playOverlay.isHidden = true
+        loadingIndicator.startAnimating()
+
+        let completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void) = { [weak self] _ in
+            self?.loadingIndicator.stopAnimating()
+        }
 
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
-            if let thumb = thumbnailURL {
-                imageView.kf.setImage(with: thumb)
-            } else {
-                imageView.kf.setImage(with: imageURL)
-            }
+            let url = thumbnailURL ?? imageURL
+            imageView.kf.setImage(with: url, completionHandler: completionHandler)
 
         case let .remoteVideo(_, thumbnailURL):
             playOverlay.isHidden = false
-            imageView.kf.setImage(with: thumbnailURL)
+            imageView.kf.setImage(with: thumbnailURL, completionHandler: completionHandler)
         }
     }
     

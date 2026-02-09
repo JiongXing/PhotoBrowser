@@ -164,8 +164,12 @@ extension PhotoBannerView: JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
         let resource = resources[index]
-        // 使用 Kingfisher 加载图片
-        cell.imageView.kf.setImage(with: resource.imageURL)
+        // 启用加载指示器
+        cell.isLoadingIndicatorEnabled = true
+        cell.startLoading()
+        cell.imageView.kf.setImage(with: resource.imageURL) { [weak cell] _ in
+            cell?.stopLoading()
+        }
         return cell
     }
 }

@@ -29,7 +29,7 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 
 - **JXPhotoBrowser**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
 - **JXZoomImageCell**：可缩放图片展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击等交互。通过 `imageView` 属性供业务方设置图片。
-- **JXImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
+- **JXImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。内置可选的加载指示器（默认不启用），支持样式定制。
 - **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，另提供 `photoBrowserDismissInteractionDidChange` 可选方法响应下拉关闭交互，不强制依赖特定基类。
 - **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例、生命周期回调（`willDisplay`/`didEndDisplaying`）以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。
 - **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
@@ -131,6 +131,34 @@ extension ViewController: JXPhotoBrowserDelegate {
         return nil // 返回 nil 使用默认尺寸
     }
 }
+```
+
+## JXImageCell 加载指示器
+
+`JXImageCell` 内置了一个 `UIActivityIndicatorView` 加载指示器，**默认不启用**。适用于 Banner 等嵌入式场景下展示图片加载状态。
+
+### 基础用法
+
+```swift
+let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
+
+// 启用加载指示器
+cell.isLoadingIndicatorEnabled = true
+cell.startLoading()
+
+// 图片加载完成后停止
+cell.imageView.kf.setImage(with: imageURL) { [weak cell] _ in
+    cell?.stopLoading()
+}
+```
+
+### 自定义样式
+
+通过 `loadingIndicator` 属性可直接定制指示器的外观：
+
+```swift
+cell.loadingIndicator.style = .large       // 指示器尺寸
+cell.loadingIndicator.color = .systemBlue  // 指示器颜色
 ```
 
 ## 自定义 Cell
