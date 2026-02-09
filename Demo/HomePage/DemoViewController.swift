@@ -232,7 +232,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         let media = items[index]
         switch media.source {
         case .remoteImage:
-            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoBrowserCell.reuseIdentifier, for: indexPath) as! JXPhotoBrowserCell
+            let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
             return cell
         case .remoteVideo:
             let cell = browser.dequeueReusableCell(withReuseIdentifier: VideoPlayerCell.videoReuseIdentifier, for: indexPath) as! VideoPlayerCell
@@ -244,7 +244,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         let media = items[index]
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
-            guard let photoCell = cell as? JXPhotoBrowserCell else { return }
+            guard let photoCell = cell as? JXZoomImageCell else { return }
             print("[willDisplay] index: \(index), imageURL: \(imageURL)")
             // 同步取出缓存的缩略图作为占位图，然后加载原图
             let placeholder = thumbnailURL.flatMap { ImageCache.default.retrieveImageInMemoryCache(forKey: $0.absoluteString) }

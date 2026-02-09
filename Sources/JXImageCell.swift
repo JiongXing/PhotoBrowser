@@ -1,18 +1,18 @@
 //
-//  JXBasicImageCell.swift
+//  JXImageCell.swift
 //  JXPhotoBrowser
 //
 
 import UIKit
 
-/// 仅用于基础图片展示的 Cell
-/// 不支持缩放、手势等高级功能，主要用于嵌入式场景（如 Banner）
-open class JXBasicImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
+/// 轻量级图片展示 Cell
+/// 不支持缩放、手势等高级功能，适用于 Banner 等嵌入式场景
+open class JXImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     
     // MARK: - Public Properties
     
     /// 复用标识符
-    public static let reuseIdentifier = "JXBasicImageCell"
+    public static let reuseIdentifier = "JXImageCell"
     
     /// 内部图片视图，仅做展示
     public let imageView: UIImageView = {

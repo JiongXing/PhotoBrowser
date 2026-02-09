@@ -6,7 +6,7 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 
 - **零数据模型依赖**：框架不定义任何数据模型，业务方完全使用自己的数据结构，通过 delegate 配置 Cell 内容。
 - **图片加载完全开放**：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
-- **极简 Cell 协议**：`JXPhotoBrowserCellProtocol` 仅包含 `browser` 和 `transitionImageView` 两个属性，将浏览器与具体 Cell 实现解耦，既可以直接使用内置的 `JXPhotoBrowserCell`，也可以实现完全自定义的 Cell。
+- **极简 Cell 协议**：`JXPhotoBrowserCellProtocol` 仅包含 `browser` 和 `transitionImageView` 两个属性，将浏览器与具体 Cell 实现解耦，既可以直接使用内置的 `JXZoomImageCell`，也可以实现完全自定义的 Cell。
 - **协议驱动的数据与 UI 解耦**：`JXPhotoBrowserDelegate` 只关心数量、Cell 与转场，不强制统一的数据模型。
 
 ## 功能特性
@@ -22,14 +22,14 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
   - **Zoom**：类似微信/系统相册的缩放转场效果，无缝衔接列表与大图。
   - **None**：无动画直接显示。
 - **浏览体验优化**：基于 `UICollectionView` 复用机制，内存占用低，滑动流畅。
-- **自定义 Cell 支持**：内置图片 `JXPhotoBrowserCell`，也支持通过协议与注册机制接入完全自定义的 Cell（如视频播放 Cell）。
+- **自定义 Cell 支持**：内置图片 `JXZoomImageCell`，也支持通过协议与注册机制接入完全自定义的 Cell（如视频播放 Cell）。
 - **Overlay 组件机制**：支持按需装载附加 UI 组件（如页码指示器、关闭按钮等），默认不装载任何组件，零开销。内置 `JXPageIndicatorOverlay` 页码指示器。
 
 ## 核心架构
 
 - **JXPhotoBrowser**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
-- **JXPhotoBrowserCell**：默认图片展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击等交互。通过 `imageView` 属性供业务方设置图片。
-- **JXBasicImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
+- **JXZoomImageCell**：可缩放图片展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击等交互。通过 `imageView` 属性供业务方设置图片。
+- **JXImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。
 - **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，另提供 `photoBrowserDismissInteractionDidChange` 可选方法响应下拉关闭交互，不强制依赖特定基类。
 - **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例、生命周期回调（`willDisplay`/`didEndDisplaying`）以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。
 - **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
@@ -85,13 +85,13 @@ extension ViewController: JXPhotoBrowserDelegate {
     
     // 2. 提供用于展示的 Cell
     func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXPhotoBrowserCell.reuseIdentifier, for: indexPath) as! JXPhotoBrowserCell
+        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
         return cell
     }
     
     // 3. 当 Cell 将要显示时加载图片
     func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
-        guard let photoCell = cell as? JXPhotoBrowserCell else { return }
+        guard let photoCell = cell as? JXZoomImageCell else { return }
         let item = items[index]
         
         // 使用 Kingfisher 加载图片（可替换为 SDWebImage 或其他库）
@@ -132,12 +132,12 @@ extension ViewController: JXPhotoBrowserDelegate {
 
 框架支持两种方式创建自定义 Cell：
 
-### 方式一：继承 JXPhotoBrowserCell（推荐）
+### 方式一：继承 JXZoomImageCell（推荐）
 
-继承 `JXPhotoBrowserCell` 可自动获得缩放、转场、手势等功能。以 Demo 中的 `VideoPlayerCell` 为例，它继承 `JXPhotoBrowserCell` 并添加了视频播放能力：
+继承 `JXZoomImageCell` 可自动获得缩放、转场、手势等功能。以 Demo 中的 `VideoPlayerCell` 为例，它继承 `JXZoomImageCell` 并添加了视频播放能力：
 
 ```swift
-class VideoPlayerCell: JXPhotoBrowserCell {
+class VideoPlayerCell: JXZoomImageCell {
     static let videoReuseIdentifier = "VideoPlayerCell"
     
     private var player: AVPlayer?
@@ -285,7 +285,7 @@ browser.addOverlay(CloseButtonOverlay())
 
 ```swift
 func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
-    guard let photoCell = cell as? JXPhotoBrowserCell else { return }
+    guard let photoCell = cell as? JXZoomImageCell else { return }
     
     // 同步从缓存取出缩略图作为占位图
     let placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)

@@ -103,7 +103,7 @@ open class JXPhotoBrowser: UIViewController {
         cv.isPagingEnabled = true
         
         // 注册默认Cell
-        cv.register(JXPhotoBrowserCell.self, forCellWithReuseIdentifier: JXPhotoBrowserCell.reuseIdentifier)
+        cv.register(JXZoomImageCell.self, forCellWithReuseIdentifier: JXZoomImageCell.reuseIdentifier)
         
         return cv
     }()
@@ -254,13 +254,13 @@ open class JXPhotoBrowser: UIViewController {
             guard let cell = visibleCell() else { return }
             interactiveDismissCell = cell
             collectionView.isScrollEnabled = false
-            // 如果是 JXPhotoBrowserCell，禁用其内部 scrollView 滚动以避免手势冲突
-            if let photoCell = cell as? JXPhotoBrowserCell {
+            // 如果是 JXZoomImageCell，禁用其内部 scrollView 滚动以避免手势冲突
+            if let photoCell = cell as? JXZoomImageCell {
                 photoCell.scrollView.isScrollEnabled = false
             }
             
             // 记录初始状态以计算跟随
-            let referenceView: UIView = (cell as? JXPhotoBrowserCell)?.scrollView ?? collectionView
+            let referenceView: UIView = (cell as? JXZoomImageCell)?.scrollView ?? collectionView
             initialTouchPoint = gesture.location(in: referenceView)
             if let imageView = cell.transitionImageView {
                 initialImageCenter = imageView.center
@@ -321,7 +321,7 @@ open class JXPhotoBrowser: UIViewController {
                     self.view.backgroundColor = .black
                 }) { _ in
                     self.collectionView.isScrollEnabled = true
-                    if let photoCell = cell as? JXPhotoBrowserCell {
+                    if let photoCell = cell as? JXZoomImageCell {
                         photoCell.scrollView.isScrollEnabled = true
                     }
                     // 通知 Cell 下拉交互结束（回弹恢复）
@@ -331,7 +331,7 @@ open class JXPhotoBrowser: UIViewController {
             }
         default:
             collectionView.isScrollEnabled = true
-            if let photoCell = interactiveDismissCell as? JXPhotoBrowserCell {
+            if let photoCell = interactiveDismissCell as? JXZoomImageCell {
                 photoCell.scrollView.isScrollEnabled = true
             }
             // 通知 Cell 下拉交互结束（异常取消）
@@ -538,9 +538,9 @@ open class JXPhotoBrowser: UIViewController {
         }
     }
     
-    /// 当前展示中的 PhotoCell（便捷方法，仅返回 JXPhotoBrowserCell 类型）
-    open func visiblePhotoCell() -> JXPhotoBrowserCell? {
-        return visibleCell() as? JXPhotoBrowserCell
+    /// 当前展示中的 ZoomImageCell（便捷方法，仅返回 JXZoomImageCell 类型）
+    open func visibleZoomImageCell() -> JXZoomImageCell? {
+        return visibleCell() as? JXZoomImageCell
     }
     
     // MARK: - Overlay Management
@@ -743,14 +743,14 @@ extension JXPhotoBrowser: UIGestureRecognizerDelegate {
             // 必须是垂直向下的手势
             guard velocity.y > 0, abs(velocity.y) > abs(velocity.x) else { return false }
             
-            // 如果是 JXPhotoBrowserCell，检查缩放和滚动状态
-            if let photoCell = visiblePhotoCell() {
+            // 如果是 JXZoomImageCell，检查缩放和滚动状态
+            if let photoCell = visibleZoomImageCell() {
                 let isZoomed = photoCell.scrollView.zoomScale > 1.0 + 0.01
                 let isAtTop = photoCell.scrollView.contentOffset.y <= 1.0
                 return !isZoomed && isAtTop
             }
             
-            // 自定义 Cell（非 JXPhotoBrowserCell）：直接允许下拉关闭
+            // 自定义 Cell（非 JXZoomImageCell）：直接允许下拉关闭
             guard visibleCell() != nil else { return false }
             return true
         }

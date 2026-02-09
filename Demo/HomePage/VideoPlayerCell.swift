@@ -9,8 +9,8 @@ import AVFoundation
 import JXPhotoBrowser
 
 /// 视频播放 Cell
-/// 继承自 JXPhotoBrowserCell，添加视频播放功能
-open class VideoPlayerCell: JXPhotoBrowserCell {
+/// 继承自 JXZoomImageCell，添加视频播放功能
+open class VideoPlayerCell: JXZoomImageCell {
     
     // MARK: - Static Properties
     

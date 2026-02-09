@@ -120,7 +120,7 @@ class PhotoBannerView: UIView {
         browser.itemSpacing = 8  // 设置图片之间的间距
         browser.isAutoPlayEnabled = true  // 开启自动轮播
         browser.autoPlayInterval = 3.0  // 轮播间隔 3 秒
-        browser.register(JXBasicImageCell.self, forReuseIdentifier: JXBasicImageCell.reuseIdentifier)
+        browser.register(JXImageCell.self, forReuseIdentifier: JXImageCell.reuseIdentifier)
         
         // 装载页码指示器
         let pageIndicator = JXPageIndicatorOverlay()
@@ -162,7 +162,7 @@ extension PhotoBannerView: JXPhotoBrowserDelegate {
     }
     
     func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXBasicImageCell.reuseIdentifier, for: indexPath) as! JXBasicImageCell
+        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
         let resource = resources[index]
         // 使用 Kingfisher 加载图片
         cell.imageView.kf.setImage(with: resource.imageURL)

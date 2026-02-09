@@ -1,14 +1,15 @@
 //
-//  JXPhotoBrowserCell.swift
+//  JXZoomImageCell.swift
 //  JXPhotoBrowser
 //
 
 import UIKit
 
 /// 支持图片捏合缩放查看的 Cell
-open class JXPhotoBrowserCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrowserCellProtocol {
+/// 内部使用 UIScrollView 实现缩放，支持单击关闭、双击切换缩放模式等手势交互
+open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrowserCellProtocol {
     // MARK: - Static
-    public static let reuseIdentifier = "JXPhotoBrowserCell"
+    public static let reuseIdentifier = "JXZoomImageCell"
     
     // MARK: - UI
     /// 承载图片并支持捏合缩放的滚动视图
