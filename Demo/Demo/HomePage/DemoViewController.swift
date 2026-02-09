@@ -256,9 +256,16 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         case let .remoteVideo(videoURL, thumbnailURL):
             guard let videoCell = cell as? DemoVideoCell else { return }
             print("[willDisplay] index: \(index), videoURL: \(videoURL)")
-            // 同步取出缓存的缩略图作为占位图，然后配置视频
-            let placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)
-            videoCell.configure(videoURL: videoURL, coverImage: placeholder)
+            // 先尝试从内存缓存同步获取封面图
+            let memoryImage = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)
+            videoCell.configure(videoURL: videoURL, coverImage: memoryImage)
+            
+            // 内存缓存为空时（如 App 从后台恢复后缓存被清理），异步从磁盘/网络加载封面图
+            if memoryImage == nil {
+                videoCell.imageView.kf.setImage(with: thumbnailURL) { [weak videoCell] _ in
+                    videoCell?.setNeedsLayout()
+                }
+            }
         }
     }
     

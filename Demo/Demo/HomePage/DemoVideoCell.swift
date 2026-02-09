@@ -55,11 +55,17 @@ open class DemoVideoCell: JXPhotoCell {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setupLoadingIndicator()
+        setupAppLifecycleObservers()
     }
     
     public required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupLoadingIndicator()
+        setupAppLifecycleObservers()
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     open override func prepareForReuse() {
@@ -77,6 +83,21 @@ open class DemoVideoCell: JXPhotoCell {
             loadingIndicator.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
+    }
+    
+    private func setupAppLifecycleObservers() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
     }
     
     // MARK: - Public Methods
@@ -216,5 +237,24 @@ open class DemoVideoCell: JXPhotoCell {
     @objc private func videoDidReachEnd() {
         player?.seek(to: .zero)
         player?.play()
+    }
+    
+    // MARK: - App Lifecycle
+    
+    /// App 进入后台时，主动断开 playerLayer 与 player 的关联
+    /// 防止 iOS 回收 GPU 资源后 playerLayer 进入不可恢复的异常状态
+    @objc private func handleDidEnterBackground() {
+        guard let playerLayer = playerLayer else { return }
+        playerLayer.player = nil
+    }
+    
+    /// App 从后台返回前台时，重新关联 player 并恢复播放
+    @objc private func handleWillEnterForeground() {
+        guard let player = player, let playerLayer = playerLayer else { return }
+        playerLayer.player = player
+        
+        if isPlaying {
+            player.play()
+        }
     }
 }
