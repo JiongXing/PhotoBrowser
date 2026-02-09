@@ -26,6 +26,7 @@
 - [x] 支持网络图片加载、查看原图加载，由用户自由选择其他框架进行图片加载与缓存
 - [x] 支持添加附加控件，框架提供了两种页面指示器的实现，以及在例子工程提供了加载进度环的实现
 - [x] 支持自动轮播，可配置轮播间隔，支持循环轮播或到达末页自动停止
+- [x] 支持下拉关闭交互状态回调，Cell 可感知下拉缩小状态并做出响应（如隐藏 loading）
 
 ## 近期版本更新
 
@@ -350,6 +351,35 @@ open lazy var cellDidAppear: (JXPhotoBrowserCell, Int) -> Void = { _, _ in }
 ```
 
 例子工程有简单的本地视频播放实现，详情可参考[VideoPhotoViewController](Example/Example/VideoPhotoViewController.swift)
+
+### 下拉关闭交互回调
+
+当用户下拉图片（图片缩小跟随手指）时，框架会通知 Cell 交互状态的变化。自定义 Cell 可重写 `JXPhotoBrowserCellProtocol` 的方法来响应：
+
+```swift
+/// isInteracting: true 表示正在下拉，false 表示回弹恢复
+func photoBrowserDismissInteractionDidChange(isInteracting: Bool)
+```
+
+典型应用场景：视频 Cell 在下拉交互时隐藏 loading 指示器，避免遮挡缩小中的画面。
+
+```swift
+class VideoCell: JXPhotoCell {
+    func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {
+        if isInteracting {
+            // 下拉时隐藏 loading
+            hideLoading()
+        } else {
+            // 回弹恢复时，如果仍在缓冲则重新显示 loading
+            if player?.timeControlStatus == .waitingToPlayAtSpecifiedRate {
+                showLoading()
+            }
+        }
+    }
+}
+```
+
+> 注意：当用户下拉后松手触发关闭时，不会收到 `isInteracting = false` 回调（因为浏览器即将消失）。
 
 ### 图片与视频混合浏览
 

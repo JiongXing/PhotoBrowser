@@ -271,6 +271,9 @@ open class JXPhotoBrowser: UIViewController {
                 delegate?.photoBrowser(self, setThumbnailHidden: true, at: pageIndex)
             }
             
+            // 通知 Cell 进入下拉交互状态
+            cell.photoBrowserDismissInteractionDidChange(isInteracting: true)
+            
         case .changed:
             guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else { return }
             let translation = gesture.translation(in: view)
@@ -321,6 +324,8 @@ open class JXPhotoBrowser: UIViewController {
                     if let photoCell = cell as? JXPhotoCell {
                         photoCell.scrollView.isScrollEnabled = true
                     }
+                    // 通知 Cell 下拉交互结束（回弹恢复）
+                    cell.photoBrowserDismissInteractionDidChange(isInteracting: false)
                     self.interactiveDismissCell = nil
                 }
             }
@@ -329,6 +334,8 @@ open class JXPhotoBrowser: UIViewController {
             if let photoCell = interactiveDismissCell as? JXPhotoCell {
                 photoCell.scrollView.isScrollEnabled = true
             }
+            // 通知 Cell 下拉交互结束（异常取消）
+            interactiveDismissCell?.photoBrowserDismissInteractionDidChange(isInteracting: false)
             interactiveDismissCell = nil
         }
     }

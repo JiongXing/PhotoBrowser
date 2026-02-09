@@ -274,4 +274,9 @@ open class JXPhotoCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoBrows
     @objc open func handleSingleTap(_ gesture: UITapGestureRecognizer) {
         browser?.dismissSelf()
     }
+    
+    // MARK: - Dismiss Interaction
+    
+    /// 下拉关闭交互状态变化时调用，子类可重写以响应下拉交互状态变化
+    open func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {}
 }
