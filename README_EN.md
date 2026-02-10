@@ -54,7 +54,7 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
 
 ## Requirements
 
-- iOS 11.0+
+- iOS 12.0+
 - Swift 5.4+
 
 ## Installation

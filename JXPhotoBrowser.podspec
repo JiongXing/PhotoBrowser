@@ -15,7 +15,8 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'jiongxing' => 'liangjiongxing@qq.com' }
 
-  s.platform         = :ios, '11.0'
+  s.platform         = :ios, '12.0'
+  s.swift_versions   = ['5.4']
 
   s.source           = { :git => 'https://github.com/JiongXing/PhotoBrowser.git', :tag => s.version.to_s }
   s.source_files     = 'Sources/**/*.{swift}'

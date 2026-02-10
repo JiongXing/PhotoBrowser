@@ -12,12 +12,16 @@
     "jiongxing": "liangjiongxing@qq.com"
   },
   "platforms": {
-    "ios": "11.0"
+    "ios": "12.0"
   },
+  "swift_versions": [
+    "5.4"
+  ],
   "source": {
     "git": "https://github.com/JiongXing/PhotoBrowser.git",
     "tag": "4.0.0"
   },
   "source_files": "Sources/**/*.{swift}",
-  "frameworks": "UIKit"
+  "frameworks": "UIKit",
+  "swift_version": "5.4"
 }

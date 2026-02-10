@@ -707,9 +707,9 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3E6C981F2CB312553F84F8C54E976A55 /* Release */ = {
+		102285E21374AB4376D8725418878E1E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 895395BFCE362F77E7B669C6CFD479DD /* JXPhotoBrowser.release.xcconfig */;
+			baseConfigurationReference = E2092026C77000061A40E95625F3D123 /* JXPhotoBrowser.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -726,7 +726,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/JXPhotoBrowser/JXPhotoBrowser-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -739,13 +739,12 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Release;
+			name = Debug;
 		};
 		64526FED157A173E7209E8A68A219BE4 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -787,9 +786,9 @@
 			};
 			name = Release;
 		};
-		8B9E1B96D6D610A5D35DB54A29FC3590 /* Debug */ = {
+		6505CBF23AD4371AFBD59DFDB65E9671 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E2092026C77000061A40E95625F3D123 /* JXPhotoBrowser.debug.xcconfig */;
+			baseConfigurationReference = 895395BFCE362F77E7B669C6CFD479DD /* JXPhotoBrowser.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
@@ -806,7 +805,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Target Support Files/JXPhotoBrowser/JXPhotoBrowser-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -819,12 +818,13 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 5.4;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Debug;
+			name = Release;
 		};
 		903A0004D3E6651EFD5D2E16214D101B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1078,8 +1078,8 @@
 		1C688541238CBF273BB91E422157FBD5 /* Build configuration list for PBXNativeTarget "JXPhotoBrowser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8B9E1B96D6D610A5D35DB54A29FC3590 /* Debug */,
-				3E6C981F2CB312553F84F8C54E976A55 /* Release */,
+				102285E21374AB4376D8725418878E1E /* Debug */,
+				6505CBF23AD4371AFBD59DFDB65E9671 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
