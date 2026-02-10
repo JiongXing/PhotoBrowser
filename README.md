@@ -1,5 +1,7 @@
 # JXPhotoBrowser
 
+[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
+
 [English Documentation](README_EN.md)
 
 JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，实现 iOS 系统相册的交互体验。支持缩放、拖拽关闭、自定义转场动画等特性，架构清晰，易于集成和扩展。同时支持 **UIKit** 和 **SwiftUI** 两种调用方式（SwiftUI 通过桥接层集成，详见 Demo-SwiftUI 示例工程）。
