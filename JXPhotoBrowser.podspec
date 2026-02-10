@@ -1,24 +1,23 @@
 Pod::Spec.new do |s|
   s.name             = 'JXPhotoBrowser'
   s.version          = '4.0.0'
-  s.summary          = '轻量级图片/视频浏览器，支持无限循环与缩放转场。'
+  s.summary          = 'A lightweight, customizable iOS photo/video browser with zoom transitions and infinite looping.'
 
   s.description      = <<-DESC
-  JXPhotoBrowser 是一个轻量级的照片/视频浏览组件：
-  - 支持水平/竖直浏览与分页
-  - 支持无限循环滑动
-  - 内置 Zoom/Fade/None 转场动画
-  - 支持从缩略图几何匹配无缝缩放
-  - 图片加载通过协议抽象，可自由接入第三方库
+  JXPhotoBrowser is a lightweight, zero-dependency iOS photo/video browser
+  built on UICollectionView. It features pinch-to-zoom, drag-to-dismiss,
+  Zoom/Fade/None transition animations, infinite-loop scrolling, and a
+  plug-in overlay system. The framework defines no data models and has no
+  image-loading logic built in — bring your own (Kingfisher, SDWebImage, etc.).
   DESC
 
-  s.homepage         = 'https://example.com/JXPhotoBrowser'
+  s.homepage         = 'https://github.com/JiongXing/PhotoBrowser'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'jiongxing' => 'liangjiongxing@qq.com' }
 
   s.platform         = :ios, '11.0'
 
-  s.source           = { :path => '.' }
+  s.source           = { :git => 'https://github.com/JiongXing/PhotoBrowser.git', :tag => s.version.to_s }
   s.source_files     = 'Sources/**/*.{swift}'
 
   s.frameworks       = 'UIKit'
