@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 
-[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)](https://github.com/Carthage/Carthage) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)](https://github.com/Carthage/Carthage) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
 
 [English Documentation](README_EN.md)
 
@@ -50,6 +50,14 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 
 ## 安装
 
+### CocoaPods
+
+在你的 `Podfile` 中添加：
+
+```ruby
+pod 'JXPhotoBrowser'
+```
+
 ### Swift Package Manager
 
 在 Xcode 中：
@@ -64,14 +72,6 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 dependencies: [
     .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.0")
 ]
-```
-
-### CocoaPods
-
-在你的 `Podfile` 中添加：
-
-```ruby
-pod 'JXPhotoBrowser'
 ```
 
 ### Carthage
