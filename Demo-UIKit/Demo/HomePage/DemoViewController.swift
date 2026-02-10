@@ -88,7 +88,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     private func setupData() {
-        let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
+        let base = URL(string: "https://raw.githubusercontent.com/JiongXing/MediaResources/master/PhotoBrowser")!
         
         // 图片数据
         let photos = (0..<9).map { i -> DemoMedia in

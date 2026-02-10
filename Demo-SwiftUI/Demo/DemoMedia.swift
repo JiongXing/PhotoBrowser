@@ -45,7 +45,7 @@ struct DemoMedia: Identifiable {
     
     /// 构建示例数据源
     static func makeSampleItems() -> [DemoMedia] {
-        let base = URL(string: "https://raw.githubusercontent.com/JiongXing/PhotoBrowser/master/Medias")!
+        let base = URL(string: "https://raw.githubusercontent.com/JiongXing/MediaResources/master/PhotoBrowser")!
         
         // 9 张图片
         let photos = (0..<9).map { i -> DemoMedia in
