@@ -1,5 +1,5 @@
 {
-  "originHash" : "a0f829624fbe29f52a0db546a10bc5976daf8d4e3382136f1632a947958848af",
+  "originHash" : "2186df6f15bb5ef372e6c415d3b0007f0efd6c192dba941815fc2ae1be232d04",
   "pins" : [
     {
       "identity" : "kingfisher",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "d30a5fad881137e2267f96a8e3fc35c58999bb94",
         "version" : "8.6.2"
+      }
+    },
+    {
+      "identity" : "photobrowser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/JiongXing/PhotoBrowser.git",
+      "state" : {
+        "revision" : "2316993eeb98f1c18edfe6af1066d2e9ad6e3722",
+        "version" : "4.0.0"
       }
     }
   ],

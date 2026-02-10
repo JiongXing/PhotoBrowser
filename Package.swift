@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "JXPhotoBrowser",
     platforms: [
-        .iOS(.v11)
+        .iOS(.v12)
     ],
     products: [
         .library(
@@ -16,7 +16,10 @@ let package = Package(
     targets: [
         .target(
             name: "JXPhotoBrowser",
-            path: "Sources"
+            path: "Sources",
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
+            ]
         )
     ]
 )

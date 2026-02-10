@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'JXPhotoBrowser'
-  s.version          = '4.0.0'
+  s.version          = '4.0.1'
   s.summary          = 'A lightweight, customizable iOS photo/video browser with zoom transitions and infinite looping.'
 
   s.description      = <<-DESC
@@ -20,6 +20,10 @@ Pod::Spec.new do |s|
 
   s.source           = { :git => 'https://github.com/JiongXing/PhotoBrowser.git', :tag => s.version.to_s }
   s.source_files     = 'Sources/**/*.{swift}'
+
+  s.resource_bundles = {
+    'JXPhotoBrowser' => ['Sources/PrivacyInfo.xcprivacy']
+  }
 
   s.frameworks       = 'UIKit'
 end

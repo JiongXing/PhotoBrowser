@@ -52,6 +52,12 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
   - **Demo-SwiftUI**：SwiftUI 示例，使用 SPM 集成，演示如何通过桥接层在 SwiftUI 中使用 JXPhotoBrowser（媒体网格、设置面板、图片浏览）。
   - **Demo-Carthage**：UIKit 示例，使用 Carthage 集成。首次使用需在 `Demo-Carthage` 目录下执行 `carthage update --use-xcframeworks --platform iOS` 构建框架。
 
+## 隐私清单（Privacy Manifest）
+
+本框架已包含 `PrivacyInfo.xcprivacy` 隐私清单文件，符合 Apple 自 2024 年春季起对第三方 SDK 的隐私清单要求。
+
+JXPhotoBrowser **不追踪用户、不收集任何数据、不使用任何 Required Reason API**，隐私清单中所有字段均为空声明。通过 CocoaPods、SPM 或 Carthage 集成时，隐私清单会自动包含在框架中，无需额外配置。
+
 ## 系统要求
 
 - iOS 12.0+
@@ -64,8 +70,12 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 在你的 `Podfile` 中添加：
 
 ```ruby
-pod 'JXPhotoBrowser'
+pod 'JXPhotoBrowser', '~> 4.0.1'
 ```
+
+> **注意**：Xcode 15 起默认开启了 **User Script Sandboxing**（`ENABLE_USER_SCRIPT_SANDBOXING=YES`），该沙盒机制会阻止 CocoaPods 的 Run Script 阶段（如 `[CP] Copy Pods Resources`、`[CP] Embed Pods Frameworks` 等）访问沙盒外的文件，导致编译失败。需要在编译 Target 的 **Build Settings** 中将 `ENABLE_USER_SCRIPT_SANDBOXING` 设置为 `NO`：
+>
+> **Target → Build Settings → Build Options → User Script Sandboxing → No**
 
 ### Swift Package Manager
 
@@ -79,7 +89,7 @@ pod 'JXPhotoBrowser'
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.0")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.1")
 ]
 ```
 
@@ -531,7 +541,7 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXP
 
 ## 版本更新
 
-**v4.0.0**（2026/02/10）— 全面重构，回归 `UICollectionView`，支持无限循环滚动，新增 SwiftUI 示例。不兼容 3.x 版本。
+**v4.0.1**（2026/02/10）— 全面重构，回归 `UICollectionView`，支持无限循环滚动，新增 SwiftUI 示例。不兼容 3.x 版本。
 
 完整更新记录请查看 [CHANGELOG](CHANGELOG.md)。
 

@@ -52,6 +52,12 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
   - **Demo-SwiftUI**: SwiftUI demo using SPM. Demonstrates how to use JXPhotoBrowser in SwiftUI via a bridging layer (media grid, settings panel, photo browsing).
   - **Demo-Carthage**: UIKit demo using Carthage. On first use, run `carthage update --use-xcframeworks --platform iOS` in the `Demo-Carthage` directory to build the framework.
 
+## Privacy Manifest
+
+This framework includes a `PrivacyInfo.xcprivacy` privacy manifest file, complying with Apple's privacy manifest requirement for third-party SDKs effective spring 2024.
+
+JXPhotoBrowser **does not track users, does not collect any data, and does not use any Required Reason APIs** — all fields in the privacy manifest are empty declarations. When integrating via CocoaPods, SPM, or Carthage, the privacy manifest is automatically included with the framework — no additional configuration is needed.
+
 ## Requirements
 
 - iOS 12.0+
@@ -64,8 +70,12 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
 Add to your `Podfile`:
 
 ```ruby
-pod 'JXPhotoBrowser'
+pod 'JXPhotoBrowser', '~> 4.0.1'
 ```
+
+> **Note**: Starting from Xcode 15, **User Script Sandboxing** (`ENABLE_USER_SCRIPT_SANDBOXING=YES`) is enabled by default. This sandbox mechanism prevents CocoaPods' Run Script phases (such as `[CP] Copy Pods Resources`, `[CP] Embed Pods Frameworks`, etc.) from accessing files outside the sandbox, causing build failures. You need to set `ENABLE_USER_SCRIPT_SANDBOXING` to `NO` in your build target's **Build Settings**:
+>
+> **Target → Build Settings → Build Options → User Script Sandboxing → No**
 
 ### Swift Package Manager
 
@@ -79,7 +89,7 @@ Or add the dependency in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.0")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.1")
 ]
 ```
 
@@ -532,7 +542,7 @@ This ensures the cell has an image with the correct dimensions when the transiti
 
 ## Release Notes
 
-**v4.0.0** (2026/02/10) — Full rewrite. Back to `UICollectionView`, with infinite-loop scrolling support and a new SwiftUI demo. Not backward-compatible with 3.x.
+**v4.0.1** (2026/02/10) — Full rewrite. Back to `UICollectionView`, with infinite-loop scrolling support and a new SwiftUI demo. Not backward-compatible with 3.x.
 
 See the full release history in the [CHANGELOG](CHANGELOG.md).
 
