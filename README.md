@@ -529,6 +529,12 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXP
 
 这样可以确保转场动画开始时，Cell 已经有正确尺寸的图片，动画效果更加流畅。
 
+## 版本更新
+
+**v4.0.0**（2026/02/10）— 全面重构，回归 `UICollectionView`，支持无限循环滚动，新增 SwiftUI 示例。不兼容 3.x 版本。
+
+完整更新记录请查看 [CHANGELOG](CHANGELOG.md)。
+
 ## License
 
 本项目基于 MIT 协议开源。

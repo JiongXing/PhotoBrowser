@@ -530,6 +530,12 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXP
 
 This ensures the cell has an image with the correct dimensions when the transition animation starts, resulting in a smoother animation.
 
+## Release Notes
+
+**v4.0.0** (2026/02/10) — Full rewrite. Back to `UICollectionView`, with infinite-loop scrolling support and a new SwiftUI demo. Not backward-compatible with 3.x.
+
+See the full release history in the [CHANGELOG](CHANGELOG.md).
+
 ## License
 
 This project is licensed under the MIT License.

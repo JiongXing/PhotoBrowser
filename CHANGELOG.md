@@ -1,5 +1,21 @@
 # Change Log
 
+## Version 4.0.0
+
+> 2026/02/10
+
+**全面重构，不兼容 3.x 版本。**
+
+### 核心设计变更
+
+- **回归 `UICollectionView`**：3.x 弃用的 `UICollectionView` 重新回归，利用系统 Cell 复用机制，支持无限循环滚动。
+- **Delegate 驱动**：以 `JXPhotoBrowserDelegate` 取代 3.x 的多种 DataSource，框架不定义任何数据模型，不内置图片加载逻辑，业务方拥有完全的数据和加载自主权。
+- **极简 Cell 协议**：`JXPhotoBrowserCellProtocol` 仅 2 个属性（`browser` + `transitionImageView`），内置 `JXZoomImageCell`（可缩放）和 `JXImageCell`（轻量级），也支持完全自定义。
+- **Overlay 按需装载**：`JXPhotoBrowserOverlay` 协议统一接入附加 UI 组件，默认零装载、零开销，内置 `JXPageIndicatorOverlay` 页码指示器。
+- **独立转场动画器**：Fade / Zoom / None 三种转场动画各自独立实现 `UIViewControllerAnimatedTransitioning`，Zoom 不满足前置条件时自动降级为 Fade。
+
+---
+
 ### Version 3.1.6
 
 > 2025/10/23
