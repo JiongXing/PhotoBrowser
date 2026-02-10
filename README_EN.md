@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 
-[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)](https://github.com/Carthage/Carthage) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
 
 [中文文档](README.md)
 
@@ -73,6 +73,22 @@ Add to your `Podfile`:
 ```ruby
 pod 'JXPhotoBrowser'
 ```
+
+### Carthage
+
+Add to your `Cartfile`:
+
+```
+github "JiongXing/PhotoBrowser"
+```
+
+Then run:
+
+```bash
+carthage update --use-xcframeworks --platform iOS
+```
+
+Once the build is complete, drag `Carthage/Build/JXPhotoBrowser.xcframework` into your Xcode project's **Frameworks, Libraries, and Embedded Content** section, and set it to **Embed & Sign**.
 
 ### Manual Installation
 
@@ -490,6 +506,7 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
 - Sample projects:
   - **Demo-UIKit**: UIKit demo using CocoaPods, depends on `Kingfisher` for image loading. Demonstrates full features (photo browsing, video playback, banner carousel, etc.).
   - **Demo-SwiftUI**: SwiftUI demo using SPM. Demonstrates how to use JXPhotoBrowser in SwiftUI via a bridging layer (media grid, settings panel, photo browsing).
+  - **Demo-Carthage**: UIKit demo using Carthage. On first use, run `carthage update --use-xcframeworks --platform iOS` in the `Demo-Carthage` directory to build the framework.
 
 ## FAQ
 

@@ -14,7 +14,7 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         let container = ctx.containerView
         let duration = transitionDuration(using: ctx)
         
-        guard let fromVC = ctx.viewController(forKey: .from) as? JXPhotoBrowser,
+        guard let fromVC = ctx.viewController(forKey: .from) as? JXPhotoBrowserViewController,
               let fromView = ctx.view(forKey: .from) else {
             ctx.completeTransition(false)
             return

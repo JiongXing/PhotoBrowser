@@ -6,8 +6,28 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		966DE7012F3ADC0B00A90038 /* JXPhotoBrowser.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 966DE7002F3ADC0B00A90038 /* JXPhotoBrowser.xcframework */; };
+		966DE7022F3ADC0B00A90038 /* JXPhotoBrowser.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 966DE7002F3ADC0B00A90038 /* JXPhotoBrowser.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		966DE7042F3ADC0B00A90038 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				966DE7022F3ADC0B00A90038 /* JXPhotoBrowser.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		966DE6DC2F3ADC0900A90038 /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		966DE7002F3ADC0B00A90038 /* JXPhotoBrowser.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = JXPhotoBrowser.xcframework; path = Carthage/Build/JXPhotoBrowser.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				966DE7012F3ADC0B00A90038 /* JXPhotoBrowser.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +67,7 @@
 			isa = PBXGroup;
 			children = (
 				966DE6DE2F3ADC0900A90038 /* Demo */,
+				966DE7032F3ADC0B00A90038 /* Frameworks */,
 				966DE6DD2F3ADC0900A90038 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,6 +80,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		966DE7032F3ADC0B00A90038 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				966DE7002F3ADC0B00A90038 /* JXPhotoBrowser.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -68,6 +98,7 @@
 				966DE6D82F3ADC0900A90038 /* Sources */,
 				966DE6D92F3ADC0900A90038 /* Frameworks */,
 				966DE6DA2F3ADC0900A90038 /* Resources */,
+				966DE7042F3ADC0B00A90038 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

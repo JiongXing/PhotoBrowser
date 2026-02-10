@@ -15,7 +15,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         let container = ctx.containerView
         let duration = transitionDuration(using: ctx)
 
-        guard let toVC = ctx.viewController(forKey: .to) as? JXPhotoBrowser,
+        guard let toVC = ctx.viewController(forKey: .to) as? JXPhotoBrowserViewController,
               let toView = ctx.view(forKey: .to) else {
             ctx.completeTransition(false)
             return

@@ -75,7 +75,7 @@ class PhotoBannerView: UIView {
     // MARK: - Private Properties
     
     /// 嵌入的图片浏览器
-    private var browser: JXPhotoBrowser?
+    private var browser: JXPhotoBrowserViewController?
     
     /// 高度约束
     private var heightConstraint: NSLayoutConstraint?
@@ -112,7 +112,7 @@ class PhotoBannerView: UIView {
     private func setupBrowser() {
         backgroundColor = .clear
         
-        let browser = JXPhotoBrowser()
+        let browser = JXPhotoBrowserViewController()
         browser.delegate = self
         browser.scrollDirection = .horizontal
         browser.transitionType = .none
@@ -157,11 +157,11 @@ class PhotoBannerView: UIView {
 
 extension PhotoBannerView: JXPhotoBrowserDelegate {
     
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         return resources.count
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
         let resource = resources[index]
         // 启用加载指示器

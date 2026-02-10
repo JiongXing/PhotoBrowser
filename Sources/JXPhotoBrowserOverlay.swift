@@ -17,7 +17,7 @@ public protocol JXPhotoBrowserOverlay: UIView {
     /// 组件被添加到浏览器视图时调用
     /// 在此方法中完成初始布局（如添加约束、设置 frame 等）
     /// - Parameter browser: 宿主浏览器实例
-    func setup(with browser: JXPhotoBrowser)
+    func setup(with browser: JXPhotoBrowserViewController)
     
     /// 数据重载或布局变化时调用
     /// 组件应根据最新的总数和页码更新显示内容

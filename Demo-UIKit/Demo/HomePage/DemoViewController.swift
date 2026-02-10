@@ -36,7 +36,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     // 数据源
     private var items: [DemoMedia] = []
     
-    private weak var photoBrowser: JXPhotoBrowser?
+    private weak var photoBrowser: JXPhotoBrowserViewController?
     
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
     open override var shouldAutorotate: Bool {
@@ -198,7 +198,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let browser = JXPhotoBrowser()
+        let browser = JXPhotoBrowserViewController()
         browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
         browser.delegate = self
         browser.initialIndex = indexPath.item
@@ -224,11 +224,11 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
 
 // MARK: - JXPhotoBrowser Delegate
 extension DemoViewController: JXPhotoBrowserDelegate {
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         return items.count
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let media = items[index]
         switch media.source {
         case .remoteImage:
@@ -240,7 +240,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         }
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         let media = items[index]
         switch media.source {
         case let .remoteImage(imageURL, thumbnailURL):
@@ -267,7 +267,7 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         }
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
         // 停止视频播放
         if let videoCell = cell as? VideoPlayerCell {
             videoCell.stopVideo()
@@ -275,14 +275,14 @@ extension DemoViewController: JXPhotoBrowserDelegate {
     }
     
     // 为 Zoom 转场提供列表中的缩略图视图（用于起止位置计算）
-    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailViewAt index: Int) -> UIView? {
         let ip = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: ip) as? MediaThumbnailCell else { return nil }
         return cell.imageView
     }
     
     // 控制缩略图的显隐（Zoom 转场时隐藏源视图，避免视觉重叠）
-    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         let ip = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: ip) as? MediaThumbnailCell {
             cell.imageView.isHidden = hidden

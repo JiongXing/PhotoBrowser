@@ -1,6 +1,6 @@
 # JXPhotoBrowser
 
-[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/JiongXing/PhotoBrowser)](https://github.com/JiongXing/PhotoBrowser/releases) [![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)](https://github.com/Carthage/Carthage) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
 
 [English Documentation](README_EN.md)
 
@@ -73,6 +73,22 @@ dependencies: [
 ```ruby
 pod 'JXPhotoBrowser'
 ```
+
+### Carthage
+
+在你的 `Cartfile` 中添加：
+
+```
+github "JiongXing/PhotoBrowser"
+```
+
+然后运行：
+
+```bash
+carthage update --use-xcframeworks --platform iOS
+```
+
+构建完成后，将 `Carthage/Build/JXPhotoBrowser.xcframework` 拖入 Xcode 工程的 **Frameworks, Libraries, and Embedded Content** 中，并设置为 **Embed & Sign**。
 
 ### 手动安装
 
@@ -489,6 +505,7 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
 - 示例工程：
   - **Demo-UIKit**：UIKit 示例，使用 CocoaPods 集成，依赖 `Kingfisher` 加载图片，演示完整功能（图片浏览、视频播放、Banner 轮播等）。
   - **Demo-SwiftUI**：SwiftUI 示例，使用 SPM 集成，演示如何通过桥接层在 SwiftUI 中使用 JXPhotoBrowser（媒体网格、设置面板、图片浏览）。
+  - **Demo-Carthage**：UIKit 示例，使用 Carthage 集成。首次使用需在 `Demo-Carthage` 目录下执行 `carthage update --use-xcframeworks --platform iOS` 构建框架。
 
 ## 常见问题 (FAQ)
 

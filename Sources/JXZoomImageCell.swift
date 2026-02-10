@@ -60,7 +60,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     // MARK: - State
     
     /// 弱引用的浏览器（用于调用关闭）
-    public weak var browser: JXPhotoBrowser?
+    public weak var browser: JXPhotoBrowserViewController?
     
     // MARK: - Init
     public override init(frame: CGRect) {

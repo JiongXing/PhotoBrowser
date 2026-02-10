@@ -5,7 +5,7 @@
 
 import UIKit
 
-open class JXPhotoBrowser: UIViewController {
+open class JXPhotoBrowserViewController: UIViewController {
     
     // MARK: - Public Properties
     
@@ -550,7 +550,7 @@ open class JXPhotoBrowser: UIViewController {
     ///
     /// 使用示例：
     /// ```swift
-    /// let browser = JXPhotoBrowser()
+    /// let browser = JXPhotoBrowserViewController()
     /// browser.addOverlay(JXPageIndicatorOverlay())
     /// ```
     ///
@@ -663,7 +663,7 @@ open class JXPhotoBrowser: UIViewController {
 
 // MARK: - UICollectionView DataSource & Delegate
 
-extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return virtualCount
@@ -734,7 +734,7 @@ extension JXPhotoBrowser: UICollectionViewDataSource, UICollectionViewDelegate, 
 }
 
 // MARK: - UIGestureRecognizerDelegate
-extension JXPhotoBrowser: UIGestureRecognizerDelegate {
+extension JXPhotoBrowserViewController: UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == panGesture {
             if scrollDirection == .vertical { return false }
@@ -765,7 +765,7 @@ extension JXPhotoBrowser: UIGestureRecognizerDelegate {
 
 // MARK: - Transition Animation
 
-extension JXPhotoBrowser: UIViewControllerTransitioningDelegate {
+extension JXPhotoBrowserViewController: UIViewControllerTransitioningDelegate {
     
     open func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         switch transitionType {

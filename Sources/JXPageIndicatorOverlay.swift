@@ -62,7 +62,7 @@ open class JXPageIndicatorOverlay: UIView, JXPhotoBrowserOverlay {
     private var setNeedsUpdatePosition = false
     
     /// 弱引用宿主浏览器
-    private weak var browser: JXPhotoBrowser?
+    private weak var browser: JXPhotoBrowserViewController?
     
     // MARK: - Lifecycle
     
@@ -82,7 +82,7 @@ open class JXPageIndicatorOverlay: UIView, JXPhotoBrowserOverlay {
     
     // MARK: - JXPhotoBrowserOverlay
     
-    open func setup(with browser: JXPhotoBrowser) {
+    open func setup(with browser: JXPhotoBrowserViewController) {
         self.browser = browser
         updatePositionConstraints()
     }
