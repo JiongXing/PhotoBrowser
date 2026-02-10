@@ -2,6 +2,10 @@
 
 JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，实现 iOS 系统相册的交互体验。支持缩放、拖拽关闭、自定义转场动画等特性，架构清晰，易于集成和扩展。同时支持 **UIKit** 和 **SwiftUI** 两种调用方式（SwiftUI 通过桥接层集成，详见 Demo-SwiftUI 示例工程）。
 
+| 首页列表 | 图片浏览 | 缩放下滑关闭 |
+| :---: | :---: | :---: |
+| ![首页列表](readme_assets/homepage.png) | ![图片浏览](readme_assets/browsing.png) | ![下滑缩放关闭](readme_assets/zoom_dismiss.png) |
+
 ## 核心设计
 
 - **零数据模型依赖**：框架不定义任何数据模型，业务方完全使用自己的数据结构，通过 delegate 配置 Cell 内容。
@@ -218,19 +222,13 @@ struct ContentView: View {
 
 > **注意**：`JXPhotoBrowser` 的 `delegate` 是 `weak` 引用，必须在 SwiftUI 侧用 `@State` 持有 Presenter 实例，否则它会在创建后立即被释放。
 
-### SwiftUI 不支持 Zoom 转场
+### 关于 Zoom 转场
 
-SwiftUI 项目中**仅支持 Fade 和 None 转场**，不支持 Zoom 转场动画。
+Demo-SwiftUI 示例工程未演示 Zoom 转场动画，默认使用 Fade 转场。
 
-**原因**：Zoom 转场依赖 `thumbnailViewAt` delegate 方法返回列表中缩略图的 `UIView` 引用，框架通过该引用计算动画起止位置（`convert(_:to:)`）并复制图片内容构建临时动画视图。而 SwiftUI 的 `AsyncImage` 等原生视图无法暴露底层 `UIView` 引用，因此无法提供 Zoom 转场所需的视图信息。
+**原因**：Zoom 转场依赖 `thumbnailViewAt` delegate 方法返回列表中缩略图的 `UIView` 引用，框架通过该引用计算动画起止位置并构建临时动画视图。而 SwiftUI 的 `AsyncImage` 等原生视图无法直接提供底层 `UIView` 引用。
 
-**建议**：在 SwiftUI 项目中使用 `.fade` 转场类型，可获得流畅的渐隐渐现效果：
-
-```swift
-browser.transitionType = .fade
-```
-
-如需 Zoom 转场效果，请使用 UIKit 集成方案（参见 Demo-UIKit 示例工程）。
+**如需自行实现**：可将缩略图从 `AsyncImage` 替换为 `UIViewRepresentable` 包裹的 `UIImageView`，从而获取真实的 `UIView` 引用，再通过 `thumbnailViewAt` 和 `setThumbnailHidden` 两个 delegate 方法提供给框架即可。具体的 Zoom 转场接入方式可参考 Demo-UIKit 示例工程。
 
 ## JXImageCell 加载指示器
 
