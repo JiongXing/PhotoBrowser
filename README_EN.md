@@ -6,9 +6,9 @@
 
 JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that delivers an experience similar to the native iOS Photos app. It supports zooming, drag-to-dismiss, custom transition animations, and more. The architecture is clean and easy to integrate and extend. It supports both **UIKit** and **SwiftUI** (SwiftUI integration via a bridging layer — see the Demo-SwiftUI sample project).
 
-| Home List | Photo Browsing | Zoom & Dismiss |
+| Home List | Photo Browsing | Pull down to close |
 | :---: | :---: | :---: |
-| ![Home List](readme_assets/homepage.png) | ![Photo Browsing](readme_assets/browsing.png) | ![Zoom & Dismiss](readme_assets/zoom_dismiss.png) |
+| ![Home List](readme_assets/homepage.png) | ![Photo Browsing](readme_assets/browsing.png) | ![Pull down to close](readme_assets/pull_down.png) |
 
 ## Core Design
 
