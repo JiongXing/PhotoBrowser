@@ -18,8 +18,5 @@
     "path": "."
   },
   "source_files": "Sources/**/*.{swift}",
-  "frameworks": [
-    "UIKit",
-    "AVFoundation"
-  ]
+  "frameworks": "UIKit"
 }

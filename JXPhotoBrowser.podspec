@@ -21,5 +21,5 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files     = 'Sources/**/*.{swift}'
 
-  s.frameworks       = 'UIKit', 'AVFoundation'
+  s.frameworks       = 'UIKit'
 end
