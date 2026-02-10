@@ -43,6 +43,15 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 - **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
 - **JXPageIndicatorOverlay**：内置页码指示器组件，基于 `UIPageControl`，支持自定义位置和样式，通过 `addOverlay` 按需装载。
 
+## 依赖
+
+- 框架本身依赖：`UIKit`（核心），**无任何第三方依赖**。
+- 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
+- 示例工程：
+  - **Demo-UIKit**：UIKit 示例，使用 CocoaPods 集成，依赖 `Kingfisher` 加载图片，演示完整功能（图片浏览、视频播放、Banner 轮播等）。
+  - **Demo-SwiftUI**：SwiftUI 示例，使用 SPM 集成，演示如何通过桥接层在 SwiftUI 中使用 JXPhotoBrowser（媒体网格、设置面板、图片浏览）。
+  - **Demo-Carthage**：UIKit 示例，使用 Carthage 集成。首次使用需在 `Demo-Carthage` 目录下执行 `carthage update --use-xcframeworks --platform iOS` 构建框架。
+
 ## 系统要求
 
 - iOS 11.0+
@@ -497,15 +506,6 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
     }
 }.resume()
 ```
-
-## 依赖
-
-- 框架本身依赖：`UIKit`（核心），**无任何第三方依赖**。
-- 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
-- 示例工程：
-  - **Demo-UIKit**：UIKit 示例，使用 CocoaPods 集成，依赖 `Kingfisher` 加载图片，演示完整功能（图片浏览、视频播放、Banner 轮播等）。
-  - **Demo-SwiftUI**：SwiftUI 示例，使用 SPM 集成，演示如何通过桥接层在 SwiftUI 中使用 JXPhotoBrowser（媒体网格、设置面板、图片浏览）。
-  - **Demo-Carthage**：UIKit 示例，使用 Carthage 集成。首次使用需在 `Demo-Carthage` 目录下执行 `carthage update --use-xcframeworks --platform iOS` 构建框架。
 
 ## 常见问题 (FAQ)
 

@@ -43,6 +43,15 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
 - **JXPhotoBrowserOverlay**: Overlay component protocol defining `setup`, `reloadData`, and `didChangedPageIndex` methods for unified integration of supplementary UI such as page indicators and close buttons.
 - **JXPageIndicatorOverlay**: Built-in page indicator component based on `UIPageControl`, with customizable position and styling, loaded on demand via `addOverlay`.
 
+## Dependencies
+
+- Framework dependency: `UIKit` (core) — **no third-party dependencies**.
+- Image loading: The framework does not include built-in image loading logic. You are free to use Kingfisher, SDWebImage, or any other library.
+- Sample projects:
+  - **Demo-UIKit**: UIKit demo using CocoaPods, depends on `Kingfisher` for image loading. Demonstrates full features (photo browsing, video playback, banner carousel, etc.).
+  - **Demo-SwiftUI**: SwiftUI demo using SPM. Demonstrates how to use JXPhotoBrowser in SwiftUI via a bridging layer (media grid, settings panel, photo browsing).
+  - **Demo-Carthage**: UIKit demo using Carthage. On first use, run `carthage update --use-xcframeworks --platform iOS` in the `Demo-Carthage` directory to build the framework.
+
 ## Requirements
 
 - iOS 11.0+
@@ -498,15 +507,6 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
     }
 }.resume()
 ```
-
-## Dependencies
-
-- Framework dependency: `UIKit` (core) — **no third-party dependencies**.
-- Image loading: The framework does not include built-in image loading logic. You are free to use Kingfisher, SDWebImage, or any other library.
-- Sample projects:
-  - **Demo-UIKit**: UIKit demo using CocoaPods, depends on `Kingfisher` for image loading. Demonstrates full features (photo browsing, video playback, banner carousel, etc.).
-  - **Demo-SwiftUI**: SwiftUI demo using SPM. Demonstrates how to use JXPhotoBrowser in SwiftUI via a bridging layer (media grid, settings panel, photo browsing).
-  - **Demo-Carthage**: UIKit demo using Carthage. On first use, run `carthage update --use-xcframeworks --platform iOS` in the `Demo-Carthage` directory to build the framework.
 
 ## FAQ
 
