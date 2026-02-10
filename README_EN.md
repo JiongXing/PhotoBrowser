@@ -35,7 +35,7 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
 
 ## Core Architecture
 
-- **JXPhotoBrowser**: Core view controller, subclass of `UIViewController`. Internally manages a `UICollectionView` for displaying pages, handling global configuration (scroll direction, looping) and gesture interactions (drag-to-dismiss).
+- **JXPhotoBrowserViewController**: Core view controller, subclass of `UIViewController`. Internally manages a `UICollectionView` for displaying pages, handling global configuration (scroll direction, looping) and gesture interactions (drag-to-dismiss).
 - **JXZoomImageCell**: Zoomable image cell, subclass of `UICollectionViewCell` conforming to `JXPhotoBrowserCellProtocol`. Uses `UIScrollView` for zooming and handles single-tap/double-tap interactions. Exposes an `imageView` property for image loading.
 - **JXImageCell**: Lightweight image cell without zoom gestures, suitable for embedded scenarios such as banners. Includes an optional loading indicator (disabled by default) with customizable styling.
 - **JXPhotoBrowserCellProtocol**: Minimal cell protocol requiring only `browser` (weak reference to the browser) and `transitionImageView` (transition view). Provides an optional `photoBrowserDismissInteractionDidChange` method for responding to drag-to-dismiss interactions. No specific base class is required.
@@ -111,7 +111,7 @@ Drag all files from the `Sources` directory into your project.
 import JXPhotoBrowser
 
 // 1. Create a browser instance
-let browser = JXPhotoBrowser()
+let browser = JXPhotoBrowserViewController()
 browser.delegate = self
 browser.initialIndex = indexPath.item // Set the initial index
 
@@ -133,18 +133,18 @@ import Kingfisher // Example uses Kingfisher — can be replaced with any image 
 
 extension ViewController: JXPhotoBrowserDelegate {
     // 1. Return the total number of items
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         return items.count
     }
     
     // 2. Provide the cell for display
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
         return cell
     }
     
     // 3. Load the image when the cell is about to be displayed
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         let item = items[index]
         
@@ -156,19 +156,19 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
     
     // 4. (Optional) Clean up resources when cell ends displaying (e.g., cancel loading, stop playback)
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
         // Cancel image loading, stop video playback, etc.
     }
     
     // 5. (Optional) Support Zoom transition: provide the thumbnail view from the list
-    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailViewAt index: Int) -> UIView? {
         let indexPath = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: indexPath) as? MyCell else { return nil }
         return cell.imageView
     }
     
     // 6. (Optional) Control thumbnail visibility to avoid visual overlap during Zoom transition
-    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {
             cell.imageView.isHidden = hidden
@@ -176,7 +176,7 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
     
     // 7. (Optional) Custom cell size — defaults to the browser's full-screen size
-    func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize? {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, sizeForItemAt index: Int) -> CGSize? {
         return nil // Return nil to use the default size
     }
 }
@@ -189,7 +189,7 @@ JXPhotoBrowser is a UIKit-based framework. In SwiftUI projects, it can be integr
 ### Core Approach
 
 1. **Grid and settings panel** are built with pure SwiftUI (`LazyVGrid`, `Picker`, `AsyncImage`, etc.)
-2. **Full-screen photo browser** is invoked through the bridging layer calling `JXPhotoBrowser`
+2. **Full-screen photo browser** is invoked through the bridging layer calling `JXPhotoBrowserViewController`
 3. Create a Presenter class conforming to `JXPhotoBrowserDelegate`, obtain the current `UIViewController`, and call `browser.present(from:)`
 
 ### Bridging Layer Example
@@ -197,14 +197,14 @@ JXPhotoBrowser is a UIKit-based framework. In SwiftUI projects, it can be integr
 ```swift
 import JXPhotoBrowser
 
-/// Encapsulates the creation, configuration, and presentation of JXPhotoBrowser
+/// Encapsulates the creation, configuration, and presentation of JXPhotoBrowserViewController
 final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
     private let items: [MyMediaItem]
 
     func present(initialIndex: Int) {
         guard let viewController = topViewController() else { return }
 
-        let browser = JXPhotoBrowser()
+        let browser = JXPhotoBrowserViewController()
         browser.delegate = self
         browser.initialIndex = initialIndex
         browser.transitionType = .fade
@@ -212,15 +212,15 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
         browser.present(from: viewController)
     }
 
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         items.count
     }
 
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
     }
 
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         // Load image into photoCell.imageView ...
     }
@@ -231,7 +231,7 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
 
 ```swift
 struct ContentView: View {
-    // Hold the presenter (JXPhotoBrowser.delegate is weak — requires external strong reference)
+    // Hold the presenter (JXPhotoBrowserViewController.delegate is weak — requires external strong reference)
     @State private var presenter: PhotoBrowserPresenter?
 
     var body: some View {
@@ -249,7 +249,7 @@ struct ContentView: View {
 }
 ```
 
-> **Note**: The `delegate` property of `JXPhotoBrowser` is a `weak` reference. You must hold the Presenter instance with `@State` on the SwiftUI side, otherwise it will be deallocated immediately after creation.
+> **Note**: The `delegate` property of `JXPhotoBrowserViewController` is a `weak` reference. You must hold the Presenter instance with `@State` on the SwiftUI side, otherwise it will be deallocated immediately after creation.
 
 ### About Zoom Transition
 
@@ -333,7 +333,7 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     static let reuseIdentifier = "StandaloneCell"
     
     // Required: weak reference to the browser (to avoid retain cycles)
-    weak var browser: JXPhotoBrowser?
+    weak var browser: JXPhotoBrowserViewController?
     
     // Optional: used for Zoom transition animation; return nil to use Fade animation
     var transitionImageView: UIImageView? { imageView }
@@ -358,7 +358,7 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
 ### Registering and Using Custom Cells
 
 ```swift
-let browser = JXPhotoBrowser()
+let browser = JXPhotoBrowserViewController()
 
 // Register custom cell (must be done before setting the delegate)
 browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
@@ -367,7 +367,7 @@ browser.delegate = self
 browser.present(from: self)
 
 // Use in delegate
-func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
     let cell = browser.dequeueReusableCell(withReuseIdentifier: VideoPlayerCell.videoReuseIdentifier, for: indexPath) as! VideoPlayerCell
     cell.configure(videoURL: url, coverImage: thumbnail)
     return cell
@@ -383,7 +383,7 @@ The framework provides a generic overlay component system for adding supplementa
 The framework ships with `JXPageIndicatorOverlay` (based on `UIPageControl`), loadable with a single line of code:
 
 ```swift
-let browser = JXPhotoBrowser()
+let browser = JXPhotoBrowserViewController()
 browser.addOverlay(JXPageIndicatorOverlay())
 ```
 
@@ -405,7 +405,7 @@ Implement the `JXPhotoBrowserOverlay` protocol to create custom components:
 ```swift
 class CloseButtonOverlay: UIView, JXPhotoBrowserOverlay {
     
-    func setup(with browser: JXPhotoBrowser) {
+    func setup(with browser: JXPhotoBrowserViewController) {
         // Complete layout here (e.g., add constraints)
     }
     
@@ -517,7 +517,7 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
 **Solution**: In the `willDisplay` delegate method, make sure to synchronously set a placeholder image. For example, when using Kingfisher:
 
 ```swift
-func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
     guard let photoCell = cell as? JXZoomImageCell else { return }
     
     // Synchronously retrieve the thumbnail from cache as a placeholder

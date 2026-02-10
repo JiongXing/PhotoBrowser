@@ -2,7 +2,7 @@
 //  PhotoBrowserPresenter.swift
 //  Demo
 //
-//  封装 JXPhotoBrowser 的创建、配置和呈现逻辑
+//  封装 JXPhotoBrowserViewController 的创建、配置和呈现逻辑
 //
 
 import UIKit
@@ -12,7 +12,7 @@ import Kingfisher
 
 // MARK: - 浏览器呈现器
 
-/// 封装 JXPhotoBrowser 的创建、配置和呈现
+/// 封装 JXPhotoBrowserViewController 的创建、配置和呈现
 /// 实现 JXPhotoBrowserDelegate，作为 SwiftUI 与 UIKit 浏览器之间的桥梁
 final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
     private let items: [DemoMedia]
@@ -33,7 +33,7 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
     func present(initialIndex: Int) {
         guard let viewController = Self.topViewController() else { return }
         
-        let browser = JXPhotoBrowser()
+        let browser = JXPhotoBrowserViewController()
         browser.delegate = self
         browser.initialIndex = initialIndex
         browser.transitionType = transitionType
@@ -49,16 +49,16 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
     
     // MARK: - JXPhotoBrowserDelegate
     
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         items.count
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
         return cell
     }
     
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         guard let imageURL = items[index].fullImageURL else { return }
         

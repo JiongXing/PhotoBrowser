@@ -35,7 +35,7 @@ JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，�
 
 ## 核心架构
 
-- **JXPhotoBrowser**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
+- **JXPhotoBrowserViewController**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
 - **JXZoomImageCell**：可缩放图片展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击等交互。通过 `imageView` 属性供业务方设置图片。
 - **JXImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。内置可选的加载指示器（默认不启用），支持样式定制。
 - **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，另提供 `photoBrowserDismissInteractionDidChange` 可选方法响应下拉关闭交互，不强制依赖特定基类。
@@ -111,7 +111,7 @@ carthage update --use-xcframeworks --platform iOS
 import JXPhotoBrowser
 
 // 1. 创建浏览器实例
-let browser = JXPhotoBrowser()
+let browser = JXPhotoBrowserViewController()
 browser.delegate = self
 browser.initialIndex = indexPath.item // 设置初始索引
 
@@ -133,18 +133,18 @@ import Kingfisher // 示例使用 Kingfisher，可替换为任意图片加载库
 
 extension ViewController: JXPhotoBrowserDelegate {
     // 1. 返回图片总数
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         return items.count
     }
     
     // 2. 提供用于展示的 Cell
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
         return cell
     }
     
     // 3. 当 Cell 将要显示时加载图片
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         let item = items[index]
         
@@ -156,19 +156,19 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
     
     // 4. (可选) Cell 结束显示时清理资源（如取消加载、停止播放等）
-    func photoBrowser(_ browser: JXPhotoBrowser, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
         // 可用于取消图片加载、停止视频播放等
     }
     
     // 5. (可选) 支持 Zoom 转场：提供列表中的缩略图视图
-    func photoBrowser(_ browser: JXPhotoBrowser, thumbnailViewAt index: Int) -> UIView? {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailViewAt index: Int) -> UIView? {
         let indexPath = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: indexPath) as? MyCell else { return nil }
         return cell.imageView
     }
     
     // 6. (可选) 控制缩略图显隐，避免 Zoom 转场时视觉重叠
-    func photoBrowser(_ browser: JXPhotoBrowser, setThumbnailHidden hidden: Bool, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {
             cell.imageView.isHidden = hidden
@@ -176,7 +176,7 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
     
     // 7. (可选) 自定义 Cell 尺寸，默认使用浏览器全屏尺寸
-    func photoBrowser(_ browser: JXPhotoBrowser, sizeForItemAt index: Int) -> CGSize? {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, sizeForItemAt index: Int) -> CGSize? {
         return nil // 返回 nil 使用默认尺寸
     }
 }
@@ -189,7 +189,7 @@ JXPhotoBrowser 是基于 UIKit 的框架，在 SwiftUI 项目中可通过桥接�
 ### 核心思路
 
 1. **网格和设置面板**使用纯 SwiftUI 实现（`LazyVGrid`、`Picker`、`AsyncImage` 等）
-2. **全屏图片浏览器**通过桥接层调用 `JXPhotoBrowser`
+2. **全屏图片浏览器**通过桥接层调用 `JXPhotoBrowserViewController`
 3. 创建一个 Presenter 类实现 `JXPhotoBrowserDelegate`，获取当前 `UIViewController` 后调用 `browser.present(from:)`
 
 ### 桥接层示例
@@ -197,14 +197,14 @@ JXPhotoBrowser 是基于 UIKit 的框架，在 SwiftUI 项目中可通过桥接�
 ```swift
 import JXPhotoBrowser
 
-/// 封装 JXPhotoBrowser 的创建、配置和呈现
+/// 封装 JXPhotoBrowserViewController 的创建、配置和呈现
 final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
     private let items: [MyMediaItem]
 
     func present(initialIndex: Int) {
         guard let viewController = topViewController() else { return }
 
-        let browser = JXPhotoBrowser()
+        let browser = JXPhotoBrowserViewController()
         browser.delegate = self
         browser.initialIndex = initialIndex
         browser.transitionType = .fade
@@ -212,15 +212,15 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
         browser.present(from: viewController)
     }
 
-    func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         items.count
     }
 
-    func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
     }
 
-    func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         // 加载图片到 photoCell.imageView ...
     }
@@ -231,7 +231,7 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
 
 ```swift
 struct ContentView: View {
-    // 持有 presenter（JXPhotoBrowser.delegate 为 weak，需要外部强引用）
+    // 持有 presenter（JXPhotoBrowserViewController.delegate 为 weak，需要外部强引用）
     @State private var presenter: PhotoBrowserPresenter?
 
     var body: some View {
@@ -249,7 +249,7 @@ struct ContentView: View {
 }
 ```
 
-> **注意**：`JXPhotoBrowser` 的 `delegate` 是 `weak` 引用，必须在 SwiftUI 侧用 `@State` 持有 Presenter 实例，否则它会在创建后立即被释放。
+> **注意**：`JXPhotoBrowserViewController` 的 `delegate` 是 `weak` 引用，必须在 SwiftUI 侧用 `@State` 持有 Presenter 实例，否则它会在创建后立即被释放。
 
 ### 关于 Zoom 转场
 
@@ -333,7 +333,7 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     static let reuseIdentifier = "StandaloneCell"
     
     // 必须实现：弱引用浏览器（避免循环引用）
-    weak var browser: JXPhotoBrowser?
+    weak var browser: JXPhotoBrowserViewController?
     
     // 可选实现：用于 Zoom 转场动画，返回 nil 则使用 Fade 动画
     var transitionImageView: UIImageView? { imageView }
@@ -357,7 +357,7 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
 ### 注册和使用自定义 Cell
 
 ```swift
-let browser = JXPhotoBrowser()
+let browser = JXPhotoBrowserViewController()
 
 // 注册自定义 Cell（必须在设置 delegate 之前）
 browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
@@ -366,7 +366,7 @@ browser.delegate = self
 browser.present(from: self)
 
 // 在 delegate 中使用
-func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
     let cell = browser.dequeueReusableCell(withReuseIdentifier: VideoPlayerCell.videoReuseIdentifier, for: indexPath) as! VideoPlayerCell
     cell.configure(videoURL: url, coverImage: thumbnail)
     return cell
@@ -382,7 +382,7 @@ func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexP
 框架内置了 `JXPageIndicatorOverlay`（基于 `UIPageControl`），一行代码即可装载：
 
 ```swift
-let browser = JXPhotoBrowser()
+let browser = JXPhotoBrowserViewController()
 browser.addOverlay(JXPageIndicatorOverlay())
 ```
 
@@ -404,7 +404,7 @@ browser.addOverlay(indicator)
 ```swift
 class CloseButtonOverlay: UIView, JXPhotoBrowserOverlay {
     
-    func setup(with browser: JXPhotoBrowser) {
+    func setup(with browser: JXPhotoBrowserViewController) {
         // 在此完成布局（如添加约束）
     }
     
@@ -516,7 +516,7 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
 **解决方案**：在 `willDisplay` 代理方法中，确保同步设置占位图。例如使用 Kingfisher 时：
 
 ```swift
-func photoBrowser(_ browser: JXPhotoBrowser, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
+func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
     guard let photoCell = cell as? JXZoomImageCell else { return }
     
     // 同步从缓存取出缩略图作为占位图

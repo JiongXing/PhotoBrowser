@@ -9,7 +9,7 @@ import UIKit
 ///
 /// 使用方法：
 /// ```swift
-/// let browser = JXPhotoBrowser()
+/// let browser = JXPhotoBrowserViewController()
 /// browser.addOverlay(JXPageIndicatorOverlay())
 /// ```
 ///

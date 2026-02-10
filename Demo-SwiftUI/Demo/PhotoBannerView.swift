@@ -3,7 +3,7 @@
 //  Demo
 //
 //  横向滚动的图片 Banner 视图（SwiftUI 桥接）
-//  使用 UIViewControllerRepresentable 嵌入 JXPhotoBrowser，支持分页滚动、循环滚动和自动轮播
+//  使用 UIViewControllerRepresentable 嵌入 JXPhotoBrowserViewController，支持分页滚动、循环滚动和自动轮播
 //
 
 import SwiftUI
@@ -11,7 +11,7 @@ import JXPhotoBrowser
 import Kingfisher
 
 /// 横向滚动的图片 Banner 视图
-/// 通过 UIViewControllerRepresentable 桥接 JXPhotoBrowser，适用于嵌入式 Banner 场景
+/// 通过 UIViewControllerRepresentable 桥接 JXPhotoBrowserViewController，适用于嵌入式 Banner 场景
 struct PhotoBannerView: UIViewControllerRepresentable {
     
     /// 图片资源列表（imageURL, thumbnailURL）
@@ -29,8 +29,8 @@ struct PhotoBannerView: UIViewControllerRepresentable {
         Coordinator(resources: resources)
     }
     
-    func makeUIViewController(context: Context) -> JXPhotoBrowser {
-        let browser = JXPhotoBrowser()
+    func makeUIViewController(context: Context) -> JXPhotoBrowserViewController {
+        let browser = JXPhotoBrowserViewController()
         browser.delegate = context.coordinator
         browser.scrollDirection = .horizontal
         browser.transitionType = .none
@@ -53,8 +53,8 @@ struct PhotoBannerView: UIViewControllerRepresentable {
         return browser
     }
     
-    func updateUIViewController(_ browser: JXPhotoBrowser, context: Context) {
-        // 同步 SwiftUI 状态到 JXPhotoBrowser
+    func updateUIViewController(_ browser: JXPhotoBrowserViewController, context: Context) {
+        // 同步 SwiftUI 状态到 JXPhotoBrowserViewController
         context.coordinator.resources = resources
         browser.isLoopingEnabled = isLoopingEnabled
         browser.isAutoPlayEnabled = isAutoPlayEnabled
@@ -62,7 +62,7 @@ struct PhotoBannerView: UIViewControllerRepresentable {
     
     // MARK: - Coordinator
     
-    /// 作为 JXPhotoBrowserDelegate，桥接 SwiftUI 数据到 JXPhotoBrowser
+    /// 作为 JXPhotoBrowserDelegate，桥接 SwiftUI 数据到 JXPhotoBrowserViewController
     final class Coordinator: NSObject, JXPhotoBrowserDelegate {
         
         /// 图片资源列表
@@ -74,11 +74,11 @@ struct PhotoBannerView: UIViewControllerRepresentable {
         
         // MARK: - JXPhotoBrowserDelegate
         
-        func numberOfItems(in browser: JXPhotoBrowser) -> Int {
+        func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
             resources.count
         }
         
-        func photoBrowser(_ browser: JXPhotoBrowser, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+        func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
             let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
             let resource = resources[index]
             // 启用加载指示器

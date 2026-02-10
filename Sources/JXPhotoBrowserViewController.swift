@@ -1,5 +1,5 @@
 //
-//  JXPhotoBrowser.swift
+//  JXPhotoBrowserViewController.swift
 //  JXPhotoBrowser
 //
 
@@ -586,18 +586,18 @@ open class JXPhotoBrowserViewController: UIViewController {
     ///   - cellClass: 要注册的Cell类（必须实现JXPhotoBrowserCellProtocol协议）
     ///   - reuseIdentifier: 必须提供的复用标识符（与调用方复用时保持一致）
     /// - Returns: 注册是否成功（false 表示参数不合法或未实现协议）
-    /// - Note: 建议在创建JXPhotoBrowser实例后、设置delegate之前调用此方法
+    /// - Note: 建议在创建JXPhotoBrowserViewController实例后、设置delegate之前调用此方法
     @discardableResult
     public func register(_ cellClass: AnyClass, forReuseIdentifier reuseIdentifier: String) -> Bool {
         let trimmed = reuseIdentifier.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            assertionFailure("JXPhotoBrowser.register(_:forReuseIdentifier:) 失败：reuseIdentifier 不能为空")
+            assertionFailure("JXPhotoBrowserViewController.register(_:forReuseIdentifier:) 失败：reuseIdentifier 不能为空")
             return false
         }
         
         // 运行时校验：必须满足 JXPhotoBrowserCellProtocol（即 JXPhotoBrowserAnyCell）
         guard cellClass is JXPhotoBrowserCellProtocol.Type else {
-            assertionFailure("JXPhotoBrowser.register(_:forReuseIdentifier:) 失败：\(cellClass) 未实现 JXPhotoBrowserCellProtocol")
+            assertionFailure("JXPhotoBrowserViewController.register(_:forReuseIdentifier:) 失败：\(cellClass) 未实现 JXPhotoBrowserCellProtocol")
             return false
         }
         
@@ -672,7 +672,7 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let real = realCount > 0 ? realIndex(fromVirtual: indexPath.item) : 0
         guard let delegate = delegate else {
-            assertionFailure("JXPhotoBrowser.collectionView(_:cellForItemAt:) 失败：delegate 不能为 nil")
+            assertionFailure("JXPhotoBrowserViewController.collectionView(_:cellForItemAt:) 失败：delegate 不能为 nil")
             return UICollectionViewCell()
         }
         let cell = delegate.photoBrowser(self, cellForItemAt: real, at: indexPath)

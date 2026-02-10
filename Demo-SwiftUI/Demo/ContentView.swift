@@ -19,7 +19,7 @@ struct ContentView: View {
     @State private var transitionType: TransitionType = .fade
     @State private var scrollDirection: ScrollDirection = .horizontal
     
-    /// 持有浏览器呈现器（JXPhotoBrowser.delegate 为 weak，需要外部强引用）
+    /// 持有浏览器呈现器（JXPhotoBrowserViewController.delegate 为 weak，需要外部强引用）
     @State private var presenter: PhotoBrowserPresenter?
     
     /// 网格列配置：3 列等宽
