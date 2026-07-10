@@ -75,9 +75,18 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     }()
     
     // MARK: - State
-    
+
     /// 弱引用的浏览器（用于调用关闭）
     public weak var browser: JXPhotoBrowserViewController?
+
+    /// 双击放大倍数（相对适配尺寸，需大于 1.0）。为 nil 时保持默认行为（长边铺满 ↔ 短边铺满模式切换）
+    public var doubleTapZoomScale: CGFloat? {
+        didSet {
+            if let scale = doubleTapZoomScale {
+                scrollView.maximumZoomScale = max(scrollView.maximumZoomScale, scale)
+            }
+        }
+    }
     
     // MARK: - Init
     public override init(frame: CGRect) {
@@ -262,6 +271,18 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         let containerSize = effectiveContentSize
         
         if isInitialScale {
+            // 指定了双击放大倍数时，以点击点为中心放大到指定倍数（保持长边铺满的基础布局）
+            if let zoomScale = doubleTapZoomScale, zoomScale > 1 {
+                let zoomSize = CGSize(width: containerSize.width / zoomScale,
+                                      height: containerSize.height / zoomScale)
+                let zoomRect = CGRect(x: tapInZoomContentView.x - zoomSize.width * 0.5,
+                                      y: tapInZoomContentView.y - zoomSize.height * 0.5,
+                                      width: zoomSize.width,
+                                      height: zoomSize.height)
+                scrollView.zoom(to: zoomRect, animated: true)
+                return
+            }
+
             // 在初始缩放状态下，切换缩放模式（长边铺满 <-> 短边铺满）
             let oldContentSize = zoomContentView.bounds.size
             isShortEdgeFit.toggle()

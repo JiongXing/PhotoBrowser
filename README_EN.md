@@ -22,9 +22,10 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
 - **Multi-Mode Browsing**: Supports both horizontal and vertical scrolling.
 - **Infinite Looping**: Seamless looping with smooth transitions between first and last items.
 - **Gesture Interactions**:
-  - **Double-Tap Zoom**: Mimics the native Photos app double-tap zoom behavior.
+  - **Double-Tap Zoom**: Mimics the native Photos app double-tap zoom behavior, or zoom to a fixed scale (`doubleTapZoomScale`).
   - **Pinch-to-Zoom**: Supports two-finger pinch zoom (1.0x – 3.0x).
   - **Drag-to-Dismiss**: Interactive pan-down gesture to dismiss, with image scaling and background fade effects. To avoid conflicts with scrolling zoomed content, it only begins when the image is back at the minimum zoom scale.
+- **Programmatic Paging**: A `scrollToPage(at:animated:)` method to jump to a specific page via code (instant or animated), compatible with infinite looping mode.
 - **Transition Animations**:
   - **Fade**: Classic fade-in/fade-out effect.
   - **Zoom**: WeChat/Photos-style zoom transition, seamlessly connecting the list thumbnail to the full-size image.
@@ -191,6 +192,40 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
 }
 ```
+
+## Programmatic Paging & Double-Tap Zoom Scale
+
+### Programmatic Paging
+
+Besides swipe gestures, you can switch to a specific page via code. Useful for external button navigation, thumbnail navigation, or rapid consecutive paging (keeping up with fast taps):
+
+```swift
+// Jump to page 5 instantly (no animation, safe for rapid consecutive calls)
+browser.scrollToPage(at: 5, animated: false)
+
+// Jump with the system scrolling animation
+browser.scrollToPage(at: 5, animated: true)
+```
+
+- `index` is the real data-source index (`0..<count`); out-of-range values are ignored.
+- In infinite looping mode, the nearest scrolling direction is chosen automatically.
+- Overlays such as the page indicator are updated in sync after the jump.
+
+### Double-Tap Zoom Scale
+
+By default, `JXZoomImageCell` toggles between "long-edge fill" and "short-edge fill" modes on double-tap. To double-tap zoom to a fixed scale instead, set `doubleTapZoomScale` (relative to the fitted size, must be greater than `1.0`):
+
+```swift
+func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
+    let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
+    cell.doubleTapZoomScale = 2.5 // Double-tap to zoom to 2.5x the fitted size, anchored at the tap point
+    return cell
+}
+```
+
+- When set to `nil` (default), the original mode-toggling behavior is preserved.
+- Zooming is anchored at the tap point; double-tapping again zooms back to the fitted size.
+- If the scale exceeds `scrollView.maximumZoomScale`, the maximum is raised automatically to accommodate it.
 
 ## Using with SwiftUI
 

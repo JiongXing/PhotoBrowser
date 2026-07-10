@@ -516,6 +516,32 @@ open class JXPhotoBrowserViewController: UIViewController {
         vc.present(self, animated: transitionType != .none, completion: nil)
     }
     
+    /// 滚动到指定索引页
+    /// - Parameters:
+    ///   - index: 真实数据源索引（0..<count），越界时忽略
+    ///   - animated: false 时瞬间跳页，可连续快速调用；true 时使用系统滚动动画
+    open func scrollToPage(at index: Int, animated: Bool) {
+        let count = realCount
+        guard count > 0, (0..<count).contains(index) else { return }
+
+        stopAutoPlay()
+
+        let targetVirtual: Int
+        if isLoopingEnabled {
+            targetVirtual = nearestVirtualIndex(for: index, near: calculateCurrentVirtualIndex())
+        } else {
+            targetVirtual = index
+        }
+
+        collectionView.scrollToItem(at: IndexPath(item: targetVirtual, section: 0), at: scrollDirection.scrollPosition, animated: animated)
+
+        // 非动画滚动不会触发 scrollViewDidEndScrollingAnimation，需手动同步页码并恢复轮播
+        if !animated {
+            updateCurrentPageIndex()
+            startAutoPlayIfNeeded()
+        }
+    }
+
     /// 当前展示中的 Cell（协议类型，支持自定义Cell）
     /// 通过几何中心距离计算，确保在滚动中也能准确获取视觉中心的 Cell
     open func visibleCell() -> JXPhotoBrowserCellProtocol? {
