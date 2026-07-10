@@ -6,6 +6,8 @@
 
 JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that delivers an experience similar to the native iOS Photos app. It supports zooming, drag-to-dismiss, custom transition animations, and more. The architecture is clean and easy to integrate and extend. It supports both **UIKit** and **SwiftUI** (SwiftUI integration via a bridging layer — see the Demo-SwiftUI sample project).
 
+For a detailed technical design document, see [TECHNICAL_SOLUTION.md](TECHNICAL_SOLUTION.md) (Chinese).
+
 | Home List | Photo Browsing | Pull down to close |
 | :---: | :---: | :---: |
 | ![Home List](readme_assets/homepage.png) | ![Photo Browsing](readme_assets/browsing.png) | ![Pull down to close](readme_assets/pull_down.png) |
@@ -23,9 +25,11 @@ JXPhotoBrowser is a lightweight, customizable iOS photo/video browser that deliv
 - **Infinite Looping**: Seamless looping with smooth transitions between first and last items.
 - **Gesture Interactions**:
   - **Double-Tap Zoom**: Mimics the native Photos app double-tap zoom behavior, or zoom to a fixed scale (`doubleTapZoomScale`).
-  - **Pinch-to-Zoom**: Supports two-finger pinch zoom (1.0x – 3.0x).
-  - **Drag-to-Dismiss**: Interactive pan-down gesture to dismiss, with image scaling and background fade effects. To avoid conflicts with scrolling zoomed content, it only begins when the image is back at the minimum zoom scale.
+  - **Pinch-to-Zoom**: Supports two-finger pinch zoom (1.0x – 3.0x by default, adjustable via `maximumZoomScale`).
+  - **Drag-to-Dismiss**: Interactive pan-down gesture to dismiss, with image scaling and background fade effects. To avoid conflicts with scrolling zoomed content, it only begins when the image is back at the minimum zoom scale (horizontal scrolling mode only).
 - **Programmatic Paging**: A `scrollToPage(at:animated:)` method to jump to a specific page via code (instant or animated), compatible with infinite looping mode.
+- **Auto Play**: Timed automatic paging (`isAutoPlayEnabled` / `autoPlayInterval`), automatically paused while the user is scrolling — commonly used in banner scenarios.
+- **Item Spacing**: Set the gap between adjacent pages via `itemSpacing`; the gap is only visible while paging.
 - **Transition Animations**:
   - **Fade**: Classic fade-in/fade-out effect.
   - **Zoom**: WeChat/Photos-style zoom transition, seamlessly connecting the list thumbnail to the full-size image.
@@ -232,6 +236,51 @@ cell.scrollView.maximumZoomScale = 5.0 // Raises the ceiling for both pinch and 
 cell.doubleTapZoomScale = 5.0
 ```
 
+## Auto Play & Item Spacing
+
+### Auto Play
+
+```swift
+browser.isAutoPlayEnabled = true // Enable auto play (default: false)
+browser.autoPlayInterval = 3.0   // Paging interval (default: 3.0 seconds)
+```
+
+- Automatically paused while the user is scrolling manually, and resumed when scrolling ends.
+- With infinite looping enabled (`isLoopingEnabled = true`), auto play runs indefinitely; otherwise it stops automatically at the last page.
+- Auto play does not start with fewer than two pages.
+
+### Item Spacing
+
+```swift
+browser.itemSpacing = 20 // Gap between adjacent pages (default: 0)
+```
+
+The gap is only visible while swiping between pages; when a page comes to rest, the content still fills the browser.
+
+## Embedded Banner Usage
+
+Full-screen browsing and banner carousels share the same core: embed the `JXPhotoBrowserViewController`'s view as a subview of any screen, combined with `transitionType = .none`, the lightweight `JXImageCell`, and auto play. See `PhotoBannerView.swift` in Demo-UIKit for a complete reference implementation.
+
+```swift
+let browser = JXPhotoBrowserViewController()
+browser.delegate = self
+browser.transitionType = .none        // No transition needed when embedded
+browser.isLoopingEnabled = true       // Infinite looping
+browser.itemSpacing = 8               // Page spacing
+browser.isAutoPlayEnabled = true      // Auto play
+browser.autoPlayInterval = 3.0
+browser.register(JXImageCell.self, forReuseIdentifier: JXImageCell.reuseIdentifier)
+browser.addOverlay(JXPageIndicatorOverlay())
+browser.view.backgroundColor = .clear // Blend with the host page background
+
+// Embed as a subview of the host view, sized with constraints
+browser.view.translatesAutoresizingMaskIntoConstraints = false
+containerView.addSubview(browser.view)
+// ... add constraints ...
+```
+
+> **Note**: In embedded scenarios you must hold a strong reference to the browser instance (e.g., store it as a property of the host view), and use `JXImageCell` in the delegate's `cellForItemAt` to provide content.
+
 ## Using with SwiftUI
 
 JXPhotoBrowser is a UIKit-based framework. In SwiftUI projects, it can be integrated via a bridging layer. The Demo-SwiftUI sample project demonstrates the complete integration approach.
@@ -382,7 +431,8 @@ Implement `JXPhotoBrowserCellProtocol` directly for complete freedom:
 class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
     static let reuseIdentifier = "StandaloneCell"
     
-    // Required: weak reference to the browser (to avoid retain cycles)
+    // Optional (the protocol provides a default no-op implementation): implement it when the cell
+    // needs to access the browser (e.g., to dismiss); must be declared weak to avoid retain cycles
     weak var browser: JXPhotoBrowserViewController?
     
     // Optional: used for Zoom transition animation; return nil to use Fade animation
@@ -411,7 +461,7 @@ class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
 ```swift
 let browser = JXPhotoBrowserViewController()
 
-// Register custom cell (must be done before setting the delegate)
+// Register custom cell (must be done before the first dequeue; registering right after creating the browser is recommended)
 browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
 
 browser.delegate = self
@@ -558,6 +608,11 @@ URLSession.shared.dataTask(with: imageURL) { data, _, _ in
     }
 }.resume()
 ```
+
+## Known Limitations
+
+- **Portrait only**: The browser is locked to portrait (`supportedInterfaceOrientations` returns `.portrait`); landscape and device rotation are not supported yet.
+- **No drag-to-dismiss in vertical mode**: With `scrollDirection = .vertical`, the pan-down gesture conflicts with list scrolling, so drag-to-dismiss is disabled. Use single-tap or a custom close button to exit.
 
 ## FAQ
 
