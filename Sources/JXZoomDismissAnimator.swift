@@ -50,8 +50,10 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         let endFrame = thumbnailView.convert(thumbnailView.bounds, to: container)
         
         // 隐藏真实视图，避免重影
+        // 缩略图显隐统一走 delegate 通道（setThumbnailHidden），不直接操作视图；
+        // 浏览期间缩略图理应已隐藏，此处再设一次以覆盖列表 Cell 复用导致隐藏状态丢失的情况
         srcIV.isHidden = true
-        thumbnailView.isHidden = true
+        fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: true, at: pageIndex)
         
         zoomIV.frame = startFrame
         container.addSubview(zoomIV)
@@ -60,7 +62,6 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             zoomIV.frame = endFrame
             fromView.alpha = 0
         }) { _ in
-            thumbnailView.isHidden = false
             fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
             zoomIV.removeFromSuperview()
             fromView.removeFromSuperview()
