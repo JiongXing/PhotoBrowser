@@ -86,6 +86,16 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     // MARK: - Init
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        commonInit()
+    }
+
+    public required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+
+    /// 两个 init 共用的初始化逻辑，确保从 XIB/Storyboard 实例化时同样完成 setup
+    private func commonInit() {
         // ScrollView 承载 imageView 以支持捏合缩放
         contentView.addSubview(scrollView)
         NSLayoutConstraint.activate([
@@ -101,17 +111,13 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         (imageView as? JXObservedImageView)?.onImageChange = { [weak self] in
             self?.handleImageDidChange()
         }
-        
+
         // 添加双击缩放
         scrollView.addGestureRecognizer(doubleTapGesture)
         // 添加单击关闭，并与双击冲突处理
         scrollView.addGestureRecognizer(singleTapGesture)
         singleTapGesture.require(toFail: doubleTapGesture)
         backgroundColor = .clear
-    }
-    
-    public required init?(coder: NSCoder) {
-        super.init(coder: coder)
     }
     
     // MARK: - Layout State

@@ -31,7 +31,8 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         toVC.collectionView.layoutIfNeeded()
 
         // 检查前置条件：需要源缩略图视图
-        guard let thumbnailView = toVC.delegate?.photoBrowser(toVC, thumbnailViewAt: toVC.initialIndex) else {
+        // 注意：scrollToInitialIndexIfNeeded() 已将越界的 initialIndex clamp 为安全的 pageIndex，此处须用 pageIndex 避免越界崩溃
+        guard let thumbnailView = toVC.delegate?.photoBrowser(toVC, thumbnailViewAt: toVC.pageIndex) else {
             fallbackToFade(toView: toView, duration: duration, ctx: ctx)
             return
         }

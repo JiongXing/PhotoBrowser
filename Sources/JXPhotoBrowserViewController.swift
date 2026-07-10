@@ -261,9 +261,9 @@ open class JXPhotoBrowserViewController: UIViewController {
             }
             
             // 记录初始状态以计算跟随
-            let referenceView: UIView = (cell as? JXZoomImageCell)?.scrollView ?? collectionView
-            initialTouchPoint = gesture.location(in: referenceView)
-            if let imageView = cell.transitionImageView {
+            // 触摸点与图片中心必须在同一坐标系下，故统一取 imageView.superview 坐标系
+            if let imageView = cell.transitionImageView, let container = imageView.superview {
+                initialTouchPoint = gesture.location(in: container)
                 initialImageCenter = imageView.center
             }
             
@@ -305,9 +305,11 @@ open class JXPhotoBrowserViewController: UIViewController {
             }
             
             let velocity = gesture.velocity(in: view)
-            
-            // 只要有向下的速度则关闭
-            let shouldDismiss = velocity.y > 10
+            let translation = gesture.translation(in: view)
+
+            // 下拉超过屏幕高度 1/4，或松手时速度足够快，则关闭；手势被取消时不关闭
+            let shouldDismiss = gesture.state == .ended
+                && (translation.y > view.bounds.height * 0.25 || velocity.y > 500)
             
             if shouldDismiss {
                 dismissSelf()
@@ -488,9 +490,12 @@ open class JXPhotoBrowserViewController: UIViewController {
         // 避免重复启动
         stopAutoPlay()
         
-        autoPlayTimer = Timer.scheduledTimer(withTimeInterval: autoPlayInterval, repeats: true) { [weak self] _ in
+        // 挂载到 .common mode，避免 Banner 嵌入外层滚动列表时，滚动期间 timer 被 default mode 阻塞而卡住
+        let timer = Timer(timeInterval: autoPlayInterval, repeats: true) { [weak self] _ in
             self?.autoPlayToNextPage()
         }
+        RunLoop.main.add(timer, forMode: .common)
+        autoPlayTimer = timer
     }
     
     /// 停止自动轮播定时器
