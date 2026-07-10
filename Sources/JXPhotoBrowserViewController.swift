@@ -341,6 +341,25 @@ open class JXPhotoBrowserViewController: UIViewController {
         let virtualItem = calculateCurrentVirtualIndex()
         pageIndex = realIndex(fromVirtual: virtualItem)
     }
+
+    /// 循环模式下，若当前虚拟索引偏离中间块，无动画重定位回中间块对应位置，避免连续单向滑动耗尽虚拟数据源导致循环终止
+    /// 重定位不改变真实页码 pageIndex，对用户不可见
+    private func recenterForLoopingIfNeeded() {
+        guard isLoopingEnabled else { return }
+
+        let count = realCount
+        guard count > 0 else { return }
+
+        let currentVirtual = calculateCurrentVirtualIndex()
+        let middleBlock = loopMultiplier / 2
+        let block = currentVirtual / count
+
+        // 偏离中间块时才重定位
+        guard block != middleBlock else { return }
+
+        let target = middleBlock * count + pageIndex
+        collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
+    }
     
     /// 计算当前基于偏移量的虚拟索引
     private func calculateCurrentVirtualIndex() -> Int {
@@ -676,9 +695,14 @@ open class JXPhotoBrowserViewController: UIViewController {
         }
         
         // 保持当前可见项居中（在已滚动到初始项后）
+        // 注意：不能用 calculateCurrentVirtualIndex() 反推——它按【新的】scrollDirection 读取 contentOffset，
+        // 方向切换后 offset 已不对应新方向，会导致定位错误、丢失当前页。改为基于已记录的真实页码 pageIndex 计算目标虚拟索引。
         if didScrollToInitial {
-            let virtualItem = calculateCurrentVirtualIndex()
-            collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: scrollDirection.scrollPosition, animated: false)
+            let count = realCount
+            if count > 0 {
+                let virtualItem = isLoopingEnabled ? (loopMultiplier / 2) * count + pageIndex : pageIndex
+                collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: scrollDirection.scrollPosition, animated: false)
+            }
         }
     }
 }
@@ -722,25 +746,28 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         updateCurrentPageIndex()
-        
+        recenterForLoopingIfNeeded()
+
         // 用户滚动结束，恢复自动轮播
         isUserInteracting = false
         startAutoPlayIfNeeded()
     }
-    
+
     open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
             updateCurrentPageIndex()
-            
+            recenterForLoopingIfNeeded()
+
             // 用户滚动结束，恢复自动轮播
             isUserInteracting = false
             startAutoPlayIfNeeded()
         }
     }
-    
+
     open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         updateCurrentPageIndex()
-        
+        recenterForLoopingIfNeeded()
+
         // 动画滚动结束后，检查是否需要继续自动轮播
         startAutoPlayIfNeeded()
     }

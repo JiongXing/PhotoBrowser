@@ -31,6 +31,8 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         guard let srcCell = fromVC.visibleCell(),
               let srcIV = srcCell.transitionImageView, srcIV.bounds.size != .zero,
               let thumbnailView = fromVC.delegate?.photoBrowser(fromVC, thumbnailViewAt: pageIndex) else {
+            // 降级为淡出前先恢复列表缩略图显示，避免淡出完成后缩略图永久隐藏
+            fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
             animateFadeOut(view: fromView, duration: duration, ctx: ctx)
             return
         }
