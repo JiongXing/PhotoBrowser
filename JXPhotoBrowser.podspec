@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'JXPhotoBrowser'
-  s.version          = '4.0.3'
+  s.version          = '4.1.0'
   s.summary          = 'A lightweight, customizable iOS photo/video browser with zoom transitions and infinite looping.'
 
   s.description      = <<-DESC

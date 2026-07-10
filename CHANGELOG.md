@@ -1,5 +1,15 @@
 # Change Log
 
+## Version 4.1.0
+
+> 2026/07/10
+
+- `JXZoomImageCell` 新增 `doubleTapZoomScale`：可指定双击放大的固定倍数（相对适配尺寸，以点击点为中心）；为 `nil` 时保持原有的「长边铺满 ↔ 短边铺满」模式切换行为
+- 双击放大倍数受 `scrollView.maximumZoomScale`（默认 `3.0`）上限约束，与捏合缩放天花板解耦；如需更大倍数请自行调高 `maximumZoomScale`
+- `JXPhotoBrowserViewController` 新增 `scrollToPage(at:animated:)`：支持代码直接跳转到指定页，兼容无限循环模式，`animated: false` 可连续快速调用
+
+---
+
 ## Version 4.0.3
 
 > 2026/03/27

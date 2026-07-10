@@ -73,7 +73,7 @@ JXPhotoBrowser **不追踪用户、不收集任何数据、不使用任何 Requi
 在你的 `Podfile` 中添加：
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.0.3'
+pod 'JXPhotoBrowser', '~> 4.1.0'
 ```
 
 > **注意**：Xcode 15 起默认开启了 **User Script Sandboxing**（`ENABLE_USER_SCRIPT_SANDBOXING=YES`），该沙盒机制会阻止 CocoaPods 的 Run Script 阶段（如 `[CP] Copy Pods Resources`、`[CP] Embed Pods Frameworks` 等）访问沙盒外的文件，导致编译失败。需要在编译 Target 的 **Build Settings** 中将 `ENABLE_USER_SCRIPT_SANDBOXING` 设置为 `NO`：
@@ -92,7 +92,7 @@ pod 'JXPhotoBrowser', '~> 4.0.3'
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.3")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.1.0")
 ]
 ```
 
@@ -227,7 +227,12 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: 
 
 - 设为 `nil`（默认）时保持原有的模式切换行为。
 - 放大会以双击点为中心，再次双击缩回适配尺寸。
-- 设置的倍数若超过 `scrollView.maximumZoomScale`，会自动抬高上限以容纳该倍数。
+- 该倍数受 `scrollView.maximumZoomScale`（默认 `3.0`）上限约束。若需双击放大到更大倍数，请自行调高上限：
+
+```swift
+cell.scrollView.maximumZoomScale = 5.0 // 同时抬高捏合与双击的上限
+cell.doubleTapZoomScale = 5.0
+```
 
 ## 在 SwiftUI 中使用
 
@@ -578,6 +583,8 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXP
 这样可以确保转场动画开始时，Cell 已经有正确尺寸的图片，动画效果更加流畅。
 
 ## 版本更新
+
+**v4.1.0**（2026/07/10）— 新增双击指定放大倍数（`doubleTapZoomScale`，受 `maximumZoomScale` 上限约束）与程序化翻页 API（`scrollToPage(at:animated:)`，兼容无限循环）。
 
 **v4.0.3**（2026/03/27）— 修复图片首屏居中问题，重构 `JXZoomImageCell` 的布局与居中逻辑，优化下拉关闭交互与裁剪表现。
 

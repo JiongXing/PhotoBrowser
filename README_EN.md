@@ -71,7 +71,7 @@ JXPhotoBrowser **does not track users, does not collect any data, and does not u
 Add to your `Podfile`:
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.0.3'
+pod 'JXPhotoBrowser', '~> 4.1.0'
 ```
 
 > **Note**: Starting from Xcode 15, **User Script Sandboxing** (`ENABLE_USER_SCRIPT_SANDBOXING=YES`) is enabled by default. This sandbox mechanism prevents CocoaPods' Run Script phases (such as `[CP] Copy Pods Resources`, `[CP] Embed Pods Frameworks`, etc.) from accessing files outside the sandbox, causing build failures. You need to set `ENABLE_USER_SCRIPT_SANDBOXING` to `NO` in your build target's **Build Settings**:
@@ -90,7 +90,7 @@ Or add the dependency in your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.0.3")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.1.0")
 ]
 ```
 
@@ -225,7 +225,12 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: 
 
 - When set to `nil` (default), the original mode-toggling behavior is preserved.
 - Zooming is anchored at the tap point; double-tapping again zooms back to the fitted size.
-- If the scale exceeds `scrollView.maximumZoomScale`, the maximum is raised automatically to accommodate it.
+- The scale is capped by `scrollView.maximumZoomScale` (default `3.0`). To double-tap zoom to a larger scale, raise the ceiling yourself:
+
+```swift
+cell.scrollView.maximumZoomScale = 5.0 // Raises the ceiling for both pinch and double-tap
+cell.doubleTapZoomScale = 5.0
+```
 
 ## Using with SwiftUI
 
@@ -577,6 +582,8 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXP
 This ensures the cell has an image with the correct dimensions when the transition animation starts, resulting in a smoother animation.
 
 ## Release Notes
+
+**v4.1.0** (2026/07/10) — Added a configurable double-tap zoom scale (`doubleTapZoomScale`, capped by `maximumZoomScale`) and a programmatic paging API (`scrollToPage(at:animated:)`, compatible with infinite looping).
 
 **v4.0.3** (2026/03/27) — Fixed initial image centering, reworked `JXZoomImageCell` layout/centering behavior, and refined drag-to-dismiss and clipping behavior.
 
