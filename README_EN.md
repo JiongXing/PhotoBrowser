@@ -640,7 +640,7 @@ This ensures the cell has an image with the correct dimensions when the transiti
 
 ## Release Notes
 
-**v4.1.0** (2026/07/10) — Added a configurable double-tap zoom scale (`doubleTapZoomScale`, capped by `maximumZoomScale`) and a programmatic paging API (`scrollToPage(at:animated:)`, compatible with infinite looping).
+**v4.1.0** (2026/07/10) — Added a configurable double-tap zoom scale (`doubleTapZoomScale`, capped by `maximumZoomScale`) and a programmatic paging API (`scrollToPage(at:animated:)`, compatible with infinite looping); fixed infinite-loop termination and autoplay lockup after exhausting the virtual data source, stale thumbnail state during Zoom transitions, drag-to-dismiss tracking offset, and more — see [CHANGELOG](CHANGELOG.md).
 
 **v4.0.3** (2026/03/27) — Fixed initial image centering, reworked `JXZoomImageCell` layout/centering behavior, and refined drag-to-dismiss and clipping behavior.
 

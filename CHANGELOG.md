@@ -1,7 +1,12 @@
 # Change Log
 
-## Unreleased
+## Version 4.1.0
 
+> 2026/07/10
+
+- `JXZoomImageCell` 新增 `doubleTapZoomScale`：可指定双击放大的固定倍数（相对适配尺寸，以点击点为中心）；为 `nil` 时保持原有的「长边铺满 ↔ 短边铺满」模式切换行为
+- 双击放大倍数受 `scrollView.maximumZoomScale`（默认 `3.0`）上限约束，与捏合缩放天花板解耦；如需更大倍数请自行调高 `maximumZoomScale`
+- `JXPhotoBrowserViewController` 新增 `scrollToPage(at:animated:)`：支持代码直接跳转到指定页，兼容无限循环模式，`animated: false` 可连续快速调用
 - 修复无限循环模式下连续单向滑动耗尽虚拟数据源导致循环终止、自动轮播永久停止的问题（滚动结束后自动回中）
 - 修复 Zoom 转场降级为淡出关闭时，列表缩略图未恢复显示、永久隐藏的问题
 - 修复运行时切换 `scrollDirection` 后丢失当前页、跳回第 0 页的问题
@@ -11,16 +16,6 @@
 - 修复 `JXZoomImageCell` 从 XIB/Storyboard 实例化时未执行初始化的问题
 - 修复业务方传入越界 `initialIndex` 时，Zoom 转场可能引发 delegate 侧数组越界的问题
 - **行为变化**：`setThumbnailHidden` 的默认实现由空操作改为自动切换 `thumbnailViewAt` 返回视图的 `isHidden`。未实现该方法的宿主现在开箱即用：浏览期间当前页缩略图保持隐藏（与系统相册一致）。Zoom 转场动画器不再直接操作缩略图视图，显隐统一经由 delegate 通道
-
----
-
-## Version 4.1.0
-
-> 2026/07/10
-
-- `JXZoomImageCell` 新增 `doubleTapZoomScale`：可指定双击放大的固定倍数（相对适配尺寸，以点击点为中心）；为 `nil` 时保持原有的「长边铺满 ↔ 短边铺满」模式切换行为
-- 双击放大倍数受 `scrollView.maximumZoomScale`（默认 `3.0`）上限约束，与捏合缩放天花板解耦；如需更大倍数请自行调高 `maximumZoomScale`
-- `JXPhotoBrowserViewController` 新增 `scrollToPage(at:animated:)`：支持代码直接跳转到指定页，兼容无限循环模式，`animated: false` 可连续快速调用
 
 ---
 

@@ -638,7 +638,7 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXP
 
 ## 版本更新
 
-**v4.1.0**（2026/07/10）— 新增双击指定放大倍数（`doubleTapZoomScale`，受 `maximumZoomScale` 上限约束）与程序化翻页 API（`scrollToPage(at:animated:)`，兼容无限循环）。
+**v4.1.0**（2026/07/10）— 新增双击指定放大倍数（`doubleTapZoomScale`，受 `maximumZoomScale` 上限约束）与程序化翻页 API（`scrollToPage(at:animated:)`，兼容无限循环）；修复无限循环耗尽虚拟数据源导致的循环终止与自动轮播卡死、Zoom 转场缩略图状态残留、下拉关闭跟手偏移等问题，详见 [CHANGELOG](CHANGELOG.md)。
 
 **v4.0.3**（2026/03/27）— 修复图片首屏居中问题，重构 `JXZoomImageCell` 的布局与居中逻辑，优化下拉关闭交互与裁剪表现。
 
