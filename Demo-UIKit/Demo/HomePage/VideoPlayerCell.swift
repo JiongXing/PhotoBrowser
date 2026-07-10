@@ -237,6 +237,7 @@ open class VideoPlayerCell: JXZoomImageCell {
     // MARK: - Dismiss Interaction
     
     open override func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {
+        super.photoBrowserDismissInteractionDidChange(isInteracting: isInteracting)
         isDismissInteracting = isInteracting
         if isInteracting {
             // 下拉交互开始，隐藏 loading 避免遮挡缩小中的画面
