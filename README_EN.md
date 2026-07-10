@@ -183,6 +183,8 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
     
     // 6. (Optional) Control thumbnail visibility to avoid visual overlap during Zoom transition
+    // The default implementation toggles isHidden on the view returned by thumbnailViewAt, so this
+    // is usually unnecessary; implement it only for custom behavior (e.g., alpha fade, hiding a container)
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {

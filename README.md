@@ -183,6 +183,8 @@ extension ViewController: JXPhotoBrowserDelegate {
     }
     
     // 6. (可选) 控制缩略图显隐，避免 Zoom 转场时视觉重叠
+    // 默认实现会自动切换 thumbnailViewAt 返回视图的 isHidden，通常无需实现；
+    // 仅当需要自定义显隐方式（如渐隐、隐藏容器视图）时才实现此方法
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         let indexPath = IndexPath(item: index, section: 0)
         if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {
