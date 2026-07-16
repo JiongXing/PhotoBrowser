@@ -51,11 +51,11 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewDidLoad() {
         super.viewDidLoad()
         setupData()
-        setupNetworkMonitoring()
         setupBannerSettingsPanel()
         setupBannerBrowser()
         setupBrowserSettingsPanel()
         setupCollectionView()
+        setupNetworkMonitoring()
     }
     
     
@@ -124,6 +124,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         photoBannerView.translatesAutoresizingMaskIntoConstraints = false
         photoBannerView.configure(with: bannerResources)
         view.addSubview(photoBannerView)
+        photoBannerView.attach(to: self)
         
         // 监听 Banner 设置面板的开关变化，实时更新 Banner 行为
         bannerSettingsPanel.onLoopingChanged = { [weak self] isLoopingEnabled in
@@ -327,14 +328,24 @@ private extension DemoViewController {
     
     /// 请求相册权限
     func requestPhotoAuthorization(completion: @escaping (Bool) -> Void) {
-        let status = PHPhotoLibrary.authorizationStatus()
-        if status == .authorized {
-            completion(true)
-            return
-        }
-        
-        PHPhotoLibrary.requestAuthorization { newStatus in
-            completion(newStatus == .authorized)
+        if #available(iOS 14, *) {
+            let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+            if status == .authorized || status == .limited {
+                completion(true)
+                return
+            }
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+                completion(newStatus == .authorized || newStatus == .limited)
+            }
+        } else {
+            let status = PHPhotoLibrary.authorizationStatus()
+            if status == .authorized {
+                completion(true)
+                return
+            }
+            PHPhotoLibrary.requestAuthorization { newStatus in
+                completion(newStatus == .authorized)
+            }
         }
     }
     

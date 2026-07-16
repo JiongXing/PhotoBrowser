@@ -30,8 +30,6 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     /// 默认实现会切换 `thumbnailViewAt` 返回视图的 `isHidden`；仅当需要自定义显隐方式（如渐隐、隐藏容器视图）时才需实现
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int)
     
-    /// 返回指定索引的 item 尺寸，可选实现，默认返回 collectionView.bounds.size
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, sizeForItemAt index: Int) -> CGSize?
 }
 
 public extension JXPhotoBrowserDelegate {
@@ -41,5 +39,4 @@ public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         photoBrowser(browser, thumbnailViewAt: index)?.isHidden = hidden
     }
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, sizeForItemAt index: Int) -> CGSize? { nil }
 }

@@ -15,7 +15,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     /// 当前显示的图片索引
     public private(set) var pageIndex: Int = 0 {
         didSet {
-            if pageIndex != oldValue {
+            if pageIndex != oldValue, !isSynchronizingData {
                 // 仅在 Zoom 转场动画时，才对源视图进行显隐操作
                 if transitionType == .zoom {
                     // 恢复旧的
@@ -55,6 +55,10 @@ open class JXPhotoBrowserViewController: UIViewController {
     /// 图片之间的间距（默认 0）
     public var itemSpacing: CGFloat = 0 {
         didSet {
+            if !itemSpacing.isFinite || itemSpacing < 0 {
+                itemSpacing = 0
+                return
+            }
             if isViewLoaded {
                 applyCollectionViewConfig()
             }
@@ -76,14 +80,34 @@ open class JXPhotoBrowserViewController: UIViewController {
             }
         }
     }
+
+    /// 是否启用下拉关闭手势。内嵌 Banner 场景应设为 false
+    public var isDismissGestureEnabled: Bool = true
     
     /// 自动轮播间隔时间（默认 3.0 秒）
-    public var autoPlayInterval: TimeInterval = 3.0
+    public var autoPlayInterval: TimeInterval {
+        get { configuredAutoPlayInterval }
+        set {
+            configuredAutoPlayInterval = newValue.isFinite ? max(0.5, newValue) : 0.5
+            if isAutoPlayEnabled {
+                stopAutoPlay()
+                startAutoPlayIfNeeded()
+            }
+        }
+    }
         
     // MARK: - Private Properties
     
     /// 自动轮播定时器
     private var autoPlayTimer: Timer?
+
+    private var configuredAutoPlayInterval: TimeInterval = 3.0
+
+    private var isProgrammaticScrollAnimating = false
+
+    private var isSynchronizingData = false
+
+    private var displayedRealIndexes: [ObjectIdentifier: Int] = [:]
     
     /// 用户是否正在手动滚动（用于暂停自动轮播）
     private var isUserInteracting: Bool = false
@@ -112,9 +136,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     private let loopMultiplier: Int = 10
     
     /// 真实数据源数量
-    private var realCount: Int {
-        delegate?.numberOfItems(in: self) ?? 0
-    }
+    private var realCount: Int = 0
     
     /// 虚拟数据源数量（用于无限循环）
     private var virtualCount: Int {
@@ -143,6 +165,7 @@ open class JXPhotoBrowserViewController: UIViewController {
         view.backgroundColor = .black
         setupCollectionView()
         applyCollectionViewConfig()
+        reloadData(preservingCurrentPage: false)
         
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         panGesture.delegate = self
@@ -152,12 +175,12 @@ open class JXPhotoBrowserViewController: UIViewController {
         overlays.forEach { installOverlay($0) }
     }
     
-    open override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        if interactiveDismissCell != nil {
+            resetDismissInteraction(animated: false)
+        }
         
         // 仅在 Zoom 转场动画时，初始显示时隐藏源视图
         if transitionType == .zoom {
@@ -226,17 +249,8 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     // MARK: - Private Methods
     
-    /// 计算指定索引的 item 尺寸
-    /// - Parameter index: 实际数据源中的索引
-    /// - Returns: 合法的 CGSize，优先使用代理返回值，否则使用 view.bounds（满屏）
-    private func calculateItemSize(for index: Int) -> CGSize {
-        if let delegateSize = delegate?.photoBrowser(self, sizeForItemAt: index),
-           delegateSize.width > 0,
-           delegateSize.height > 0 {
-            return delegateSize
-        }
-        
-        // itemSize 始终等于 view.bounds（满屏）
+    /// 计算整页 Cell 尺寸
+    private func calculateItemSize() -> CGSize {
         let viewSize = view.bounds.size
         if viewSize.width > 0 && viewSize.height > 0 {
             return viewSize
@@ -246,12 +260,16 @@ open class JXPhotoBrowserViewController: UIViewController {
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
+        guard isDismissGestureEnabled else { return }
         // 垂直滚动模式下禁用下拉关闭手势，避免与列表滚动冲突
         if scrollDirection == .vertical { return }
         
         switch gesture.state {
         case .began:
-            guard let cell = visibleCell() else { return }
+            guard let cell = visibleCell(), let imageView = cell.transitionImageView, let container = imageView.superview else {
+                resetDismissInteraction(animated: false)
+                return
+            }
             interactiveDismissCell = cell
             collectionView.isScrollEnabled = false
             setDismissInteractionClippingDisabled(true, for: cell)
@@ -262,10 +280,8 @@ open class JXPhotoBrowserViewController: UIViewController {
             
             // 记录初始状态以计算跟随
             // 触摸点与图片中心必须在同一坐标系下，故统一取 imageView.superview 坐标系
-            if let imageView = cell.transitionImageView, let container = imageView.superview {
-                initialTouchPoint = gesture.location(in: container)
-                initialImageCenter = imageView.center
-            }
+            initialTouchPoint = gesture.location(in: container)
+            initialImageCenter = imageView.center
             
             // 仅在 Zoom 转场动画时，确保源视图隐藏
             if transitionType == .zoom {
@@ -299,8 +315,8 @@ open class JXPhotoBrowserViewController: UIViewController {
             view.backgroundColor = UIColor.black.withAlphaComponent(alpha)
             
         case .ended, .cancelled:
-            guard let cell = interactiveDismissCell, let imageView = cell.transitionImageView else {
-                collectionView.isScrollEnabled = true
+            guard interactiveDismissCell?.transitionImageView != nil else {
+                resetDismissInteraction(animated: false)
                 return
             }
             
@@ -315,26 +331,10 @@ open class JXPhotoBrowserViewController: UIViewController {
                 dismissSelf()
                 // 不恢复 ScrollEnabled，直到页面消失
             } else {
-                // 恢复
-                UIView.animate(withDuration: 0.25, animations: {
-                    imageView.transform = .identity
-                    self.view.backgroundColor = .black
-                }) { _ in
-                    self.collectionView.isScrollEnabled = true
-                    self.setDismissInteractionClippingDisabled(false, for: cell)
-                    if let photoCell = cell as? JXZoomImageCell {
-                        photoCell.scrollView.isScrollEnabled = true
-                    }
-                    self.interactiveDismissCell = nil
-                }
+                resetDismissInteraction(animated: true)
             }
         default:
-            collectionView.isScrollEnabled = true
-            setDismissInteractionClippingDisabled(false, for: interactiveDismissCell)
-            if let photoCell = interactiveDismissCell as? JXZoomImageCell {
-                photoCell.scrollView.isScrollEnabled = true
-            }
-            interactiveDismissCell = nil
+            resetDismissInteraction(animated: false)
         }
     }
     
@@ -359,7 +359,7 @@ open class JXPhotoBrowserViewController: UIViewController {
         // 偏离中间块时才重定位
         guard block != middleBlock else { return }
 
-        let target = middleBlock * count + pageIndex
+        let target = centeredVirtualIndex(for: pageIndex)
         collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
     }
     
@@ -385,15 +385,23 @@ open class JXPhotoBrowserViewController: UIViewController {
         guard count > 0 else { return 0 }
         
         if !isLoopingEnabled { return realIndex }
-        
-        let block = currentVirtual / count
-        var candidate = block * count + realIndex
-        
-        if candidate >= virtualCount, block > 0 {
-            candidate = (block - 1) * count + realIndex
-        }
-        
-        return max(0, min(candidate, virtualCount - 1))
+
+        return JXPhotoBrowserPaging.nearestVirtualIndex(
+            for: realIndex,
+            near: currentVirtual,
+            count: count,
+            virtualCount: virtualCount
+        )
+    }
+
+    /// 返回真实页在循环数据源中间块的虚拟索引；非循环模式直接返回真实索引
+    private func centeredVirtualIndex(for realIndex: Int) -> Int {
+        guard isLoopingEnabled else { return realIndex }
+        return JXPhotoBrowserPaging.centeredVirtualIndex(
+            for: realIndex,
+            count: realCount,
+            loopMultiplier: loopMultiplier
+        )
     }
     
     /// 将虚拟索引转换为真实索引
@@ -423,15 +431,9 @@ open class JXPhotoBrowserViewController: UIViewController {
             return
         }
 
-        let safeInitialIndex: Int
-        if isLoopingEnabled {
-            safeInitialIndex = ((initialIndex % count) + count) % count
-        } else {
-            safeInitialIndex = max(0, min(initialIndex, count - 1))
-        }
+        let safeInitialIndex = JXPhotoBrowserPaging.normalizedInitialIndex(initialIndex, count: count, looping: isLoopingEnabled)
 
-        let base = isLoopingEnabled ? (loopMultiplier / 2) * count : 0
-        let target = base + safeInitialIndex
+        let target = centeredVirtualIndex(for: safeInitialIndex)
         
         collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
         didScrollToInitial = true
@@ -443,6 +445,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 循环模式变更时重新加载数据并调整位置
     private func reloadForLoopingChange() {
+        stopAutoPlay()
         let currentReal = pageIndex
         collectionView.reloadData()
         
@@ -450,28 +453,29 @@ open class JXPhotoBrowserViewController: UIViewController {
         guard count > 0 else { return }
         
         // 计算新的目标索引
-        let targetIndex: Int
-        if isLoopingEnabled {
-            // 切换到循环模式：定位到中间位置
-            targetIndex = (loopMultiplier / 2) * count + currentReal
-        } else {
-            // 切换到非循环模式：定位到真实索引
-            targetIndex = min(currentReal, count - 1)
-        }
+        let targetIndex = centeredVirtualIndex(for: min(currentReal, count - 1))
         
         collectionView.scrollToItem(at: IndexPath(item: targetIndex, section: 0), at: scrollDirection.scrollPosition, animated: false)
+        startAutoPlayIfNeeded()
     }
     
     /// 关闭浏览器
     @objc open func dismissSelf() {
-        dismiss(animated: transitionType != .none, completion: nil)
+        dismiss(animated: transitionType != .none) { [weak self] in
+            self?.resetDismissInteraction(animated: false)
+        }
     }
     
     // MARK: - Auto Play
     
     /// 判断是否可以启动自动轮播
     private var canStartAutoPlay: Bool {
-        guard isAutoPlayEnabled, !isUserInteracting else { return false }
+        guard isAutoPlayEnabled,
+              !isUserInteracting,
+              !isProgrammaticScrollAnimating,
+              didScrollToInitial,
+              isViewLoaded,
+              view.window != nil else { return false }
         
         let count = realCount
         guard count > 1 else { return false }
@@ -506,6 +510,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 自动滚动到下一页
     private func autoPlayToNextPage() {
+        guard !isProgrammaticScrollAnimating else { return }
         let count = realCount
         guard count > 1 else {
             stopAutoPlay()
@@ -528,7 +533,51 @@ open class JXPhotoBrowserViewController: UIViewController {
             return
         }
         
-        collectionView.scrollToItem(at: IndexPath(item: targetVirtual, section: 0), at: scrollDirection.scrollPosition, animated: true)
+        performProgrammaticScroll(to: targetVirtual, animated: true)
+    }
+
+    /// 执行翻页并在 UIKit 没有产生实际滚动动画时同步完成状态
+    private func performProgrammaticScroll(to targetVirtual: Int, animated: Bool) {
+        let shouldAnimate = animated && willMoveContent(to: targetVirtual)
+        isProgrammaticScrollAnimating = shouldAnimate
+        collectionView.scrollToItem(
+            at: IndexPath(item: targetVirtual, section: 0),
+            at: scrollDirection.scrollPosition,
+            animated: shouldAnimate
+        )
+
+        if !shouldAnimate {
+            finishProgrammaticScroll()
+        }
+    }
+
+    /// 判断目标项居中后是否会改变实际 contentOffset
+    private func willMoveContent(to targetVirtual: Int) -> Bool {
+        collectionView.layoutIfNeeded()
+        guard let attributes = collectionView.layoutAttributesForItem(at: IndexPath(item: targetVirtual, section: 0)) else {
+            return false
+        }
+
+        let inset = collectionView.adjustedContentInset
+        let current = collectionView.contentOffset
+        if scrollDirection == .horizontal {
+            let minimum = -inset.left
+            let maximum = max(minimum, collectionView.contentSize.width - collectionView.bounds.width + inset.right)
+            let target = min(max(attributes.center.x - collectionView.bounds.width / 2, minimum), maximum)
+            return abs(target - current.x) > 0.5
+        }
+
+        let minimum = -inset.top
+        let maximum = max(minimum, collectionView.contentSize.height - collectionView.bounds.height + inset.bottom)
+        let target = min(max(attributes.center.y - collectionView.bounds.height / 2, minimum), maximum)
+        return abs(target - current.y) > 0.5
+    }
+
+    private func finishProgrammaticScroll() {
+        isProgrammaticScrollAnimating = false
+        updateCurrentPageIndex()
+        recenterForLoopingIfNeeded()
+        startAutoPlayIfNeeded()
     }
     
     // MARK: - Public Methods
@@ -550,20 +599,54 @@ open class JXPhotoBrowserViewController: UIViewController {
 
         stopAutoPlay()
 
-        let targetVirtual: Int
-        if isLoopingEnabled {
-            targetVirtual = nearestVirtualIndex(for: index, near: calculateCurrentVirtualIndex())
+        let targetVirtual = nearestVirtualIndex(for: index, near: calculateCurrentVirtualIndex())
+        performProgrammaticScroll(to: targetVirtual, animated: animated)
+    }
+
+    /// 重新读取 delegate 数据并同步页码、循环位置、Overlay 与自动轮播
+    open func reloadData(preservingCurrentPage: Bool = true) {
+        let previousCount = realCount
+        let previousPage = pageIndex
+
+        if transitionType == .zoom, previousCount > 0, previousPage < previousCount {
+            delegate?.photoBrowser(self, setThumbnailHidden: false, at: previousPage)
+        }
+
+        realCount = max(0, min(delegate?.numberOfItems(in: self) ?? 0, Int.max / loopMultiplier))
+        stopAutoPlay()
+        isProgrammaticScrollAnimating = false
+        collectionView.reloadData()
+
+        guard realCount > 0 else {
+            isSynchronizingData = true
+            pageIndex = 0
+            isSynchronizingData = false
+            didScrollToInitial = false
+            overlays.forEach { $0.reloadData(numberOfItems: 0, pageIndex: 0) }
+            return
+        }
+
+        let targetReal = preservingCurrentPage
+            ? max(0, min(previousPage, realCount - 1))
+            : JXPhotoBrowserPaging.normalizedInitialIndex(initialIndex, count: realCount, looping: isLoopingEnabled)
+        let targetVirtual = centeredVirtualIndex(for: targetReal)
+
+        collectionView.layoutIfNeeded()
+        if collectionView.bounds.size != .zero {
+            collectionView.scrollToItem(at: IndexPath(item: targetVirtual, section: 0), at: scrollDirection.scrollPosition, animated: false)
+            didScrollToInitial = true
         } else {
-            targetVirtual = index
+            didScrollToInitial = false
         }
+        isSynchronizingData = true
+        pageIndex = targetReal
+        isSynchronizingData = false
+        overlays.forEach { $0.reloadData(numberOfItems: realCount, pageIndex: targetReal) }
 
-        collectionView.scrollToItem(at: IndexPath(item: targetVirtual, section: 0), at: scrollDirection.scrollPosition, animated: animated)
-
-        // 非动画滚动不会触发 scrollViewDidEndScrollingAnimation，需手动同步页码并恢复轮播
-        if !animated {
-            updateCurrentPageIndex()
-            startAutoPlayIfNeeded()
+        if transitionType == .zoom, view.window != nil {
+            delegate?.photoBrowser(self, setThumbnailHidden: true, at: targetReal)
         }
+        startAutoPlayIfNeeded()
     }
 
     /// 当前展示中的 Cell（协议类型，支持自定义Cell）
@@ -603,6 +686,12 @@ open class JXPhotoBrowserViewController: UIViewController {
     /// - Parameter overlay: 遵循 `JXPhotoBrowserOverlay` 协议的视图组件
     /// - Note: 可在 viewDidLoad 之前或之后调用。如果 view 已加载，会立即添加到视图并触发 setup
     open func addOverlay(_ overlay: JXPhotoBrowserOverlay) {
+        if overlays.contains(where: { $0 === overlay }) { return }
+        if let oldBrowser = overlay.superview?.next as? JXPhotoBrowserViewController, oldBrowser !== self {
+            oldBrowser.removeOverlay(overlay)
+        } else if overlay.superview != nil {
+            overlay.removeFromSuperview()
+        }
         overlays.append(overlay)
         
         // 如果 view 已加载，立即装载到视图
@@ -698,6 +787,11 @@ open class JXPhotoBrowserViewController: UIViewController {
         } else {
             collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: itemSpacing, right: 0)
         }
+
+        view.setNeedsLayout()
+        if view.window != nil {
+            view.layoutIfNeeded()
+        }
         
         // 保持当前可见项居中（在已滚动到初始项后）
         // 注意：不能用 calculateCurrentVirtualIndex() 反推——它按【新的】scrollDirection 读取 contentOffset，
@@ -705,7 +799,7 @@ open class JXPhotoBrowserViewController: UIViewController {
         if didScrollToInitial {
             let count = realCount
             if count > 0 {
-                let virtualItem = isLoopingEnabled ? (loopMultiplier / 2) * count + pageIndex : pageIndex
+                let virtualItem = centeredVirtualIndex(for: pageIndex)
                 collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: scrollDirection.scrollPosition, animated: false)
             }
         }
@@ -734,17 +828,20 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     open func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let protocolCell = cell as? JXPhotoBrowserAnyCell else { return }
         let real = realIndex(fromVirtual: indexPath.item)
+        displayedRealIndexes[ObjectIdentifier(cell)] = real
         delegate?.photoBrowser(self, willDisplay: protocolCell, at: real)
     }
     
     open func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let protocolCell = cell as? JXPhotoBrowserAnyCell else { return }
-        let real = realIndex(fromVirtual: indexPath.item)
+        let real = displayedRealIndexes.removeValue(forKey: ObjectIdentifier(cell))
+            ?? realIndex(fromVirtual: indexPath.item)
         delegate?.photoBrowser(self, didEndDisplaying: protocolCell, at: real)
     }
     
     open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         // 用户开始手动滚动，暂停自动轮播
+        isProgrammaticScrollAnimating = false
         isUserInteracting = true
         stopAutoPlay()
     }
@@ -770,20 +867,14 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     }
 
     open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        updateCurrentPageIndex()
-        recenterForLoopingIfNeeded()
-
-        // 动画滚动结束后，检查是否需要继续自动轮播
-        startAutoPlayIfNeeded()
+        finishProgrammaticScroll()
     }
     
     // MARK: - UICollectionViewDelegateFlowLayout
     
-    /// 动态计算每个 item 的尺寸（从代理获取）
-    open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let real = realIndex(fromVirtual: indexPath.item)
-        // 从代理获取 itemSize，如果没有实现则返回 collectionView.bounds.size
-        return calculateItemSize(for: real)
+    /// 每个 item 固定使用浏览器整页尺寸
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return calculateItemSize()
     }
 }
 
@@ -791,14 +882,19 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
 extension JXPhotoBrowserViewController: UIGestureRecognizerDelegate {
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == panGesture {
-            if scrollDirection == .vertical { return false }
+            if !isDismissGestureEnabled || scrollDirection == .vertical { return false }
             
             let velocity = panGesture.velocity(in: view)
             // 必须是垂直向下的手势
             guard velocity.y > 0, abs(velocity.y) > abs(velocity.x) else { return false }
+
+            guard let cell = visibleCell(),
+                  let imageView = cell.transitionImageView,
+                  imageView.superview != nil,
+                  imageView.bounds.size != .zero else { return false }
             
             // 如果是 JXZoomImageCell，检查缩放和滚动状态
-            if let photoCell = visibleZoomImageCell() {
+            if let photoCell = cell as? JXZoomImageCell {
                 let scrollView = photoCell.scrollView
                 let isZoomed = scrollView.zoomScale > scrollView.minimumZoomScale + 0.01
                 let topOffset = -scrollView.adjustedContentInset.top
@@ -807,8 +903,6 @@ extension JXPhotoBrowserViewController: UIGestureRecognizerDelegate {
                 return !isZoomed && (isAtTop || !hasVerticalScrollableContent)
             }
             
-            // 自定义 Cell（非 JXZoomImageCell）：直接允许下拉关闭
-            guard visibleCell() != nil else { return false }
             return true
         }
         return true
@@ -821,6 +915,31 @@ extension JXPhotoBrowserViewController: UIGestureRecognizerDelegate {
 }
 
 private extension JXPhotoBrowserViewController {
+    func resetDismissInteraction(animated: Bool) {
+        let cell = interactiveDismissCell
+        let updates = {
+            cell?.transitionImageView?.transform = .identity
+            self.view.backgroundColor = .black
+        }
+        let completion: (Bool) -> Void = { _ in
+            self.collectionView.isScrollEnabled = true
+            self.setDismissInteractionClippingDisabled(false, for: cell)
+            if let photoCell = cell as? JXZoomImageCell {
+                photoCell.scrollView.isScrollEnabled = true
+            }
+            self.interactiveDismissCell = nil
+            self.initialTouchPoint = .zero
+            self.initialImageCenter = .zero
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.25, animations: updates, completion: completion)
+        } else {
+            updates()
+            completion(true)
+        }
+    }
+
     func setDismissInteractionClippingDisabled(_ disabled: Bool, for cell: JXPhotoBrowserAnyCell?) {
         view.clipsToBounds = !disabled
         collectionView.clipsToBounds = !disabled

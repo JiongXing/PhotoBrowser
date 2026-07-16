@@ -43,6 +43,9 @@ open class JXImageCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
             }
         }
     }
+
+    /// 用于 Zoom 转场和下拉交互的图片视图
+    open var transitionImageView: UIImageView? { imageView }
     
     // MARK: - Lifecycle
     

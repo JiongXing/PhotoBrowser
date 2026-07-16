@@ -26,8 +26,13 @@ open class JXFadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
             toView.alpha = 0
             UIView.animate(withDuration: transitionDuration(using: ctx), animations: {
                 toView.alpha = 1
-            }) { finished in
-                ctx.completeTransition(finished)
+            }) { _ in
+                let completed = !ctx.transitionWasCancelled
+                if !completed {
+                    toView.alpha = 0
+                    toView.removeFromSuperview()
+                }
+                ctx.completeTransition(completed)
             }
         } else {
             guard let fromView = ctx.view(forKey: .from) else {
@@ -47,6 +52,7 @@ open class JXFadeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
                     ctx.completeTransition(false)
                 } else {
                     fromView.removeFromSuperview()
+                    fromView.alpha = 1
                     ctx.completeTransition(true)
                 }
             }

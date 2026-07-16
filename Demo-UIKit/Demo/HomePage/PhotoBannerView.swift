@@ -33,7 +33,7 @@ class PhotoBannerView: UIView {
     /// 图片资源列表（imageURL, thumbnailURL）
     public var resources: [(imageURL: URL, thumbnailURL: URL?)] = [] {
         didSet {
-            browser?.collectionView.reloadData()
+            browser?.reloadData()
         }
     }
     
@@ -76,6 +76,8 @@ class PhotoBannerView: UIView {
     
     /// 嵌入的图片浏览器
     private var browser: JXPhotoBrowserViewController?
+
+    private weak var parentViewController: UIViewController?
     
     /// 高度约束
     private var heightConstraint: NSLayoutConstraint?
@@ -105,6 +107,42 @@ class PhotoBannerView: UIView {
     public func configure(with resources: [(imageURL: URL, thumbnailURL: URL?)]) {
         self.resources = resources
     }
+
+    /// 使用标准 View Controller containment 将浏览器嵌入宿主
+    public func attach(to parentViewController: UIViewController) {
+        guard let browser = browser, browser.parent !== parentViewController else { return }
+        detach()
+
+        self.parentViewController = parentViewController
+        parentViewController.addChild(browser)
+
+        let browserView = browser.view!
+        browserView.translatesAutoresizingMaskIntoConstraints = false
+        browserView.layer.cornerRadius = cornerRadius
+        browserView.clipsToBounds = true
+        addSubview(browserView)
+
+        let leading = browserView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalMargin)
+        let trailing = browserView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalMargin)
+        leadingConstraint = leading
+        trailingConstraint = trailing
+
+        NSLayoutConstraint.activate([
+            browserView.topAnchor.constraint(equalTo: topAnchor),
+            leading,
+            trailing,
+            browserView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+        browser.didMove(toParent: parentViewController)
+    }
+
+    public func detach() {
+        guard let browser = browser, browser.parent != nil else { return }
+        browser.willMove(toParent: nil)
+        browser.view.removeFromSuperview()
+        browser.removeFromParent()
+        parentViewController = nil
+    }
     
     // MARK: - Private Methods
     
@@ -118,8 +156,9 @@ class PhotoBannerView: UIView {
         browser.transitionType = .none
         browser.isLoopingEnabled = true
         browser.itemSpacing = 8  // 设置图片之间的间距
-        browser.isAutoPlayEnabled = true  // 开启自动轮播
         browser.autoPlayInterval = 3.0  // 轮播间隔 3 秒
+        browser.isAutoPlayEnabled = true  // 开启自动轮播
+        browser.isDismissGestureEnabled = false
         browser.register(JXImageCell.self, forReuseIdentifier: JXImageCell.reuseIdentifier)
         
         // 装载页码指示器
@@ -129,25 +168,6 @@ class PhotoBannerView: UIView {
         
         // 设置浏览器视图背景为透明，与页面背景融为一体
         browser.view.backgroundColor = .clear
-        
-        // 将浏览器视图添加到当前视图，并设置左右边距和圆角
-        let browserView = browser.view!
-        browserView.translatesAutoresizingMaskIntoConstraints = false
-        browserView.layer.cornerRadius = cornerRadius
-        browserView.clipsToBounds = true
-        addSubview(browserView)
-        
-        let leading = browserView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalMargin)
-        let trailing = browserView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalMargin)
-        leadingConstraint = leading
-        trailingConstraint = trailing
-        
-        NSLayoutConstraint.activate([
-            browserView.topAnchor.constraint(equalTo: topAnchor),
-            leading,
-            trailing,
-            browserView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
         
         self.browser = browser
     }

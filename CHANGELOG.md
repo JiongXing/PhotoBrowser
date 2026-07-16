@@ -4,6 +4,19 @@
 
 > 2026/07/10
 
+- 修复循环模式程序化跳页未选择最近虚拟项的问题
+- 新增 `reloadData(preservingCurrentPage:)`，统一处理动态数据、页码钳制、循环重定位、Overlay 与自动轮播
+- 删除 `JXPhotoBrowserDelegate.photoBrowser(_:sizeForItemAt:)`，Cell 统一使用浏览器整页尺寸
+- 新增 `isDismissGestureEnabled`；下拉关闭统一校验与清理交互状态
+- 自动轮播仅在浏览器完成定位且可见时启动，间隔下限为 0.5 秒，运行时修改会重新调度
+- 修复程序化滚动未产生实际动画时，自动轮播状态无法恢复的问题
+- 修复页码 Overlay 从单页隐藏状态无法恢复的问题，并阻止重复装载同一 Overlay
+- 完善转场取消路径，恢复真实视图与缩略图状态
+- UIKit Banner 改用标准 View Controller containment；SwiftUI Demo 改为引用仓库本地 Package
+- SwiftUI Banner 仅在图片数据变化时刷新，避免无关视图更新触发重复加载
+- CocoaPods、SwiftPM、Carthage 统一携带隐私清单，发布版本统一为 4.1.0
+- README 精简并拆分详细指南，新增 4.0 到 4.1 迁移文档
+
 - `JXZoomImageCell` 新增 `doubleTapZoomScale`：可指定双击放大的固定倍数（相对适配尺寸，以点击点为中心）；为 `nil` 时保持原有的「长边铺满 ↔ 短边铺满」模式切换行为
 - 双击放大倍数受 `scrollView.maximumZoomScale`（默认 `3.0`）上限约束，与捏合缩放天花板解耦；如需更大倍数请自行调高 `maximumZoomScale`
 - `JXPhotoBrowserViewController` 新增 `scrollToPage(at:animated:)`：支持代码直接跳转到指定页，兼容无限循环模式，`animated: false` 可连续快速调用

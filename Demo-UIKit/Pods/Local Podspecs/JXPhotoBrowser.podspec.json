@@ -1,6 +1,6 @@
 {
   "name": "JXPhotoBrowser",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "summary": "A lightweight, customizable iOS photo/video browser with zoom transitions and infinite looping.",
   "description": "JXPhotoBrowser is a lightweight, zero-dependency iOS photo/video browser\nbuilt on UICollectionView. It features pinch-to-zoom, drag-to-dismiss,\nZoom/Fade/None transition animations, infinite-loop scrolling, and a\nplug-in overlay system. The framework defines no data models and has no\nimage-loading logic built in — bring your own (Kingfisher, SDWebImage, etc.).",
   "homepage": "https://github.com/JiongXing/PhotoBrowser",
@@ -19,7 +19,7 @@
   ],
   "source": {
     "git": "https://github.com/JiongXing/PhotoBrowser.git",
-    "tag": "4.0.1"
+    "tag": "4.1.0"
   },
   "source_files": "Sources/**/*.{swift}",
   "resource_bundles": {

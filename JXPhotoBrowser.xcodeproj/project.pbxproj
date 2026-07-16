@@ -21,6 +21,8 @@
 		966DE7E42F3B0DA800A90038 /* JXPhotoBrowserTransitionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966DE7D42F3B0DA800A90038 /* JXPhotoBrowserTransitionType.swift */; };
 		966DE7E52F3B0DA800A90038 /* JXZoomDismissAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966DE7D62F3B0DA800A90038 /* JXZoomDismissAnimator.swift */; };
 		966DE7E62F3B0DA800A90038 /* JXImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966DE7CD2F3B0DA800A90038 /* JXImageCell.swift */; };
+		966DE7E72F3B0DA800A90038 /* JXPhotoBrowserPaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966DE7EB2F3B0DA800A90038 /* JXPhotoBrowserPaging.swift */; };
+		966DE7E92F3B0DA800A90038 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 966DE7EA2F3B0DA800A90038 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +41,8 @@
 		966DE7D62F3B0DA800A90038 /* JXZoomDismissAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXZoomDismissAnimator.swift; sourceTree = "<group>"; };
 		966DE7D72F3B0DA800A90038 /* JXZoomImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXZoomImageCell.swift; sourceTree = "<group>"; };
 		966DE7D82F3B0DA800A90038 /* JXZoomPresentAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXZoomPresentAnimator.swift; sourceTree = "<group>"; };
+		966DE7EB2F3B0DA800A90038 /* JXPhotoBrowserPaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JXPhotoBrowserPaging.swift; sourceTree = "<group>"; };
+		966DE7EA2F3B0DA800A90038 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +98,8 @@
 				966DE7D62F3B0DA800A90038 /* JXZoomDismissAnimator.swift */,
 				966DE7D72F3B0DA800A90038 /* JXZoomImageCell.swift */,
 				966DE7D82F3B0DA800A90038 /* JXZoomPresentAnimator.swift */,
+				966DE7EB2F3B0DA800A90038 /* JXPhotoBrowserPaging.swift */,
+				966DE7EA2F3B0DA800A90038 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -170,6 +176,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				966DE7E92F3B0DA800A90038 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,6 +200,7 @@
 				966DE7E42F3B0DA800A90038 /* JXPhotoBrowserTransitionType.swift in Sources */,
 				966DE7E52F3B0DA800A90038 /* JXZoomDismissAnimator.swift in Sources */,
 				966DE7E62F3B0DA800A90038 /* JXImageCell.swift in Sources */,
+				966DE7E72F3B0DA800A90038 /* JXPhotoBrowserPaging.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,7 +351,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 4.1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jxphotobrowser.JXPhotoBrowser;
@@ -379,7 +387,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 4.1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
 				PRODUCT_BUNDLE_IDENTIFIER = com.jxphotobrowser.JXPhotoBrowser;
@@ -418,6 +426,7 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
 	};
 	rootObject = 966DE7512F3AE04300A90038 /* Project object */;
 }

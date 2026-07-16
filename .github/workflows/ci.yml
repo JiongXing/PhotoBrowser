@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  core:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build framework
+        run: >-
+          xcodebuild -scheme JXPhotoBrowser -project JXPhotoBrowser.xcodeproj
+          -sdk iphoneos -destination 'generic/platform=iOS'
+          -derivedDataPath /tmp/JXPhotoBrowserDerivedData
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Verify framework privacy manifest
+        run: test -f /tmp/JXPhotoBrowserDerivedData/Build/Products/Debug-iphoneos/JXPhotoBrowser.framework/PrivacyInfo.xcprivacy
+  integrations:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: CocoaPods lint
+        run: pod lib lint JXPhotoBrowser.podspec --allow-warnings
+      - name: Build UIKit Demo
+        run: |
+          cd Demo-UIKit
+          pod install
+          xcodebuild -workspace Demo.xcworkspace -scheme Demo -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath /tmp/JXPhotoBrowserUIKitDerivedData CODE_SIGNING_ALLOWED=NO build
+      - name: Verify CocoaPods privacy manifest
+        run: find /tmp/JXPhotoBrowserUIKitDerivedData -name PrivacyInfo.xcprivacy -print -quit | grep -q PrivacyInfo.xcprivacy
+      - name: Build SwiftUI Demo
+        run: >-
+          xcodebuild -project Demo-SwiftUI/Demo.xcodeproj -scheme Demo
+          -sdk iphoneos -destination 'generic/platform=iOS'
+          -derivedDataPath /tmp/JXPhotoBrowserSwiftUIDerivedData
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Verify SwiftPM privacy manifest
+        run: find /tmp/JXPhotoBrowserSwiftUIDerivedData -name PrivacyInfo.xcprivacy -print -quit | grep -q PrivacyInfo.xcprivacy
+      - name: Build current Carthage XCFramework
+        run: carthage build --no-skip-current --use-xcframeworks --platform iOS
+      - name: Verify Carthage privacy manifest
+        run: find Carthage/Build/JXPhotoBrowser.xcframework -name PrivacyInfo.xcprivacy -print -quit | grep -q PrivacyInfo.xcprivacy

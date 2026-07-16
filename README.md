@@ -1,96 +1,35 @@
 # JXPhotoBrowser
 
-[![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)](https://github.com/Carthage/Carthage) [![Platform](https://img.shields.io/cocoapods/p/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
+[![CocoaPods](https://img.shields.io/cocoapods/v/JXPhotoBrowser.svg)](https://cocoapods.org/pods/JXPhotoBrowser) [![SPM Supported](https://img.shields.io/badge/SPM-supported-brightgreen)](https://swift.org/package-manager/) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg)](https://github.com/Carthage/Carthage) [![License](https://img.shields.io/github/license/JiongXing/PhotoBrowser)](LICENSE)
 
 [English Documentation](README_EN.md)
 
-JXPhotoBrowser 是一个轻量级、可定制的 iOS 图片/视频浏览器，实现 iOS 系统相册的交互体验。支持缩放、拖拽关闭、自定义转场动画等特性，架构清晰，易于集成和扩展。同时支持 **UIKit** 和 **SwiftUI** 两种调用方式（SwiftUI 通过桥接层集成，详见 Demo-SwiftUI 示例工程）。
-
-详细技术方案与实现说明请参阅 [TECHNICAL_SOLUTION.md](TECHNICAL_SOLUTION.md)。
+JXPhotoBrowser 是一个轻量、可定制的 iOS 图片/视频浏览器。核心基于 UIKit 和 `UICollectionView`，支持缩放、拖拽关闭、循环滚动、自动轮播、Zoom/Fade 转场与自定义 Cell，不绑定业务数据模型，也不内置图片加载库。
 
 | 首页列表 | 图片浏览 | 下拉关闭 |
 | :---: | :---: | :---: |
 | ![首页列表](readme_assets/homepage.png) | ![图片浏览](readme_assets/browsing.png) | ![下拉关闭](readme_assets/pull_down.png) |
 
-## 核心设计
+## 特性
 
-- **零数据模型依赖**：框架不定义任何数据模型，业务方完全使用自己的数据结构，通过 delegate 配置 Cell 内容。
-- **图片加载完全开放**：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
-- **极简 Cell 协议**：`JXPhotoBrowserCellProtocol` 仅包含 `browser` 和 `transitionImageView` 两个属性，将浏览器与具体 Cell 实现解耦，既可以直接使用内置的 `JXZoomImageCell`，也可以实现完全自定义的 Cell。
-- **协议驱动的数据与 UI 解耦**：`JXPhotoBrowserDelegate` 只关心数量、Cell 与转场，不强制统一的数据模型。
-
-## 功能特性
-
-- **多模式浏览**：支持水平（Horizontal）和垂直（Vertical）两个方向的滚动浏览。
-- **无限循环**：支持无限循环滚动（Looping），无缝切换首尾图片。
-- **手势交互**：
-  - **双击缩放**：仿系统相册支持双击切换缩放模式，也可指定固定放大倍数（`doubleTapZoomScale`）。
-  - **捏合缩放**：支持双指捏合随意缩放（默认 1.0x - 3.0x，可通过 `maximumZoomScale` 调整上限）。
-  - **拖拽关闭**：支持下滑手势（Pan）交互式关闭，伴随图片缩小和背景渐变效果。为避免与放大后的内容滚动冲突，仅在图片回到最小缩放时触发（仅水平滚动模式下可用）。
-- **程序化翻页**：提供 `scrollToPage(at:animated:)` 方法，通过代码直接跳转到指定页（支持瞬间跳转与动画滚动），兼容无限循环模式。
-- **自动轮播**：支持定时自动翻页（`isAutoPlayEnabled` / `autoPlayInterval`），用户滚动时自动暂停，常用于 Banner 场景。
-- **图片间距**：通过 `itemSpacing` 设置相邻页之间的间距，间距仅在翻页过程中可见。
-- **转场动画**：
-  - **Fade**：经典的渐隐渐现效果。
-  - **Zoom**：类似微信/系统相册的缩放转场效果，无缝衔接列表与大图。
-  - **None**：无动画直接显示。
-- **浏览体验优化**：基于 `UICollectionView` 复用机制，内存占用低，滑动流畅。
-- **自定义 Cell 支持**：内置图片 `JXZoomImageCell`，也支持通过协议与注册机制接入完全自定义的 Cell（如视频播放 Cell）。
-- **Overlay 组件机制**：支持按需装载附加 UI 组件（如页码指示器、关闭按钮等），默认不装载任何组件，零开销。内置 `JXPageIndicatorOverlay` 页码指示器。
-
-## 核心架构
-
-- **JXPhotoBrowserViewController**：核心控制器，继承自 `UIViewController`。内部维护一个 `UICollectionView` 用于展示图片页面，负责处理全局配置（如滚动方向、循环模式）和手势交互（如下滑关闭）。
-- **JXZoomImageCell**：可缩放图片展示单元，继承自 `UICollectionViewCell` 并实现 `JXPhotoBrowserCellProtocol`。内部使用 `UIScrollView` 实现缩放，负责单击、双击等交互。通过 `imageView` 属性供业务方设置图片。
-- **JXImageCell**：轻量级图片展示 Cell，不支持缩放手势，适用于 Banner 等嵌入式场景。内置可选的加载指示器（默认不启用），支持样式定制。
-- **JXPhotoBrowserCellProtocol**：极简 Cell 协议，仅需 `browser`（弱引用浏览器）和 `transitionImageView`（转场视图）两个属性即可接入浏览器，另提供 `photoBrowserDismissInteractionDidChange` 可选方法响应下拉关闭交互，不强制依赖特定基类。
-- **JXPhotoBrowserDelegate**：代理协议，负责提供总数、Cell 实例、生命周期回调（`willDisplay`/`didEndDisplaying`）以及转场动画所需的缩略图视图等，不强制要求统一的数据模型。
-- **JXPhotoBrowserOverlay**：附加视图组件协议，定义了 `setup`、`reloadData`、`didChangedPageIndex` 三个方法，用于页码指示器、关闭按钮等附加 UI 的统一接入。
-- **JXPageIndicatorOverlay**：内置页码指示器组件，基于 `UIPageControl`，支持自定义位置和样式，通过 `addOverlay` 按需装载。
-
-## 依赖
-
-- 框架本身依赖：`UIKit`（核心），**无任何第三方依赖**。
-- 图片加载：框架不内置图片加载逻辑，业务方可自由选择 Kingfisher、SDWebImage 或其他任意图片加载方案。
-- 示例工程：
-  - **Demo-UIKit**：UIKit 示例，使用 CocoaPods 集成，依赖 `Kingfisher` 加载图片，演示完整功能（图片浏览、视频播放、Banner 轮播等）。
-  - **Demo-SwiftUI**：SwiftUI 示例，使用 SPM 集成，演示如何通过桥接层在 SwiftUI 中使用 JXPhotoBrowser（媒体网格、设置面板、图片浏览）。
-  - **Demo-Carthage**：UIKit 示例，使用 Carthage 集成。首次使用需在 `Demo-Carthage` 目录下执行 `carthage update --use-xcframeworks --platform iOS` 构建框架。
-
-## 隐私清单（Privacy Manifest）
-
-本框架已包含 `PrivacyInfo.xcprivacy` 隐私清单文件，符合 Apple 自 2024 年春季起对第三方 SDK 的隐私清单要求。
-
-JXPhotoBrowser **不追踪用户、不收集任何数据、不使用任何 Required Reason API**，隐私清单中所有字段均为空声明。通过 CocoaPods、SPM 或 Carthage 集成时，隐私清单会自动包含在框架中，无需额外配置。
-
-## 系统要求
-
-- iOS 12.0+
-- Swift 5.4+
+- UIKit 核心，SwiftUI 可通过桥接层集成
+- 水平/垂直整页浏览与无限循环
+- 双击、捏合缩放和可配置固定双击倍率
+- 下拉关闭、Zoom/Fade/None 转场
+- 程序化跳页、自动轮播和页间距
+- 自定义 Cell 与 Overlay 扩展机制
+- CocoaPods、SwiftPM、Carthage
+- iOS 12.0+、Swift 5.4+
 
 ## 安装
 
 ### CocoaPods
 
-在你的 `Podfile` 中添加：
-
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.1.0'
+pod 'JXPhotoBrowser', '~> 4.1'
 ```
 
-> **注意**：Xcode 15 起默认开启了 **User Script Sandboxing**（`ENABLE_USER_SCRIPT_SANDBOXING=YES`），该沙盒机制会阻止 CocoaPods 的 Run Script 阶段（如 `[CP] Copy Pods Resources`、`[CP] Embed Pods Frameworks` 等）访问沙盒外的文件，导致编译失败。需要在编译 Target 的 **Build Settings** 中将 `ENABLE_USER_SCRIPT_SANDBOXING` 设置为 `NO`：
->
-> **Target → Build Settings → Build Options → User Script Sandboxing → No**
-
 ### Swift Package Manager
-
-在 Xcode 中：
-
-1. 选择 **File > Add Package Dependencies...**
-2. 输入仓库地址：`https://github.com/JiongXing/PhotoBrowser`
-3. 选择版本规则后点击 **Add Package**
-
-或在 `Package.swift` 中添加依赖：
 
 ```swift
 dependencies: [
@@ -100,554 +39,110 @@ dependencies: [
 
 ### Carthage
 
-在你的 `Cartfile` 中添加：
-
+```text
+github "JiongXing/PhotoBrowser" ~> 4.1
 ```
-github "JiongXing/PhotoBrowser"
-```
-
-然后运行：
 
 ```bash
 carthage update --use-xcframeworks --platform iOS
 ```
 
-构建完成后，将 `Carthage/Build/JXPhotoBrowser.xcframework` 拖入 Xcode 工程的 **Frameworks, Libraries, and Embedded Content** 中，并设置为 **Embed & Sign**。
-
-### 手动安装
-
-将 `Sources` 目录下的所有文件拖入你的工程中。
+三种集成方式都会携带 `PrivacyInfo.xcprivacy`。框架不追踪用户、不收集数据，也不使用 Required Reason API。
 
 ## 快速开始
 
-### 基础用法
-
 ```swift
 import JXPhotoBrowser
 
-// 1. 创建浏览器实例
 let browser = JXPhotoBrowserViewController()
 browser.delegate = self
-browser.initialIndex = indexPath.item // 设置初始索引
-
-// 2. 配置选项（可选）
-browser.scrollDirection = .horizontal // 滚动方向
-browser.transitionType = .zoom        // 转场动画类型
-browser.isLoopingEnabled = true       // 是否开启无限循环
-
-// 3. 展示
+browser.initialIndex = indexPath.item
+browser.transitionType = .zoom
+browser.isLoopingEnabled = true
+browser.addOverlay(JXPageIndicatorOverlay())
 browser.present(from: self)
 ```
 
-### 实现 Delegate
-
-遵守 `JXPhotoBrowserDelegate` 协议，提供数据和转场支持：
-
 ```swift
-import Kingfisher // 示例使用 Kingfisher，可替换为任意图片加载库
-
 extension ViewController: JXPhotoBrowserDelegate {
-    // 1. 返回图片总数
-    func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
-        return items.count
-    }
-    
-    // 2. 提供用于展示的 Cell
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-        let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
-        return cell
-    }
-    
-    // 3. 当 Cell 将要显示时加载图片
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
-        guard let photoCell = cell as? JXZoomImageCell else { return }
-        let item = items[index]
-        
-        // 使用 Kingfisher 加载图片（可替换为 SDWebImage 或其他库）
-        let placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: item.thumbnailURL.absoluteString)
-        photoCell.imageView.kf.setImage(with: item.originalURL, placeholder: placeholder) { [weak photoCell] _ in
-            photoCell?.setNeedsLayout()
-        }
-    }
-    
-    // 4. (可选) Cell 结束显示时清理资源（如取消加载、停止播放等）
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {
-        // 可用于取消图片加载、停止视频播放等
-    }
-    
-    // 5. (可选) 支持 Zoom 转场：提供列表中的缩略图视图
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailViewAt index: Int) -> UIView? {
-        let indexPath = IndexPath(item: index, section: 0)
-        guard let cell = collectionView.cellForItem(at: indexPath) as? MyCell else { return nil }
-        return cell.imageView
-    }
-    
-    // 6. (可选) 控制缩略图显隐，避免 Zoom 转场时视觉重叠
-    // 默认实现会自动切换 thumbnailViewAt 返回视图的 isHidden，通常无需实现；
-    // 仅当需要自定义显隐方式（如渐隐、隐藏容器视图）时才实现此方法
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
-        let indexPath = IndexPath(item: index, section: 0)
-        if let cell = collectionView.cellForItem(at: indexPath) as? MyCell {
-            cell.imageView.isHidden = hidden
-        }
-    }
-    
-    // 7. (可选) 自定义 Cell 尺寸，默认使用浏览器全屏尺寸
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, sizeForItemAt index: Int) -> CGSize? {
-        return nil // 返回 nil 使用默认尺寸
-    }
-}
-```
-
-## 程序化翻页与双击放大倍数
-
-### 程序化翻页
-
-除了手势滑动，还可以通过代码直接切换到指定页。适用于外部按钮切换、缩略图导航、需要快速连续翻页（跟上手速）等场景：
-
-```swift
-// 瞬间跳转到第 5 页（无动画，可连续快速调用）
-browser.scrollToPage(at: 5, animated: false)
-
-// 带系统滚动动画跳转
-browser.scrollToPage(at: 5, animated: true)
-```
-
-- `index` 为真实数据源索引（`0..<count`），越界时自动忽略。
-- 无限循环模式下，会自动就近选择滚动方向。
-- 页码指示器等 Overlay 会在跳转后同步更新。
-
-### 双击放大倍数
-
-`JXZoomImageCell` 默认双击在「长边铺满 ↔ 短边铺满」两种模式间切换。如需双击放大到固定倍数，设置 `doubleTapZoomScale` 即可（相对适配尺寸，需大于 `1.0`）：
-
-```swift
-func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-    let cell = browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
-    cell.doubleTapZoomScale = 2.5 // 双击以点击点为中心放大到适配尺寸的 2.5 倍
-    return cell
-}
-```
-
-- 设为 `nil`（默认）时保持原有的模式切换行为。
-- 放大会以双击点为中心，再次双击缩回适配尺寸。
-- 该倍数受 `scrollView.maximumZoomScale`（默认 `3.0`）上限约束。若需双击放大到更大倍数，请自行调高上限：
-
-```swift
-cell.scrollView.maximumZoomScale = 5.0 // 同时抬高捏合与双击的上限
-cell.doubleTapZoomScale = 5.0
-```
-
-## 自动轮播与图片间距
-
-### 自动轮播
-
-```swift
-browser.isAutoPlayEnabled = true // 开启自动轮播（默认 false）
-browser.autoPlayInterval = 3.0   // 轮播间隔（默认 3.0 秒）
-```
-
-- 用户手动滚动期间自动暂停，滚动结束后自动恢复。
-- 开启无限循环（`isLoopingEnabled = true`）时轮播无限进行；未开启时到达最后一页自动停止。
-- 数据不足两页时不会启动轮播。
-
-### 图片间距
-
-```swift
-browser.itemSpacing = 20 // 相邻页之间的间距（默认 0）
-```
-
-间距仅在翻页滑动过程中可见，页面停止时内容仍然铺满浏览器。
-
-## 内嵌 Banner 用法
-
-全屏浏览与 Banner 轮播共用同一内核：将 `JXPhotoBrowserViewController` 的 view 作为子视图嵌入任意界面，配合 `transitionType = .none`、轻量级 `JXImageCell` 与自动轮播即可实现 Banner。完整实现可参考 Demo-UIKit 中的 `PhotoBannerView.swift`。
-
-```swift
-let browser = JXPhotoBrowserViewController()
-browser.delegate = self
-browser.transitionType = .none        // 内嵌场景无需转场动画
-browser.isLoopingEnabled = true       // 无限循环
-browser.itemSpacing = 8               // 页间距
-browser.isAutoPlayEnabled = true      // 自动轮播
-browser.autoPlayInterval = 3.0
-browser.register(JXImageCell.self, forReuseIdentifier: JXImageCell.reuseIdentifier)
-browser.addOverlay(JXPageIndicatorOverlay())
-browser.view.backgroundColor = .clear // 与宿主页面背景融合
-
-// 作为子视图嵌入宿主界面，用约束控制尺寸
-browser.view.translatesAutoresizingMaskIntoConstraints = false
-containerView.addSubview(browser.view)
-// ... 添加约束 ...
-```
-
-> **注意**：内嵌场景下需要强引用 browser 实例（例如保存为宿主视图的属性），并在 delegate 的 `cellForItemAt` 中使用 `JXImageCell` 提供内容。
-
-## 在 SwiftUI 中使用
-
-JXPhotoBrowser 是基于 UIKit 的框架，在 SwiftUI 项目中可通过桥接方式集成。Demo-SwiftUI 示例工程演示了完整的集成方案。
-
-### 核心思路
-
-1. **网格和设置面板**使用纯 SwiftUI 实现（`LazyVGrid`、`Picker`、`AsyncImage` 等）
-2. **全屏图片浏览器**通过桥接层调用 `JXPhotoBrowserViewController`
-3. 创建一个 Presenter 类实现 `JXPhotoBrowserDelegate`，获取当前 `UIViewController` 后调用 `browser.present(from:)`
-
-### 桥接层示例
-
-```swift
-import JXPhotoBrowser
-
-/// 封装 JXPhotoBrowserViewController 的创建、配置和呈现
-final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
-    private let items: [MyMediaItem]
-
-    func present(initialIndex: Int) {
-        guard let viewController = topViewController() else { return }
-
-        let browser = JXPhotoBrowserViewController()
-        browser.delegate = self
-        browser.initialIndex = initialIndex
-        browser.transitionType = .fade
-        browser.addOverlay(JXPageIndicatorOverlay())
-        browser.present(from: viewController)
-    }
-
     func numberOfItems(in browser: JXPhotoBrowserViewController) -> Int {
         items.count
     }
 
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-        browser.dequeueReusableCell(withReuseIdentifier: JXZoomImageCell.reuseIdentifier, for: indexPath) as! JXZoomImageCell
+    func photoBrowser(
+        _ browser: JXPhotoBrowserViewController,
+        cellForItemAt index: Int,
+        at indexPath: IndexPath
+    ) -> JXPhotoBrowserAnyCell {
+        browser.dequeueReusableCell(
+            withReuseIdentifier: JXZoomImageCell.reuseIdentifier,
+            for: indexPath
+        )
     }
 
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
-        guard let photoCell = cell as? JXZoomImageCell else { return }
-        // 加载图片到 photoCell.imageView ...
+    func photoBrowser(
+        _ browser: JXPhotoBrowserViewController,
+        willDisplay cell: JXPhotoBrowserAnyCell,
+        at index: Int
+    ) {
+        guard let cell = cell as? JXZoomImageCell else { return }
+        // 使用业务方选择的图片加载库设置 cell.imageView.image
     }
-}
-```
 
-### 在 SwiftUI View 中调用
-
-```swift
-struct ContentView: View {
-    // 持有 presenter（JXPhotoBrowserViewController.delegate 为 weak，需要外部强引用）
-    @State private var presenter: PhotoBrowserPresenter?
-
-    var body: some View {
-        LazyVGrid(columns: columns) {
-            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                AsyncImage(url: item.thumbnailURL)
-                    .onTapGesture {
-                        let p = PhotoBrowserPresenter(items: items)
-                        presenter = p
-                        p.present(initialIndex: index)
-                    }
-            }
-        }
+    func photoBrowser(
+        _ browser: JXPhotoBrowserViewController,
+        thumbnailViewAt index: Int
+    ) -> UIView? {
+        let indexPath = IndexPath(item: index, section: 0)
+        return collectionView.cellForItem(at: indexPath)?.contentView
     }
 }
 ```
 
-> **注意**：`JXPhotoBrowserViewController` 的 `delegate` 是 `weak` 引用，必须在 SwiftUI 侧用 `@State` 持有 Presenter 实例，否则它会在创建后立即被释放。
-
-### 关于 Zoom 转场
-
-Demo-SwiftUI 示例工程未演示 Zoom 转场动画，默认使用 Fade 转场。
-
-**原因**：Zoom 转场依赖 `thumbnailViewAt` delegate 方法返回列表中缩略图的 `UIView` 引用，框架通过该引用计算动画起止位置并构建临时动画视图。而 SwiftUI 的 `AsyncImage` 等原生视图无法直接提供底层 `UIView` 引用。
-
-**如需自行实现**：可将缩略图从 `AsyncImage` 替换为 `UIViewRepresentable` 包裹的 `UIImageView`，从而获取真实的 `UIView` 引用，再通过 `thumbnailViewAt` 和 `setThumbnailHidden` 两个 delegate 方法提供给框架即可。具体的 Zoom 转场接入方式可参考 Demo-UIKit 示例工程。
-
-## JXImageCell 加载指示器
-
-`JXImageCell` 内置了一个 `UIActivityIndicatorView` 加载指示器，**默认不启用**。适用于 Banner 等嵌入式场景下展示图片加载状态。
-
-### 启用加载指示器
+数据变化后通过框架入口重载，不要直接操作内部 collectionView：
 
 ```swift
-let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
-
-// 启用加载指示器
-cell.isLoadingIndicatorEnabled = true
-cell.startLoading()
-
-// 图片加载完成后停止
-cell.imageView.kf.setImage(with: imageURL) { [weak cell] _ in
-    cell?.stopLoading()
-}
+browser.reloadData()                              // 保留并钳制当前页
+browser.reloadData(preservingCurrentPage: false) // 回到 initialIndex
 ```
 
-### 自定义样式
+## 内嵌 Banner
 
-通过 `loadingIndicator` 属性可直接定制指示器的外观：
-
-```swift
-cell.loadingIndicator.style = .large       // 指示器尺寸
-cell.loadingIndicator.color = .systemBlue  // 指示器颜色
-```
-
-## 自定义 Cell
-
-框架支持两种方式创建自定义 Cell：
-
-### 方式一：继承 JXZoomImageCell（推荐）
-
-继承 `JXZoomImageCell` 可自动获得缩放、转场、手势等功能。以 Demo 中的 `VideoPlayerCell` 为例，它继承 `JXZoomImageCell` 并添加了视频播放能力：
-
-```swift
-class VideoPlayerCell: JXZoomImageCell {
-    static let videoReuseIdentifier = "VideoPlayerCell"
-    
-    private var player: AVPlayer?
-    private var playerLayer: AVPlayerLayer?
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        // 自定义初始化：添加 loading 指示器等
-    }
-    
-    /// 配置视频资源
-    func configure(videoURL: URL, coverImage: UIImage? = nil) {
-        imageView.image = coverImage
-        // 创建播放器并开始播放...
-    }
-    
-    /// 重写单击手势：暂停视频或关闭浏览器
-    override func handleSingleTap(_ gesture: UITapGestureRecognizer) {
-        if isPlaying {
-            pauseVideo()
-        } else {
-            browser?.dismissSelf()
-        }
-    }
-}
-```
-
-### 方式二：实现协议（完全自定义）
-
-直接实现 `JXPhotoBrowserCellProtocol` 协议，获得完全的自由度：
-
-```swift
-class StandaloneCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
-    static let reuseIdentifier = "StandaloneCell"
-    
-    // 可选实现（协议提供默认空实现）：需要访问浏览器（如调用关闭）时实现，必须声明为 weak 避免循环引用
-    weak var browser: JXPhotoBrowserViewController?
-    
-    // 可选实现：用于 Zoom 转场动画，返回 nil 则使用 Fade 动画
-    var transitionImageView: UIImageView? { imageView }
-    
-    let imageView = UIImageView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        // 自定义初始化
-    }
-    
-    // 可选实现：下拉关闭交互状态变化时调用
-    // isInteracting 为 true 表示用户正在下拉（图片缩小跟随手指），false 表示交互结束（回弹恢复）
-    // 下拉关闭仅会在图片处于最小缩放状态时触发
-    // 适用于在拖拽关闭过程中暂停视频、隐藏附加 UI 等场景
-    func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {
-        // 例如：下拉时暂停视频播放
-    }
-}
-```
-
-### 注册和使用自定义 Cell
+内嵌模式必须使用标准 View Controller containment，并关闭下拉关闭手势：
 
 ```swift
 let browser = JXPhotoBrowserViewController()
-
-// 注册自定义 Cell（须在首次 dequeue 之前，建议创建实例后立即注册）
-browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
-
 browser.delegate = self
-browser.present(from: self)
+browser.transitionType = .none
+browser.isDismissGestureEnabled = false
+browser.autoPlayInterval = 3
+browser.isAutoPlayEnabled = true
 
-// 在 delegate 中使用
-func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
-    let cell = browser.dequeueReusableCell(withReuseIdentifier: VideoPlayerCell.videoReuseIdentifier, for: indexPath) as! VideoPlayerCell
-    cell.configure(videoURL: url, coverImage: thumbnail)
-    return cell
-}
+addChild(browser)
+containerView.addSubview(browser.view)
+// 为 browser.view 添加约束
+browser.didMove(toParent: self)
 ```
 
-## Overlay 组件
+移除时依次调用 `willMove(toParent: nil)`、移除 view、`removeFromParent()`。
 
-框架提供了通用的 Overlay 组件机制，用于在浏览器上层叠加附加 UI（如页码指示器、关闭按钮、标题栏等）。**默认不装载任何 Overlay，业务方按需装载**。
+## 文档
 
-### 使用内置页码指示器
-
-框架内置了 `JXPageIndicatorOverlay`（基于 `UIPageControl`），一行代码即可装载：
-
-```swift
-let browser = JXPhotoBrowserViewController()
-browser.addOverlay(JXPageIndicatorOverlay())
-```
-
-支持自定义位置和样式：
-
-```swift
-let indicator = JXPageIndicatorOverlay()
-indicator.position = .bottom(padding: 20)  // 位置：底部距离 20pt（也支持 .top）
-indicator.hidesForSinglePage = true         // 仅一页时自动隐藏
-indicator.pageControl.currentPageIndicatorTintColor = .white
-indicator.pageControl.pageIndicatorTintColor = .lightGray
-browser.addOverlay(indicator)
-```
-
-### 自定义 Overlay
-
-实现 `JXPhotoBrowserOverlay` 协议即可创建自定义组件：
-
-```swift
-class CloseButtonOverlay: UIView, JXPhotoBrowserOverlay {
-    
-    func setup(with browser: JXPhotoBrowserViewController) {
-        // 在此完成布局（如添加约束）
-    }
-    
-    func reloadData(numberOfItems: Int, pageIndex: Int) {
-        // 数据或布局变化时更新
-    }
-    
-    func didChangedPageIndex(_ index: Int) {
-        // 页码变化时更新
-    }
-}
-
-// 装载
-browser.addOverlay(CloseButtonOverlay())
-```
-
-多个 Overlay 可同时装载，互不干扰：
-
-```swift
-browser.addOverlay(JXPageIndicatorOverlay())
-browser.addOverlay(CloseButtonOverlay())
-```
-
-## 保存图片/视频到相册
-
-框架本身不内置保存功能，业务方可自行实现。Demo 中演示了通过长按手势弹出 ActionSheet 保存媒体到系统相册的完整流程。
-
-> **前提**：需要在 `Info.plist` 中配置 `NSPhotoLibraryAddUsageDescription`（写入相册权限描述）。
-
-### 核心步骤
-
-1. **添加长按手势**：在自定义 Cell 中添加 `UILongPressGestureRecognizer`。
-2. **弹出 ActionSheet**：通过 `browser` 属性获取浏览器控制器来 present。
-3. **请求权限并保存**：使用 `PHPhotoLibrary` 请求权限，下载后写入相册。
-
-### 示例：在自定义 Cell 中长按保存
-
-以 Demo 中的 `VideoPlayerCell` 为例，继承 `JXZoomImageCell` 后添加长按保存能力：
-
-```swift
-import Photos
-
-class VideoPlayerCell: JXZoomImageCell {
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        // 添加长按手势
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        scrollView.addGestureRecognizer(longPress)
-    }
-    
-    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began else { return }
-        
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "保存视频", style: .default) { [weak self] _ in
-            self?.saveVideoToAlbum()
-        })
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
-        
-        // 通过 browser 属性获取浏览器控制器来 present
-        browser?.present(alert, animated: true)
-    }
-    
-    private func saveVideoToAlbum() {
-        guard let url = videoURL else { return }
-        
-        // 1. 请求相册写入权限
-        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
-            guard status == .authorized || status == .limited else { return }
-            
-            // 2. 下载视频（远程 URL 需先下载到本地）
-            URLSession.shared.downloadTask(with: url) { tempURL, _, _ in
-                guard let tempURL else { return }
-                
-                // 3. 写入相册
-                PHPhotoLibrary.shared().performChanges({
-                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: tempURL)
-                }) { success, error in
-                    // 处理结果...
-                }
-            }.resume()
-        }
-    }
-}
-```
-
-保存图片的流程类似，将下载部分替换为图片写入即可：
-
-```swift
-// 下载图片数据
-URLSession.shared.dataTask(with: imageURL) { data, _, _ in
-    guard let data, let image = UIImage(data: data) else { return }
-    
-    PHPhotoLibrary.shared().performChanges({
-        PHAssetChangeRequest.creationRequestForAsset(from: image)
-    }) { success, error in
-        // 处理结果...
-    }
-}.resume()
-```
+- [详细使用指南](Documentation/Guides.md)
+- [4.0 → 4.1 迁移指南](Documentation/Migration-4.1.md)
+- [技术方案](TECHNICAL_SOLUTION.md)
+- [更新记录](CHANGELOG.md)
 
 ## 已知限制
 
-- **仅支持竖屏**：浏览器固定竖屏显示（`supportedInterfaceOrientations` 为 `.portrait`），暂不支持横屏或跟随设备旋转。
-- **垂直滚动模式下不支持下拉关闭**：`scrollDirection = .vertical` 时下拉手势与列表滚动冲突，框架会禁用拖拽关闭，可通过单击或自定义关闭按钮退出。
+- 浏览器固定竖屏，不支持设备旋转。
+- 垂直滚动模式下不启用下拉关闭。
+- 每个 Cell 固定为浏览器整页尺寸；4.1 不再支持逐项自定义尺寸。
 
-## 常见问题 (FAQ)
+## CocoaPods 故障排查
 
-### Q: Zoom 转场动画时图片尺寸不对或有闪烁现象？
-
-**A**: 这通常是因为打开浏览器时，目标 Cell 的 `imageView` 还没有设置图片，导致其 `bounds` 为 zero。
-
-**解决方案**：在 `willDisplay` 代理方法中，确保同步设置占位图。例如使用 Kingfisher 时：
-
-```swift
-func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
-    guard let photoCell = cell as? JXZoomImageCell else { return }
-    
-    // 同步从缓存取出缩略图作为占位图
-    let placeholder = ImageCache.default.retrieveImageInMemoryCache(forKey: thumbnailURL.absoluteString)
-    photoCell.imageView.kf.setImage(with: imageURL, placeholder: placeholder) { [weak photoCell] _ in
-        photoCell?.setNeedsLayout()
-    }
-}
-```
-
-这样可以确保转场动画开始时，Cell 已经有正确尺寸的图片，动画效果更加流畅。
-
-## 版本更新
-
-**v4.1.0**（2026/07/10）— 新增双击指定放大倍数（`doubleTapZoomScale`，受 `maximumZoomScale` 上限约束）与程序化翻页 API（`scrollToPage(at:animated:)`，兼容无限循环）；修复无限循环耗尽虚拟数据源导致的循环终止与自动轮播卡死、Zoom 转场缩略图状态残留、下拉关闭跟手偏移等问题，详见 [CHANGELOG](CHANGELOG.md)。
-
-**v4.0.3**（2026/03/27）— 修复图片首屏居中问题，重构 `JXZoomImageCell` 的布局与居中逻辑，优化下拉关闭交互与裁剪表现。
-
-**v4.0.2**（2026/02/16）— 优化双击放大体验：以点击位置为锚点放大，优化缩小动画流畅度。
-
-**v4.0.1**（2026/02/10）— 全面重构，回归 `UICollectionView`，支持无限循环滚动，新增 SwiftUI 示例。不兼容 3.x 版本。
-
-完整更新记录请查看 [CHANGELOG](CHANGELOG.md)。
+如果 Xcode 的 User Script Sandboxing 导致 CocoaPods 的资源复制或 framework 嵌入脚本明确报出沙盒访问错误，可在受影响 Target 中评估将 `ENABLE_USER_SCRIPT_SANDBOXING` 设为 `NO`。没有相关错误时无需修改该设置。
 
 ## License
 
-本项目基于 MIT 协议开源。
+MIT License

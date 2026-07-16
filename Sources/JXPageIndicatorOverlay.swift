@@ -91,9 +91,7 @@ open class JXPageIndicatorOverlay: UIView, JXPhotoBrowserOverlay {
         pageControl.numberOfPages = numberOfItems
         pageControl.currentPage = min(pageIndex, max(numberOfItems - 1, 0))
         
-        if hidesForSinglePage {
-            isHidden = numberOfItems <= 1
-        }
+        isHidden = hidesForSinglePage && numberOfItems <= 1
         
         if setNeedsUpdatePosition {
             setNeedsUpdatePosition = false

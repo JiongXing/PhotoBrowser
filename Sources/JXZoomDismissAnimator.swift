@@ -62,10 +62,19 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             zoomIV.frame = endFrame
             fromView.alpha = 0
         }) { _ in
-            fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
+            let completed = !ctx.transitionWasCancelled
             zoomIV.removeFromSuperview()
-            fromView.removeFromSuperview()
-            ctx.completeTransition(true)
+            if completed {
+                fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
+                fromView.removeFromSuperview()
+                fromView.alpha = 1
+                srcIV.isHidden = false
+            } else {
+                srcIV.isHidden = false
+                fromView.alpha = 1
+                fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: true, at: pageIndex)
+            }
+            ctx.completeTransition(completed)
         }
     }
     
@@ -82,6 +91,7 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
                 ctx.completeTransition(false)
             } else {
                 view.removeFromSuperview()
+                view.alpha = 1
                 ctx.completeTransition(true)
             }
         }

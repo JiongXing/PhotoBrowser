@@ -36,8 +36,9 @@ struct PhotoBannerView: UIViewControllerRepresentable {
         browser.transitionType = .none
         browser.isLoopingEnabled = isLoopingEnabled
         browser.itemSpacing = 8
-        browser.isAutoPlayEnabled = isAutoPlayEnabled
         browser.autoPlayInterval = 3.0
+        browser.isAutoPlayEnabled = isAutoPlayEnabled
+        browser.isDismissGestureEnabled = false
         browser.register(JXImageCell.self, forReuseIdentifier: JXImageCell.reuseIdentifier)
         
         // 装载页码指示器
@@ -55,9 +56,11 @@ struct PhotoBannerView: UIViewControllerRepresentable {
     
     func updateUIViewController(_ browser: JXPhotoBrowserViewController, context: Context) {
         // 同步 SwiftUI 状态到 JXPhotoBrowserViewController
-        context.coordinator.resources = resources
         browser.isLoopingEnabled = isLoopingEnabled
         browser.isAutoPlayEnabled = isAutoPlayEnabled
+        if context.coordinator.updateResources(resources) {
+            browser.reloadData()
+        }
     }
     
     // MARK: - Coordinator
@@ -70,6 +73,17 @@ struct PhotoBannerView: UIViewControllerRepresentable {
         
         init(resources: [(imageURL: URL, thumbnailURL: URL?)]) {
             self.resources = resources
+        }
+
+        /// 仅当图片数据实际变化时更新并通知浏览器刷新
+        func updateResources(_ newResources: [(imageURL: URL, thumbnailURL: URL?)]) -> Bool {
+            let isUnchanged = resources.count == newResources.count
+                && zip(resources, newResources).allSatisfy { pair in
+                    pair.0.imageURL == pair.1.imageURL && pair.0.thumbnailURL == pair.1.thumbnailURL
+                }
+            guard !isUnchanged else { return false }
+            resources = newResources
+            return true
         }
         
         // MARK: - JXPhotoBrowserDelegate

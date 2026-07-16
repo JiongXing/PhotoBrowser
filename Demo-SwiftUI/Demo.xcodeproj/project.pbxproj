@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		966DDE112F39FB6A00A90038 /* JXPhotoBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = 966DDE102F39FB6A00A90038 /* JXPhotoBrowser */; };
 		966DE6322F3A062200A90038 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 966DE6312F3A062200A90038 /* Kingfisher */; };
-		966DE9212F3B328700A90038 /* JXPhotoBrowser in Frameworks */ = {isa = PBXBuildFile; productRef = 966DE9202F3B328700A90038 /* JXPhotoBrowser */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +28,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				966DE9212F3B328700A90038 /* JXPhotoBrowser in Frameworks */,
 				966DE6322F3A062200A90038 /* Kingfisher in Frameworks */,
 				966DDE112F39FB6A00A90038 /* JXPhotoBrowser in Frameworks */,
 			);
@@ -76,7 +74,6 @@
 			packageProductDependencies = (
 				966DDE102F39FB6A00A90038 /* JXPhotoBrowser */,
 				966DE6312F3A062200A90038 /* Kingfisher */,
-				966DE9202F3B328700A90038 /* JXPhotoBrowser */,
 			);
 			productName = Demo;
 			productReference = 966DDDDD2F39E13E00A90038 /* Demo.app */;
@@ -108,7 +105,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				966DE6302F3A062200A90038 /* XCRemoteSwiftPackageReference "Kingfisher" */,
-				966DE91F2F3B328700A90038 /* XCRemoteSwiftPackageReference "PhotoBrowser" */,
+				966DE9222F3B328700A90038 /* XCLocalSwiftPackageReference ".." */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 966DDDDE2F39E13E00A90038 /* Products */;
@@ -366,30 +363,25 @@
 				minimumVersion = 8.6.2;
 			};
 		};
-		966DE91F2F3B328700A90038 /* XCRemoteSwiftPackageReference "PhotoBrowser" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/JiongXing/PhotoBrowser.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		966DE9222F3B328700A90038 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		966DDE102F39FB6A00A90038 /* JXPhotoBrowser */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 966DE9222F3B328700A90038 /* XCLocalSwiftPackageReference ".." */;
 			productName = JXPhotoBrowser;
 		};
 		966DE6312F3A062200A90038 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 966DE6302F3A062200A90038 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
-		};
-		966DE9202F3B328700A90038 /* JXPhotoBrowser */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 966DE91F2F3B328700A90038 /* XCRemoteSwiftPackageReference "PhotoBrowser" */;
-			productName = JXPhotoBrowser;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

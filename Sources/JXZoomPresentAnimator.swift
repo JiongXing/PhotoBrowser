@@ -71,6 +71,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         // 缩略图显隐统一走 delegate 通道（setThumbnailHidden），不直接操作视图
         toVC.delegate?.photoBrowser(toVC, setThumbnailHidden: true, at: toVC.pageIndex)
         targetIV?.isHidden = true
+        toView.alpha = 1
         toView.backgroundColor = .clear
 
         zoomView.frame = startFrame
@@ -79,11 +80,16 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         UIView.animate(withDuration: duration, animations: {
             zoomView.frame = endFrame
             toView.backgroundColor = .black
-        }) { finished in
+        }) { _ in
+            let completed = !ctx.transitionWasCancelled
             // 还原浏览器内的图片视图；缩略图在浏览期间保持隐藏，关闭时由 dismiss 流程恢复
             targetIV?.isHidden = false
+            if !completed {
+                toVC.delegate?.photoBrowser(toVC, setThumbnailHidden: false, at: toVC.pageIndex)
+                toView.removeFromSuperview()
+            }
             zoomView.removeFromSuperview()
-            ctx.completeTransition(finished)
+            ctx.completeTransition(completed)
         }
     }
     
@@ -112,8 +118,13 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
         toView.alpha = 0
         UIView.animate(withDuration: duration, animations: {
             toView.alpha = 1
-        }) { finished in
-            ctx.completeTransition(finished)
+        }) { _ in
+            let completed = !ctx.transitionWasCancelled
+            if !completed {
+                toView.alpha = 0
+                toView.removeFromSuperview()
+            }
+            ctx.completeTransition(completed)
         }
     }
 }
