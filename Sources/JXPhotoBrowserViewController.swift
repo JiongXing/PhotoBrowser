@@ -237,6 +237,34 @@ open class JXPhotoBrowserViewController: UIViewController {
         overlays.forEach { $0.reloadData(numberOfItems: count, pageIndex: pageIndex) }
     }
     
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        // 尺寸变化（旋转、分屏等）会改变 itemSize，但 collectionView 不会自动保持当前页的 contentOffset，
+        // 需要在过渡动画中按已记录的 pageIndex 重新滚动到目标位置
+        guard didScrollToInitial, realCount > 0 else { return }
+        let virtualItem = centeredVirtualIndex(for: pageIndex)
+
+        // 提前让当前可见的可缩放 Cell 感知目标尺寸，使其缩放/居中的重新计算随过渡动画平滑进行，
+        // 避免 Cell 内部 layoutSubviews 的默认即时重置在旋转时造成闪烁
+        let duration = coordinator.transitionDuration
+        for cell in collectionView.visibleCells {
+            (cell as? JXZoomImageCell)?.prepareForSizeTransition(to: size, duration: duration)
+        }
+
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            guard let self = self else { return }
+            // 处于 coordinator 的过渡动画上下文中时，即使 animated 传 false，
+            // contentOffset 变化仍会被环境动画捕获而产生可见的滚动；
+            // 用 performWithoutAnimation 包裹并立即 layoutIfNeeded，确保定位是无动画的一次性跳转
+            UIView.performWithoutAnimation {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: self.scrollDirection.scrollPosition, animated: false)
+                self.collectionView.layoutIfNeeded()
+            }
+        }, completion: nil)
+    }
+
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
     open override var shouldAutorotate: Bool {
         return false

@@ -178,6 +178,31 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         centerZoomContentViewIfNeeded()
     }
 
+    /// 在容器尺寸变化前（如设备旋转）调用，使缩放内容随外部过渡动画同步平滑地重新计算，
+    /// 避免 layoutSubviews 检测到 bounds 变化后按默认逻辑做即时（无动画）重置，造成闪烁
+    open func prepareForSizeTransition(to newSize: CGSize, duration: TimeInterval) {
+        guard newSize.width > 0, newSize.height > 0 else { return }
+
+        // 提前记录目标尺寸，避免 bounds 实际变化后 layoutSubviews 再次触发即时重置
+        lastBoundsSize = newSize
+        isShortEdgeFit = false
+
+        guard let image = imageView.image, image.size.width > 0, image.size.height > 0 else {
+            return
+        }
+
+        let newContentSize = baseContentSize(for: newSize, imageSize: image.size)
+        let targetOrigin = centeredOrigin(forContentSize: newContentSize, in: newSize)
+
+        UIView.animate(withDuration: duration) {
+            self.scrollView.setZoomScale(self.scrollView.minimumZoomScale, animated: false)
+            self.scrollView.contentOffset = .zero
+            self.zoomContentView.frame = CGRect(origin: targetOrigin, size: newContentSize)
+            self.imageView.frame = self.zoomContentView.bounds
+            self.scrollView.contentSize = newContentSize
+        }
+    }
+
     // MARK: - Layout Helper
     
     /// 获取有效的容器尺寸（兼容 ScrollView 尚未布局的情况）
@@ -246,10 +271,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         guard scrollBounds.width > 0, scrollBounds.height > 0 else { return }
         guard contentFrame.width > 0, contentFrame.height > 0 else { return }
 
-        let targetOrigin = CGPoint(
-            x: contentFrame.width < scrollBounds.width ? (scrollBounds.width - contentFrame.width) * 0.5 : 0,
-            y: contentFrame.height < scrollBounds.height ? (scrollBounds.height - contentFrame.height) * 0.5 : 0
-        )
+        let targetOrigin = centeredOrigin(forContentSize: contentFrame.size, in: scrollBounds.size)
         if zoomContentView.frame.origin != targetOrigin {
             zoomContentView.frame.origin = targetOrigin
         }
@@ -260,6 +282,14 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         let heightScale = containerSize.height / imageSize.height
         let scale = isShortEdgeFit ? max(widthScale, heightScale) : min(widthScale, heightScale)
         return CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+    }
+
+    /// 内容小于容器时居中，否则贴齐原点
+    private func centeredOrigin(forContentSize contentSize: CGSize, in containerSize: CGSize) -> CGPoint {
+        CGPoint(
+            x: contentSize.width < containerSize.width ? (containerSize.width - contentSize.width) * 0.5 : 0,
+            y: contentSize.height < containerSize.height ? (containerSize.height - contentSize.height) * 0.5 : 0
+        )
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
