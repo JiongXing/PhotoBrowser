@@ -108,6 +108,20 @@ open class JXPhotoBrowserViewController: UIViewController {
     /// 正在进行的程序化滚动（自动轮播 / scrollToPage）目标虚拟索引，用于尺寸过渡时判断应保留哪一页
     private var programmaticScrollTargetVirtual: Int?
 
+    /// 当前尺寸转场的最新目标。刷新和导航直接更新它，完成回调不持有旧页码。
+    private final class SizeTransition {
+        var pageIndex: Int?
+        var cells: [ObjectIdentifier: JXZoomImageCell] = [:]
+        let wasScrollEnabled: Bool
+
+        init(pageIndex: Int, wasScrollEnabled: Bool) {
+            self.pageIndex = pageIndex
+            self.wasScrollEnabled = wasScrollEnabled
+        }
+    }
+
+    private var sizeTransition: SizeTransition?
+
     private var isSynchronizingData = false
 
     private var displayedRealIndexes: [ObjectIdentifier: Int] = [:]
@@ -256,39 +270,65 @@ open class JXPhotoBrowserViewController: UIViewController {
         } else {
             preservedReal = realIndex(fromVirtual: calculateCurrentVirtualIndex())
         }
-        let virtualItem = centeredVirtualIndex(for: preservedReal)
+        // 若系统开始另一次尺寸转场，先释放上一轮的 Cell 布局状态。
+        if let previous = sizeTransition {
+            finishSizeTransition(previous)
+        }
+        let transition = SizeTransition(pageIndex: preservedReal, wasScrollEnabled: collectionView.isScrollEnabled)
+        sizeTransition = transition
+        stopAutoPlay()
 
-        // 下面的强制定位会打断任何进行中的拖拽减速或程序化滚动动画，且被打断的动画不保证触发
-        // scrollViewDidEndScrollingAnimation，需显式复位相关状态，避免自动轮播被永久卡住
+        // 停止旧拖拽、减速和程序化滚动，不依赖被打断动画的完成回调。
+        collectionView.isScrollEnabled = false
+        collectionView.setContentOffset(collectionView.contentOffset, animated: false)
         isUserInteracting = false
         isProgrammaticScrollAnimating = false
         programmaticScrollTargetVirtual = nil
-        stopAutoPlay()
 
-        // 提前锁定当前可见的可缩放 Cell，使其几何更新交由下面的过渡动画块显式驱动，
-        // 避免 Cell 内部 layoutSubviews 的默认即时重置在旋转时造成闪烁
-        let transitioningCells = collectionView.visibleCells.compactMap { $0 as? JXZoomImageCell }
-        transitioningCells.forEach { $0.prepareForSizeTransition() }
+        collectionView.visibleCells.forEach { prepareCellForSizeTransition($0) }
 
         coordinator.animate(alongsideTransition: { [weak self] _ in
-            guard let self = self else { return }
-            // 处于 coordinator 的过渡动画上下文中时，即使 animated 传 false，
-            // contentOffset 变化仍会被环境动画捕获而产生可见的滚动；
-            // 用 performWithoutAnimation 包裹并立即 layoutIfNeeded，确保定位是无动画的一次性跳转
+            guard let self = self, self.sizeTransition === transition else { return }
+            // 定位不继承系统的滚动动画，图片几何则在 coordinator 的动画中更新。
             UIView.performWithoutAnimation {
-                self.collectionView.collectionViewLayout.invalidateLayout()
-                self.collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: self.scrollDirection.scrollPosition, animated: false)
-                self.collectionView.layoutIfNeeded()
+                self.view.layoutIfNeeded()
+                self.alignPageForSizeTransition(transition)
             }
-            // 在 coordinator 的动画块内驱动几何更新，使其与系统过渡动画的曲线/时长保持一致
-            transitioningCells.forEach { $0.applySizeTransition(to: size) }
+            transition.cells.values.forEach { $0.applySizeTransition(to: self.view.bounds.size) }
         }, completion: { [weak self] _ in
-            guard let self = self else { return }
-            // 以实际 bounds 做最终校正，并恢复 layoutSubviews 的正常行为
-            transitioningCells.forEach { $0.finishSizeTransition() }
-            self.pageIndex = preservedReal
+            guard let self = self, self.sizeTransition === transition else { return }
+            UIView.performWithoutAnimation {
+                self.alignPageForSizeTransition(transition)
+                self.finishSizeTransition(transition)
+            }
             self.startAutoPlayIfNeeded()
         })
+    }
+
+    private func prepareCellForSizeTransition(_ cell: UICollectionViewCell) {
+        guard let transition = sizeTransition, let cell = cell as? JXZoomImageCell else { return }
+        transition.cells[ObjectIdentifier(cell)] = cell
+        cell.prepareForSizeTransition()
+    }
+
+    private func alignPageForSizeTransition(_ transition: SizeTransition) {
+        collectionView.collectionViewLayout.invalidateLayout()
+        guard let target = transition.pageIndex, (0..<realCount).contains(target) else {
+            collectionView.layoutIfNeeded()
+            return
+        }
+        collectionView.scrollToItem(at: IndexPath(item: centeredVirtualIndex(for: target), section: 0), at: scrollDirection.scrollPosition, animated: false)
+        collectionView.layoutIfNeeded()
+        // 宿主可在 Cell 生命周期回调中再次刷新或导航。
+        if sizeTransition === transition, transition.pageIndex == target {
+            pageIndex = target
+        }
+    }
+
+    private func finishSizeTransition(_ transition: SizeTransition) {
+        sizeTransition = nil
+        transition.cells.values.forEach { $0.finishSizeTransition() }
+        collectionView.isScrollEnabled = transition.wasScrollEnabled
     }
 
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
@@ -525,6 +565,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     /// 判断是否可以启动自动轮播
     private var canStartAutoPlay: Bool {
         guard isAutoPlayEnabled,
+              sizeTransition == nil,
               !isUserInteracting,
               !isProgrammaticScrollAnimating,
               didScrollToInitial,
@@ -564,7 +605,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 自动滚动到下一页
     private func autoPlayToNextPage() {
-        guard !isProgrammaticScrollAnimating else { return }
+        guard sizeTransition == nil, !isProgrammaticScrollAnimating else { return }
         let count = realCount
         guard count > 1 else {
             stopAutoPlay()
@@ -592,7 +633,8 @@ open class JXPhotoBrowserViewController: UIViewController {
 
     /// 执行翻页并在 UIKit 没有产生实际滚动动画时同步完成状态
     private func performProgrammaticScroll(to targetVirtual: Int, animated: Bool) {
-        let shouldAnimate = animated && willMoveContent(to: targetVirtual)
+        // 尺寸转场内的导航由系统转场统一定位，避免与另一段滚动动画竞争。
+        let shouldAnimate = animated && sizeTransition == nil && willMoveContent(to: targetVirtual)
         isProgrammaticScrollAnimating = shouldAnimate
         programmaticScrollTargetVirtual = shouldAnimate ? targetVirtual : nil
         collectionView.scrollToItem(
@@ -649,10 +691,12 @@ open class JXPhotoBrowserViewController: UIViewController {
     /// - Parameters:
     ///   - index: 真实数据源索引（0..<count），越界时忽略
     ///   - animated: false 时瞬间跳页，可连续快速调用；true 时使用系统滚动动画
+    /// - Note: 尺寸转场期间立即选中目标页，由尺寸转场统一定位，不叠加分页动画。
     open func scrollToPage(at index: Int, animated: Bool) {
         let count = realCount
         guard count > 0, (0..<count).contains(index) else { return }
 
+        sizeTransition?.pageIndex = index
         stopAutoPlay()
 
         let targetVirtual = nearestVirtualIndex(for: index, near: calculateCurrentVirtualIndex())
@@ -675,6 +719,7 @@ open class JXPhotoBrowserViewController: UIViewController {
         collectionView.reloadData()
 
         guard realCount > 0 else {
+            sizeTransition?.pageIndex = nil
             isSynchronizingData = true
             pageIndex = 0
             isSynchronizingData = false
@@ -687,6 +732,7 @@ open class JXPhotoBrowserViewController: UIViewController {
             ? max(0, min(previousPage, realCount - 1))
             : JXPhotoBrowserPaging.normalizedInitialIndex(initialIndex, count: realCount, looping: isLoopingEnabled)
         let targetVirtual = centeredVirtualIndex(for: targetReal)
+        sizeTransition?.pageIndex = targetReal
 
         collectionView.layoutIfNeeded()
         if collectionView.bounds.size != .zero {
@@ -879,6 +925,11 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
         }
         let cell = delegate.photoBrowser(self, cellForItemAt: real, at: indexPath)
         cell.browser = self
+        // 新出现或复用的 Cell 必须在集合视图首次布局前加入当前转场。
+        prepareCellForSizeTransition(cell)
+        if sizeTransition != nil, let photoCell = cell as? JXZoomImageCell {
+            photoCell.applySizeTransition(to: view.bounds.size)
+        }
         return cell
     }
     
@@ -905,6 +956,7 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     }
     
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        guard sizeTransition == nil else { return }
         updateCurrentPageIndex()
         recenterForLoopingIfNeeded()
 
@@ -914,6 +966,7 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     }
 
     open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard sizeTransition == nil else { return }
         if !decelerate {
             updateCurrentPageIndex()
             recenterForLoopingIfNeeded()
@@ -925,6 +978,7 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     }
 
     open func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        guard sizeTransition == nil else { return }
         finishProgrammaticScroll()
     }
     
