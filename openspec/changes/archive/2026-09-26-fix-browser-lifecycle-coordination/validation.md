@@ -44,3 +44,7 @@
 独立审查发现一个尚未修复的 P2 覆盖缺口：浏览器作为 UINavigationController 的子控制器呈现，宿主无动画关闭整个导航容器后，原缩略图仍隐藏。当前 viewDidDisappear 的退出判定遗漏父容器关闭；因此上述 39 项通过不代表“所有关闭路径恢复缩略图”已完整满足。
 
 在同一 iPhone 17 / iOS 27 模拟器上追加临时 XCTest，两次复现；宿主 presentedViewController 已为空，但缩略图恢复断言失败。复核证据：`/tmp/PhotoBrowser-Subagent-LifecycleReview/container-confirmed.log`、`/tmp/PhotoBrowser-Subagent-LifecycleReview/ContainerConfirmed.xcresult`。临时用例未纳入仓库。“全屏覆盖后宿主直接关闭整条 modal 链”的独立用例通过。此问题保留为待修复项。
+
+## 4.2.0 发布准备后续修复（2026-09-26）
+
+上节为发现时的历史状态。后续已在 `viewDidDisappear` 中补充父容器 `isBeingDismissed` 判定，复用原缩略图恢复逻辑，并将导航容器动画/无动画关闭及临时覆盖返回场景纳入状态与 UI 回归。当前修复状态、修复前失败结果和最终验收见 [4.2.0 发布记录](../../../../Documentation/Release-4.2.0.md)。

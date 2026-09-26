@@ -49,4 +49,41 @@ final class LifecycleUITests: XCTestCase {
         waitFor("closed=1;restored=1", id: "lifecycleRoot")
         capture("dismiss-complete-thumbnail-restored")
     }
+
+    func openNavigationContainer() {
+        app.terminate()
+        app.launchArguments = ["ui-lifecycle", "navigation-container"]
+        app.launch()
+        app.buttons["Open"].tap()
+        waitFor("page=0")
+    }
+
+    func testNonanimatedNavigationContainerDismissRestoresThumbnail() {
+        openNavigationContainer()
+        app.buttons["Close"].tap()
+        waitFor("closed=1;restored=1", id: "lifecycleRoot")
+        capture("navigation-nonanimated-dismiss-restored")
+    }
+
+    func testAnimatedNavigationContainerDismissRestoresThumbnail() {
+        openNavigationContainer()
+        app.buttons["Animated"].tap()
+        waitFor("closed=1;restored=1", id: "lifecycleRoot")
+        capture("navigation-animated-dismiss-restored")
+    }
+
+    func testNavigationContainerTemporaryCoverThenDismiss() {
+        openNavigationContainer()
+        app.buttons["Cover"].tap()
+        waitFor("hidden=1", id: "coverStatus")
+        capture("navigation-covered-thumbnail-hidden")
+        app.buttons["Return"].tap()
+        waitFor("page=0")
+        app.collectionViews["lifecyclePhotos"].swipeLeft()
+        waitFor("page=1")
+        capture("navigation-returned-and-paged")
+        app.buttons["Close"].tap()
+        waitFor("closed=1;restored=1", id: "lifecycleRoot")
+        capture("navigation-cover-return-dismiss-restored")
+    }
 }

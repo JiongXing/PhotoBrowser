@@ -25,17 +25,19 @@ The UIKit and SwiftUI demos use Kingfisher 8.13+ and require Xcode 26+ (Swift 6.
 
 ## Installation
 
+4.2 raises the minimum deployment target from iOS 12 to iOS 15. Apps supporting iOS 12–14 should pin 4.1.0. See the [4.1 → 4.2 migration guide](Documentation/Migration-4.2_EN.md).
+
 ### CocoaPods
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.1'
+pod 'JXPhotoBrowser', '~> 4.2'
 ```
 
 ### Swift Package Manager
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.1.0")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.2.0")
 ]
 ```
 
@@ -131,13 +133,14 @@ When removing it, call `willMove(toParent: nil)`, remove the view, then call `re
 ## Documentation
 
 - [Detailed usage guide](Documentation/Guides_EN.md)
+- [4.1 → 4.2 migration guide](Documentation/Migration-4.2_EN.md)
 - [4.0 → 4.1 migration guide](Documentation/Migration-4.1_EN.md)
 - [Technical design (Chinese)](TECHNICAL_SOLUTION.md)
 - [Change log](CHANGELOG.md)
 
 ## Known Limitations
 
-- The browser is portrait-only and does not support device rotation.
+- The browser remains portrait-only by default; size-transition fixes do not change its orientation policy.
 - Drag-to-dismiss is unavailable in vertical scrolling mode.
 - Every cell uses the browser's full-page size; per-item custom sizing was removed in 4.1.
 

@@ -153,6 +153,60 @@ final class LifecycleTests: XCTestCase {
         XCTAssertFalse(data.thumbnails[4].isHidden)
     }
 
+    func presentInNavigationContainer() -> UINavigationController {
+        browser.willMove(toParent: nil)
+        browser.view.removeFromSuperview()
+        browser.removeFromParent()
+        let navigation = UINavigationController(rootViewController: browser)
+        navigation.isNavigationBarHidden = true
+        navigation.modalPresentationStyle = .fullScreen
+        browser.collectionView.contentInsetAdjustmentBehavior = .never
+        root.present(navigation, animated: false)
+        drain(0.2)
+        XCTAssertTrue(data.thumbnails[4].isHidden)
+        return navigation
+    }
+
+    func testNonanimatedNavigationContainerDismissRestoresThumbnail() {
+        let navigation = presentInNavigationContainer()
+        root.dismiss(animated: false)
+        drain(0.2)
+        XCTAssertNil(root.presentedViewController)
+        XCTAssertTrue(browser.parent === navigation)
+        XCTAssertFalse(data.thumbnails[4].isHidden)
+    }
+
+    func testAnimatedNavigationContainerDismissRestoresThumbnail() {
+        let navigation = presentInNavigationContainer()
+        let dismissed = expectation(description: "Navigation dismissal completed")
+        root.dismiss(animated: true) { dismissed.fulfill() }
+        wait(for: [dismissed], timeout: 3)
+        XCTAssertNil(root.presentedViewController)
+        XCTAssertTrue(browser.parent === navigation)
+        XCTAssertFalse(data.thumbnails[4].isHidden)
+    }
+
+    func testNavigationContainerTemporaryCoverKeepsRestoration() {
+        let navigation = presentInNavigationContainer()
+        let cover = UIViewController()
+        cover.modalPresentationStyle = .fullScreen
+        browser.present(cover, animated: false)
+        drain(0.2)
+        XCTAssertTrue(data.thumbnails[4].isHidden)
+        cover.dismiss(animated: false)
+        drain(0.2)
+        XCTAssertTrue(root.presentedViewController === navigation)
+        XCTAssertNotNil(browser.view.window)
+        XCTAssertEqual(browser.pageIndex, 4)
+        XCTAssertTrue(data.thumbnails[4].isHidden)
+        browser.scrollToPage(at: 3, animated: false)
+        XCTAssertFalse(data.thumbnails[4].isHidden)
+        XCTAssertTrue(data.thumbnails[3].isHidden)
+        root.dismiss(animated: false)
+        drain(0.2)
+        XCTAssertFalse(data.thumbnails[3].isHidden)
+    }
+
     func testAutoplayPausesThroughPanAndReboundThenResumes() {
         enableAutoplay()
         pan(.began)

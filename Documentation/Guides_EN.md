@@ -1,4 +1,4 @@
-# JXPhotoBrowser 4.1 Usage Guide
+# JXPhotoBrowser Usage Guide
 
 ## Programmatic Paging and Data Changes
 
@@ -17,6 +17,8 @@ browser.reloadData()
 This reloads the delegate count, clamps the current page, rebuilds the looping position, refreshes overlays, and reevaluates auto play. Do not call `browser.collectionView.reloadData()` directly.
 
 ### Restoring Zoom Thumbnails
+
+4.2.0 fixes thumbnail restoration when the browser is wrapped in a `UINavigationController`: animated and nonanimated container dismissal restore the original state. A temporary full-screen cover keeps the thumbnail hidden; returning still allows paging and normal dismissal.
 
 The browser retains the original thumbnail identity and `isHidden` value for restoration on paging, reload, and dismissal, including nonanimated dismissal. The existing `setThumbnailHidden` callback remains supported; restoration only calls it when the index is valid and still refers to the original view.
 

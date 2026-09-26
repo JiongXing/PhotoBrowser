@@ -251,7 +251,8 @@ open class JXPhotoBrowserViewController: UIViewController {
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         resetDismissInteraction(animated: false)
-        if isBeingDismissed || isMovingFromParent || (presentingViewController == nil && parent == nil) {
+        // 容器关闭时子控制器仍保留 parent，需检查父容器的退出状态；临时覆盖不满足此条件。
+        if isBeingDismissed || parent?.isBeingDismissed == true || isMovingFromParent || (presentingViewController == nil && parent == nil) {
             restoreThumbnail()
         }
     }

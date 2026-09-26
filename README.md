@@ -25,17 +25,19 @@ UIKit 和 SwiftUI 示例使用 Kingfisher 8.13+，需要 Xcode 26+（Swift 6.2+�
 
 ## 安装
 
+4.2 将最低系统从 iOS 12 提升到 iOS 15；仍需支持 iOS 12–14 的应用请固定使用 4.1.0。升级注意事项见 [4.1 → 4.2 迁移指南](Documentation/Migration-4.2.md)。
+
 ### CocoaPods
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.1'
+pod 'JXPhotoBrowser', '~> 4.2'
 ```
 
 ### Swift Package Manager
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.1.0")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.2.0")
 ]
 ```
 
@@ -131,13 +133,14 @@ browser.didMove(toParent: self)
 ## 文档
 
 - [详细使用指南](Documentation/Guides.md)
+- [4.1 → 4.2 迁移指南](Documentation/Migration-4.2.md)
 - [4.0 → 4.1 迁移指南](Documentation/Migration-4.1.md)
 - [技术方案](TECHNICAL_SOLUTION.md)
 - [更新记录](CHANGELOG.md)
 
 ## 已知限制
 
-- 浏览器固定竖屏，不支持设备旋转。
+- 浏览器默认固定竖屏；尺寸变化修复不改变默认方向策略。
 - 垂直滚动模式下不启用下拉关闭。
 - 每个 Cell 固定为浏览器整页尺寸；4.1 不再支持逐项自定义尺寸。
 

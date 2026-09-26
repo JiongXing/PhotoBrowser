@@ -1,4 +1,4 @@
-# JXPhotoBrowser 4.1 使用指南
+# JXPhotoBrowser 使用指南
 
 ## 程序化翻页与动态数据
 
@@ -17,6 +17,8 @@ browser.reloadData()
 框架会重新读取 delegate 数量、钳制当前页、重建循环位置、刷新 Overlay 并重新评估自动轮播。不要直接调用 `browser.collectionView.reloadData()`。
 
 ### Zoom 缩略图恢复
+
+4.2.0 修复了浏览器包裹在 `UINavigationController` 中时的缩略图恢复：宿主动画或无动画关闭导航容器后恢复原状态；另一个全屏页面临时遮挡浏览器时继续保持缩略图隐藏，返回后仍可翻页和正常关闭。
 
 浏览器保存隐藏前的缩略图视图和 `isHidden`，在换页、刷新及关闭（含无动画关闭）时恢复。旧的 `setThumbnailHidden` 接口继续可用；恢复回调仅在索引有效且仍对应原视图时调用，避免旧索引访问新数据。
 

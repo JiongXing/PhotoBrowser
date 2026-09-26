@@ -4,6 +4,7 @@ final class LifecycleHostController: UIViewController, JXPhotoBrowserDelegate {
     private var browser: JXPhotoBrowserViewController?
     private let rootStatus = UILabel()
     private let browserStatus = UILabel()
+    private let coverStatus = UILabel()
     private var thumbnails: [UIImageView] = []
     private var timer: Timer?
     private var dragCount = 0
@@ -70,8 +71,39 @@ final class LifecycleHostController: UIViewController, JXPhotoBrowserDelegate {
             browserStatus.bottomAnchor.constraint(equalTo: browser.view.safeAreaLayoutGuide.bottomAnchor),
             browserStatus.heightAnchor.constraint(equalToConstant: 70)
         ])
-        browser.present(from: self)
+        if ProcessInfo.processInfo.arguments.contains("navigation-container") {
+            browser.navigationItem.rightBarButtonItems = [
+                UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(closeContainer)),
+                UIBarButtonItem(title: "Animated", style: .plain, target: self, action: #selector(closeContainerAnimated)),
+                UIBarButtonItem(title: "Cover", style: .plain, target: self, action: #selector(showCover))
+            ]
+            let navigation = UINavigationController(rootViewController: browser)
+            navigation.modalPresentationStyle = .fullScreen
+            present(navigation, animated: false)
+        } else {
+            browser.present(from: self)
+        }
     }
+
+    @objc private func closeContainer() { dismiss(animated: false) }
+    @objc private func closeContainerAnimated() { dismiss(animated: true) }
+
+    @objc private func showCover() {
+        let cover = UIViewController()
+        cover.modalPresentationStyle = .fullScreen
+        cover.view.backgroundColor = .white
+        let back = UIButton(type: .system)
+        back.setTitle("Return", for: .normal)
+        back.frame = CGRect(x: 20, y: 80, width: 100, height: 44)
+        back.addTarget(self, action: #selector(hideCover), for: .touchUpInside)
+        cover.view.addSubview(back)
+        coverStatus.frame = CGRect(x: 20, y: 150, width: 300, height: 44)
+        coverStatus.accessibilityIdentifier = "coverStatus"
+        cover.view.addSubview(coverStatus)
+        browser?.present(cover, animated: false)
+    }
+
+    @objc private func hideCover() { browser?.presentedViewController?.dismiss(animated: false) }
 
     @objc private func enableAutoplay() {
         browser?.autoPlayInterval = 1.5
@@ -98,6 +130,7 @@ final class LifecycleHostController: UIViewController, JXPhotoBrowserDelegate {
     private func updateStatus() {
         rootStatus.text = "closed=\(presentedViewController == nil ? 1 : 0);restored=\(thumbnails.allSatisfy { !$0.isHidden } ? 1 : 0)"
         guard let browser = browser else { return }
+        coverStatus.text = "hidden=\(thumbnails.filter { $0.isHidden }.count)"
         if dragging && browser.pageIndex != dragPage { movedDuringDrag = true }
         if !dragging && dragCount > 0 && browser.pageIndex != dragPage { resumed = true }
         let zoom = browser.visibleZoomImageCell()?.scrollView.zoomScale ?? 1

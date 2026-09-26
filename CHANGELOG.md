@@ -1,5 +1,25 @@
 # Change Log
 
+## Version 4.2.0
+
+> 发布准备中 · 2026/09/26
+
+- **兼容性变化**：最低系统由 iOS 12.0 提升至 iOS 15.0，CocoaPods、SwiftPM 和框架构建配置统一；需要 iOS 12–14 的应用请固定使用 4.1.0
+- 修复尺寸变化期间的页码与 Cell 几何同步：拖拽/减速保留最近页，程序化滚动保留目标页；刷新和跳页以最新目标为准，避免旧完成回调覆盖新状态
+- 完善尺寸变化后的缩放布局、循环定位和自动轮播恢复；浏览器默认仍固定竖屏
+- 改善动态数据、换页及直接关闭浏览器时的缩略图恢复，保存原始视图与隐藏状态，避免旧索引访问替换后的数据
+- 新增可选 `thumbnailRestorationAt` 委托方法，支持自定义缩略图显隐的原始状态恢复
+- 新增默认实现为 `true` 的 `canBeginDismissInteraction`，允许自定义 Cell 控制下拉准入
+- 下拉与回弹期间暂停自动轮播；刷新、跳页或尺寸变化会清理旧交互；`photoBrowserDismissInteractionDidChange(false)` 现在也会在中断和关闭清理时调用
+- UIKit 示例修复视频下载临时文件所有权与清理，统一使用只添加相册权限；保存工具不进入发布库
+- UIKit / SwiftUI 示例升级 Kingfisher 至 8.13.0，要求 Xcode 26+；SwiftUI 示例最低 iOS 16.0，库保持零第三方依赖
+- 新增状态、文件与系统交互回归及 CI 入口
+- 修复浏览器包裹在 `UINavigationController` 中时，宿主动画或无动画关闭整个导航容器后缩略图仍隐藏的问题；临时全屏遮挡后返回仍保持浏览状态和后续恢复责任
+
+迁移说明：[中文](Documentation/Migration-4.2.md) / [English](Documentation/Migration-4.2_EN.md)。
+
+---
+
 ## Version 4.1.0
 
 > 2026/07/10
