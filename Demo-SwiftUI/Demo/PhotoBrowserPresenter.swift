@@ -14,7 +14,7 @@ import Kingfisher
 
 /// 封装 JXPhotoBrowserViewController 的创建、配置和呈现
 /// 实现 JXPhotoBrowserDelegate，作为 SwiftUI 与 UIKit 浏览器之间的桥梁
-final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
+final class PhotoBrowserPresenter: @preconcurrency JXPhotoBrowserDelegate {
     private let items: [DemoMedia]
     private let transitionType: JXPhotoBrowserTransitionType
     private let scrollDirection: JXPhotoBrowserScrollDirection
@@ -58,6 +58,7 @@ final class PhotoBrowserPresenter: JXPhotoBrowserDelegate {
         return cell
     }
     
+    @MainActor
     func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {
         guard let photoCell = cell as? JXZoomImageCell else { return }
         guard let imageURL = items[index].fullImageURL else { return }

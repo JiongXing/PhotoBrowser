@@ -48,7 +48,9 @@ Xcode 27.0（27A266a）下主框架、UIKit/CocoaPods 示例和 SwiftUI/SwiftPM 
 
 主框架和 UIKit 示例原命令因 Xcode 27 不接受 iOS 12/10 部署目标而失败，验证时额外传入 `IPHONEOS_DEPLOYMENT_TARGET=15.0`。未修改项目最低系统版本；这不证明 iOS 12 兼容性。SwiftUI 示例无需覆盖参数即可构建通过。
 
-原 PR 的远端 CI `35569746302`：主框架、Pod lint、UIKit 构建成功，SwiftUI 构建 exit 65，后续 SwiftPM 隐私及 Carthage 步骤跳过。详细日志需要 GitHub 登录；本地未重现该失败，不能断言远端 CI 已修复。必须在回推后检查新的 CI。
+原 PR 的远端 CI `35569746302`：主框架、Pod lint、UIKit 构建成功，SwiftUI 构建 exit 65，后续 SwiftPM 隐私及 Carthage 步骤跳过。授权后日志确认：Xcode 16.4 编译 `PhotoBannerView.Coordinator` 时，在非隔离的委托回调中调用 Kingfisher 的 `@MainActor setImage` 失败；该编译器不支持项目中新版 Xcode 的默认 MainActor 隔离设置。
+
+SwiftUI 示例显式标注两个图片加载委托回调为 `@MainActor`，并使用 `@preconcurrency` 桥接库既有的非隔离委托协议。回调来自 UIKit 主线程；不改变库的公开协议或通过异步任务推迟 Cell 配置。Xcode 27 下使用 `SWIFT_DEFAULT_ACTOR_ISOLATION=nonisolated SWIFT_APPROACHABLE_CONCURRENCY=NO` 可复现同类错误（`PhotoBrowserPresenter` 的加载回调）；修复后分别验证此配置和项目默认配置。远端 Xcode 16.4 的完整集成结果以最新 PR CI 为准。
 
 ## 模拟器证据（2026-09-26）
 
