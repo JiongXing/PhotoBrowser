@@ -105,6 +105,9 @@ open class JXPhotoBrowserViewController: UIViewController {
 
     private var isProgrammaticScrollAnimating = false
 
+    /// 正在进行的程序化滚动（自动轮播 / scrollToPage）目标虚拟索引，用于尺寸过渡时判断应保留哪一页
+    private var programmaticScrollTargetVirtual: Int?
+
     private var isSynchronizingData = false
 
     private var displayedRealIndexes: [ObjectIdentifier: Int] = [:]
@@ -237,6 +240,57 @@ open class JXPhotoBrowserViewController: UIViewController {
         overlays.forEach { $0.reloadData(numberOfItems: count, pageIndex: pageIndex) }
     }
     
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        // 尺寸变化（旋转、分屏等）会改变 itemSize，但 collectionView 不会自动保持当前页的 contentOffset，
+        // 需要在过渡动画中重新滚动到目标位置
+        guard didScrollToInitial, realCount > 0 else { return }
+
+        // pageIndex 仅在拖拽/减速/程序化滚动结束时才更新，尺寸变化发生在滚动过程中时可能仍是旧值。
+        // 若存在进行中的程序化滚动（如自动轮播），应保留其目标页，避免回退到旧页；
+        // 否则在旧布局仍然有效时，按当前 contentOffset 换算出的几何居中页，兼容拖拽/减速中的场景
+        let preservedReal: Int
+        if isProgrammaticScrollAnimating, let targetVirtual = programmaticScrollTargetVirtual {
+            preservedReal = realIndex(fromVirtual: targetVirtual)
+        } else {
+            preservedReal = realIndex(fromVirtual: calculateCurrentVirtualIndex())
+        }
+        let virtualItem = centeredVirtualIndex(for: preservedReal)
+
+        // 下面的强制定位会打断任何进行中的拖拽减速或程序化滚动动画，且被打断的动画不保证触发
+        // scrollViewDidEndScrollingAnimation，需显式复位相关状态，避免自动轮播被永久卡住
+        isUserInteracting = false
+        isProgrammaticScrollAnimating = false
+        programmaticScrollTargetVirtual = nil
+        stopAutoPlay()
+
+        // 提前锁定当前可见的可缩放 Cell，使其几何更新交由下面的过渡动画块显式驱动，
+        // 避免 Cell 内部 layoutSubviews 的默认即时重置在旋转时造成闪烁
+        let transitioningCells = collectionView.visibleCells.compactMap { $0 as? JXZoomImageCell }
+        transitioningCells.forEach { $0.prepareForSizeTransition() }
+
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            guard let self = self else { return }
+            // 处于 coordinator 的过渡动画上下文中时，即使 animated 传 false，
+            // contentOffset 变化仍会被环境动画捕获而产生可见的滚动；
+            // 用 performWithoutAnimation 包裹并立即 layoutIfNeeded，确保定位是无动画的一次性跳转
+            UIView.performWithoutAnimation {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.scrollToItem(at: IndexPath(item: virtualItem, section: 0), at: self.scrollDirection.scrollPosition, animated: false)
+                self.collectionView.layoutIfNeeded()
+            }
+            // 在 coordinator 的动画块内驱动几何更新，使其与系统过渡动画的曲线/时长保持一致
+            transitioningCells.forEach { $0.applySizeTransition(to: size) }
+        }, completion: { [weak self] _ in
+            guard let self = self else { return }
+            // 以实际 bounds 做最终校正，并恢复 layoutSubviews 的正常行为
+            transitioningCells.forEach { $0.finishSizeTransition() }
+            self.pageIndex = preservedReal
+            self.startAutoPlayIfNeeded()
+        })
+    }
+
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
     open override var shouldAutorotate: Bool {
         return false
@@ -540,6 +594,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     private func performProgrammaticScroll(to targetVirtual: Int, animated: Bool) {
         let shouldAnimate = animated && willMoveContent(to: targetVirtual)
         isProgrammaticScrollAnimating = shouldAnimate
+        programmaticScrollTargetVirtual = shouldAnimate ? targetVirtual : nil
         collectionView.scrollToItem(
             at: IndexPath(item: targetVirtual, section: 0),
             at: scrollDirection.scrollPosition,
@@ -575,6 +630,7 @@ open class JXPhotoBrowserViewController: UIViewController {
 
     private func finishProgrammaticScroll() {
         isProgrammaticScrollAnimating = false
+        programmaticScrollTargetVirtual = nil
         updateCurrentPageIndex()
         recenterForLoopingIfNeeded()
         startAutoPlayIfNeeded()
@@ -615,6 +671,7 @@ open class JXPhotoBrowserViewController: UIViewController {
         realCount = max(0, min(delegate?.numberOfItems(in: self) ?? 0, Int.max / loopMultiplier))
         stopAutoPlay()
         isProgrammaticScrollAnimating = false
+        programmaticScrollTargetVirtual = nil
         collectionView.reloadData()
 
         guard realCount > 0 else {
@@ -842,6 +899,7 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
     open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         // 用户开始手动滚动，暂停自动轮播
         isProgrammaticScrollAnimating = false
+        programmaticScrollTargetVirtual = nil
         isUserInteracting = true
         stopAutoPlay()
     }

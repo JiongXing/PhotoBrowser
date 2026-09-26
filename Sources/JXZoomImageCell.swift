@@ -128,7 +128,11 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     private var isShortEdgeFit: Bool = false
 
     private var isPerformingLayoutUpdate = false
-    
+
+    /// 是否处于外部驱动的尺寸过渡中（如设备旋转）。期间几何更新由外部按过渡进度显式驱动，
+    /// layoutSubviews 的默认重置逻辑需让位，避免两者相互竞争产生跳变
+    private var isTransitioningSize = false
+
     // MARK: - Lifecycle
     
     open override func prepareForReuse() {
@@ -161,7 +165,11 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        
+
+        // 尺寸过渡期间，几何更新完全由 applySizeTransition/finishSizeTransition 驱动，
+        // 跳过默认重置逻辑，避免与过渡动画竞争造成跳变
+        guard !isTransitioningSize else { return }
+
         let sizeChanged = lastBoundsSize != bounds.size
         if sizeChanged {
             lastBoundsSize = bounds.size
@@ -176,6 +184,41 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
             adjustImageViewFrame()
         }
         centerZoomContentViewIfNeeded()
+    }
+
+    /// 尺寸过渡（如设备旋转）开始前调用：锁定 layoutSubviews 的默认重置逻辑，交由外部显式驱动几何更新
+    open func prepareForSizeTransition() {
+        isTransitioningSize = true
+        isShortEdgeFit = false
+    }
+
+    /// 在 UIViewControllerTransitionCoordinator 的动画块内调用，使几何变化随外部过渡动画一起插值，
+    /// 而不是使用独立计时的动画块，保证与系统过渡动画同步
+    open func applySizeTransition(to newSize: CGSize) {
+        guard newSize.width > 0, newSize.height > 0 else { return }
+
+        scrollView.setZoomScale(scrollView.minimumZoomScale, animated: false)
+        scrollView.contentOffset = .zero
+
+        guard let image = imageView.image, image.size.width > 0, image.size.height > 0 else {
+            zoomContentView.frame = .zero
+            imageView.frame = .zero
+            scrollView.contentSize = .zero
+            return
+        }
+
+        let newContentSize = baseContentSize(for: newSize, imageSize: image.size)
+        let targetOrigin = centeredOrigin(forContentSize: newContentSize, in: newSize)
+        zoomContentView.frame = CGRect(origin: targetOrigin, size: newContentSize)
+        imageView.frame = zoomContentView.bounds
+        scrollView.contentSize = newContentSize
+    }
+
+    /// 尺寸过渡结束后调用：以实际 bounds 做最终校正，并恢复 layoutSubviews 的正常行为
+    open func finishSizeTransition() {
+        isTransitioningSize = false
+        lastBoundsSize = bounds.size
+        adjustImageViewFrame()
     }
 
     // MARK: - Layout Helper
@@ -246,10 +289,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         guard scrollBounds.width > 0, scrollBounds.height > 0 else { return }
         guard contentFrame.width > 0, contentFrame.height > 0 else { return }
 
-        let targetOrigin = CGPoint(
-            x: contentFrame.width < scrollBounds.width ? (scrollBounds.width - contentFrame.width) * 0.5 : 0,
-            y: contentFrame.height < scrollBounds.height ? (scrollBounds.height - contentFrame.height) * 0.5 : 0
-        )
+        let targetOrigin = centeredOrigin(forContentSize: contentFrame.size, in: scrollBounds.size)
         if zoomContentView.frame.origin != targetOrigin {
             zoomContentView.frame.origin = targetOrigin
         }
@@ -260,6 +300,14 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         let heightScale = containerSize.height / imageSize.height
         let scale = isShortEdgeFit ? max(widthScale, heightScale) : min(widthScale, heightScale)
         return CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
+    }
+
+    /// 内容小于容器时居中，否则贴齐原点
+    private func centeredOrigin(forContentSize contentSize: CGSize, in containerSize: CGSize) -> CGPoint {
+        CGPoint(
+            x: contentSize.width < containerSize.width ? (containerSize.width - contentSize.width) * 0.5 : 0,
+            y: contentSize.height < containerSize.height ? (containerSize.height - contentSize.height) * 0.5 : 0
+        )
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
