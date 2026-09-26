@@ -66,7 +66,7 @@ struct PhotoBannerView: UIViewControllerRepresentable {
     // MARK: - Coordinator
     
     /// 作为 JXPhotoBrowserDelegate，桥接 SwiftUI 数据到 JXPhotoBrowserViewController
-    final class Coordinator: NSObject, JXPhotoBrowserDelegate {
+    final class Coordinator: NSObject, @preconcurrency JXPhotoBrowserDelegate {
         
         /// 图片资源列表
         var resources: [(imageURL: URL, thumbnailURL: URL?)]
@@ -92,6 +92,7 @@ struct PhotoBannerView: UIViewControllerRepresentable {
             resources.count
         }
         
+        @MainActor
         func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
             let cell = browser.dequeueReusableCell(withReuseIdentifier: JXImageCell.reuseIdentifier, for: indexPath) as! JXImageCell
             let resource = resources[index]
