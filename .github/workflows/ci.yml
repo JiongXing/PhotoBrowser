@@ -5,6 +5,17 @@ on:
   pull_request:
 
 jobs:
+  agent-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install OpenSpec
+        run: npm install --global @fission-ai/openspec@1.13.2
+      - name: Validate specifications
+        run: openspec validate --all --strict --no-interactive --json
   core:
     runs-on: macos-15
     steps:
