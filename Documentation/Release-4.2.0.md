@@ -1,6 +1,18 @@
-# 4.2.0 发布准备
+# 4.2.0 发布记录
 
-记录日期：2026-09-26。本文保留发布前的验证快照与操作步骤。版本准备和导航容器修复已提交为 `7818c8c`；正式发布已获授权，线上状态以远端 tag、GitHub CI 和 CocoaPods trunk 为准。
+发布日期：2026-09-26。4.2.0 已发布至 CocoaPods，完成远端 CI、tag 校验、Pod 远端校验与 CDN 消费端安装构建。本文同时保留发布前验证快照及操作步骤。
+
+## 正式发布结果
+
+- 发布提交：`0a09aa30ffddfbae30195e3d8c2814a5a5f321f3`，已推送到 master。
+- [4.2.0 tag](https://github.com/JiongXing/PhotoBrowser/tree/4.2.0) 已推送并核对，解引用到上述提交；未移动已有 tag。
+- [发布提交 CI](https://github.com/JiongXing/PhotoBrowser/actions/runs/36244232819) 四组任务全部通过。远端 iOS 18.5 模拟器 45 项测试通过，0 失败、0 跳过；本地 iOS 27 的结果见下文。
+- 针对远端 tag 的 `pod spec lint JXPhotoBrowser.podspec --allow-warnings` 通过，日志 `/tmp/PhotoBrowser-4.2.0-SpecLint.log`。
+- CocoaPods trunk 已于 2026-09-26 13:22:30 UTC（北京时间 21:22:30）登记 4.2.0。发布命令随后返回 `Net::OpenTimeout`，因此通过 trunk 公共版本 API、`pod trunk info` 和[正式 podspec](https://trunk.cocoapods.org/api/v1/pods/JXPhotoBrowser/specs/4.2.0) 交叉确认发布成功，没有重复提交。
+- 正式 podspec 的版本、源码 tag、最低 iOS 15.0 和隐私资源配置均已核对；trunk、CDN 与本地 podspec 内容一致。
+- [4.2.0 tag CI](https://github.com/JiongXing/PhotoBrowser/actions/runs/36244900721) 也已全部通过。
+- CDN 版本索引最初仍命中发布前缓存，等待刷新后，独立宿主使用 `pod 'JXPhotoBrowser', '4.2.0'` 和官方 CDN 成功执行 `pod install --repo-update`；没有 `:path`、`:git` 或 `:podspec` 替代源。
+- 消费端 iOS 构建通过；下载的 Sources 与 4.2.0 tag 逐文件一致，内嵌框架版本为 4.2.0、MinimumOSVersion 为 15.0，确认包含 `JXPhotoBrowser.bundle/PrivacyInfo.xcprivacy`。独立宿主位于 `/tmp/PhotoBrowser-4.2.0-CDN-Smoke/`，安装及构建日志为 `/tmp/PhotoBrowser-4.2.0-CDN-{Install,Build}.log`。
 
 ## 版本范围
 
