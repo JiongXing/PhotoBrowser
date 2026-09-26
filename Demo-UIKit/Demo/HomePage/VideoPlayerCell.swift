@@ -321,68 +321,21 @@ open class VideoPlayerCell: JXZoomImageCell {
     }
     
     private func downloadAndSaveVideo(from url: URL) {
-        // 本地文件直接保存
-        if url.isFileURL {
-            performSaveToAlbum(fileURL: url)
-            return
-        }
-        
-        showToast("正在保存...")
-        
-        let task = URLSession.shared.downloadTask(with: url) { [weak self] tempURL, response, error in
+        if !url.isFileURL { showToast("正在保存...") }
+        VideoSaveService.save(from: url) { [weak self] result in
             DispatchQueue.main.async {
-                guard let self else { return }
-                
-                if let error {
-                    self.isSavingVideo = false
-                    self.showToast("下载失败：\(error.localizedDescription)")
-                    return
-                }
-                
-                guard let tempURL else {
-                    self.isSavingVideo = false
-                    self.showToast("下载失败")
-                    return
-                }
-                
-                // 将临时文件移动到 tmp 目录（带 .mp4 后缀），避免系统自动清理
-                let destinationURL = FileManager.default.temporaryDirectory
-                    .appendingPathComponent(UUID().uuidString)
-                    .appendingPathExtension("mp4")
-                do {
-                    try FileManager.default.moveItem(at: tempURL, to: destinationURL)
-                    self.performSaveToAlbum(fileURL: destinationURL)
-                } catch {
-                    self.isSavingVideo = false
-                    self.showToast("保存失败")
-                }
-            }
-        }
-        task.resume()
-    }
-    
-    private func performSaveToAlbum(fileURL: URL) {
-        PHPhotoLibrary.shared().performChanges({
-            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: fileURL)
-        }) { [weak self] success, error in
-            DispatchQueue.main.async {
-                guard let self else { return }
+                guard let self = self else { return }
                 self.isSavingVideo = false
-                
-                // 清理非本地源的临时文件
-                if !fileURL.isFileURL || fileURL.path.contains(NSTemporaryDirectory()) {
-                    try? FileManager.default.removeItem(at: fileURL)
-                }
-                
-                if success {
+                switch result {
+                case .success:
                     self.showToast("已保存到相册")
-                } else {
-                    self.showToast("保存失败：\(error?.localizedDescription ?? "未知错误")")
+                case .failure(let error):
+                    self.showToast("保存失败：\(error.localizedDescription)")
                 }
             }
         }
     }
-    
+
     // MARK: - Toast
     
     private func showToast(_ message: String) {

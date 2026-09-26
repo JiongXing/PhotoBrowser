@@ -107,7 +107,7 @@ codegraph status
 
 命令见 [AGENTS.md](../AGENTS.md#构建命令)，发布检查见 [CI](../.github/workflows/ci.yml)。当前无独立测试 target；静态检查与 Demo 构建不能替代交互验证，也不要将 `swift build` 的 macOS 目标作为 UIKit 库的验收。
 
-CI 的 `agent-workflow` job 独立校验 OpenSpec；iOS 构建和集成检查保留在原有 jobs 中。本地只运行与本次改动相符的检查。
+CI 的 `agent-workflow` job 独立校验 OpenSpec；`behavior` job 通过 `Validation/run-tests.sh` 运行状态、文件与系统交互回归并保存结果包；iOS 构建和集成检查保留在原有 jobs 中。运行方式和覆盖边界见 [验证说明](../Validation/Rotation/README.md)。本地只运行与本次改动相符的检查。
 
 ## 工具版本与维护
 

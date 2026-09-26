@@ -14,7 +14,12 @@ final class RotationSceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options: UIScene.ConnectionOptions) {
         guard let scene = scene as? UIWindowScene else { return }
         window = UIWindow(windowScene: scene)
-        window?.rootViewController = ProcessInfo.processInfo.arguments.contains("ui-rotation") ? RotationHostController() : UIViewController()
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("ui-lifecycle") {
+            window?.rootViewController = LifecycleHostController()
+        } else {
+            window?.rootViewController = arguments.contains("ui-rotation") ? RotationHostController() : UIViewController()
+        }
         window?.makeKeyAndVisible()
     }
 }

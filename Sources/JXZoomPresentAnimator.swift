@@ -32,7 +32,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
 
         // 检查前置条件：需要源缩略图视图
         // 注意：scrollToInitialIndexIfNeeded() 已将越界的 initialIndex clamp 为安全的 pageIndex，此处须用 pageIndex 避免越界崩溃
-        guard let thumbnailView = toVC.delegate?.photoBrowser(toVC, thumbnailViewAt: toVC.pageIndex) else {
+        guard let thumbnailView = toVC.thumbnailViewForCurrentPage() else {
             fallbackToFade(toView: toView, duration: duration, ctx: ctx)
             return
         }
@@ -69,7 +69,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
 
         // 隐藏真实视图，避免重影
         // 缩略图显隐统一走 delegate 通道（setThumbnailHidden），不直接操作视图
-        toVC.delegate?.photoBrowser(toVC, setThumbnailHidden: true, at: toVC.pageIndex)
+        toVC.hideCurrentThumbnail()
         targetIV?.isHidden = true
         toView.alpha = 1
         toView.backgroundColor = .clear
@@ -85,7 +85,7 @@ open class JXZoomPresentAnimator: NSObject, UIViewControllerAnimatedTransitionin
             // 还原浏览器内的图片视图；缩略图在浏览期间保持隐藏，关闭时由 dismiss 流程恢复
             targetIV?.isHidden = false
             if !completed {
-                toVC.delegate?.photoBrowser(toVC, setThumbnailHidden: false, at: toVC.pageIndex)
+                toVC.restoreThumbnail()
                 toView.removeFromSuperview()
             }
             zoomView.removeFromSuperview()

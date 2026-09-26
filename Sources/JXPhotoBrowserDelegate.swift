@@ -29,6 +29,11 @@ public protocol JXPhotoBrowserDelegate: AnyObject {
     /// 设置指定索引的 item 的缩略图视图的显隐状态（Zoom 转场时隐藏源视图，避免视觉重叠）
     /// 默认实现会切换 `thumbnailViewAt` 返回视图的 `isHidden`；仅当需要自定义显隐方式（如渐隐、隐藏容器视图）时才需实现
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int)
+
+    /// 在隐藏前提供恢复操作（可选，默认 nil）。闭包应捕获原始视图/状态，而非重新按索引查找数据。
+    /// 自定义显隐且数据可能替换时实现；恢复时调用此闭包，不再调用 setThumbnailHidden(false)。
+    /// 使用弱引用，避免闭包强持有 browser。默认显隐由框架保存原视图并恢复。
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailRestorationAt index: Int) -> (() -> Void)?
     
 }
 
@@ -36,6 +41,7 @@ public extension JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowserViewController, willDisplay cell: JXPhotoBrowserAnyCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowserViewController, didEndDisplaying cell: JXPhotoBrowserAnyCell, at index: Int) {}
     func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailViewAt index: Int) -> UIView? { nil }
+    func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailRestorationAt index: Int) -> (() -> Void)? { nil }
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
         photoBrowser(browser, thumbnailViewAt: index)?.isHidden = hidden
     }

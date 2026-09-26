@@ -133,6 +133,8 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     /// layoutSubviews 的默认重置逻辑需让位，避免两者相互竞争产生跳变
     private var isTransitioningSize = false
 
+    private var dismissInteractionState: (scrollEnabled: Bool, clips: [Bool])?
+
     // MARK: - Lifecycle
     
     open override func prepareForReuse() {
@@ -163,6 +165,13 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     
     /// 若调用方提供的是 UIImageView，则可参与几何匹配 Zoom 动画
     open var transitionImageView: UIImageView? { imageView }
+
+    open var canBeginDismissInteraction: Bool {
+        let isZoomed = scrollView.zoomScale > scrollView.minimumZoomScale + 0.01
+        let isAtTop = scrollView.contentOffset.y <= -scrollView.adjustedContentInset.top + 1.0
+        let hasVerticalContent = scrollView.contentSize.height > scrollView.bounds.height + 1.0
+        return !isTransitioningSize && !isZoomed && (isAtTop || !hasVerticalContent)
+    }
 
     open override func layoutSubviews() {
         super.layoutSubviews()
@@ -400,10 +409,17 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     }
 
     open func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {
-        clipsToBounds = !isInteracting
-        contentView.clipsToBounds = !isInteracting
-        scrollView.clipsToBounds = !isInteracting
-        zoomContentView.clipsToBounds = !isInteracting
+        let views = [self, contentView, scrollView, zoomContentView]
+        if isInteracting {
+            guard dismissInteractionState == nil else { return }
+            dismissInteractionState = (scrollView.isScrollEnabled, views.map { $0.clipsToBounds })
+            scrollView.isScrollEnabled = false
+            views.forEach { $0.clipsToBounds = false }
+        } else if let state = dismissInteractionState {
+            dismissInteractionState = nil
+            scrollView.isScrollEnabled = state.scrollEnabled
+            zip(views, state.clips).forEach { $0.0.clipsToBounds = $0.1 }
+        }
     }
 
     private func handleImageDidChange() {

@@ -1,24 +1,26 @@
-# PR #241 尺寸转场回归
+# 浏览器行为回归
 
-此目录只用于验证，不进入发布库或 Demo。脚本把独立测试工程生成到指定临时目录，直接编译当前 `Sources/*.swift`，不修改主工程或 Pods。
+此目录只用于验证，不进入发布库或 Demo。脚本把独立测试工程生成到指定临时目录，直接编译当前 `Sources/*.swift` 和 Demo 的视频保存工具，不修改主工程或 Pods。下方保留 PR #241 的历史旋转验证记录。
 
 ## 运行
 
 需要 Xcode、iOS Simulator，以及 CocoaPods 使用的 Ruby `xcodeproj` gem。
 
 ```sh
-ruby Validation/Rotation/generate_project.rb /tmp/PhotoBrowser-Rotation
-xcrun simctl list devices available
-xcodebuild -project /tmp/PhotoBrowser-Rotation/Rotation.xcodeproj \
-  -scheme Rotation -destination 'platform=iOS Simulator,id=<设备 UUID>' \
-  -derivedDataPath /tmp/PhotoBrowser-Rotation/DerivedData \
-  -resultBundlePath /tmp/PhotoBrowser-Rotation/results.xcresult \
-  -parallel-testing-enabled NO -collect-test-diagnostics never test
+Validation/run-tests.sh /tmp/PhotoBrowser-Validation
+# 仅状态回归（含视频文件测试和一次真实 Photos 写入）
+TEST_SUITE=state Validation/run-tests.sh /tmp/PhotoBrowser-State
+# 指定模拟器，仅运行系统交互
+SIMULATOR_UDID=<设备 UUID> TEST_SUITE=ui Validation/run-tests.sh /tmp/PhotoBrowser-UI
 ```
 
-每次运行使用新的结果包路径。仅运行状态回归可加 `-only-testing:RotationTests`；仅运行系统交互可加 `-only-testing:RotationUITests`。
+每次使用新的输出目录；不传目录时自动创建临时目录。默认选择已启动或第一个可用 iPhone，CI 使用同一入口运行全部测试。脚本在 XCTest 启动前安装宿主并授予模拟器的相册添加权限；不得在测试中途修改权限，因为系统可能终止宿主进程。结果包、构建和测试日志保存在输出目录。关闭失败时的冗长诊断采集，保留真实测试退出码。
 
 ## 覆盖与限制
+
+- `LifecycleTests`：真实 UIKit 宿主与可控手势处理，覆盖数据缩减/替换、缩略图恢复、动画/无动画关闭、临时覆盖、轮播暂停恢复、旧回弹隔离及自定义 Cell 准入。它不替代真实手势测试。
+- `LifecycleUITests`：真实下拉停留和回弹、恢复轮播、双击放大后的下拉拒绝与关闭后缩略图恢复，保存截图。
+- `VideoSaveTests`：下载临时文件接管、成功/失败清理与调用方本地文件保留；`VideoSaveSmokeTests` 在模拟器生成一个短视频并实际写入相册，保存后源文件仍存在。冒烟测试会在模拟器相册留下测试视频。
 
 - `RotationTests`：使用真实 UIKit 集合视图和可控转场协调器，验证缩减/清空数据、动画开始前后跳页、无效导航、轮播暂停恢复、循环与间距、Cell 首次布局前准备、复用、缩放回调、旧转场完成回调以及默认方向策略。可控协调器用于检查时序，不代表真实系统旋转。
 - `RotationUITests`：全屏 Scene 宿主和允许旋转的浏览器子类，调用系统旋转、拖拽/减速、捏合及双击。每个页面检查同时验证页码、实际集合视图位置和对齐；保存屏幕截图。宿主的 `phase` 记录转场开始时真实的拖拽/减速状态。
@@ -36,7 +38,7 @@ xcodebuild -project /tmp/PhotoBrowser-Rotation/Rotation.xcodeproj \
 ```sh
 mkdir -p /tmp/PhotoBrowser-Rotation-Baseline
 git archive 45315994694dd4c9c19fd40f40c5c5256d99f6bc Sources | tar -x -C /tmp/PhotoBrowser-Rotation-Baseline
-ROTATION_SOURCE_ROOT=/tmp/PhotoBrowser-Rotation-Baseline \
+ROTATION_ONLY=1 ROTATION_SOURCE_ROOT=/tmp/PhotoBrowser-Rotation-Baseline \
   ruby Validation/Rotation/generate_project.rb /tmp/PhotoBrowser-Rotation-Baseline/project
 ```
 

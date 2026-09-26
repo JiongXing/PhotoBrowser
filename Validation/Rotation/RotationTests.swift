@@ -256,7 +256,7 @@ final class RotationData: NSObject, JXPhotoBrowserDelegate {
         if requirePreparedCells, let cell = cell as? ObservedCell, !cell.prepared { unpreparedIndexes.append(index) }
     }
     func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
-        if hidden && !(0..<count).contains(index) { invalidHiddenIndexes.append(index) }
+        if !(0..<count).contains(index) { invalidHiddenIndexes.append(index) }
     }
 }
 

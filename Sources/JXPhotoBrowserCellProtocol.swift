@@ -19,11 +19,13 @@ public protocol JXPhotoBrowserCellProtocol: UICollectionViewCell {
     /// 如果返回非nil，框架会使用此视图进行Zoom转场动画
     /// 如果返回nil，转场动画将降级为Fade动画
     var transitionImageView: UIImageView? { get }
+
+    /// 是否允许开始下拉关闭（默认 true）。自定义媒体可按自身缩放、滚动或播放状态决定。
+    var canBeginDismissInteraction: Bool { get }
     
     /// 下拉关闭交互状态变化时调用
     /// 当用户下拉图片（图片缩小跟随手指）时，框架会通知 Cell 交互状态的变化
-    /// - Parameter isInteracting: `true` 表示正在进行下拉交互，`false` 表示交互结束（回弹恢复）
-    /// - Note: 当用户下拉后松手触发关闭时，不会收到 `false` 回调（因为浏览器即将消失）
+    /// - Parameter isInteracting: `true` 表示开始下拉，`false` 表示回弹、被新操作中断或关闭后的清理
     func photoBrowserDismissInteractionDidChange(isInteracting: Bool)
 }
 
@@ -37,7 +39,8 @@ public extension JXPhotoBrowserCellProtocol {
     }
     
     var transitionImageView: UIImageView? { nil }
+
+    var canBeginDismissInteraction: Bool { true }
     
     func photoBrowserDismissInteractionDidChange(isInteracting: Bool) {}
 }
-

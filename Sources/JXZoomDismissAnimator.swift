@@ -26,13 +26,12 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             toView.layoutIfNeeded()
         }
         
-        let pageIndex = fromVC.pageIndex
         // 前置条件不满足则直接降级为淡出
         guard let srcCell = fromVC.visibleCell(),
               let srcIV = srcCell.transitionImageView, srcIV.bounds.size != .zero,
-              let thumbnailView = fromVC.delegate?.photoBrowser(fromVC, thumbnailViewAt: pageIndex) else {
+              let thumbnailView = fromVC.thumbnailViewForCurrentPage() else {
             // 降级为淡出前先恢复列表缩略图显示，避免淡出完成后缩略图永久隐藏
-            fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
+            fromVC.restoreThumbnail()
             animateFadeOut(view: fromView, duration: duration, ctx: ctx)
             return
         }
@@ -53,7 +52,7 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
         // 缩略图显隐统一走 delegate 通道（setThumbnailHidden），不直接操作视图；
         // 浏览期间缩略图理应已隐藏，此处再设一次以覆盖列表 Cell 复用导致隐藏状态丢失的情况
         srcIV.isHidden = true
-        fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: true, at: pageIndex)
+        fromVC.hideCurrentThumbnail()
         
         zoomIV.frame = startFrame
         container.addSubview(zoomIV)
@@ -65,14 +64,14 @@ open class JXZoomDismissAnimator: NSObject, UIViewControllerAnimatedTransitionin
             let completed = !ctx.transitionWasCancelled
             zoomIV.removeFromSuperview()
             if completed {
-                fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: false, at: pageIndex)
+                fromVC.restoreThumbnail()
                 fromView.removeFromSuperview()
                 fromView.alpha = 1
                 srcIV.isHidden = false
             } else {
                 srcIV.isHidden = false
                 fromView.alpha = 1
-                fromVC.delegate?.photoBrowser(fromVC, setThumbnailHidden: true, at: pageIndex)
+                fromVC.hideCurrentThumbnail()
             }
             ctx.completeTransition(completed)
         }

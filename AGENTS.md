@@ -61,7 +61,7 @@ JXPhotoBrowser — 轻量级 iOS 图片/视频浏览器。单一内核 + 协议�
 - `JXPhotoBrowserViewController` — 浏览器内核:基于 `UICollectionView` 的分页与复用、循环滚动、Overlay 管理、下拉关闭
 - `JXZoomImageCell` — 可缩放图片 Cell(`UIScrollView` 捏合/双击缩放、宽高比适配居中)
 - `JXImageCell` — 轻量 Cell,用于内嵌 Banner 场景(无缩放)
-- `JXPhotoBrowserCellProtocol` — 自定义 Cell 的最小协议：`browser`、`transitionImageView` 和下拉交互状态回调（均提供默认实现）
+- `JXPhotoBrowserCellProtocol` — 自定义 Cell 的最小协议：`browser`、`transitionImageView`、下拉准入和交互状态回调（均提供默认实现）
 - `JXPhotoBrowserDelegate` — 宿主提供数量、Cell 实例、生命周期回调、Zoom 转场缩略图
 - `JXPhotoBrowserOverlay` / `JXPageIndicatorOverlay` — 附加 UI 插件协议及内置页码指示器
 

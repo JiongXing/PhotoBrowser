@@ -19,14 +19,18 @@ end
 app.build_configurations.each do |config|
   config.build_settings['INFOPLIST_KEY_UIApplicationSceneManifest_Generation'] = 'YES'
   config.build_settings['INFOPLIST_KEY_UIRequiresFullScreen'] = 'YES'
+  config.build_settings['INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription'] = 'Verify demo video saving.'
   config.build_settings['INFOPLIST_KEY_UILaunchScreen_Generation'] = 'YES'
   config.build_settings['INFOPLIST_KEY_UISupportedInterfaceOrientations'] = 'UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight'
 end
 sources = Dir[File.join(ENV.fetch('ROTATION_SOURCE_ROOT', root), 'Sources/*.swift')]
 sources << File.join(__dir__, 'RotationHost.swift')
+sources << File.join(__dir__, 'LifecycleHost.swift')
+sources << File.join(root, 'Demo-UIKit/Demo/HomePage/VideoSaveService.swift')
 app.add_file_references(sources.map { |path| project.main_group.new_file(path) })
-tests.add_file_references([project.main_group.new_file(File.join(__dir__, 'RotationTests.swift'))])
-ui.add_file_references([project.main_group.new_file(File.join(__dir__, 'RotationUITests.swift'))])
+test_files = ENV['ROTATION_ONLY'] == '1' ? ['RotationTests.swift'] : ['RotationTests.swift', 'LifecycleTests.swift', 'VideoSaveTests.swift']
+tests.add_file_references(test_files.map { |name| project.main_group.new_file(File.join(__dir__, name)) })
+ui.add_file_references(['RotationUITests.swift', 'LifecycleUITests.swift'].map { |name| project.main_group.new_file(File.join(__dir__, name)) })
 tests.add_dependency(app)
 ui.add_dependency(app)
 tests.build_configurations.each do |config|

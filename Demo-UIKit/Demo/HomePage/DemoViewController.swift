@@ -361,25 +361,18 @@ private extension DemoViewController {
     
     /// 下载视频后保存
     func downloadVideoAndSave(_ url: URL, presentingViewController: UIViewController) {
-        URLSession.shared.downloadTask(with: url) { [weak self] tempURL, _, error in
-            guard let self = self else { return }
-            guard let tempURL = tempURL, error == nil else {
-                DispatchQueue.main.async {
-                    self.presentToast(message: "视频下载失败", on: presentingViewController)
+        VideoSaveService.save(from: url) { [weak self] result in
+            DispatchQueue.main.async {
+                let message: String
+                switch result {
+                case .success: message = "已保存到系统相册"
+                case .failure: message = "保存失败"
                 }
-                return
+                self?.presentToast(message: message, on: presentingViewController)
             }
-            
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: tempURL)
-            }) { success, _ in
-                DispatchQueue.main.async {
-                    self.presentToast(message: success ? "已保存到系统相册" : "保存失败", on: presentingViewController)
-                }
-            }
-        }.resume()
+        }
     }
-    
+
     /// 简单提示
     func presentToast(message: String, on viewController: UIViewController) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)

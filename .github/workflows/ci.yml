@@ -31,6 +31,28 @@ jobs:
           CODE_SIGNING_ALLOWED=NO build
       - name: Verify framework privacy manifest
         run: test -f /tmp/JXPhotoBrowserDerivedData/Build/Products/Debug-iphoneos/JXPhotoBrowser.framework/PrivacyInfo.xcprivacy
+  behavior:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+      - name: Install test project generator
+        run: gem install xcodeproj --version 1.27.0 --no-document
+      - name: Run state and interaction regressions
+        run: Validation/run-tests.sh /tmp/PhotoBrowser-Validation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: behavior-test-results
+          path: |
+            /tmp/PhotoBrowser-Validation/*.log
+            /tmp/PhotoBrowser-Validation/*.xcresult
   integrations:
     runs-on: macos-15
     steps:
