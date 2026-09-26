@@ -328,24 +328,13 @@ private extension DemoViewController {
     
     /// 请求相册权限
     func requestPhotoAuthorization(completion: @escaping (Bool) -> Void) {
-        if #available(iOS 14, *) {
-            let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
-            if status == .authorized || status == .limited {
-                completion(true)
-                return
-            }
-            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
-                completion(newStatus == .authorized || newStatus == .limited)
-            }
-        } else {
-            let status = PHPhotoLibrary.authorizationStatus()
-            if status == .authorized {
-                completion(true)
-                return
-            }
-            PHPhotoLibrary.requestAuthorization { newStatus in
-                completion(newStatus == .authorized)
-            }
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        if status == .authorized || status == .limited {
+            completion(true)
+            return
+        }
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+            completion(newStatus == .authorized || newStatus == .limited)
         }
     }
     

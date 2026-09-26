@@ -73,7 +73,7 @@ browser.addOverlay(indicator)
 
 ## 保存到相册
 
-框架不内置保存能力。iOS 14+ 使用 `.addOnly` 权限；iOS 12/13 使用旧授权接口。ActionSheet 在 iPad 上必须设置 `popoverPresentationController.sourceView` 和 `sourceRect`。
+框架不内置保存能力。最低支持 iOS 15，保存图片和视频统一使用 `.addOnly` 权限。ActionSheet 在 iPad 上必须设置 `popoverPresentationController.sourceView` 和 `sourceRect`。
 
 ## CocoaPods 沙盒问题
 

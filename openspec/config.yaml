@@ -3,7 +3,7 @@ schema: spec-driven
 context: |
   Language: zh-CN. Write artifacts in Chinese; keep OpenSpec structural headings
   and SHALL/MUST, WHEN/THEN keywords in English.
-  Project: JXPhotoBrowser, a UIKit photo/video browser library, iOS 12+, Swift 5.4+.
+  Project: JXPhotoBrowser, a UIKit photo/video browser library, iOS 15+, Swift 5.4+.
   Sources/ is the published library. The core has no third-party dependency or
   business data model; hosts provide data/loading through delegates and custom cells.
   Distribution: SwiftPM (Package.swift), CocoaPods (JXPhotoBrowser.podspec), Carthage.

@@ -19,7 +19,9 @@ JXPhotoBrowser 是一个轻量、可定制的 iOS 图片/视频浏览器。核�
 - 程序化跳页、自动轮播和页间距
 - 自定义 Cell 与 Overlay 扩展机制
 - CocoaPods、SwiftPM、Carthage
-- iOS 12.0+、Swift 5.4+
+- iOS 15.0+、Swift 5.4+（SwiftUI 示例要求 iOS 16.0+）
+
+UIKit 和 SwiftUI 示例使用 Kingfisher 8.13+，需要 Xcode 26+（Swift 6.2+）。
 
 ## 安装
 
@@ -40,7 +42,7 @@ dependencies: [
 ### Carthage
 
 ```text
-github "JiongXing/PhotoBrowser" ~> 4.1
+github "JiongXing/PhotoBrowser"
 ```
 
 ```bash

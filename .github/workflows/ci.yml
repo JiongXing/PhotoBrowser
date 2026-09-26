@@ -20,6 +20,9 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - name: Build framework
         run: >-
           xcodebuild -scheme JXPhotoBrowser -project JXPhotoBrowser.xcodeproj
@@ -32,6 +35,9 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - name: CocoaPods lint
         run: pod lib lint JXPhotoBrowser.podspec --allow-warnings
       - name: Build UIKit Demo

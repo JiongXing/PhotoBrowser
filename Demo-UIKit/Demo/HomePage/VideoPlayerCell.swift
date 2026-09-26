@@ -298,37 +298,19 @@ open class VideoPlayerCell: JXZoomImageCell {
         isSavingVideo = true
         
         // 先请求相册权限
-        let status: PHAuthorizationStatus
-        if #available(iOS 14, *) {
-            status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
-        } else {
-            status = PHPhotoLibrary.authorizationStatus()
-        }
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
         
         switch status {
         case .authorized, .limited:
             downloadAndSaveVideo(from: url)
         case .notDetermined:
-            if #available(iOS 14, *) {
-                PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] newStatus in
-                    DispatchQueue.main.async {
-                        if newStatus == .authorized || newStatus == .limited {
-                            self?.downloadAndSaveVideo(from: url)
-                        } else {
-                            self?.isSavingVideo = false
-                            self?.showToast("需要相册权限才能保存视频")
-                        }
-                    }
-                }
-            } else {
-                PHPhotoLibrary.requestAuthorization { [weak self] newStatus in
-                    DispatchQueue.main.async {
-                        if newStatus == .authorized {
-                            self?.downloadAndSaveVideo(from: url)
-                        } else {
-                            self?.isSavingVideo = false
-                            self?.showToast("需要相册权限才能保存视频")
-                        }
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] newStatus in
+                DispatchQueue.main.async {
+                    if newStatus == .authorized || newStatus == .limited {
+                        self?.downloadAndSaveVideo(from: url)
+                    } else {
+                        self?.isSavingVideo = false
+                        self?.showToast("需要相册权限才能保存视频")
                     }
                 }
             }

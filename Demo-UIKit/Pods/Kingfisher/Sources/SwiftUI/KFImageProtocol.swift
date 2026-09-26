@@ -1,0 +1,175 @@
+//
+//  KFImageProtocol.swift
+//  Kingfisher
+//
+//  Created by onevcat on 2021/05/08.
+//
+//  Copyright (c) 2021 Wei Wang <onevcat@gmail.com>
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+
+#if canImport(SwiftUI) && canImport(Combine)
+import SwiftUI
+import Combine
+
+
+/// Represents a view that is compatible with Kingfisher in SwiftUI.
+///
+/// As a framework user, you do not need to know the details of this protocol. As the public types, ``KFImage`` and
+/// ``KFAnimatedImage`` conform this type and should be used in your app to represent an image view with network and
+/// cache support in SwiftUI.
+@MainActor
+public protocol KFImageProtocol: View, KFOptionSetter {
+    associatedtype HoldingView: KFImageHoldingView & Sendable
+    var context: KFImage.Context<HoldingView> { get set }
+    init(context: KFImage.Context<HoldingView>)
+}
+
+extension KFImageProtocol {
+    @MainActor
+    public var body: some View {
+        ZStack {
+            KFImageRenderer<HoldingView>(
+                context: context
+            ).id(context)
+        }
+    }
+    
+    /// Creates an image view compatible with Kingfisher for loading an image from the provided `Source`.
+    ///
+    /// - Parameters:
+    ///   - source: The `Source` of the image that specifies where to load the target image.
+    public init(source: Source?) {
+        let context = KFImage.Context<HoldingView>(source: source)
+        self.init(context: context)
+    }
+
+    /// Creates an image view compatible with Kingfisher for loading an image from the provided `URL`.
+    ///
+    /// - Parameters:
+    ///   - url: The `URL` defining the location from which to load the target image.
+    public init(_ url: URL?) {
+        self.init(source: url?.convertToSource())
+    }
+    
+    /// Configures the current image with a `block` and returns another `Image` to use as the final content.
+    ///
+    /// This block will be lazily applied when creating the final `Image`.
+    ///
+    /// If multiple `configure` modifiers are added to the image, they will be evaluated in order.
+    ///
+    /// - Parameter block: The block that applies to the loaded image. The block should return an `Image` that is
+    ///  configured.
+    /// - Returns: A ``KFImage`` or ``KFAnimatedImage`` view that configures the internal `Image` with the provided
+    /// `block`.
+    ///
+    /// > If you want to configure the input image (which is usually an `Image` value) and use a non-`Image` value as
+    /// > the configured result, use ``KFImageProtocol/contentConfigure(_:)`` instead.
+    public func configure(_ block: @escaping (HoldingView) -> HoldingView) -> Self {
+        let result = copyForMutation()
+        result.context.configurations.append(block)
+        return result
+    }
+
+    /// Configures the current image with a `block` and returns a `View` to use as the final content.
+    ///
+    /// This block will be lazily applied when creating the final `Image`.
+    ///
+    /// If multiple `contentConfigure` modifiers are added to the image, only the last one will be stored and used.
+    ///
+    /// - Parameter block: The block applies to the loaded image. The block should return a `View` that is configured.
+    /// - Returns: A ``KFImage`` or ``KFAnimatedImage`` view that configures the internal `Image` with the provided
+    /// `block`.
+    public func contentConfigure<V: View>(@ViewBuilder _ block: @escaping (HoldingView) -> V) -> Self {
+        contentConfigure { view, _ in block(view) }
+    }
+
+    /// Configures the current image with a `block` and returns a `View` to use as the final content, with a flag
+    /// telling whether the image is loaded as input.
+    ///
+    /// This block will be lazily applied when creating the final `Image`. It does not run only for images the caller
+    /// retrieved, so the `isLoaded` parameter lets you gate configurations that only make sense for a real image:
+    ///
+    /// ```swift
+    /// KFImage(url)
+    ///     .contentConfigure { image, isLoaded in
+    ///         if isLoaded {
+    ///             image.resizable().scaledToFit().overlay(Badge())
+    ///         } else {
+    ///             image
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// The `isLoaded` parameter is `true` only when the image comes from the cache or the network, including a partial
+    /// image delivered by progressive loading. It is `false` in two situations, which differ in whether the view the
+    /// block returns reaches the screen:
+    ///
+    /// - **Before any image exists.** The default rendering path still evaluates the block, but keeps the image branch
+    /// hidden, so what the block returns is not displayed. Setting a load transition with
+    /// `loadTransition(_:animation:)` skips this evaluation instead. Use `placeholder(_:)` to fill the loading state.
+    /// - **While the fallback supplied by the deprecated `onFailureImage` is shown.** That fallback is a real image, so
+    /// the block is evaluated *and* its result displayed with `isLoaded` as `false` — on the default path and with a
+    /// load transition alike. Use ``onFailureView(_:)`` to render a failure state that is not an image.
+    ///
+    /// If multiple `contentConfigure` modifiers are added to the image, only the last one will be stored and used.
+    ///
+    /// - Parameter block: The block applies to the loaded image and a flag telling whether the image is loaded. The
+    /// block should return a `View` that is configured.
+    /// - Returns: A ``KFImage`` or ``KFAnimatedImage`` view that configures the internal `Image` with the provided
+    /// `block`.
+    public func contentConfigure<V: View>(@ViewBuilder _ block: @escaping (HoldingView, Bool) -> V) -> Self {
+        let result = copyForMutation()
+        result.context.contentConfiguration = { AnyView(block($0, $1)) }
+        return result
+    }
+}
+
+@MainActor
+public protocol KFImageHoldingView: View {
+    associatedtype RenderingView
+    static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> Self
+}
+
+extension KFImageProtocol {
+    /// Returns a new view value whose ``KFImage/Context`` is a copy of the current one.
+    ///
+    /// ``KFImage`` and ``KFAnimatedImage`` are value types but hold their settings in a reference type context.
+    /// All modifiers apply changes to the copied context returned by this method, so a derived view never mutates
+    /// the view value it was created from.
+    public func copyForMutation() -> Self {
+        var result = self
+        result.context = context.copy()
+        return result
+    }
+
+    public var options: KingfisherParsedOptionsInfo {
+        get { context.options }
+        nonmutating set { context.options = newValue }
+    }
+
+    public var onFailureDelegate: Delegate<KingfisherError, Void> { context.onFailureDelegate }
+    public var onSuccessDelegate: Delegate<RetrieveImageResult, Void> { context.onSuccessDelegate }
+    public var onProgressDelegate: Delegate<(Int64, Int64), Void> { context.onProgressDelegate }
+
+    public var delegateObserver: AnyObject { context }
+}
+
+
+#endif

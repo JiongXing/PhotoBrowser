@@ -26,11 +26,13 @@
 
 import Foundation
 
-/// Represents a session data task in `ImageDownloader`. It consists of an underlying `URLSessionDataTask` and
-/// an array of `TaskCallback`. Multiple `TaskCallback`s could be added for a single downloading data task.
-public class SessionDataTask {
+/// Represents a session data task in ``ImageDownloader``.
+///
+/// Essentially, a ``SessionDataTask`` wraps a `URLSessionDataTask` and manages the download data.
+/// It uses a ``SessionDataTask/CancelToken`` to track the task and manage its cancellation.
+public class SessionDataTask: @unchecked Sendable {
 
-    /// Represents the type of token which used for cancelling a task.
+    /// Represents the type of token used for canceling a task.
     public typealias CancelToken = Int
 
     struct TaskCallback {
@@ -38,17 +40,45 @@ public class SessionDataTask {
         let options: KingfisherParsedOptionsInfo
     }
 
-    /// Downloaded raw data of current task.
-    public private(set) var mutableData: Data
+    private var _mutableData: Data
+    /// The downloaded raw data of the current task.
+    public var mutableData: Data {
+        lock.lock()
+        defer { lock.unlock() }
+        return Data(_mutableData)
+    }
 
-    // This is a copy of `task.originalRequest?.url`. It is for getting a race-safe behavior for a pitfall on iOS 13.
+    var mutableDataCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return _mutableData.count
+    }
+
+    // Zero-copy access to the accumulated data for internal use. This shares the storage of
+    // `_mutableData` through copy-on-write. `Data(_mutableData)` can allocate a full-size copy
+    // on older Foundation versions.
+    // That allocation can trap (`EXC_BREAKPOINT` in `__DataStorage`) on memory-constrained devices
+    // when the downloaded data is large (#2543). Sharing is safe: a later `didReceiveData` append
+    // copies on write and never mutates the storage a previously returned value sees.
+    var sharedData: Data {
+        lock.lock()
+        defer { lock.unlock() }
+        return _mutableData
+    }
+
+    // This is a copy of `task.originalRequest?.url`. It is for obtaining race-safe behavior for a pitfall on iOS 13.
     // Ref: https://github.com/onevcat/Kingfisher/issues/1511
     public let originalURL: URL?
 
-    /// The underlying download task. It is only for debugging purpose when you encountered an error. You should not
-    /// modify the content of this task or start it yourself.
+    /// The underlying download task. 
+    ///
+    /// It is only for debugging purposes when you encounter an error. You should not modify the content of this task
+    /// or start it yourself.
     public let task: URLSessionDataTask
+    
     private var callbacksStore = [CancelToken: TaskCallback]()
+    private var prioritiesStore = [CancelToken: Float]()
+    private var completed = false
 
     var callbacks: [SessionDataTask.TaskCallback] {
         lock.lock()
@@ -58,11 +88,25 @@ public class SessionDataTask {
 
     private var currentToken = 0
     private let lock = NSLock()
+    
+    private var _metrics: NetworkMetrics?
+    /// The network metrics collected during the download task.
+    public var metrics: NetworkMetrics? {
+        lock.lock()
+        defer { lock.unlock() }
+        return _metrics
+    }
 
     let onTaskDone = Delegate<(Result<(Data, URLResponse?), KingfisherError>, [TaskCallback]), Void>()
     let onCallbackCancelled = Delegate<(CancelToken, TaskCallback), Void>()
 
-    var started = false
+    private var _started = false
+    var started: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return _started
+    }
+
     var containsCallbacks: Bool {
         // We should be able to use `task.state != .running` to check it.
         // However, in some rare cases, cancelling the task does not change
@@ -75,13 +119,22 @@ public class SessionDataTask {
     init(task: URLSessionDataTask) {
         self.task = task
         self.originalURL = task.originalRequest?.url
-        mutableData = Data()
+        _mutableData = Data()
     }
 
-    func addCallback(_ callback: TaskCallback) -> CancelToken {
+    func addCallback(_ callback: TaskCallback) -> CancelToken? {
         lock.lock()
         defer { lock.unlock() }
+        guard !completed else { return nil }
+
         callbacksStore[currentToken] = callback
+        let priority = callback.options.downloadPriority
+        prioritiesStore[currentToken] = priority
+        // A new subscriber can only raise the maximum. Scanning all subscribers on
+        // every join makes a large shared download take quadratic time to register.
+        if prioritiesStore.count == 1 || priority > task.priority {
+            task.priority = priority
+        }
         defer { currentToken += 1 }
         return currentToken
     }
@@ -91,14 +144,64 @@ public class SessionDataTask {
         defer { lock.unlock() }
         if let callback = callbacksStore[token] {
             callbacksStore[token] = nil
+            prioritiesStore[token] = nil
+            updateTaskPriority()
             return callback
         }
         return nil
     }
 
+    func setPriority(_ priority: Float, for token: CancelToken) {
+        lock.lock()
+        defer { lock.unlock() }
+        guard callbacksStore[token] != nil else { return }
+        prioritiesStore[token] = priority
+        updateTaskPriority()
+    }
+
+    func resetPriority(for token: CancelToken) {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let callback = callbacksStore[token] else { return }
+        prioritiesStore[token] = callback.options.downloadPriority
+        updateTaskPriority()
+    }
+
+    private func updateTaskPriority() {
+        guard let priority = prioritiesStore.values.max() else { return }
+        task.priority = priority
+    }
+    
+    @discardableResult
+    func removeAllCallbacks() -> [TaskCallback] {
+        lock.lock()
+        defer { lock.unlock() }
+        let callbacks = callbacksStore.values
+        callbacksStore.removeAll()
+        prioritiesStore.removeAll()
+        return Array(callbacks)
+    }
+
+    @discardableResult
+    func completeAndRemoveAllCallbacks() -> [TaskCallback] {
+        lock.lock()
+        defer { lock.unlock() }
+        completed = true
+        let callbacks = callbacksStore.values
+        callbacksStore.removeAll()
+        prioritiesStore.removeAll()
+        return Array(callbacks)
+    }
+
     func resume() {
-        guard !started else { return }
-        started = true
+        // Atomic check-and-set; `task.resume()` is called outside the lock.
+        lock.lock()
+        guard !_started else {
+            lock.unlock()
+            return
+        }
+        _started = true
+        lock.unlock()
         task.resume()
     }
 
@@ -110,12 +213,26 @@ public class SessionDataTask {
     }
 
     func forceCancel() {
-        for token in callbacksStore.keys {
+        // Snapshot the tokens under the lock, then cancel outside of it: `forceCancel` can run on
+        // any thread while `callbacksStore` is being mutated, and `cancel(token:)` re-acquires the
+        // non-recurrent lock.
+        lock.lock()
+        let tokens = Array(callbacksStore.keys)
+        lock.unlock()
+        for token in tokens {
             cancel(token: token)
         }
     }
 
     func didReceiveData(_ data: Data) {
-        mutableData.append(data)
+        lock.lock()
+        defer { lock.unlock() }
+        _mutableData.append(data)
+    }
+    
+    func didCollectMetrics(_ metrics: NetworkMetrics) {
+        lock.lock()
+        defer { lock.unlock() }
+        _metrics = metrics
     }
 }

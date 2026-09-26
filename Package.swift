@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "JXPhotoBrowser",
     platforms: [
-        .iOS(.v12)
+        .iOS("15.0")
     ],
     products: [
         .library(

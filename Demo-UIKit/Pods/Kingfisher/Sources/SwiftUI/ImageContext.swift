@@ -1,0 +1,196 @@
+//
+//  ImageContext.swift
+//  Kingfisher
+//
+//  Created by onevcat on 2021/05/08.
+//
+//  Copyright (c) 2021 Wei Wang <onevcat@gmail.com>
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+
+#if canImport(SwiftUI) && canImport(Combine)
+import SwiftUI
+import Combine
+
+extension KFImage {
+    public class Context<HoldingView: KFImageHoldingView>: @unchecked Sendable where HoldingView: Sendable {
+        
+        private let propertyQueue = DispatchQueue(label: "com.onevcat.Kingfisher.KFImageContextPropertyQueue")
+        
+        let source: Source?
+        var _options = KingfisherParsedOptionsInfo(
+            KingfisherManager.shared.defaultOptions + [.loadDiskFileSynchronously]
+        )
+        var options: KingfisherParsedOptionsInfo {
+            get { propertyQueue.sync { _options } }
+            set { propertyQueue.sync { _options = newValue } }
+        }
+
+        var _configurations: [(HoldingView) -> HoldingView] = []
+        var configurations: [(HoldingView) -> HoldingView] {
+            get { propertyQueue.sync { _configurations } }
+            set { propertyQueue.sync { _configurations = newValue } }
+        }
+        
+        var _renderConfigurations: [(HoldingView.RenderingView) -> Void] = []
+        var renderConfigurations: [(HoldingView.RenderingView) -> Void] {
+            get { propertyQueue.sync { _renderConfigurations } }
+            set { propertyQueue.sync { _renderConfigurations = newValue } }
+        }
+        
+        // The `Bool` parameter tells whether the passed-in view holds an image retrieved from the cache or the network.
+        var _contentConfiguration: ((HoldingView, Bool) -> AnyView)? = nil
+        var contentConfiguration: ((HoldingView, Bool) -> AnyView)? {
+            get { propertyQueue.sync { _contentConfiguration } }
+            set { propertyQueue.sync { _contentConfiguration = newValue } }
+        }
+        
+        var _cancelOnDisappear: Bool = false
+        var cancelOnDisappear: Bool {
+            get { propertyQueue.sync { _cancelOnDisappear } }
+            set { propertyQueue.sync { _cancelOnDisappear = newValue } }
+        }
+
+        var _reducePriorityOnDisappear: Bool = false
+		var reducePriorityOnDisappear: Bool {
+            get { propertyQueue.sync { _reducePriorityOnDisappear } }
+            set { propertyQueue.sync { _reducePriorityOnDisappear = newValue } }
+        }
+        
+        var _placeholder: ((Progress) -> AnyView)? = nil
+        var placeholder: ((Progress) -> AnyView)? {
+            get { propertyQueue.sync { _placeholder } }
+            set { propertyQueue.sync { _placeholder = newValue } }
+        }
+
+        var _failureView: (() -> AnyView)? = nil
+        var failureView: (() -> AnyView)? {
+            get { propertyQueue.sync { _failureView } }
+            set { propertyQueue.sync { _failureView = newValue } }
+        }
+
+        var _startLoadingBeforeViewAppear: Bool = false
+        var startLoadingBeforeViewAppear: Bool {
+            get { propertyQueue.sync { _startLoadingBeforeViewAppear } }
+            set { propertyQueue.sync { _startLoadingBeforeViewAppear = newValue } }
+        }
+        
+        // SwiftUI transition support
+        var _swiftUITransition: AnyTransition? = nil
+        var swiftUITransition: AnyTransition? {
+            get { propertyQueue.sync { _swiftUITransition } }
+            set { propertyQueue.sync { _swiftUITransition = newValue } }
+        }
+        
+        var _swiftUIAnimation: Animation? = nil
+        var swiftUIAnimation: Animation? {
+            get { propertyQueue.sync { _swiftUIAnimation } }
+            set { propertyQueue.sync { _swiftUIAnimation = newValue } }
+        }
+
+        let onFailureDelegate: Delegate<KingfisherError, Void>
+        let onSuccessDelegate: Delegate<RetrieveImageResult, Void>
+        let onProgressDelegate: Delegate<(Int64, Int64), Void>
+        
+        init(
+            source: Source?,
+            onFailureDelegate: Delegate<KingfisherError, Void> = Delegate<KingfisherError, Void>(),
+            onSuccessDelegate: Delegate<RetrieveImageResult, Void> = Delegate<RetrieveImageResult, Void>(),
+            onProgressDelegate: Delegate<(Int64, Int64), Void> = Delegate<(Int64, Int64), Void>()
+        ) {
+            self.source = source
+            self.onFailureDelegate = onFailureDelegate
+            self.onSuccessDelegate = onSuccessDelegate
+            self.onProgressDelegate = onProgressDelegate
+        }
+        
+        /// Creates a new context with all settings copied from `self`.
+        ///
+        /// - Important: When adding a new stored property to `Context`, it must be copied here as well.
+        /// Otherwise the setting is silently dropped as soon as another modifier is applied after it in a chain.
+        func copy() -> Context<HoldingView> {
+            let copied = Context(
+                source: source,
+                onFailureDelegate: onFailureDelegate.copy(),
+                onSuccessDelegate: onSuccessDelegate.copy(),
+                onProgressDelegate: onProgressDelegate.copy()
+            )
+            // `copied` is not visible to any other thread yet, so its backing storage can be written directly.
+            // Reading through a single `sync` gives an atomic snapshot and avoids per-property queue hops.
+            propertyQueue.sync {
+                copied._options = _options
+                copied._configurations = _configurations
+                copied._renderConfigurations = _renderConfigurations
+                copied._contentConfiguration = _contentConfiguration
+                copied._cancelOnDisappear = _cancelOnDisappear
+                copied._reducePriorityOnDisappear = _reducePriorityOnDisappear
+                copied._placeholder = _placeholder
+                copied._failureView = _failureView
+                copied._startLoadingBeforeViewAppear = _startLoadingBeforeViewAppear
+                copied._swiftUITransition = _swiftUITransition
+                copied._swiftUIAnimation = _swiftUIAnimation
+            }
+            return copied
+        }
+        
+        func shouldApplyFade(cacheType: CacheType) -> Bool {
+            options.forceTransition || cacheType == .none
+        }
+
+        func fadeTransitionDuration(cacheType: CacheType) -> TimeInterval? {
+            shouldApplyFade(cacheType: cacheType)
+            ? options.transition.fadeDuration
+                : nil
+        }
+    }
+}
+
+extension ImageTransition {
+    // Only for fade effect in SwiftUI.
+    fileprivate var fadeDuration: TimeInterval? {
+        switch self {
+        case .fade(let duration):
+            return duration
+        default:
+            return nil
+        }
+    }
+}
+
+
+extension KFImage.Context: Hashable {
+    public static func == (lhs: KFImage.Context<HoldingView>, rhs: KFImage.Context<HoldingView>) -> Bool {
+        lhs.source == rhs.source &&
+        lhs.options.processor.identifier == rhs.options.processor.identifier
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(source)
+        hasher.combine(options.processor.identifier)
+    }
+}
+
+#if !os(watchOS)
+extension KFAnimatedImage {
+    public typealias Context = KFImage.Context
+    typealias ImageBinder = KFImage.ImageBinder
+}
+#endif
+
+#endif

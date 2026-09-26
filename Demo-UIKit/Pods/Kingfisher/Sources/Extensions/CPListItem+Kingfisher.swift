@@ -1,10 +1,11 @@
+
 //
-//  TVMonogramView+Kingfisher.swift
+//  CPListItem+Kingfisher.swift
 //  Kingfisher
 //
-//  Created by Marvin Nazari on 2020-12-07.
+//  Created by Wayne Hartman on 2021-08-29.
 //
-//  Copyright (c) 2020 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2019 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +25,14 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-import Foundation
+#if canImport(CarPlay) && !targetEnvironment(macCatalyst)
+import CarPlay
 
-#if canImport(TVUIKit)
-
-import TVUIKit
-
-@available(tvOS 12.0, *)
-extension KingfisherWrapper where Base: TVMonogramView {
-
+@MainActor
+extension KingfisherWrapper where Base: CPListItem {
+    
     // MARK: Setting Image
-
+    
     /// Sets an image to the image view with a source.
     ///
     /// - Parameters:
@@ -58,9 +56,9 @@ extension KingfisherWrapper where Base: TVMonogramView {
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
-        let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
+        let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? []))
         return setImage(
             with: source,
             placeholder: placeholder,
@@ -68,84 +66,6 @@ extension KingfisherWrapper where Base: TVMonogramView {
             progressBlock: progressBlock,
             completionHandler: completionHandler
         )
-    }
-
-    func setImage(
-        with source: Source?,
-        placeholder: KFCrossPlatformImage? = nil,
-        parsedOptions: KingfisherParsedOptionsInfo,
-        progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
-    {
-        var mutatingSelf = self
-        guard let source = source else {
-            base.image = placeholder
-            mutatingSelf.taskIdentifier = nil
-            completionHandler?(.failure(KingfisherError.imageSettingError(reason: .emptySource)))
-            return nil
-        }
-
-        var options = parsedOptions
-        if !options.keepCurrentImageWhileLoading {
-            base.image = placeholder
-        }
-
-        let issuedIdentifier = Source.Identifier.next()
-        mutatingSelf.taskIdentifier = issuedIdentifier
-
-        if let block = progressBlock {
-            options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
-        }
-
-        if let provider = ImageProgressiveProvider(options, refresh: { image in
-            self.base.image = image
-        }) {
-            options.onDataReceived = (options.onDataReceived ?? []) + [provider]
-        }
-
-        options.onDataReceived?.forEach {
-            $0.onShouldApply = { issuedIdentifier == self.taskIdentifier }
-        }
-
-        let task = KingfisherManager.shared.retrieveImage(
-            with: source,
-            options: options,
-            downloadTaskUpdated: { mutatingSelf.imageTask = $0 },
-            completionHandler: { result in
-                CallbackQueue.mainCurrentOrAsync.execute {
-                    guard issuedIdentifier == self.taskIdentifier else {
-                        let reason: KingfisherError.ImageSettingErrorReason
-                        do {
-                            let value = try result.get()
-                            reason = .notCurrentSourceTask(result: value, error: nil, source: source)
-                        } catch {
-                            reason = .notCurrentSourceTask(result: nil, error: error, source: source)
-                        }
-                        let error = KingfisherError.imageSettingError(reason: reason)
-                        completionHandler?(.failure(error))
-                        return
-                    }
-
-                    mutatingSelf.imageTask = nil
-                    mutatingSelf.taskIdentifier = nil
-
-                    switch result {
-                    case .success(let value):
-                        self.base.image = value.image
-                        completionHandler?(result)
-
-                    case .failure:
-                        if let image = options.onFailureImage {
-                            self.base.image = image
-                        }
-                        completionHandler?(result)
-                    }
-                }
-            }
-        )
-
-        mutatingSelf.imageTask = task
-        return task
     }
     
     /// Sets an image to the image view with a requested resource.
@@ -167,11 +87,11 @@ extension KingfisherWrapper where Base: TVMonogramView {
     ///
     @discardableResult
     public func setImage(
-        with resource: Resource?,
+        with resource: (any Resource)?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         return setImage(
             with: resource?.convertToSource(),
@@ -181,37 +101,84 @@ extension KingfisherWrapper where Base: TVMonogramView {
             completionHandler: completionHandler)
     }
 
+    func setImage(
+        with source: Source?,
+        placeholder: KFCrossPlatformImage? = nil,
+        parsedOptions: KingfisherParsedOptionsInfo,
+        progressBlock: DownloadProgressBlock? = nil,
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+    {
+        return setImage(
+            with: source,
+            imageAccessor: ImagePropertyAccessor(
+                setImage: { listItem, image, _ in
+                    listItem.setImage(image)
+                },
+                getImage: { listItem in
+                    listItem.image
+                }
+            ),
+            taskAccessor: TaskPropertyAccessor(
+                setTaskIdentifier: { wrapper, identifier in
+                    wrapper.taskIdentifier = identifier
+                },
+                getTaskIdentifier: { wrapper in
+                    wrapper.taskIdentifier
+                },
+                setTask: { wrapper, task in
+                    wrapper.imageTask = task
+                },
+                getCancellationToken: { wrapper in
+                    wrapper.cancellationToken
+                },
+                setCancellationToken: { wrapper, token in
+                    wrapper.cancellationToken = token
+                }
+            ),
+            placeholder: placeholder,
+            parsedOptions: parsedOptions,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler
+        )
+    }
+    
     // MARK: Cancelling Image
-
+    
     /// Cancel the image download task bounded to the image view if it is running.
     /// Nothing will happen if the downloading has already finished.
     public func cancelDownloadTask() {
         imageTask?.cancel()
+        cancellationToken?.cancel()
     }
 }
 
-private var taskIdentifierKey: Void?
-private var imageTaskKey: Void?
+@MainActor private var taskIdentifierKey: Void?
+@MainActor private var cancellationTokenKey: Void?
+@MainActor private var imageTaskKey: Void?
 
 // MARK: Properties
-@available(tvOS 12.0, *)
-extension KingfisherWrapper where Base: TVMonogramView {
-    
+@MainActor
+extension KingfisherWrapper where Base: CPListItem {
+
     public private(set) var taskIdentifier: Source.Identifier.Value? {
         get {
             let box: Box<Source.Identifier.Value>? = getAssociatedObject(base, &taskIdentifierKey)
             return box?.value
         }
-        set {
+        nonmutating set {
             let box = newValue.map { Box($0) }
             setRetainedAssociatedObject(base, &taskIdentifierKey, box)
         }
     }
 
+    var cancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &cancellationTokenKey) }
+        nonmutating set { setRetainedAssociatedObject(base, &cancellationTokenKey, newValue) }
+    }
+
     private var imageTask: DownloadTask? {
         get { return getAssociatedObject(base, &imageTaskKey) }
-        set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
+        nonmutating set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
     }
 }
-
 #endif

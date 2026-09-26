@@ -1,0 +1,148 @@
+//
+//  KFAnimatedImage.swift
+//  Kingfisher
+//
+//  Created by wangxingbin on 2021/4/29.
+//
+//  Copyright (c) 2021 Wei Wang <onevcat@gmail.com>
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+
+#if canImport(SwiftUI) && canImport(Combine) && !os(watchOS)
+import SwiftUI
+import Combine
+
+/// Represents an animated image view in SwiftUI that manages its content using Kingfisher.
+///
+/// Similar to ``KFImage``, this view provides support for animated image formats like GIF.
+///
+/// - Important: Like ``KFImage``, `KFAnimatedImage` loads disk cached images synchronously by default 
+/// (`.loadDiskFileSynchronously()` is enabled). This prevents image flickering during SwiftUI view updates 
+/// but may impact performance when loading large animated images from disk. You can disable this behavior 
+/// by calling `.loadDiskFileSynchronously(false)` if you prefer better loading performance over visual consistency.
+///
+public struct KFAnimatedImage: KFImageProtocol {
+    public typealias HoldingView = KFAnimatedImageViewRepresenter
+    public var context: Context<HoldingView>
+    public init(context: KFImage.Context<HoldingView>) {
+        self.context = context
+    }
+    
+    /// Configures current rendering view with a `block`. This block will be applied when the under-hood
+    /// `AnimatedImageView` is created in `UIViewRepresentable.makeUIView(context:)`
+    ///
+    /// - Parameter block: The block applies to the animated image view.
+    /// - Returns: A `KFAnimatedImage` view that being configured by the `block`.
+    public func configure(_ block: @escaping (HoldingView.RenderingView) -> Void) -> Self {
+        let result = copyForMutation()
+        result.context.renderConfigurations.append(block)
+        return result
+    }
+
+#if os(iOS)
+    /// Whether the animated frame buffer should be purged when the app enters background.
+    ///
+    /// This is an opt-in behavior to reduce memory footprint when your app is in background. When enabled,
+    /// the internal `AnimatedImageView` stops animating and purges preloaded frames on
+    /// `UIApplication.didEnterBackgroundNotification`. If the view was animating before entering background, it will
+    /// prepare frames and resume animation on `UIApplication.willEnterForegroundNotification`.
+    ///
+    /// - Parameter purge: Whether to enable the frame purging behavior. Default is `true`.
+    /// - Returns: A `KFAnimatedImage` view that configures the behavior.
+    public func purgeFramesOnBackground(_ purge: Bool = true) -> Self {
+        configure { $0.purgeFramesOnBackground = purge }
+    }
+#endif
+}
+
+#if os(macOS)
+typealias KFCrossPlatformViewRepresentable = NSViewRepresentable
+#else
+typealias KFCrossPlatformViewRepresentable = UIViewRepresentable
+#endif
+
+/// A wrapped `UIViewRepresentable` of `AnimatedImageView`
+public struct KFAnimatedImageViewRepresenter: KFCrossPlatformViewRepresentable, KFImageHoldingView, Sendable {
+    public typealias RenderingView = AnimatedImageView
+    public static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> KFAnimatedImageViewRepresenter {
+        KFAnimatedImageViewRepresenter(image: image, context: context)
+    }
+    
+    var image: KFCrossPlatformImage?
+    let context: KFImage.Context<KFAnimatedImageViewRepresenter>
+    
+    #if os(macOS)
+    public func makeNSView(context: Context) -> AnimatedImageView {
+        return makeImageView()
+    }
+    
+    public func updateNSView(_ nsView: AnimatedImageView, context: Context) {
+        updateImageView(nsView)
+    }
+    #else
+    public func makeUIView(context: Context) -> AnimatedImageView {
+        return makeImageView()
+    }
+    
+    public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
+        updateImageView(uiView)
+    }
+    #endif
+    
+    @MainActor
+    private func makeImageView() -> AnimatedImageView {
+        let view = AnimatedImageView()
+        
+        #if !os(macOS)
+        view.isUserInteractionEnabled = true
+        #endif
+        
+        self.context.renderConfigurations.forEach { $0(view) }
+        
+        view.image = image
+        
+        // Allow SwiftUI scale (fit/fill) working fine.
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        return view
+    }
+    
+    @MainActor
+    private func updateImageView(_ imageView: AnimatedImageView) {
+        imageView.image = image
+    }
+}
+
+#if DEBUG
+struct KFAnimatedImage_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            KFAnimatedImage(source: .network(URL(string: "https://raw.githubusercontent.com/onevcat/Kingfisher-TestImages/master/DemoAppImage/GIF/1.gif")!))
+                .onSuccess { r in
+                    print(r)
+                }
+                .placeholder {
+                    ProgressView()
+                }
+                .padding()
+        }
+    }
+}
+#endif
+#endif

@@ -29,6 +29,7 @@
 #if canImport(UIKit)
 import UIKit
 
+@MainActor
 extension KingfisherWrapper where Base: UIButton {
 
     // MARK: Setting Image
@@ -56,7 +57,7 @@ extension KingfisherWrapper where Base: UIButton {
         placeholder: UIImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
         return setImage(
@@ -88,12 +89,12 @@ extension KingfisherWrapper where Base: UIButton {
     ///
     @discardableResult
     public func setImage(
-        with resource: Resource?,
+        with resource: (any Resource)?,
         for state: UIControl.State,
         placeholder: UIImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         return setImage(
             with: resource?.convertToSource(),
@@ -111,77 +112,40 @@ extension KingfisherWrapper where Base: UIButton {
         placeholder: UIImage? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
-        guard let source = source else {
-            base.setImage(placeholder, for: state)
-            setTaskIdentifier(nil, for: state)
-            completionHandler?(.failure(KingfisherError.imageSettingError(reason: .emptySource)))
-            return nil
-        }
-
-        var options = parsedOptions
-        if !options.keepCurrentImageWhileLoading {
-            base.setImage(placeholder, for: state)
-        }
-
-        var mutatingSelf = self
-        let issuedIdentifier = Source.Identifier.next()
-        setTaskIdentifier(issuedIdentifier, for: state)
-
-        if let block = progressBlock {
-            options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
-        }
-
-        if let provider = ImageProgressiveProvider(options, refresh: { image in
-            self.base.setImage(image, for: state)
-        }) {
-            options.onDataReceived = (options.onDataReceived ?? []) + [provider]
-        }
-
-        options.onDataReceived?.forEach {
-            $0.onShouldApply = { issuedIdentifier == self.taskIdentifier(for: state) }
-        }
-
-        let task = KingfisherManager.shared.retrieveImage(
+        return setImage(
             with: source,
-            options: options,
-            downloadTaskUpdated: { mutatingSelf.imageTask = $0 },
-            completionHandler: { result in
-                CallbackQueue.mainCurrentOrAsync.execute {
-                    guard issuedIdentifier == self.taskIdentifier(for: state) else {
-                        let reason: KingfisherError.ImageSettingErrorReason
-                        do {
-                            let value = try result.get()
-                            reason = .notCurrentSourceTask(result: value, error: nil, source: source)
-                        } catch {
-                            reason = .notCurrentSourceTask(result: nil, error: error, source: source)
-                        }
-                        let error = KingfisherError.imageSettingError(reason: reason)
-                        completionHandler?(.failure(error))
-                        return
-                    }
-
-                    mutatingSelf.imageTask = nil
-                    mutatingSelf.setTaskIdentifier(nil, for: state)
-
-                    switch result {
-                    case .success(let value):
-                        self.base.setImage(value.image, for: state)
-                        completionHandler?(result)
-
-                    case .failure:
-                        if let image = options.onFailureImage {
-                            self.base.setImage(image, for: state)
-                        }
-                        completionHandler?(result)
-                    }
+            imageAccessor: ImagePropertyAccessor(
+                setImage: { button, image, _ in
+                    button.setImage(image, for: state)
+                },
+                getImage: { button in
+                    button.image(for: state)
                 }
-            }
+            ),
+            taskAccessor: TaskPropertyAccessor(
+                setTaskIdentifier: { wrapper, identifier in
+                    wrapper.setTaskIdentifier(identifier, for: state)
+                },
+                getTaskIdentifier: { wrapper in
+                    wrapper.taskIdentifier(for: state)
+                },
+                setTask: { wrapper, task in
+                    wrapper.imageTask = task
+                },
+                getCancellationToken: { wrapper in
+                    wrapper.imageCancellationToken
+                },
+                setCancellationToken: { wrapper, token in
+                    wrapper.imageCancellationToken = token
+                }
+            ),
+            placeholder: placeholder,
+            parsedOptions: parsedOptions,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler
         )
-
-        mutatingSelf.imageTask = task
-        return task
     }
 
     // MARK: Cancelling Downloading Task
@@ -190,6 +154,7 @@ extension KingfisherWrapper where Base: UIButton {
     /// Nothing will happen if the downloading has already finished.
     public func cancelImageDownloadTask() {
         imageTask?.cancel()
+        imageCancellationToken?.cancel()
     }
 
     // MARK: Setting Background Image
@@ -218,7 +183,7 @@ extension KingfisherWrapper where Base: UIButton {
         placeholder: UIImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
         return setBackgroundImage(
@@ -250,12 +215,12 @@ extension KingfisherWrapper where Base: UIButton {
     ///
     @discardableResult
     public func setBackgroundImage(
-        with resource: Resource?,
+        with resource: (any Resource)?,
         for state: UIControl.State,
         placeholder: UIImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
         return setBackgroundImage(
             with: resource?.convertToSource(),
@@ -272,77 +237,40 @@ extension KingfisherWrapper where Base: UIButton {
         placeholder: UIImage? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
         progressBlock: DownloadProgressBlock? = nil,
-        completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil) -> DownloadTask?
     {
-        guard let source = source else {
-            base.setBackgroundImage(placeholder, for: state)
-            setBackgroundTaskIdentifier(nil, for: state)
-            completionHandler?(.failure(KingfisherError.imageSettingError(reason: .emptySource)))
-            return nil
-        }
-
-        var options = parsedOptions
-        if !options.keepCurrentImageWhileLoading {
-            base.setBackgroundImage(placeholder, for: state)
-        }
-
-        var mutatingSelf = self
-        let issuedIdentifier = Source.Identifier.next()
-        setBackgroundTaskIdentifier(issuedIdentifier, for: state)
-
-        if let block = progressBlock {
-            options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
-        }
-
-        if let provider = ImageProgressiveProvider(options, refresh: { image in
-            self.base.setBackgroundImage(image, for: state)
-        }) {
-            options.onDataReceived = (options.onDataReceived ?? []) + [provider]
-        }
-
-        options.onDataReceived?.forEach {
-            $0.onShouldApply = { issuedIdentifier == self.backgroundTaskIdentifier(for: state) }
-        }
-
-        let task = KingfisherManager.shared.retrieveImage(
+        return setImage(
             with: source,
-            options: options,
-            downloadTaskUpdated: { mutatingSelf.backgroundImageTask = $0 },
-            completionHandler: { result in
-                CallbackQueue.mainCurrentOrAsync.execute {
-                    guard issuedIdentifier == self.backgroundTaskIdentifier(for: state) else {
-                        let reason: KingfisherError.ImageSettingErrorReason
-                        do {
-                            let value = try result.get()
-                            reason = .notCurrentSourceTask(result: value, error: nil, source: source)
-                        } catch {
-                            reason = .notCurrentSourceTask(result: nil, error: error, source: source)
-                        }
-                        let error = KingfisherError.imageSettingError(reason: reason)
-                        completionHandler?(.failure(error))
-                        return
-                    }
-
-                    mutatingSelf.backgroundImageTask = nil
-                    mutatingSelf.setBackgroundTaskIdentifier(nil, for: state)
-
-                    switch result {
-                    case .success(let value):
-                        self.base.setBackgroundImage(value.image, for: state)
-                        completionHandler?(result)
-
-                    case .failure:
-                        if let image = options.onFailureImage {
-                            self.base.setBackgroundImage(image, for: state)
-                        }
-                        completionHandler?(result)
-                    }
+            imageAccessor: ImagePropertyAccessor(
+                setImage: { button, image, _ in
+                    button.setBackgroundImage(image, for: state)
+                },
+                getImage: { button in
+                    button.backgroundImage(for: state)
                 }
-            }
+            ),
+            taskAccessor: TaskPropertyAccessor(
+                setTaskIdentifier: { wrapper, identifier in
+                    wrapper.setBackgroundTaskIdentifier(identifier, for: state)
+                },
+                getTaskIdentifier: { wrapper in
+                    wrapper.backgroundTaskIdentifier(for: state)
+                },
+                setTask: { wrapper, task in
+                    wrapper.backgroundImageTask = task
+                },
+                getCancellationToken: { wrapper in
+                    wrapper.backgroundImageCancellationToken
+                },
+                setCancellationToken: { wrapper, token in
+                    wrapper.backgroundImageCancellationToken = token
+                }
+            ),
+            placeholder: placeholder,
+            parsedOptions: parsedOptions,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler
         )
-
-        mutatingSelf.backgroundImageTask = task
-        return task
     }
 
     // MARK: Cancelling Background Downloading Task
@@ -351,14 +279,17 @@ extension KingfisherWrapper where Base: UIButton {
     /// Nothing will happen if the downloading has already finished.
     public func cancelBackgroundImageDownloadTask() {
         backgroundImageTask?.cancel()
+        backgroundImageCancellationToken?.cancel()
     }
 }
 
 // MARK: - Associated Object
-private var taskIdentifierKey: Void?
-private var imageTaskKey: Void?
+@MainActor private var taskIdentifierKey: Void?
+@MainActor private var imageTaskKey: Void?
+@MainActor private var imageCancellationTokenKey: Void?
 
 // MARK: Properties
+@MainActor
 extension KingfisherWrapper where Base: UIButton {
 
     private typealias TaskIdentifier = Box<[UInt: Source.Identifier.Value]>
@@ -380,15 +311,22 @@ extension KingfisherWrapper where Base: UIButton {
     
     private var imageTask: DownloadTask? {
         get { return getAssociatedObject(base, &imageTaskKey) }
-        set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
+        nonmutating set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
+    }
+
+    private var imageCancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &imageCancellationTokenKey) }
+        nonmutating set { setRetainedAssociatedObject(base, &imageCancellationTokenKey, newValue) }
     }
 }
 
 
-private var backgroundTaskIdentifierKey: Void?
-private var backgroundImageTaskKey: Void?
+@MainActor private var backgroundTaskIdentifierKey: Void?
+@MainActor private var backgroundImageTaskKey: Void?
+@MainActor private var backgroundImageCancellationTokenKey: Void?
 
 // MARK: Background Properties
+@MainActor
 extension KingfisherWrapper where Base: UIButton {
     
     public func backgroundTaskIdentifier(for state: UIControl.State) -> Source.Identifier.Value? {
@@ -408,7 +346,12 @@ extension KingfisherWrapper where Base: UIButton {
     
     private var backgroundImageTask: DownloadTask? {
         get { return getAssociatedObject(base, &backgroundImageTaskKey) }
-        mutating set { setRetainedAssociatedObject(base, &backgroundImageTaskKey, newValue) }
+        nonmutating set { setRetainedAssociatedObject(base, &backgroundImageTaskKey, newValue) }
+    }
+
+    private var backgroundImageCancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &backgroundImageCancellationTokenKey) }
+        nonmutating set { setRetainedAssociatedObject(base, &backgroundImageCancellationTokenKey, newValue) }
     }
 }
 #endif

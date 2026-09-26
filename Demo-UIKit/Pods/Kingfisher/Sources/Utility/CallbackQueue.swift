@@ -26,34 +26,47 @@
 
 import Foundation
 
-/// Represents callback queue behaviors when an calling of closure be dispatched.
-///
-/// - asyncMain: Dispatch the calling to `DispatchQueue.main` with an `async` behavior.
-/// - currentMainOrAsync: Dispatch the calling to `DispatchQueue.main` with an `async` behavior if current queue is not
-///                       `.main`. Otherwise, call the closure immediately in current main queue.
-/// - untouch: Do not change the calling queue for closure.
-/// - dispatch: Dispatches to a specified `DispatchQueue`.
-public enum CallbackQueue {
-    /// Dispatch the calling to `DispatchQueue.main` with an `async` behavior.
-    case mainAsync
-    /// Dispatch the calling to `DispatchQueue.main` with an `async` behavior if current queue is not
-    /// `.main`. Otherwise, call the closure immediately in current main queue.
-    case mainCurrentOrAsync
-    /// Do not change the calling queue for closure.
-    case untouch
-    /// Dispatches to a specified `DispatchQueue`.
-    case dispatch(DispatchQueue)
+public typealias ExecutionQueue = CallbackQueue
+
+/// Represents the behavior of the callback queue selection when a closure is dispatched.
+public enum CallbackQueue: Sendable {
     
-    public func execute(_ block: @escaping () -> Void) {
+    /// Dispatches the closure to `DispatchQueue.main` with an `async` behavior.
+    case mainAsync
+    
+    /// Dispatches the closure to `DispatchQueue.main` with an `async` behavior if the current queue is not `.main`.
+    ///  Otherwise, it calls the closure immediately on the current main queue.
+    case mainCurrentOrAsync
+    
+    /// Does not change the calling queue for the closure.
+    case untouch
+    
+    /// Dispatches the closure to a specified `DispatchQueue`.
+    case dispatch(DispatchQueue)
+
+    /// Dispatches the closure to an operation-queue–like type.
+    ///
+    /// Use this case when you want to integrate Kingfisher's work into your own scheduling policy.
+    /// For example, you can control concurrency, priority, or implement a LIFO execution order.
+    ///
+    /// - Note: Execution order and whether the block runs serially or concurrently depend on the
+    ///   provided queue. Kingfisher does not enforce ordering guarantees for this case.
+    case operationQueue(CallbackOperationQueue)
+
+    /// Executes the `block` in a dispatch queue defined by `self`.
+    /// - Parameter block: The block needs to be executed.
+    public func execute(_ block: @Sendable @escaping () -> Void) {
         switch self {
         case .mainAsync:
-            DispatchQueue.main.async { block() }
+            CallbackQueueMain.async { block() }
         case .mainCurrentOrAsync:
-            DispatchQueue.main.safeAsync { block() }
+            CallbackQueueMain.currentOrAsync { block() }
         case .untouch:
             block()
         case .dispatch(let queue):
             queue.async { block() }
+        case .operationQueue(let queue):
+            queue.addOperation(block)
         }
     }
 
@@ -63,19 +76,44 @@ public enum CallbackQueue {
         case .mainCurrentOrAsync: return .main
         case .untouch: return OperationQueue.current?.underlyingQueue ?? .main
         case .dispatch(let queue): return queue
+        case .operationQueue(let queue): return queue.underlyingQueue ?? .main
         }
     }
 }
 
-extension DispatchQueue {
-    // This method will dispatch the `block` to self.
-    // If `self` is the main queue, and current thread is main thread, the block
-    // will be invoked immediately instead of being dispatched.
-    func safeAsync(_ block: @escaping ()->()) {
-        if self === DispatchQueue.main && Thread.isMainThread {
-            block()
+enum CallbackQueueMain {
+    static func currentOrAsync(_ block: @MainActor @Sendable @escaping () -> Void) {
+        if Thread.isMainThread {
+            MainActor.runUnsafely { block() }
         } else {
-            async { block() }
+            DispatchQueue.main.async { block() }
         }
     }
+    
+    static func async(_ block: @MainActor @Sendable @escaping () -> Void) {
+        DispatchQueue.main.async { block() }
+    }
 }
+
+extension MainActor {
+    @_unavailableFromAsync
+    static func runUnsafely<T: Sendable>(_ body: @MainActor () throws -> T) rethrows -> T {
+        return try MainActor.assumeIsolated(body)
+    }
+}
+
+/// A minimal abstraction used by ``CallbackQueue/operationQueue(_:)``.
+///
+/// Conform your own type to control how Kingfisher schedules work. `OperationQueue` already
+/// conforms to this protocol.
+public protocol CallbackOperationQueue: AnyObject, Sendable {
+    /// The underlying `DispatchQueue` if available.
+    ///
+    /// Kingfisher uses this value only when it needs a best-effort `DispatchQueue` representation.
+    var underlyingQueue: DispatchQueue? { get }
+
+    /// Schedules a block for execution on this queue.
+    func addOperation(_ block: @Sendable @escaping () -> Void)
+}
+
+extension OperationQueue: CallbackOperationQueue {}

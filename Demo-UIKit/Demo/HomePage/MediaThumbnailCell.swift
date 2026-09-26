@@ -99,7 +99,7 @@ final class MediaThumbnailCell: UICollectionViewCell {
         playOverlay.isHidden = true
         loadingIndicator.startAnimating()
 
-        let completionHandler: ((Result<RetrieveImageResult, KingfisherError>) -> Void) = { [weak self] _ in
+        let completionHandler: @MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void = { [weak self] _ in
             self?.loadingIndicator.stopAnimating()
         }
 

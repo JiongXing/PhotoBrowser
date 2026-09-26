@@ -73,7 +73,7 @@ Because `browser.delegate` is weak, the Presenter or Coordinator needs an extern
 
 ## Saving to the Photo Library
 
-Saving is intentionally outside the framework. Use `.addOnly` authorization on iOS 14+ and the legacy API on iOS 12/13. On iPad, configure the ActionSheet's `popoverPresentationController.sourceView` and `sourceRect`.
+Saving is intentionally outside the framework. With iOS 15 as the minimum, use `.addOnly` authorization for saving images and videos. On iPad, configure the ActionSheet's `popoverPresentationController.sourceView` and `sourceRect`.
 
 ## CocoaPods Sandboxing
 
