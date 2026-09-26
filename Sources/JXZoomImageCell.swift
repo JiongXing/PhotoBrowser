@@ -137,6 +137,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     
     open override func prepareForReuse() {
         super.prepareForReuse()
+        isTransitioningSize = false
         
         // 清空旧图像
         imageView.image = nil
@@ -241,6 +242,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     /// - false: scaleAspectFit（长边铺满容器，短边等比例缩放，居中展示）
     /// - true: scaleAspectFill（短边铺满容器，长边等比例缩放）
     open func adjustImageViewFrame() {
+        guard !isTransitioningSize else { return }
         let containerSize = effectiveContentSize
         guard containerSize.width > 0, containerSize.height > 0 else { return }
         
@@ -284,6 +286,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     }
 
     private func centerZoomContentViewIfNeeded() {
+        guard !isTransitioningSize else { return }
         let scrollBounds = CGRect(origin: .zero, size: effectiveContentSize)
         let contentFrame = zoomContentView.frame
         guard scrollBounds.width > 0, scrollBounds.height > 0 else { return }
@@ -311,6 +314,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     }
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+        guard !isTransitioningSize else { return }
         let currentScale = scrollView.zoomScale
         let isInitialScale = abs(currentScale - scrollView.minimumZoomScale) < 0.01
         
