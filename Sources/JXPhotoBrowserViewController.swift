@@ -388,12 +388,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 计算整页 Cell 尺寸
     private func calculateItemSize() -> CGSize {
-        let viewSize = view.bounds.size
-        if viewSize.width > 0 && viewSize.height > 0 {
-            return viewSize
-        }
-        
-        return UIScreen.main.bounds.size
+        return view.bounds.size
     }
     
     @objc private func handlePanGesture(_ gesture: UIPanGestureRecognizer) {
