@@ -174,8 +174,10 @@ final class RotationHostController: UIViewController, JXPhotoBrowserDelegate {
         let visible = cv.indexPathsForVisibleItems.min { lhs, rhs in abs(Double(lhs.item) - Double(virtual)) < abs(Double(rhs.item) - Double(virtual)) }
         let aligned = abs(virtual - virtual.rounded()) < 0.002
         let zoom = browser.visibleZoomImageCell()?.scrollView.zoomScale ?? 0
-        let imageWidth = browser.visibleZoomImageCell()?.imageView.frame.width ?? 0
-        let imageHeight = browser.visibleZoomImageCell()?.imageView.frame.height ?? 0
+        let cell = browser.visibleZoomImageCell()
+        let imageFrame = cell.map { $0.imageView.convert($0.imageView.bounds, to: $0.contentView) } ?? .zero
+        let imageWidth = imageFrame.width
+        let imageHeight = imageFrame.height
         let fitted = imageWidth <= browser.view.bounds.width + 1 && imageHeight <= browser.view.bounds.height + 1
         status.text = "page=\(browser.pageIndex);visible=\((visible?.item ?? 0) % max(1, count));aligned=\(aligned ? 1 : 0);zoom=\(String(format: "%.2f", zoom));fit=\(fitted ? 1 : 0);landscape=\(view.bounds.width > view.bounds.height ? 1 : 0);transition=\(browser.rotating ? 1 : 0);count=\(count);trigger=\(browser.rotationTrigger);preserved=\(browser.preservedPage);phase=\(browser.phase)"
     }

@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- 修复双击与捏合缩放无法互相还原：统一使用 UIScrollView 缩放状态，默认短边铺满及指定双击倍数均遵守 maximumZoomScale 上限
+
 ## Version 4.2.0
 
 > 2026/09/26

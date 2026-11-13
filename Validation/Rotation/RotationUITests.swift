@@ -101,6 +101,28 @@ final class RotationUITests: XCTestCase {
         waitFor("zoom=1.00")
         assertAutoplayRecovers()
     }
+    func testMixedZoomGestures() {
+        for arguments in [["nonloop"], ["nonloop", "fixedzoom"]] {
+            launch(arguments)
+            let photos = app.collectionViews["photos"]
+            photos.doubleTap()
+            waitFor("fit=0")
+            photos.pinch(withScale: 0.2, velocity: -1)
+            waitFor("zoom=1.00;fit=1")
+            photos.pinch(withScale: 2, velocity: 1)
+            let zoomed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "NOT (label CONTAINS 'zoom=1.00')"), object: app.staticTexts["status"])
+            XCTAssertEqual(XCTWaiter.wait(for: [zoomed], timeout: 3), .completed)
+            photos.doubleTap()
+            waitFor("zoom=1.00;fit=1")
+            photos.doubleTap()
+            waitFor("fit=0")
+            let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            attachment.name = "mixed-zoom-\(arguments.joined(separator: "-"))"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+            app.terminate()
+        }
+    }
     func assertAutoplayRecovers() {
         app.buttons["Auto"].tap()
         XCUIDevice.shared.orientation = .portrait
