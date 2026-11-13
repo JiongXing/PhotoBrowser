@@ -28,7 +28,7 @@ sources << File.join(__dir__, 'RotationHost.swift')
 sources << File.join(__dir__, 'LifecycleHost.swift')
 sources << File.join(root, 'Demo-UIKit/Demo/HomePage/VideoSaveService.swift')
 app.add_file_references(sources.map { |path| project.main_group.new_file(path) })
-test_files = ENV['ROTATION_ONLY'] == '1' ? ['RotationTests.swift'] : ['RotationTests.swift', 'LifecycleTests.swift', 'VideoSaveTests.swift']
+test_files = ENV['ROTATION_ONLY'] == '1' ? ['RotationTests.swift'] : ['RotationTests.swift', 'LifecycleTests.swift', 'VideoSaveTests.swift', 'ZoomTests.swift']
 tests.add_file_references(test_files.map { |name| project.main_group.new_file(File.join(__dir__, name)) })
 ui.add_file_references(['RotationUITests.swift', 'LifecycleUITests.swift'].map { |name| project.main_group.new_file(File.join(__dir__, name)) })
 tests.add_dependency(app)

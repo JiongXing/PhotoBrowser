@@ -34,7 +34,7 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailRestorationA
 
 ## Zooming
 
-`JXZoomImageCell` toggles between full-image display and short-edge fill by default. To use a fixed double-tap scale:
+`JXZoomImageCell` uses the same zoom scale for pinch and double tap: pinch can undo a double-tap zoom, and double tap returns a pinched image to full-image display. By default, double tap targets short-edge fill, capped by `scrollView.maximumZoomScale` (3 by default). Very wide or tall images may need a higher maximum to reach fill. To use a fixed double-tap scale:
 
 ```swift
 cell.scrollView.maximumZoomScale = 5
