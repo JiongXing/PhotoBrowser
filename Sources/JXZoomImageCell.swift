@@ -253,9 +253,10 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         }
 
         let contentSize = baseContentSize(for: containerSize, imageSize: image.size)
-        zoomContentView.frame = CGRect(origin: .zero, size: contentSize)
+        // 更新未缩放的 bounds，避免在非单位 transform 下修改 frame 反向改变基础尺寸。
+        zoomContentView.bounds = CGRect(origin: .zero, size: contentSize)
         imageView.frame = zoomContentView.bounds
-        scrollView.contentSize = contentSize
+        scrollView.contentSize = zoomContentView.frame.size
         centerZoomContentViewIfNeeded()
     }
 
@@ -269,12 +270,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
     }
 
     open func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-        let isAtMinimumZoom = scrollView.zoomScale <= scrollView.minimumZoomScale + 0.01
-        if isAtMinimumZoom {
-            adjustImageViewFrame()
-        } else {
-            centerZoomContentViewIfNeeded()
-        }
+        centerZoomContentViewIfNeeded()
     }
 
     // MARK: - Helpers
@@ -313,10 +309,7 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
 
     @objc open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
         guard !isTransitioningSize else { return }
-        let currentScale = scrollView.zoomScale
-        let isInitialScale = abs(currentScale - scrollView.minimumZoomScale) < 0.01
-        
-        if !isInitialScale {
+        if scrollView.zoomScale > scrollView.minimumZoomScale {
             scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
             return
         }
@@ -383,10 +376,6 @@ open class JXZoomImageCell: UICollectionViewCell, UIScrollViewDelegate, JXPhotoB
         isPerformingLayoutUpdate = true
         defer { isPerformingLayoutUpdate = false }
 
-        if scrollView.zoomScale <= scrollView.minimumZoomScale + 0.01 || zoomContentView.bounds.isEmpty {
-            adjustImageViewFrame()
-        } else {
-            centerZoomContentViewIfNeeded()
-        }
+        adjustImageViewFrame()
     }
 }

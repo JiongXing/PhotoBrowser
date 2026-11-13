@@ -28,7 +28,18 @@ On iPhone 18 Pro / iOS 27.2: all 3 selected UI tests passed — mixed pinch/doub
 
 Result: `/tmp/PhotoBrowser-Zoom-iPhone.xcresult`.
 
-No physical-device, iPad or older-iOS verification is claimed. CI has not been run for this branch.
+No physical-device, iPad or older-iOS verification is claimed. Remote CI status has not been verified.
+
+## Branch review (2026-11-13)
+
+Additional regression tests reproduced two edge cases in the first fix:
+
+- An aspect-fill target less than 1% above minimum triggered the old near-minimum layout path, shrinking the unscaled image bounds. The same tolerance made the next double tap zoom in again instead of resetting. Zoom completion now only recenters; double tap resets any scale above minimum.
+- Replacing an image while zoomed retained the old image proportions because the image observer skipped layout above minimum. Image changes now update unscaled bounds and the corresponding scaled scroll content size, preserving zoom.
+
+The expanded tests also check the exact uncapped fill target and reuse during an unfinished double-tap animation. Before the corrections, 2 of 8 zoom tests failed: `/tmp/PhotoBrowser-Zoom-Review/Results.xcresult`.
+
+After the corrections, on iPhone 18 Pro / iOS 27.2, all 37 state tests (8 zoom, 12 rotation, 17 lifecycle) and 4 selected UI tests (mixed gestures, vertical paging/double-tap rotation, fixed zoom/rotation/autoplay, and zoom dismissal veto/completion) passed. Main framework, UIKit demo and SwiftUI demo device builds also passed. Result: `/tmp/PhotoBrowser-Zoom-Review/Fixed.xcresult`.
 
 ## Running
 
