@@ -1,5 +1,7 @@
 # Mixed zoom gesture validation
 
+Sections through “Running” document PR #244 historically. Current behavior and evidence are recorded under [Fill-based zoom and top dismissal](#fill-based-zoom-and-top-dismissal-2026-11-17).
+
 Base: upstream `57b8414` (4.2.0). This is a focused repair of mixed zoom gestures; no public API is added.
 
 ## Reproduction
@@ -44,3 +46,27 @@ After the corrections, on iPhone 18 Pro / iOS 27.2, all 37 state tests (8 zoom, 
 ## Running
 
 The existing `Validation/run-tests.sh` entry point includes these tests. For a focused run, generate the project using `Validation/Rotation/generate_project.rb`, then select `RotationTests/ZoomTests` and `RotationUITests/RotationUITests/testMixedZoomGestures` with `xcodebuild`. Use a conventional iPhone simulator for the system rotation tests.
+
+## Fill-based zoom and top dismissal (2026-11-17)
+
+The earlier sections record PR #244's original fit-based implementation and its historical zoom veto. This section records the subsequent `fill-based-zoom-dismiss` change, locally integrated from master `f725644` and PR head `7511edc` with merge commit `22004b0`.
+
+Native `zoomScale == 1` now means aspect fill; initial complete-image display uses `minimumZoomScale = fitScale / fillScale`. The default maximum is 2. The guides document migration of native maximum and configured double-tap targets. Dismissal is admitted at touch receipt only when already at the inset-adjusted top; a drag that reaches the top must end before another pull dismisses.
+
+New numeric fixtures first failed against the integrated PR (2 tests, 11 assertions), then passed: a 100 × 800 image in a 400 × 800 container has minimum 0.25, fill size 400 × 3200, and maximum size 800 × 6400. The panorama fixture verifies a host maximum of 4 survives layout and rotation.
+
+Additional regressions caught and fixed an automatic-inset position jump when disabling scrolling and an image-bounds mutation on cancellation with a pre-existing image transform. The follow-finger test verifies screen displacement and exact restoration at both minimum and 2×, including image bounds/center, transform, native zoom and offset. A separate failing test reproduced a touch starting 5 points below the top reaching it before pan recognition; admission is now captured before that scroll. Deferred image replacement during dismissal is also covered.
+
+Environment: Xcode 27.0 (27A266a), iPhone 18 Pro Max simulator, iOS 27.0 (24A434). Main framework, UIKit/CocoaPods and SwiftUI/SwiftPM device builds passed with signing disabled; no deployment-target overrides were needed. Final build logs: `/tmp/PhotoBrowser-FillZoom/{framework,uikit,swiftui}-final.log`.
+
+The focused zoomed-top cancellation/completion UI test passed, with its screenshot inspected for 2× scale and preserved top offset: `/tmp/PhotoBrowser-FillZoom-Baseline/GreenRestore.xcresult`. Long-image width-fill/top-repull and pinch-isolation UI tests also passed. An overlapping diagnostic test invocation terminated a UI host during an earlier exploratory run; the affected scenario subsequently passed in isolation. Final suite execution is serial.
+
+Independent read-only review covered the full master-to-working-tree change, specifications and tests. It reported no Critical/Important findings and requested the current validation record already planned here. Its delivery condition is a passing full suite and final builds.
+
+No physical-device, iPad or older-iOS verification is claimed. No remote push, approval or merge of PR #244 was performed.
+
+The first complete suite passed 65/67 tests. Two inherited UI inputs required migration: an implicit landscape double-tap point could land at the top (where dismissal is now allowed), and pinching a configured 2× image by 0.2 only reaches 0.4, still above the fixture's new minimum. The updated test explicitly taps the image middle and asserts non-top before scrolling; the mixed-gesture test pinches by 0.1 to reach complete fit. Both passed in a focused rerun: `/tmp/PhotoBrowser-FillZoom-Full/AdjustedGestures.xcresult`. These corrections changed test inputs, without additional production changes.
+
+Final complete run: **67/67 passed, zero failures and zero skips** (51 state/file tests and 16 system UI tests), using `Validation/run-tests.sh /tmp/PhotoBrowser-FillZoom-Final`. Result bundle: `/tmp/PhotoBrowser-FillZoom-Final/Results.xcresult`; logs: `build.log` and `test.log` in the same directory. Mixed-gesture, long-image, cancellation and landscape-fit screenshots were inspected.
+
+OpenSpec archive `2026-11-17-fill-based-zoom-dismiss` synchronized the image-zoom and browser-lifecycle contracts. Strict validation passed for all six main specs after archive, with no active change remaining; `git diff --check` passed. Independent review has no deferred findings.

@@ -34,12 +34,18 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailRestorationA
 
 ## 缩放
 
-`JXZoomImageCell` 的捏合与双击共用缩放倍数：双击放大后可捏合缩小，捏合放大后可双击恢复完整显示。默认双击以短边铺满为目标，受 `scrollView.maximumZoomScale`（默认 3）限制；极宽或极长图片需要提高上限才能铺满。固定倍率模式：
+`JXZoomImageCell` 的捏合与双击共用原生 `scrollView.zoomScale`，以图片等比例铺满容器（aspect fill）为 **1 倍**。初始完整显示的倍率为 `minimumZoomScale`，由图片和容器比例计算，可小于 1。默认最大倍率为 **2**，布局和旋转不会覆盖宿主设置的上限。
+
+例如，100 × 800 图片在 400 × 800 容器中：完整显示为 0.25 倍（100 × 800），双击到 1 倍铺满（400 × 3200），最大 2 倍（800 × 6400）。极长、极宽图片也可在默认配置下双击铺满。
+
+默认双击从完整显示放大到 1 倍，已放大时双击回到完整显示；捏合可在最小、最大倍率之间连续缩放。指定双击目标仍以铺满为基准，并受滚动视图的缩放范围约束：
 
 ```swift
 cell.scrollView.maximumZoomScale = 5
 cell.doubleTapZoomScale = 4
 ```
+
+迁移注意：`doubleTapZoomScale` 和 `maximumZoomScale` 以前相对完整适配尺寸，现在相对铺满尺寸。检测完整显示应将 `zoomScale` 与 `minimumZoomScale` 比较，不再假定初始倍率为 1。图片的未变换 bounds 表示铺满基础尺寸；需要屏幕中的实际显示尺寸时，使用视图坐标转换。
 
 ## 自定义 Cell
 
@@ -70,7 +76,9 @@ final class MediaCell: UICollectionViewCell, JXPhotoBrowserCellProtocol {
 browser.register(MediaCell.self, forReuseIdentifier: MediaCell.reuseIdentifier)
 ```
 
-`canBeginDismissInteraction` 默认返回 `true`。自定义 Cell 可返回 `false` 阻止下拉，例如内容已放大或正在编辑；在 `photoBrowserDismissInteractionDidChange` 内暂停并恢复自己的滚动容器。内置 `JXZoomImageCell` 已处理缩放、到顶判断与原始滚动/裁剪状态恢复。
+`canBeginDismissInteraction` 默认返回 `true`。自定义 Cell 可返回 `false` 阻止下拉，例如正在编辑；在 `photoBrowserDismissInteractionDidChange` 内暂停并恢复自己的滚动容器。
+
+内置 `JXZoomImageCell` 在图片到顶后允许单指向下关闭，放大状态也适用；双指捏合不触发关闭。手势开始时若未到顶，本次只滚动图片，即使途中到顶也需松手后重新下拉才关闭。顶部判断考虑实际内容边距；取消关闭后恢复原倍率、偏移和滚动/裁剪配置。纵向分页继续禁用下拉关闭。
 
 下拉及回弹期间自动轮播暂停，回弹结束后按当前显示、数据和尺寸转场状态恢复。刷新、有效跳页和尺寸变化会先结束旧下拉交互。
 

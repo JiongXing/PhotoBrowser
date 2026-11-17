@@ -34,12 +34,18 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailRestorationA
 
 ## Zooming
 
-`JXZoomImageCell` uses the same zoom scale for pinch and double tap: pinch can undo a double-tap zoom, and double tap returns a pinched image to full-image display. By default, double tap targets short-edge fill, capped by `scrollView.maximumZoomScale` (3 by default). Very wide or tall images may need a higher maximum to reach fill. To use a fixed double-tap scale:
+`JXZoomImageCell` uses the native `scrollView.zoomScale` for both pinch and double tap. **1×** means the image's aspect-fill size. Initial full-image display uses a calculated `minimumZoomScale`, which can be below 1. The default maximum is **2×**; layout and rotation preserve a host-configured maximum.
+
+For a 100 × 800 image in a 400 × 800 container, full-image display is 0.25× (100 × 800), double tap reaches 1× fill (400 × 3200), and the default maximum is 2× (800 × 6400). Tall and wide images can reach fill with the default configuration.
+
+Double tap goes from full-image display to 1× and returns an enlarged image to its minimum. Pinch moves continuously through the same range. A configured double-tap target is also relative to fill and is clamped to the scroll view's zoom range:
 
 ```swift
 cell.scrollView.maximumZoomScale = 5
 cell.doubleTapZoomScale = 4
 ```
+
+Migration: `doubleTapZoomScale` and `maximumZoomScale` previously used the aspect-fit size as their basis; they now use aspect fill. Compare `zoomScale` with `minimumZoomScale` to detect full-image display instead of assuming an initial scale of 1. Untransformed image bounds describe the fill base; use view coordinate conversion to obtain the displayed size.
 
 ## Custom Cells
 
@@ -70,7 +76,9 @@ Every cell uses the browser's full-page size. Register it before dequeuing:
 browser.register(MediaCell.self, forReuseIdentifier: MediaCell.reuseIdentifier)
 ```
 
-`canBeginDismissInteraction` defaults to `true`. A custom cell can return `false` while zoomed or editing, and suspend/restore its own scrolling in `photoBrowserDismissInteractionDidChange`. `JXZoomImageCell` already handles zoom/top-edge eligibility and preserves its original scrolling and clipping settings.
+`canBeginDismissInteraction` defaults to `true`. A custom cell can return `false` while editing, and suspend/restore its own scrolling in `photoBrowserDismissInteractionDidChange`.
+
+The built-in `JXZoomImageCell` allows one-finger downward dismissal at the top, including while enlarged. Two-finger pinching does not dismiss. A gesture starting away from the top only scrolls the image: after reaching the top, lift and pull down again to dismiss. Top detection accounts for content insets. Cancellation restores the previous zoom, offset, scrolling and clipping settings. Vertical paging continues to disable pull-down dismissal.
 
 Auto play pauses throughout dismiss dragging and rebound, then resumes when visibility, data, and size-transition state allow. Reload, valid navigation, and size changes first end the old dismiss interaction.
 

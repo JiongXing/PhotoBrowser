@@ -150,15 +150,15 @@ final class RotationTests: XCTestCase {
         XCTAssertEqual(cell.imageView.superview!.frame, transitioningFrame)
         cell.frame.size = CGSize(width: 844, height: 390)
         cell.finishSizeTransition()
-        XCTAssertEqual(cell.scrollView.zoomScale, 1)
-        XCTAssertEqual(cell.imageView.bounds.size, CGSize(width: 585, height: 390))
+        XCTAssertEqual(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale)
+        XCTAssertEqual(cell.imageView.convert(cell.imageView.bounds, to: cell.contentView).size, CGSize(width: 585, height: 390))
         cell.prepareForSizeTransition()
         cell.prepareForReuse()
         cell.imageView.image = data.image
         cell.frame.size = CGSize(width: 390, height: 844)
         cell.setNeedsLayout()
         cell.layoutIfNeeded()
-        XCTAssertEqual(cell.imageView.bounds.size, CGSize(width: 390, height: 260))
+        XCTAssertEqual(cell.imageView.convert(cell.imageView.bounds, to: cell.contentView).size, CGSize(width: 390, height: 260))
     }
 
     func testDirectionsSpacingAndLoopBoundary() {

@@ -12,10 +12,16 @@ final class LifecycleHostController: UIViewController, JXPhotoBrowserDelegate {
     private var dragPage = 0
     private var movedDuringDrag = false
     private var resumed = false
-    private let image = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 400)).image { c in
-        UIColor.systemBlue.setFill()
-        c.fill(CGRect(x: 0, y: 0, width: 600, height: 400))
-    }
+    private let image: UIImage = {
+        let size = ProcessInfo.processInfo.arguments.contains("long-image")
+            ? CGSize(width: 100, height: 800) : CGSize(width: 600, height: 400)
+        return UIGraphicsImageRenderer(size: size).image { c in
+            for row in 0..<8 {
+                UIColor(hue: CGFloat(row) / 8, saturation: 0.7, brightness: 0.85, alpha: 1).setFill()
+                c.fill(CGRect(x: 0, y: CGFloat(row) * size.height / 8, width: size.width, height: size.height / 8))
+            }
+        }
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -115,7 +121,8 @@ final class LifecycleHostController: UIViewController, JXPhotoBrowserDelegate {
     func photoBrowser(_ browser: JXPhotoBrowserViewController, cellForItemAt index: Int, at indexPath: IndexPath) -> JXPhotoBrowserAnyCell {
         let cell = browser.dequeueReusableCell(withReuseIdentifier: "lifecycle", for: indexPath) as! LifecycleImageCell
         cell.imageView.image = image
-        cell.doubleTapZoomScale = 2
+        let args = ProcessInfo.processInfo.arguments
+        cell.doubleTapZoomScale = args.contains("long-image") && !args.contains("fixedzoom") ? nil : 2
         cell.interactionChanged = { [weak self, weak browser] active in
             guard let self = self else { return }
             self.dragging = active
@@ -133,8 +140,13 @@ final class LifecycleHostController: UIViewController, JXPhotoBrowserDelegate {
         coverStatus.text = "hidden=\(thumbnails.filter { $0.isHidden }.count)"
         if dragging && browser.pageIndex != dragPage { movedDuringDrag = true }
         if !dragging && dragCount > 0 && browser.pageIndex != dragPage { resumed = true }
-        let zoom = browser.visibleZoomImageCell()?.scrollView.zoomScale ?? 1
-        browserStatus.text = "page=\(browser.pageIndex);dragCount=\(dragCount);dragging=\(dragging ? 1 : 0);moved=\(movedDuringDrag ? 1 : 0);resumed=\(resumed ? 1 : 0);scroll=\(browser.collectionView.isScrollEnabled ? 1 : 0);zoom=\(String(format: "%.2f", zoom))"
+        let cell = browser.visibleZoomImageCell()
+        let zoom = cell?.scrollView.zoomScale ?? 1
+        let frame = cell.map { $0.imageView.convert($0.imageView.bounds, to: $0.contentView) } ?? .zero
+        let fitted = frame.width <= browser.view.bounds.width + 1 && frame.height <= browser.view.bounds.height + 1
+        let widthFilled = abs(frame.width - browser.view.bounds.width) < 1
+        let top = cell.map { abs($0.scrollView.contentOffset.y + $0.scrollView.adjustedContentInset.top) <= 1 } ?? false
+        browserStatus.text = "page=\(browser.pageIndex);dragCount=\(dragCount);dragging=\(dragging ? 1 : 0);moved=\(movedDuringDrag ? 1 : 0);resumed=\(resumed ? 1 : 0);scroll=\(browser.collectionView.isScrollEnabled ? 1 : 0);zoom=\(String(format: "%.2f", zoom));fit=\(fitted ? 1 : 0);widthFill=\(widthFilled ? 1 : 0);top=\(top ? 1 : 0)"
     }
 }
 

@@ -144,9 +144,8 @@ open class VideoPlayerCell: JXZoomImageCell {
     override open func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
         super.handleDoubleTap(gesture)
         
-        // super 返回后，imageView.bounds 已是动画的最终值（模型层）。
-        // playerLayer 不会自动跟随 imageView 的 frame 动画，
-        // 需要手动用匹配的 CATransaction 动画同步更新。
+        // 倍率动画由父容器承担，playerLayer 随图片一起缩放。
+        // 保持视频图层与图片未缩放的基础 bounds 一致。
         if let playerLayer = playerLayer {
             CATransaction.begin()
             CATransaction.setAnimationDuration(0.3)

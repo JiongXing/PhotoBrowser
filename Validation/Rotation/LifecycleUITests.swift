@@ -36,18 +36,77 @@ final class LifecycleUITests: XCTestCase {
         capture("dismiss-cancel-autoplay-resumed")
     }
 
-    func testZoomVetoAndDismissCompletionRestoreThumbnail() {
+    func testZoomedMiddleScrollThenFitDismissRestoresThumbnail() {
         let photos = app.collectionViews["lifecyclePhotos"]
-        photos.doubleTap()
+        photos.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).doubleTap()
         waitFor("zoom=2.00")
+        capture("zoomed-landscape-before-scroll")
+        waitFor("top=0")
         photos.swipeDown()
         waitFor("dragCount=0")
-        capture("zoom-veto")
+        capture("zoomed-middle-scroll")
         photos.doubleTap()
-        waitFor("zoom=1.00")
+        waitFor("fit=1")
         photos.swipeDown()
         waitFor("closed=1;restored=1", id: "lifecycleRoot")
         capture("dismiss-complete-thumbnail-restored")
+    }
+
+    func openLongImage(fixedZoom: Bool = false) {
+        app.terminate()
+        app.launchArguments = ["ui-lifecycle", "long-image"] + (fixedZoom ? ["fixedzoom"] : [])
+        app.launch()
+        app.buttons["Open"].tap()
+        waitFor("fit=1")
+    }
+
+    func drag(_ from: CGFloat, to: CGFloat, hold: TimeInterval = 1) {
+        let photos = app.collectionViews["lifecyclePhotos"]
+        let start = photos.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: from))
+        let end = photos.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: to))
+        start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: hold)
+    }
+
+    func testLongImageFillScrollToTopThenNewPullDismisses() {
+        openLongImage()
+        let photos = app.collectionViews["lifecyclePhotos"]
+        photos.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.18)).doubleTap()
+        waitFor("zoom=1.00;fit=0;widthFill=1;top=0")
+        capture("long-image-width-filled")
+        drag(0.25, to: 0.8)
+        waitFor("top=1")
+        waitFor("dragCount=0")
+        capture("long-image-at-top-without-dismiss")
+        drag(0.3, to: 0.7)
+        waitFor("closed=1;restored=1", id: "lifecycleRoot")
+        capture("long-image-new-pull-dismissed")
+    }
+
+    func testLongImageZoomedTopCancelPreservesScaleThenDismisses() {
+        openLongImage(fixedZoom: true)
+        let photos = app.collectionViews["lifecyclePhotos"]
+        photos.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12)).doubleTap()
+        waitFor("zoom=2.00")
+        waitFor("top=0")
+        drag(0.2, to: 0.85)
+        waitFor("top=1")
+        waitFor("dragCount=0")
+        drag(0.4, to: 0.48)
+        waitFor("dragCount=1;dragging=0")
+        waitFor("zoom=2.00;fit=0;widthFill=0;top=1")
+        waitFor("scroll=1")
+        capture("long-image-2x-cancel-preserved")
+        drag(0.3, to: 0.7)
+        waitFor("closed=1;restored=1", id: "lifecycleRoot")
+    }
+
+    func testLongImagePinchDoesNotBeginDismiss() {
+        openLongImage()
+        let photos = app.collectionViews["lifecyclePhotos"]
+        photos.pinch(withScale: 3, velocity: 1)
+        waitFor("fit=0")
+        waitFor("dragCount=0")
+        capture("long-image-pinch-without-dismiss")
     }
 
     func openNavigationContainer() {

@@ -38,7 +38,7 @@ final class ZoomTests: XCTestCase {
     }
 
     func assertFitted(file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertEqual(cell.scrollView.zoomScale, 1, accuracy: 0.01, file: file, line: line)
+        XCTAssertEqual(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale, accuracy: 0.000001, file: file, line: line)
         let frame = cell.imageView.convert(cell.imageView.bounds, to: cell.contentView)
         XCTAssertLessThanOrEqual(frame.width, cell.bounds.width + 1, file: file, line: line)
         XCTAssertLessThanOrEqual(frame.height, cell.bounds.height + 1, file: file, line: line)
@@ -46,14 +46,84 @@ final class ZoomTests: XCTestCase {
         XCTAssertEqual(frame.midY, cell.bounds.midY, accuracy: 1, file: file, line: line)
     }
 
+    func testFillBasedLongImageScales() {
+        cell.frame.size = CGSize(width: 400, height: 800)
+        setImage(CGSize(width: 100, height: 800))
+        XCTAssertEqual(cell.scrollView.minimumZoomScale, 0.25, accuracy: 0.000001)
+        XCTAssertEqual(cell.scrollView.zoomScale, 0.25, accuracy: 0.000001)
+        let fitted = cell.imageView.convert(cell.imageView.bounds, to: cell.contentView)
+        XCTAssertEqual(fitted.width, 100, accuracy: 0.01)
+        XCTAssertEqual(fitted.height, 800, accuracy: 0.01)
+        doubleTap()
+        XCTAssertEqual(cell.scrollView.zoomScale, 1, accuracy: 0.000001)
+        let filled = cell.imageView.convert(cell.imageView.bounds, to: cell.contentView)
+        XCTAssertEqual(filled.width, 400, accuracy: 0.01)
+        XCTAssertEqual(filled.height, 3200, accuracy: 0.01)
+        cell.scrollView.setZoomScale(cell.scrollView.maximumZoomScale, animated: false)
+        let maximum = cell.imageView.convert(cell.imageView.bounds, to: cell.contentView)
+        XCTAssertEqual(maximum.width, 800, accuracy: 0.01)
+        XCTAssertEqual(maximum.height, 6400, accuracy: 0.01)
+    }
+
+    func testFillBasedPanoramaPreservesHostMaximum() {
+        cell.frame.size = CGSize(width: 800, height: 400)
+        cell.scrollView.maximumZoomScale = 4
+        setImage(CGSize(width: 800, height: 100))
+        XCTAssertEqual(cell.scrollView.minimumZoomScale, 0.25, accuracy: 0.000001)
+        doubleTap()
+        XCTAssertEqual(cell.scrollView.zoomScale, 1, accuracy: 0.000001)
+        cell.scrollView.setZoomScale(4, animated: false)
+        cell.setNeedsLayout()
+        cell.layoutIfNeeded()
+        let frame = cell.imageView.convert(cell.imageView.bounds, to: cell.contentView)
+        XCTAssertEqual(frame.width, 12800, accuracy: 0.01)
+        XCTAssertEqual(frame.height, 1600, accuracy: 0.01)
+        XCTAssertEqual(cell.scrollView.maximumZoomScale, 4)
+    }
+
+    func testImageClearReloadAndRotationKeepValidZoomRange() {
+        cell.scrollView.maximumZoomScale = 4
+        cell.scrollView.setZoomScale(2, animated: false)
+        cell.scrollView.contentOffset = CGPoint(x: 100, y: 500)
+        cell.imageView.image = nil
+        XCTAssertEqual(cell.scrollView.contentSize, .zero)
+        setImage(CGSize(width: 100, height: 800))
+        assertFitted()
+        cell.scrollView.setZoomScale(2, animated: false)
+        cell.scrollView.contentOffset = CGPoint(x: 100, y: 500)
+        cell.prepareForSizeTransition()
+        cell.applySizeTransition(to: CGSize(width: 844, height: 390))
+        cell.frame.size = CGSize(width: 844, height: 390)
+        cell.finishSizeTransition()
+        assertFitted()
+        XCTAssertEqual(cell.scrollView.maximumZoomScale, 4)
+        cell.prepareForReuse()
+        setImage(CGSize(width: 100, height: 800))
+        assertFitted()
+        XCTAssertEqual(cell.scrollView.maximumZoomScale, 4)
+    }
+
+    func testZoomedReplacementClampsOffsetAndKeepsFillMultiplier() {
+        cell.scrollView.setZoomScale(2, animated: false)
+        cell.scrollView.contentOffset = CGPoint(x: 2000, y: 500)
+        setImage(CGSize(width: 100, height: 800))
+        XCTAssertEqual(cell.scrollView.zoomScale, 2, accuracy: 0.000001)
+        XCTAssertEqual(cell.scrollView.contentSize.width, 780, accuracy: 0.01)
+        XCTAssertEqual(cell.scrollView.contentSize.height, 6240, accuracy: 0.01)
+        XCTAssertLessThanOrEqual(cell.scrollView.contentOffset.x, 390.01)
+        XCTAssertGreaterThanOrEqual(cell.scrollView.contentOffset.y, -cell.scrollView.adjustedContentInset.top)
+        doubleTap()
+        assertFitted()
+    }
+
     func testDoubleTapThenPinchBackToFit() {
         let baseSize = cell.imageView.bounds.size
         doubleTap()
-        XCTAssertGreaterThan(cell.scrollView.zoomScale, 1)
+        XCTAssertGreaterThan(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale)
         XCTAssertEqual(cell.imageView.bounds.size, baseSize)
         // Drive the same scale/delegate path as UIScrollView's pinch recognizer.
-        cell.scrollView.setZoomScale(1, animated: false)
-        cell.scrollViewDidEndZooming(cell.scrollView, with: cell.imageView.superview, atScale: 1)
+        cell.scrollView.setZoomScale(cell.scrollView.minimumZoomScale, animated: false)
+        cell.scrollViewDidEndZooming(cell.scrollView, with: cell.imageView.superview, atScale: cell.scrollView.minimumZoomScale)
         assertFitted()
         XCTAssertTrue(cell.canBeginDismissInteraction)
     }
@@ -63,8 +133,9 @@ final class ZoomTests: XCTestCase {
         doubleTap()
         assertFitted()
         doubleTap()
-        XCTAssertGreaterThan(cell.scrollView.zoomScale, 1)
-        XCTAssertFalse(cell.canBeginDismissInteraction)
+        XCTAssertGreaterThan(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale)
+        cell.scrollView.contentOffset.y = -cell.scrollView.adjustedContentInset.top
+        XCTAssertTrue(cell.canBeginDismissInteraction)
         doubleTap()
         assertFitted()
     }
@@ -74,7 +145,7 @@ final class ZoomTests: XCTestCase {
             setImage(size)
             cell.scrollView.maximumZoomScale = 2
             doubleTap()
-            XCTAssertGreaterThan(cell.scrollView.zoomScale, 1)
+            XCTAssertGreaterThan(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale)
             XCTAssertLessThanOrEqual(cell.scrollView.zoomScale, 2.01)
             doubleTap()
             assertFitted()
@@ -109,7 +180,7 @@ final class ZoomTests: XCTestCase {
         cell.scrollView.maximumZoomScale = 5
         let baseSize = cell.imageView.bounds.size
         doubleTap()
-        XCTAssertEqual(cell.scrollView.zoomScale, 844.0 / 260.0, accuracy: 0.01)
+        XCTAssertEqual(cell.scrollView.zoomScale, 1, accuracy: 0.000001)
         XCTAssertEqual(cell.imageView.bounds.size, baseSize)
         doubleTap()
         assertFitted()
@@ -121,12 +192,14 @@ final class ZoomTests: XCTestCase {
         setImage(CGSize(width: 400, height: 600))
         XCTAssertEqual(cell.scrollView.zoomScale, scale, accuracy: 0.001)
         XCTAssertEqual(cell.imageView.bounds.width / cell.imageView.bounds.height, 400.0 / 600.0, accuracy: 0.001)
-        XCTAssertEqual(cell.imageView.bounds.size, CGSize(width: 390, height: 585))
-        XCTAssertEqual(cell.scrollView.contentSize.width, 390 * scale, accuracy: 0.01)
-        XCTAssertEqual(cell.scrollView.contentSize.height, 585 * scale, accuracy: 0.01)
+        XCTAssertEqual(cell.imageView.bounds.width, 1688.0 / 3.0, accuracy: 0.01)
+        XCTAssertEqual(cell.imageView.bounds.height, 844, accuracy: 0.01)
+        XCTAssertEqual(cell.scrollView.contentSize.width, 1688.0 / 3.0 * scale, accuracy: 0.01)
+        XCTAssertEqual(cell.scrollView.contentSize.height, 844 * scale, accuracy: 0.01)
         doubleTap()
         assertFitted()
-        XCTAssertEqual(cell.imageView.bounds.size, CGSize(width: 390, height: 585))
+        XCTAssertEqual(cell.imageView.bounds.width, 1688.0 / 3.0, accuracy: 0.01)
+        XCTAssertEqual(cell.imageView.bounds.height, 844, accuracy: 0.01)
     }
 
     func testReuseInterruptsDoubleTapAnimation() {
@@ -137,7 +210,8 @@ final class ZoomTests: XCTestCase {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { settled.fulfill() }
         wait(for: [settled], timeout: 2)
         assertFitted()
-        XCTAssertEqual(cell.imageView.bounds.size, CGSize(width: 390, height: 585))
+        XCTAssertEqual(cell.imageView.bounds.width, 1688.0 / 3.0, accuracy: 0.01)
+        XCTAssertEqual(cell.imageView.bounds.height, 844, accuracy: 0.01)
     }
 
     func testDoubleTapNearMatchingAspectRatioKeepsBaseSize() {
@@ -147,7 +221,7 @@ final class ZoomTests: XCTestCase {
         XCTAssertEqual(cell.imageView.bounds.width, baseSize.width, accuracy: 0.01)
         XCTAssertEqual(cell.imageView.bounds.height, baseSize.height, accuracy: 0.01)
         doubleTap()
-        XCTAssertEqual(cell.scrollView.zoomScale, 1, accuracy: 0.000001)
+        XCTAssertEqual(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale, accuracy: 0.000001)
         assertFitted()
     }
 }

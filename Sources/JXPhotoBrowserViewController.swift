@@ -185,6 +185,7 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 交互手势
     private var panGesture: UIPanGestureRecognizer!
+    private var dismissGestureCanBegin: Bool?
     
     private final class DismissInteraction {
         let cell: JXPhotoBrowserAnyCell
@@ -220,6 +221,7 @@ open class JXPhotoBrowserViewController: UIViewController {
         reloadData(preservingCurrentPage: false)
         
         panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        panGesture.maximumNumberOfTouches = 1
         panGesture.delegate = self
         view.addGestureRecognizer(panGesture)
         
@@ -398,7 +400,8 @@ open class JXPhotoBrowserViewController: UIViewController {
         
         switch gesture.state {
         case .began:
-            guard dismissInteraction == nil, sizeTransition == nil, !isProgrammaticScrollAnimating,
+            guard dismissGestureCanBegin != false,
+                  dismissInteraction == nil, sizeTransition == nil, !isProgrammaticScrollAnimating,
                   let cell = visibleCell(), cell.canBeginDismissInteraction,
                   let imageView = cell.transitionImageView, let container = imageView.superview else { return }
             stopAutoPlay()
@@ -415,7 +418,8 @@ open class JXPhotoBrowserViewController: UIViewController {
             }
             
         case .changed:
-            guard let interaction = dismissInteraction, let imageView = interaction.cell.transitionImageView else { return }
+            guard let interaction = dismissInteraction, let imageView = interaction.cell.transitionImageView,
+                  let container = imageView.superview else { return }
             let translation = gesture.translation(in: view)
             
             // 下拉时缩小；上拉时（负值）不放大，保持原大小但跟随位移
@@ -431,10 +435,14 @@ open class JXPhotoBrowserViewController: UIViewController {
             let adjustX = vector.x * (1 - scale)
             let adjustY = vector.y * (1 - scale)
             
-            // 变换图片：Translation + Adjustment
-            let transform = CGAffineTransform(translationX: translation.x + adjustX, y: translation.y + adjustY)
-                .scaledBy(x: scale, y: scale)
-            imageView.transform = transform
+            // 图片父容器可能处于缩放状态，先把屏幕位移转换到它的坐标系。
+            let origin = view.convert(CGPoint.zero, to: container)
+            let translated = view.convert(translation, to: container)
+            let localTranslation = CGPoint(x: translated.x - origin.x, y: translated.y - origin.y)
+            imageView.transform = interaction.imageTransform
+                .concatenating(CGAffineTransform(scaleX: scale, y: scale))
+                .concatenating(CGAffineTransform(translationX: localTranslation.x + adjustX,
+                                               y: localTranslation.y + adjustY))
             
             // 背景透明度：只有下拉时才变透明
             let alpha = translation.y > 0 ? max(0, 1 - abs(progress) * 1.5) : 1.0
@@ -1062,10 +1070,19 @@ extension JXPhotoBrowserViewController: UICollectionViewDataSource, UICollection
 
 // MARK: - UIGestureRecognizerDelegate
 extension JXPhotoBrowserViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer == panGesture {
+            // 在触摸开始时锁定准入，避免识别阈值内的滚动先到顶后接管同一次拖动。
+            dismissGestureCanBegin = visibleCell()?.canBeginDismissInteraction ?? false
+        }
+        return true
+    }
+
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer == panGesture {
             if !isDismissGestureEnabled || scrollDirection == .vertical { return false }
-            guard dismissInteraction == nil, sizeTransition == nil, !isProgrammaticScrollAnimating else { return false }
+            guard dismissGestureCanBegin != false,
+                  dismissInteraction == nil, sizeTransition == nil, !isProgrammaticScrollAnimating else { return false }
             
             let velocity = panGesture.velocity(in: view)
             // 必须是垂直向下的手势

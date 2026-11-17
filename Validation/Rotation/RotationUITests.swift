@@ -85,11 +85,11 @@ final class RotationUITests: XCTestCase {
     func testPinchAndAutoplayRecoverAfterRotation() {
         launch()
         app.collectionViews["photos"].pinch(withScale: 2, velocity: 1)
-        let zoomed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "NOT (label CONTAINS 'zoom=1.00')"), object: app.staticTexts["status"])
+        let zoomed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label CONTAINS 'fit=0'"), object: app.staticTexts["status"])
         XCTAssertEqual(XCTWaiter.wait(for: [zoomed], timeout: 3), .completed, app.staticTexts["status"].label)
         XCUIDevice.shared.orientation = .landscapeRight
         checkPage(0)
-        waitFor("zoom=1.00")
+        waitFor("fit=1")
         assertAutoplayRecovers()
     }
     func testDoubleTapZoomAndAutoplayRecoverAfterRotation() {
@@ -98,7 +98,7 @@ final class RotationUITests: XCTestCase {
         waitFor("zoom=2.00")
         XCUIDevice.shared.orientation = .landscapeLeft
         checkPage(0)
-        waitFor("zoom=1.00")
+        waitFor("fit=1")
         assertAutoplayRecovers()
     }
     func testMixedZoomGestures() {
@@ -107,13 +107,14 @@ final class RotationUITests: XCTestCase {
             let photos = app.collectionViews["photos"]
             photos.doubleTap()
             waitFor("fit=0")
-            photos.pinch(withScale: 0.2, velocity: -1)
-            waitFor("zoom=1.00;fit=1")
+            // A configured 2× target needs to shrink below this fixture's sub-unit fit scale.
+            photos.pinch(withScale: 0.1, velocity: -1)
+            waitFor("fit=1")
             photos.pinch(withScale: 2, velocity: 1)
-            let zoomed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "NOT (label CONTAINS 'zoom=1.00')"), object: app.staticTexts["status"])
+            let zoomed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label CONTAINS 'fit=0'"), object: app.staticTexts["status"])
             XCTAssertEqual(XCTWaiter.wait(for: [zoomed], timeout: 3), .completed)
             photos.doubleTap()
-            waitFor("zoom=1.00;fit=1")
+            waitFor("fit=1")
             photos.doubleTap()
             waitFor("fit=0")
             let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())

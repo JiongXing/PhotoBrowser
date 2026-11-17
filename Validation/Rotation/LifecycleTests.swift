@@ -49,11 +49,13 @@ final class LifecycleTests: XCTestCase {
         wait(for: [e], timeout: duration + 3)
     }
 
-    func pan(_ state: UIGestureRecognizer.State, translation: CGPoint = .zero) {
+    func pan(_ state: UIGestureRecognizer.State, translation: CGPoint = .zero, touch: CGPoint = .zero) {
         if state == .began { browser.collectionView.layoutIfNeeded() }
         let pan = LifecyclePan()
+        pan.coordinateView = browser.view
+        pan.touchPoint = touch
         pan.state = state
-        pan.setTranslation(translation, in: browser.view)
+        pan.testTranslation = translation
         browser.perform(NSSelectorFromString("handlePanGesture:"), with: pan)
     }
 
@@ -304,11 +306,121 @@ final class LifecycleTests: XCTestCase {
         XCTAssertFalse(cell.scrollView.clipsToBounds)
         XCTAssertFalse(browser.collectionView.isScrollEnabled)
         cell.scrollView.setZoomScale(2, animated: false)
+        cell.scrollView.contentOffset.y = -cell.scrollView.adjustedContentInset.top
+        XCTAssertTrue(cell.canBeginDismissInteraction)
+        cell.scrollView.contentOffset.y = 80
         XCTAssertFalse(cell.canBeginDismissInteraction)
+    }
+
+    func testZoomedTopWithInsetAllowsDismissButMiddleDoesNot() {
+        let cell = browser.visibleZoomImageCell()!
+        cell.scrollView.setZoomScale(2, animated: false)
+        cell.scrollView.contentInset.top = 24
+        cell.scrollView.contentOffset = CGPoint(x: 100, y: -cell.scrollView.adjustedContentInset.top)
+        XCTAssertTrue(cell.canBeginDismissInteraction)
+        cell.scrollView.contentOffset.y = 80
+        XCTAssertFalse(cell.canBeginDismissInteraction)
+    }
+
+    func testScrollToTopNeedsANewDismissGesture() {
+        let cell = browser.visibleZoomImageCell()!
+        cell.imageView.image = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 800)).image { _ in }
+        cell.scrollView.setZoomScale(1, animated: false)
+        cell.scrollView.contentOffset.y = 200
+        pan(.began)
+        XCTAssertTrue(browser.collectionView.isScrollEnabled)
+        cell.scrollView.contentOffset.y = -cell.scrollView.adjustedContentInset.top
+        pan(.changed, translation: CGPoint(x: 0, y: 80))
+        XCTAssertTrue(browser.collectionView.isScrollEnabled)
+        XCTAssertEqual(cell.imageView.transform, .identity)
+        pan(.ended)
+        pan(.began)
+        XCTAssertFalse(browser.collectionView.isScrollEnabled)
+        pan(.cancelled)
+        drain(0.35)
+        XCTAssertTrue(browser.collectionView.isScrollEnabled)
+    }
+
+    func testDismissTracksFingerAndRestoresZoomedGeometry() {
+        let cell = browser.visibleZoomImageCell()!
+        cell.imageView.image = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 800)).image { _ in }
+        for scale in [cell.scrollView.minimumZoomScale, 2] {
+            cell.scrollView.setZoomScale(scale, animated: false)
+            cell.scrollView.contentOffset = CGPoint(x: 0, y: -cell.scrollView.adjustedContentInset.top)
+            browser.collectionView.layoutIfNeeded()
+            cell.imageView.transform = CGAffineTransform(translationX: 8, y: 3).scaledBy(x: 1.1, y: 1.1)
+            let originalTransform = cell.imageView.transform
+            let originalCenter = cell.imageView.center
+            let originalBounds = cell.imageView.bounds
+            let originalOffset = cell.scrollView.contentOffset
+            let touch = CGPoint(x: 200, y: 120)
+            let imagePoint = cell.imageView.convert(touch, from: browser.view)
+            pan(.began, touch: touch)
+            XCTAssertFalse(browser.collectionView.isScrollEnabled)
+            pan(.changed, translation: CGPoint(x: 12, y: 80))
+            let moved = cell.imageView.convert(imagePoint, to: browser.view)
+            XCTAssertEqual(moved.x, 212, accuracy: 0.5)
+            XCTAssertEqual(moved.y, 200, accuracy: 0.5)
+            pan(.cancelled)
+            drain(0.35)
+            XCTAssertEqual(cell.imageView.transform, originalTransform)
+            XCTAssertEqual(cell.imageView.center, originalCenter)
+            XCTAssertEqual(cell.imageView.bounds, originalBounds)
+            XCTAssertEqual(cell.scrollView.zoomScale, scale, accuracy: 0.000001)
+            XCTAssertEqual(cell.scrollView.contentOffset, originalOffset)
+            XCTAssertTrue(cell.scrollView.isScrollEnabled)
+            cell.imageView.transform = .identity
+        }
+    }
+
+    func testTouchStartingBelowTopCannotDismissAfterReachingTop() {
+        let cell = browser.visibleZoomImageCell()!
+        cell.scrollView.setZoomScale(2, animated: false)
+        let recognizer = browser.view.gestureRecognizers!.first { $0 is UIPanGestureRecognizer }!
+        cell.scrollView.contentOffset.y = -cell.scrollView.adjustedContentInset.top + 5
+        XCTAssertTrue((browser as UIGestureRecognizerDelegate).gestureRecognizer?(recognizer, shouldReceive: UITouch()) ?? true)
+        // UIScrollView may consume a few points before the pan crosses its recognition threshold.
+        cell.scrollView.contentOffset.y = -cell.scrollView.adjustedContentInset.top
+        pan(.began)
+        XCTAssertTrue(browser.collectionView.isScrollEnabled)
+        pan(.ended)
+        XCTAssertTrue((browser as UIGestureRecognizerDelegate).gestureRecognizer?(recognizer, shouldReceive: UITouch()) ?? true)
+        pan(.began)
+        XCTAssertFalse(browser.collectionView.isScrollEnabled)
+        pan(.cancelled)
+        drain(0.35)
+    }
+
+    func testImageReplacementDuringDismissWaitsUntilCancellation() {
+        let cell = browser.visibleZoomImageCell()!
+        let originalBounds = cell.imageView.bounds
+        pan(.began)
+        pan(.changed, translation: CGPoint(x: 0, y: 80))
+        cell.imageView.image = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 800)).image { _ in }
+        cell.layoutIfNeeded()
+        XCTAssertEqual(cell.imageView.bounds, originalBounds)
+        pan(.cancelled)
+        drain(0.35)
+        let frame = cell.imageView.convert(cell.imageView.bounds, to: cell.contentView)
+        XCTAssertEqual(frame.width / frame.height, 0.125, accuracy: 0.000001)
+        XCTAssertLessThanOrEqual(frame.height, cell.bounds.height + 1)
+        XCTAssertEqual(cell.scrollView.zoomScale, cell.scrollView.minimumZoomScale, accuracy: 0.000001)
     }
 }
 
 final class LifecyclePan: UIPanGestureRecognizer {
+    weak var coordinateView: UIView?
+    var touchPoint: CGPoint = .zero
+    var testTranslation: CGPoint = .zero
+    override func translation(in view: UIView?) -> CGPoint {
+        guard let coordinateView = coordinateView else { return testTranslation }
+        let origin = coordinateView.convert(CGPoint.zero, to: view)
+        let point = coordinateView.convert(testTranslation, to: view)
+        return CGPoint(x: point.x - origin.x, y: point.y - origin.y)
+    }
+    override func location(in view: UIView?) -> CGPoint {
+        coordinateView?.convert(touchPoint, to: view) ?? .zero
+    }
     private var testState: UIGestureRecognizer.State = .possible
     override var state: UIGestureRecognizer.State {
         get { testState }
