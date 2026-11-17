@@ -1,6 +1,6 @@
 # 4.3.0 发布记录
 
-目标发布日期：2026-11-17（Asia/Taipei）。当前处于发布准备阶段；远端 tag、CI、CocoaPods trunk 和 CDN 消费端结果将在实际完成后记录。
+发布日期：2026-11-17（Asia/Taipei）。4.3.0 已发布到 CocoaPods；发布提交、远端 tag、完整 CI、官方 CDN 安装和独立宿主构建均已核对通过。
 
 ## 范围与 review
 
@@ -24,7 +24,7 @@
 - UIKit 示例通过 `pod install` 更新本地 Pod 版本及已跟踪元数据，不手工修改 Pods；保留 Kingfisher 8.13.0。
 - 主工作区既有 UIKit 工程签名配置不属于发布改动，保持未提交。
 
-## 发布计划与验收
+## 发布流程与验收
 
 1. 完成 `4.2.0` 到待发布源码的独立 review，核对迁移说明和版本配置，处理阻塞问题。
 2. 本地 Pod lint、主框架、UIKit/CocoaPods、SwiftUI/SwiftPM 和 Carthage XCFramework 构建通过；核对版本、最低系统和各产物隐私清单。运行时源码未变时，沿用同一源码提交的 67 项行为验证证据。
@@ -50,3 +50,14 @@
 | 静态检查 | 六项 OpenSpec 严格校验、发布文档本地链接、版本/lockfile 和 `git diff --check` 通过 | `OpenSpec.json` |
 
 `pod install` 提示本机存在未使用的旧 master specs repo；本次使用官方 CDN，不更改本机 repo 配置。UIKit 工程原有未提交改动已逐字核对并保留，不包含在发布提交中。
+
+## 远端发布结果
+
+- 发布提交：[`aaa89a2`](https://github.com/JiongXing/PhotoBrowser/commit/aaa89a24cc05f4f7db127cc4d884a7afd8fcfdaf)。master 与 annotated tag [`4.3.0`](https://github.com/JiongXing/PhotoBrowser/tree/4.3.0) 原子推送；tag 指向该提交，发布后不移动。
+- 完整 CI：[master](https://github.com/JiongXing/PhotoBrowser/actions/runs/44100764944) 与 [tag](https://github.com/JiongXing/PhotoBrowser/actions/runs/44100764957) 均通过，覆盖主框架、行为回归、OpenSpec、CocoaPods、SwiftPM 和 Carthage 集成及隐私清单检查。
+- 远端 tag 的 `pod spec lint JXPhotoBrowser.podspec --allow-warnings` 通过，见 `SpecLint.log`。
+- trunk 登记时间：2026-11-17 22:27:42（Asia/Taipei）。提交过程中出现 GitHub commit API / 连接超时；每次重试前核实登记状态，最终通过 trunk 公共 API、`pod trunk info` 和官方 Specs 仓库确认发布成功。官方 podspec 与本地发布文件逐字段一致，源码 tag 为 `4.3.0`、最低 iOS 15.0。
+- 官方 CDN 的 4.3.0 podspec 与本地文件一致。首次安装遇到版本索引缓存延迟；22:42（Asia/Taipei）刷新后，独立宿主仅使用 `source 'https://cdn.cocoapods.org/'` 与 `pod 'JXPhotoBrowser', '4.3.0'`，`pod install --repo-update` 和 iOS 设备目标构建均通过，未使用本地路径或 Git 源替代。
+- 消费端 `Podfile.lock` 为 4.3.0、spec repo 为 trunk，checksum 与发布 podspec 一致，没有 external sources。下载的 15 个 Sources 文件与发布源码逐字节一致；内嵌框架版本为 4.3.0、最低 iOS 15.0，隐私清单与源码逐字节一致。
+
+远端与消费端证据：`CI-Master.json`、`CI-Tag.json`、`TrunkPush*.log`、`TrunkAfter.json`、`TrunkInfoAfter.log`、`PublishedSpec.json`、`SpecsGitHub.json`、`CDNSpec.json`、`CDNInstallFinal.log`、`CDNBuild.log`、`CDNArtifacts.json`、`CDNSmoke/Podfile.lock`。本记录的最终验收结果通过后续文档提交补充，不改动已发布 tag。
