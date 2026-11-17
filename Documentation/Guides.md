@@ -34,7 +34,7 @@ func photoBrowser(_ browser: JXPhotoBrowserViewController, thumbnailRestorationA
 
 ## 缩放
 
-`JXZoomImageCell` 默认在完整显示与短边铺满之间切换。固定倍率模式：
+`JXZoomImageCell` 的捏合与双击共用缩放倍数：双击放大后可捏合缩小，捏合放大后可双击恢复完整显示。默认双击以短边铺满为目标，受 `scrollView.maximumZoomScale`（默认 3）限制；极宽或极长图片需要提高上限才能铺满。固定倍率模式：
 
 ```swift
 cell.scrollView.maximumZoomScale = 5
