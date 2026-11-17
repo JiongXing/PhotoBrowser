@@ -228,6 +228,18 @@ final class RotationTests: XCTestCase {
         XCTAssertEqual(browser.supportedInterfaceOrientations, .portrait)
     }
 
+    func testItemSizeDoesNotFallBackToScreenWhenViewBoundsAreUnavailable() {
+        browser.view.bounds = .zero
+
+        let size = browser.collectionView(
+            browser.collectionView,
+            layout: browser.collectionView.collectionViewLayout,
+            sizeForItemAt: IndexPath(item: 0, section: 0)
+        )
+
+        XCTAssertEqual(size, .zero)
+    }
+
 }
 
 @MainActor
