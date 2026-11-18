@@ -32,14 +32,14 @@ UIKit 和 SwiftUI 示例使用 Kingfisher 8.13+，需要 Xcode 26+（Swift 6.2+�
 ### CocoaPods
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.3'
+pod 'JXPhotoBrowser', '~> 4.3.1'
 ```
 
 ### Swift Package Manager
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.3.0")
+    .package(url: "https://github.com/JiongXing/PhotoBrowser", from: "4.3.1")
 ]
 ```
 

@@ -5,10 +5,10 @@
 ## 安装
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.3'
+pod 'JXPhotoBrowser', '~> 4.3.1'
 ```
 
-SwiftPM 使用 `from: "4.3.0"`，Carthage 可指定 `github "JiongXing/PhotoBrowser" ~> 4.3`。示例的系统和工具要求见 [README](../README.md)。
+SwiftPM 使用 `from: "4.3.1"`，Carthage 可指定 `github "JiongXing/PhotoBrowser" ~> 4.3.1`。示例的系统和工具要求见 [README](../README.md)。
 
 ## 倍率基准
 

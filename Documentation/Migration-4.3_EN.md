@@ -5,10 +5,10 @@
 ## Installation
 
 ```ruby
-pod 'JXPhotoBrowser', '~> 4.3'
+pod 'JXPhotoBrowser', '~> 4.3.1'
 ```
 
-Use `from: "4.3.0"` with SwiftPM, or `github "JiongXing/PhotoBrowser" ~> 4.3` with Carthage. Demo OS and tool requirements are listed in the [README](../README_EN.md).
+Use `from: "4.3.1"` with SwiftPM, or `github "JiongXing/PhotoBrowser" ~> 4.3.1` with Carthage. Demo OS and tool requirements are listed in the [README](../README_EN.md).
 
 ## Zoom scale basis
 
