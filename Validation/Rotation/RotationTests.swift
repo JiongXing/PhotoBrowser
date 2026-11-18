@@ -228,6 +228,146 @@ final class RotationTests: XCTestCase {
         XCTAssertEqual(browser.supportedInterfaceOrientations, .portrait)
     }
 
+    func testInitialPresentationUsesFinalContainerSize() {
+        for direction in [JXPhotoBrowserScrollDirection.horizontal, .vertical] {
+            for looping in [false, true] {
+                for spacing: CGFloat in [0, 20] {
+                    let presented = JXPhotoBrowserViewController()
+                    presented.delegate = data
+                    presented.initialIndex = 1
+                    presented.scrollDirection = direction
+                    presented.isLoopingEnabled = looping
+                    presented.itemSpacing = spacing
+                    presented.loadViewIfNeeded()
+                    presented.view.frame = CGRect(x: 0, y: 0, width: 466, height: 678)
+                    presented.reloadData(preservingCurrentPage: false)
+
+                    browser.addChild(presented)
+                    browser.view.addSubview(presented.view)
+                    presented.view.frame = CGRect(x: 0, y: 0, width: 951, height: 669)
+                    presented.didMove(toParent: browser)
+                    presented.view.setNeedsLayout()
+                    presented.view.layoutIfNeeded()
+                    presented.collectionView.layoutIfNeeded()
+
+                    let cv = presented.collectionView
+                    let virtualIndex = looping ? data.count * 5 + 1 : 1
+                    let stride = direction == .horizontal ? cv.bounds.width : cv.bounds.height
+                    let offset = direction == .horizontal ? cv.contentOffset.x : cv.contentOffset.y
+                    XCTAssertEqual(presented.pageIndex, 1)
+                    XCTAssertEqual(offset, CGFloat(virtualIndex) * stride, accuracy: 0.01)
+                    let frame = cv.layoutAttributesForItem(at: IndexPath(item: virtualIndex, section: 0))!.frame
+                    XCTAssertEqual(frame.size, presented.view.bounds.size)
+                    XCTAssertEqual(direction == .horizontal ? frame.minY : frame.minX, 0, accuracy: 0.01)
+
+                    presented.willMove(toParent: nil)
+                    presented.view.removeFromSuperview()
+                    presented.removeFromParent()
+                }
+            }
+        }
+    }
+
+    func testFullPageLayoutDoesNotAddSafeAreaInsets() {
+        browser.additionalSafeAreaInsets = UIEdgeInsets(top: 20, left: 30, bottom: 34, right: 84)
+        browser.view.setNeedsLayout()
+        browser.view.layoutIfNeeded()
+        browser.collectionView.layoutIfNeeded()
+        XCTAssertEqual(browser.collectionView.adjustedContentInset, browser.collectionView.contentInset)
+        assertPage(4)
+    }
+
+    func testSelectionBeforePresentationSurvivesInitialLayout() {
+        let presented = JXPhotoBrowserViewController()
+        presented.delegate = data
+        presented.initialIndex = 4
+        presented.isLoopingEnabled = false
+        presented.loadViewIfNeeded()
+        presented.scrollToPage(at: 2, animated: false)
+        data.count = 4
+        presented.reloadData()
+
+        browser.addChild(presented)
+        browser.view.addSubview(presented.view)
+        presented.view.frame = CGRect(x: 0, y: 0, width: 951, height: 669)
+        presented.didMove(toParent: browser)
+        presented.view.setNeedsLayout()
+        presented.view.layoutIfNeeded()
+        presented.collectionView.layoutIfNeeded()
+
+        XCTAssertEqual(presented.pageIndex, 2)
+        XCTAssertEqual(presented.collectionView.contentOffset.x, 2 * presented.collectionView.bounds.width, accuracy: 0.01)
+
+        presented.willMove(toParent: nil)
+        presented.view.removeFromSuperview()
+        presented.removeFromParent()
+    }
+
+    func testReloadWhileDetachedThenReattachAtSameSize() throws {
+        let embedded = JXPhotoBrowserViewController()
+        attachForPageSelection(embedded)
+        try assertVisiblePage(0, in: embedded)
+
+        embedded.view.removeFromSuperview()
+        XCTAssertNil(embedded.view.window)
+        embedded.initialIndex = 3
+        embedded.reloadData(preservingCurrentPage: false)
+        browser.view.addSubview(embedded.view)
+        browser.view.layoutIfNeeded()
+        embedded.view.layoutIfNeeded()
+        embedded.collectionView.layoutIfNeeded()
+
+        try assertVisiblePage(3, in: embedded)
+    }
+
+    func testVisibleReloadAfterOneTimeInitialScrollOverride() throws {
+        let embedded = OneTimeInitialScrollBrowser()
+        attachForPageSelection(embedded)
+        try assertVisiblePage(0, in: embedded)
+
+        embedded.initialIndex = 3
+        embedded.reloadData(preservingCurrentPage: false)
+        embedded.collectionView.layoutIfNeeded()
+
+        try assertVisiblePage(3, in: embedded)
+    }
+
+    func testInitialIndexSetAfterZeroSizedLoad() throws {
+        let embedded = ZeroSizedBrowser()
+        embedded.delegate = data
+        embedded.isLoopingEnabled = false
+        embedded.loadViewIfNeeded()
+        XCTAssertEqual(embedded.view.bounds.size, .zero)
+        embedded.initialIndex = 3
+
+        attachForPageSelection(embedded)
+        try assertVisiblePage(3, in: embedded)
+    }
+
+    private func attachForPageSelection(_ embedded: JXPhotoBrowserViewController) {
+        embedded.delegate = data
+        embedded.isLoopingEnabled = false
+        embedded.addOverlay(JXPageIndicatorOverlay())
+        browser.addChild(embedded)
+        embedded.view.frame = CGRect(x: 0, y: 0, width: 400, height: 400)
+        browser.view.addSubview(embedded.view)
+        embedded.didMove(toParent: browser)
+        embedded.view.setNeedsLayout()
+        embedded.view.layoutIfNeeded()
+        embedded.collectionView.layoutIfNeeded()
+    }
+
+    private func assertVisiblePage(_ expected: Int, in embedded: JXPhotoBrowserViewController,
+                                   file: StaticString = #filePath, line: UInt = #line) throws {
+        XCTAssertEqual(embedded.pageIndex, expected, file: file, line: line)
+        let indicator = try XCTUnwrap(embedded.overlays.first as? JXPageIndicatorOverlay, file: file, line: line)
+        XCTAssertEqual(indicator.pageControl.currentPage, expected, file: file, line: line)
+        let cell = try XCTUnwrap(embedded.visibleZoomImageCell(), file: file, line: line)
+        XCTAssertEqual(embedded.collectionView.indexPath(for: cell)?.item, expected, file: file, line: line)
+        XCTAssertEqual(embedded.collectionView.contentOffset.x, CGFloat(expected) * embedded.collectionView.bounds.width,
+                       accuracy: 0.01, file: file, line: line)
+    }
+
     func testItemSizeDoesNotFallBackToScreenWhenViewBoundsAreUnavailable() {
         browser.view.bounds = .zero
 
@@ -240,6 +380,22 @@ final class RotationTests: XCTestCase {
         XCTAssertEqual(size, .zero)
     }
 
+}
+
+private final class OneTimeInitialScrollBrowser: JXPhotoBrowserViewController {
+    private var positioned = false
+
+    override func scrollToInitialIndexIfNeeded() {
+        guard viewIfLoaded?.window != nil, !positioned else { return }
+        super.scrollToInitialIndexIfNeeded()
+        positioned = true
+    }
+}
+
+private final class ZeroSizedBrowser: JXPhotoBrowserViewController {
+    override func loadView() {
+        view = UIView(frame: .zero)
+    }
 }
 
 @MainActor

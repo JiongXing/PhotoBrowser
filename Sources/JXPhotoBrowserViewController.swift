@@ -162,6 +162,8 @@ open class JXPhotoBrowserViewController: UIViewController {
         cv.showsHorizontalScrollIndicator = false
         cv.showsVerticalScrollIndicator = false
         cv.isPagingEnabled = true
+        // 整页 Cell 已覆盖浏览器 bounds，不再由安全区缩小分页区域。
+        cv.contentInsetAdjustmentBehavior = .never
         
         // 注册默认Cell
         cv.register(JXZoomImageCell.self, forCellWithReuseIdentifier: JXZoomImageCell.reuseIdentifier)
@@ -182,6 +184,8 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 是否已滚动到初始位置（避免重复滚动）
     fileprivate var didScrollToInitial = false
+    private var preservesPageBeforeInitialLayout = false
+    private var needsReloadAlignment = false
     
     /// 交互手势
     private var panGesture: UIPanGestureRecognizer!
@@ -291,7 +295,11 @@ open class JXPhotoBrowserViewController: UIViewController {
             layout.invalidateLayout()
         }
         
-        scrollToInitialIndexIfNeeded()
+        if needsReloadAlignment {
+            alignReloadedPageIfNeeded()
+        } else {
+            scrollToInitialIndexIfNeeded()
+        }
         
         // 通知所有 Overlay 刷新数据（布局变化后更新位置和内容）
         let count = realCount
@@ -310,7 +318,9 @@ open class JXPhotoBrowserViewController: UIViewController {
         // 若存在进行中的程序化滚动（如自动轮播），应保留其目标页，避免回退到旧页；
         // 否则在旧布局仍然有效时，按当前 contentOffset 换算出的几何居中页，兼容拖拽/减速中的场景
         let preservedReal: Int
-        if isProgrammaticScrollAnimating, let targetVirtual = programmaticScrollTargetVirtual {
+        if needsReloadAlignment {
+            preservedReal = pageIndex
+        } else if isProgrammaticScrollAnimating, let targetVirtual = programmaticScrollTargetVirtual {
             preservedReal = realIndex(fromVirtual: targetVirtual)
         } else {
             preservedReal = realIndex(fromVirtual: calculateCurrentVirtualIndex())
@@ -547,33 +557,33 @@ open class JXPhotoBrowserViewController: UIViewController {
     
     /// 滚动到初始索引位置
     open func scrollToInitialIndexIfNeeded() {
-        guard didScrollToInitial == false else {
-            return
-        }
-        
-        guard view.window != nil else {
-            return
-        }
-        
-        let bounds = collectionView.bounds
-        if bounds.size == .zero {
-            return
-        }
+        guard !didScrollToInitial, !needsReloadAlignment, view.window != nil, realCount > 0,
+              hasValidPageSize else { return }
 
-        let count = realCount
-        guard count > 0 else {
-            return
-        }
-
-        let safeInitialIndex = JXPhotoBrowserPaging.normalizedInitialIndex(initialIndex, count: count, looping: isLoopingEnabled)
-
-        let target = centeredVirtualIndex(for: safeInitialIndex)
-        
-        collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
+        let target = preservesPageBeforeInitialLayout ? pageIndex
+            : JXPhotoBrowserPaging.normalizedInitialIndex(initialIndex, count: realCount, looping: isLoopingEnabled)
+        alignPage(target)
         didScrollToInitial = true
-        pageIndex = safeInitialIndex
-        
+        pageIndex = target
+
         // 初始定位完成后，启动自动轮播（支持嵌入式使用场景）
+        startAutoPlayIfNeeded()
+    }
+
+    private var hasValidPageSize: Bool {
+        view.bounds.width > 0 && view.bounds.height > 0 && collectionView.frame == calculateCollectionViewFrame()
+    }
+
+    private func alignPage(_ realIndex: Int) {
+        let target = centeredVirtualIndex(for: realIndex)
+        collectionView.scrollToItem(at: IndexPath(item: target, section: 0), at: scrollDirection.scrollPosition, animated: false)
+    }
+
+    private func alignReloadedPageIfNeeded() {
+        guard needsReloadAlignment, hasValidPageSize else { return }
+        needsReloadAlignment = false
+        alignPage(pageIndex)
+        didScrollToInitial = true
         startAutoPlayIfNeeded()
     }
     
@@ -612,6 +622,7 @@ open class JXPhotoBrowserViewController: UIViewController {
               !isSynchronizingData,
               !isUserInteracting,
               !isProgrammaticScrollAnimating,
+              !needsReloadAlignment,
               didScrollToInitial,
               isViewLoaded,
               view.window != nil else { return false }
@@ -733,6 +744,14 @@ open class JXPhotoBrowserViewController: UIViewController {
         guard count > 0, (0..<count).contains(index) else { return }
         resetDismissInteraction(animated: false)
 
+        if !didScrollToInitial {
+            preservesPageBeforeInitialLayout = true
+            if view.window == nil || !hasValidPageSize {
+                pageIndex = index
+                return
+            }
+        }
+
         sizeTransition?.pageIndex = index
         stopAutoPlay()
 
@@ -758,7 +777,8 @@ open class JXPhotoBrowserViewController: UIViewController {
         guard realCount > 0 else {
             sizeTransition?.pageIndex = nil
             pageIndex = 0
-            didScrollToInitial = false
+            needsReloadAlignment = false
+            preservesPageBeforeInitialLayout = false
             overlays.forEach { $0.reloadData(numberOfItems: 0, pageIndex: 0) }
             return
         }
@@ -766,17 +786,16 @@ open class JXPhotoBrowserViewController: UIViewController {
         let targetReal = preservingCurrentPage
             ? max(0, min(previousPage, realCount - 1))
             : JXPhotoBrowserPaging.normalizedInitialIndex(initialIndex, count: realCount, looping: isLoopingEnabled)
-        let targetVirtual = centeredVirtualIndex(for: targetReal)
         sizeTransition?.pageIndex = targetReal
-
-        collectionView.layoutIfNeeded()
-        if collectionView.bounds.size != .zero {
-            collectionView.scrollToItem(at: IndexPath(item: targetVirtual, section: 0), at: scrollDirection.scrollPosition, animated: false)
-            didScrollToInitial = true
-        } else {
-            didScrollToInitial = false
-        }
         pageIndex = targetReal
+        if didScrollToInitial || view.window != nil {
+            // 已定位的浏览器可以按当前尺寸在离窗时刷新，同尺寸重新挂载不一定会触发布局。
+            needsReloadAlignment = true
+            alignReloadedPageIfNeeded()
+            if needsReloadAlignment { view.setNeedsLayout() }
+        } else {
+            preservesPageBeforeInitialLayout = preservingCurrentPage
+        }
         overlays.forEach { $0.reloadData(numberOfItems: realCount, pageIndex: targetReal) }
 
         if transitionType == .zoom, view.window != nil {

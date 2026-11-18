@@ -14,7 +14,7 @@ import JXPhotoBrowser
 import Kingfisher
 
 // MARK: - ViewController
-class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
+class DemoViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     
     /// Banner 设置面板（控制无限循环、自动轮播）
     private var bannerSettingsPanel: BannerSettingsPanel!
@@ -23,6 +23,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     private var browserSettingsPanel: BrowserSettingsPanel!
     
     private var collectionView: UICollectionView!
+    private let collectionViewLayout = UICollectionViewFlowLayout()
     
     /// 顶部横向 Banner 视图
     private var photoBannerView: PhotoBannerView!
@@ -35,8 +36,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     // 数据源
     private var items: [DemoMedia] = []
-    
-    private weak var photoBrowser: JXPhotoBrowserViewController?
     
     /// 是否允许自动旋转（固定为 false，不支持设备旋转）
     open override var shouldAutorotate: Bool {
@@ -56,6 +55,18 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         setupBrowserSettingsPanel()
         setupCollectionView()
         setupNetworkMonitoring()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let columns: CGFloat = 3
+        let layout = collectionViewLayout
+        let totalSpacing = layout.sectionInset.left + layout.sectionInset.right + layout.minimumInteritemSpacing * (columns - 1)
+        let itemWidth = floor((collectionView.bounds.width - totalSpacing) / columns)
+        let itemSize = CGSize(width: itemWidth, height: itemWidth)
+        if layout.itemSize != itemSize {
+            layout.itemSize = itemSize
+        }
     }
     
     
@@ -143,7 +154,7 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     private func setupCollectionView() {
-        let layout = UICollectionViewFlowLayout()
+        let layout = collectionViewLayout
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 8
@@ -178,26 +189,10 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MediaThumbnailCell.reuseIdentifier, for: indexPath) as! MediaThumbnailCell
         cell.configure(with: items[indexPath.item])
-        if let browser = photoBrowser, browser.pageIndex == indexPath.item {
-            cell.imageView.isHidden = true
-        } else {
-            cell.imageView.isHidden = false
-        }
         return cell
     }
     
-    // MARK: - DelegateFlowLayout
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let flowLayout = collectionViewLayout as? UICollectionViewFlowLayout else {
-            return CGSize(width: 100, height: 100)
-        }
-        let columns: CGFloat = 3
-        let totalSpacing = flowLayout.sectionInset.left + flowLayout.sectionInset.right + flowLayout.minimumInteritemSpacing * (columns - 1)
-        let availableWidth = collectionView.bounds.width - totalSpacing
-        let itemWidth = floor(availableWidth / columns)
-        return CGSize(width: itemWidth, height: itemWidth)
-    }
-    
+    // MARK: - Delegate
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let browser = JXPhotoBrowserViewController()
         browser.register(VideoPlayerCell.self, forReuseIdentifier: VideoPlayerCell.videoReuseIdentifier)
@@ -209,7 +204,6 @@ class DemoViewController: UIViewController, UICollectionViewDataSource, UICollec
         browser.transitionType = browserSettingsPanel.transitionType
         browser.itemSpacing = 20
         
-        self.photoBrowser = browser
         browser.present(from: self)
     }
     
@@ -278,14 +272,6 @@ extension DemoViewController: JXPhotoBrowserDelegate {
         let ip = IndexPath(item: index, section: 0)
         guard let cell = collectionView.cellForItem(at: ip) as? MediaThumbnailCell else { return nil }
         return cell.imageView
-    }
-    
-    // 控制缩略图的显隐（Zoom 转场时隐藏源视图，避免视觉重叠）
-    func photoBrowser(_ browser: JXPhotoBrowserViewController, setThumbnailHidden hidden: Bool, at index: Int) {
-        let ip = IndexPath(item: index, section: 0)
-        if let cell = collectionView.cellForItem(at: ip) as? MediaThumbnailCell {
-            cell.imageView.isHidden = hidden
-        }
     }
 }
 
